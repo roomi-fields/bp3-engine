@@ -70,6 +70,7 @@ Boolean LoadedStartString = FALSE;
 BPConsoleOpts gOptions;
 
 
+#ifndef __BP3_WASM__
 int main (int argc, char* args[])
 {
 	int  result;
@@ -212,6 +213,7 @@ int main (int argc, char* args[])
 	// CloseCurrentDriver(FALSE);
 	return EXIT_SUCCESS;
 }
+#endif /* __BP3_WASM__ */
 
 void ConsoleInit(BPConsoleOpts* opts)
 {

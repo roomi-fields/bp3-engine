@@ -1,26 +1,36 @@
-# Top-level .gitignore for Bol Processor repository
-# Git will ignore these files and directories
+# RTFM local database
+.rtfm/
 
-# Finder and OS X metadata files
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dev-debug.log
+# Dependency directories
+node_modules/
+# Environment variables
+.env
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+# OS specific
 .DS_Store
 
-# Xcode per-user settings
-*.mode1
-*.mode1v3
-*.pbxuser
-*.xcworkspace
-xcuserdata/
-
-# Xcode build artifacts
+# Build artifacts
 build/
-DerivedData/
-bp32
-bp64
-bpconsole
 
-# Command-line build artifacts
-*.o
-bp
+# WASM binaries in dist (large files)
+dist*/bp3.wasm
+dist*/bp3.data
+dist*/bp3.js
 
-# BP2 decoded resource files
-resources/decoded_resources/
+# Task files
+# tasks.json
+# tasks/

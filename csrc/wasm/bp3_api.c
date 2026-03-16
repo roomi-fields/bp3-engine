@@ -213,10 +213,12 @@ int bp3_load_alphabet(const char* text) {
     return 0;
 }
 
+/* bp3_load_settings: kept for backward compatibility but should not be used.
+   LoadSettings() expects Bernard's -se format, not arbitrary JSON.
+   Use bp3_load_settings_params() instead. */
 EMSCRIPTEN_KEEPALIVE
 int bp3_load_settings(const char* json_content) {
     if(!json_content || json_content[0] == '\0') return -1;
-    /* Write JSON content to virtual filesystem, then call LoadSettings */
     FILE* f = fopen("/tmp_settings.json", "w");
     if(!f) return -2;
     fputs(json_content, f);
@@ -224,6 +226,37 @@ int bp3_load_settings(const char* json_content) {
     int r = LoadSettings("/tmp_settings.json", FALSE);
     remove("/tmp_settings.json");
     return (r == OK) ? 0 : -3;
+}
+
+/* bp3_load_settings_params: set engine parameters directly without file I/O.
+   noteConvention: 0=English, 1=French, 2=Indian, 3=Keys
+   quantize: quantization in ms (0 = off)
+   timeRes: time resolution in ms
+   natureOfTime: 0=smooth, 1=striated
+   seed: random seed (0 = don't change)
+   maxTime: max computation time in seconds (0 = no limit)
+*/
+EMSCRIPTEN_KEEPALIVE
+int bp3_load_settings_params(int noteConvention, int quantize, int timeRes,
+                              int natureOfTime, int seed, int maxTime) {
+    NoteConvention = noteConvention;
+    Quantize = quantize;
+    Time_res = (long)timeRes;
+    Nature_of_time = natureOfTime;
+
+    if(seed > 0) {
+        Seed = (unsigned)(((long)seed) % 32768L);
+        ReseedOrShuffle(seed);
+    }
+
+    if(maxTime > 0) MaxConsoleTime = (long)maxTime;
+    else MaxConsoleTime = 0;  /* No limit */
+
+    /* Force recompilation since note convention may have changed */
+    CompiledGr = FALSE;
+    CompiledAl = FALSE;
+
+    return 0;
 }
 
 EMSCRIPTEN_KEEPALIVE

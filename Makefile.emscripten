@@ -7,8 +7,8 @@
 CC = emcc
 
 # Source directories
-BP3_SRC = source/BP2
-WASM_SRC = source/wasm
+BP3_SRC = csrc/bp3
+WASM_SRC = csrc/wasm
 
 # Compiler flags
 CFLAGS = -O2 \
@@ -26,7 +26,7 @@ LDFLAGS = \
 	-s EXPORTED_RUNTIME_METHODS='["ccall","cwrap","UTF8ToString","FS"]' \
 	-s ALLOW_MEMORY_GROWTH=1 \
 	-s INITIAL_MEMORY=33554432 \
-	-s STACK_SIZE=2097152 \
+	-s STACK_SIZE=8388608 \
 	-s MODULARIZE=1 \
 	-s EXPORT_NAME='BP3Module' \
 	-s FILESYSTEM=1 \
@@ -47,6 +47,7 @@ BP3_SRCS = \
 	$(BP3_SRC)/Misc.c \
 	$(BP3_SRC)/Strings.c \
 	$(BP3_SRC)/CTextHandles.c \
+	$(BP3_SRC)/cJSON.c \
 	$(BP3_SRC)/Encode.c \
 	$(BP3_SRC)/Polymetric.c \
 	$(BP3_SRC)/FillPhaseDiagram.c \
@@ -56,6 +57,7 @@ BP3_SRCS = \
 	$(BP3_SRC)/SetObjectFeatures.c \
 	$(BP3_SRC)/TimeSetFunctions.c \
 	$(BP3_SRC)/TimeSet.c \
+	$(BP3_SRC)/Tonality.c \
 	$(BP3_SRC)/Arithmetic.c \
 	$(BP3_SRC)/Automata.c \
 	$(BP3_SRC)/Zouleb.c \

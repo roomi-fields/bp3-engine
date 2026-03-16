@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 process.chdir(path.join(__dirname, '..', 'build'));
 
-const BP3_CTESTS = '/mnt/d/Claude/musicology-phd/scratch/bp3-ctests';
+const BP3_CTESTS = path.join(__dirname, '..', 'test-data');
 
 function convertOldSettings(content) {
     const lines = content.split('\n');

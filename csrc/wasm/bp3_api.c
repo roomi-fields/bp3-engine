@@ -404,3 +404,82 @@ EMSCRIPTEN_KEEPALIVE
 int bp3_get_midi_event_count(void) {
     return (int)eventCount;
 }
+
+/* ---- Timed tokens extraction ---- */
+/* Reads p_Instance[] (filled by TimeSet) + p_Bol[] (terminal names)
+   to produce a JSON array of { token, start, end, vel, chan, trans, ins } */
+
+#define TOKEN_JSON_BUF_SIZE (512 * 1024)
+static char token_json_buffer[TOKEN_JSON_BUF_SIZE];
+
+EMSCRIPTEN_KEEPALIVE
+const char* bp3_get_timed_tokens(void) {
+    int pos = 0;
+    int remaining, written;
+    int count = 0;
+
+    pos += snprintf(token_json_buffer + pos, TOKEN_JSON_BUF_SIZE - pos, "[");
+
+    if(p_Instance == NULL || *p_Instance == NULL || Maxevent < 3) {
+        token_json_buffer[pos++] = ']';
+        token_json_buffer[pos] = '\0';
+        return token_json_buffer;
+    }
+
+    for(long k = 2; k < Maxevent; k++) {
+        int j = (*p_Instance)[k].object;
+        if(j == 0) continue;
+        if(j < 0) j = -j;
+
+        /* Get terminal name from p_Bol, or reconstruct from MIDI key */
+        const char *name = "?";
+        static char note_name[64];
+        if(j >= 16384) {
+            /* Simple note: MIDI key encoded as object - 16384.
+               Use PrintThisNote to get the symbolic name (C4, Do3, sa6...) */
+            int key = j - 16384;
+            int scale = (*p_Instance)[k].scale;
+            PrintThisNote(scale, midiKey, -1, -1, note_name);
+            name = note_name;
+        } else if(j > 1 && j < Jbol && p_Bol != NULL && (*p_Bol)[j] != NULL
+           && *((*p_Bol)[j]) != NULL) {
+            name = *((*p_Bol)[j]);
+        }
+
+        remaining = TOKEN_JSON_BUF_SIZE - pos - 2;
+        if(remaining < 256) break;
+
+        if(count > 0) token_json_buffer[pos++] = ',';
+
+        written = snprintf(token_json_buffer + pos, remaining,
+            "{\"token\":\"%s\",\"start\":%ld,\"end\":%ld,"
+            "\"vel\":%d,\"chan\":%d,\"trans\":%d,\"ins\":%d}",
+            name,
+            (long)(*p_Instance)[k].starttime,
+            (long)(*p_Instance)[k].endtime,
+            (int)(*p_Instance)[k].velocity,
+            (int)(*p_Instance)[k].channel,
+            (int)(*p_Instance)[k].transposition,
+            (int)(*p_Instance)[k].instrument);
+
+        if(written > 0 && written < remaining) {
+            pos += written;
+            count++;
+        } else break;
+    }
+
+    token_json_buffer[pos++] = ']';
+    token_json_buffer[pos] = '\0';
+    return token_json_buffer;
+}
+
+EMSCRIPTEN_KEEPALIVE
+int bp3_get_timed_token_count(void) {
+    int count = 0;
+    if(p_Instance == NULL || *p_Instance == NULL || Maxevent < 3)
+        return 0;
+    for(long k = 2; k < Maxevent; k++) {
+        if((*p_Instance)[k].object != 0) count++;
+    }
+    return count;
+}

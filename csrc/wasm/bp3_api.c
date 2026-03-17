@@ -319,9 +319,17 @@ int bp3_produce(void) {
        Without this, Improvize grammars loop 20+ items then return ABORT. */
     Improvize = FALSE;
 
+    /* Redirect stdout to /dev/null during production to avoid JS stack overflow.
+       Every printf/fprintf(stdout) in BP3's C code triggers a WASM→JS syscall (fd_write).
+       Deep recursion (Compute.c has 542 printf calls) exhausts the JS call stack.
+       Output is captured via the BPPrintMessage callback instead. */
+    freopen("/dev/null", "w", stdout);
+
     emscripten_log(EM_LOG_CONSOLE, "bp3_produce: calling ProduceItems...");
     result = ProduceItems(wStartString, FALSE, FALSE, NULL);
     emscripten_log(EM_LOG_CONSOLE, "bp3_produce: done, result=%d", result);
+
+    freopen("/dev/stdout", "w", stdout);
     return result;
 }
 

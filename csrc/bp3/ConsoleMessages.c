@@ -61,14 +61,23 @@ static FILE*	gOutDestinations[MAXOUTDEST] =
 static bp_message_callback_t	gMessageCallback = NULL;
 
 void ConsoleMessagesInit() {
-    gOutDestinations[odiDisplay] = stdout;
-    gOutDestinations[odiMidiDump] = stdout;
-    gOutDestinations[odiCsScore] = stdout;
-    gOutDestinations[odiTrace] = stdout;
-    gOutDestinations[odiInfo] = stdout;
-    gOutDestinations[odiWarning] = stdout;
-    gOutDestinations[odiError] = stdout;
-    gOutDestinations[odiUserInt] = stdout;
+#ifdef __BP3_WASM__
+    /* WASM: don't write to stdout — all output goes through the message callback.
+       fprintf(stdout) in WASM triggers JS syscalls (fd_write) which consume JS stack.
+       Deep recursion in Compute.c (118 BPPrintMessage calls × recursion depth)
+       causes "Maximum call stack size exceeded" on complex grammars (vina3). */
+    FILE* dest = NULL;
+#else
+    FILE* dest = stdout;
+#endif
+    gOutDestinations[odiDisplay] = dest;
+    gOutDestinations[odiMidiDump] = dest;
+    gOutDestinations[odiCsScore] = dest;
+    gOutDestinations[odiTrace] = dest;
+    gOutDestinations[odiInfo] = dest;
+    gOutDestinations[odiWarning] = dest;
+    gOutDestinations[odiError] = dest;
+    gOutDestinations[odiUserInt] = dest;
     }
 
 void SetOutputDestinations(int dest, FILE* file) {
@@ -104,49 +113,50 @@ int BPPrintMessage(int force,int dest, const char *format, ...) {
         va_end(args);
     }
 
-    // Handle standard destinations
-    if(dest & odDisplay) {
+    // Handle standard destinations (skip if NULL — WASM uses callback only)
+    if((dest & odDisplay) && gOutDestinations[odiDisplay] != NULL) {
         va_start(args, format);
         vfprintf(gOutDestinations[odiDisplay], format, args);
         va_end(args);
     }
-    if(dest & odMidiDump) {
+    if((dest & odMidiDump) && gOutDestinations[odiMidiDump] != NULL) {
         va_start(args, format);
         vfprintf(gOutDestinations[odiMidiDump], format, args);
         va_end(args);
     }
-    if(dest & odCsScore) {
+    if((dest & odCsScore) && gOutDestinations[odiCsScore] != NULL) {
         va_start(args, format);
         vfprintf(gOutDestinations[odiCsScore], format, args);
         va_end(args);
     }
-    if(dest & odTrace) {
+    if((dest & odTrace) && gOutDestinations[odiTrace] != NULL) {
         va_start(args, format);
         vfprintf(gOutDestinations[odiTrace], format, args);
         va_end(args);
     }
-    if(dest & odUserInt) {
+    if((dest & odUserInt) && gOutDestinations[odiUserInt] != NULL) {
         va_start(args, format);
         vfprintf(gOutDestinations[odiUserInt], format, args);
         va_end(args);
     }
     if(dest & odError) {
         va_start(args, format);
-    //    vfprintf(gOutDestinations[odiError], format, args);
+#ifndef __BP3_WASM__
         vfprintf(stdout, format, args);
+#endif
         va_end(args);
     }
-    if((dest & odWarning) && !PlayAllChunks && (!Improvize || ItemNumber < 1)) {
+    if((dest & odWarning) && gOutDestinations[odiWarning] != NULL && !PlayAllChunks && (!Improvize || ItemNumber < 1)) {
         va_start(args, format);
         vfprintf(gOutDestinations[odiWarning], format, args);
         va_end(args);
     }
     if((dest & odInfo) && (((!Improvize || ItemNumber < 1) && !HideMessages && !PlayAllChunks) || force)) {
         va_start(args, format);
-   //     fprintf(stderr, "ok %s\n",format);
-   //     vfprintf(gOutDestinations[odiInfo], format, args);
+#ifndef __BP3_WASM__
         result = vfprintf(stdout, format, args);
         if(result < 0) fprintf(stderr, "Error occurred during writing to stdout.\n");
+#endif
         va_end(args);
         }
 	return OK;

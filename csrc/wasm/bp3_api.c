@@ -133,9 +133,9 @@ int bp3_init(void) {
     TraceMIDIinteraction = FALSE;
     TimeStopped = Oldtimestopped = 0L;
     MIDIsyncDelay = 380;
-    DisplayItems = FALSE;  /* Must be FALSE in WASM — TRUE causes stack overflow
-                               on complex grammars (Visser3: 7593 tokens).
-                               Output is retrieved via bp3_get_result() from TEH[OutputWindow]. */
+    DisplayItems = FALSE;  /* FALSE avoids stack overflow on complex grammars (Visser3).
+                               Output is captured via BPPrintMessage(odDisplay) callback
+                               into output_buffer, retrieved by bp3_get_result(). */
 
     NoteOffInputFilter = NoteOnInputFilter = KeyPressureInputFilter =
     ControlTypeInputFilter = ProgramTypeInputFilter =
@@ -189,13 +189,15 @@ int bp3_init(void) {
     ReseedOrShuffle(NEWSEED);
     CopyStringToTextHandle(TEH[wStartString], "S\n");
 
-    /* Call LoadSettings with minimal defaults to initialize internal state.
-       Without this, complex grammars (Visser3) crash — LoadSettings performs
-       essential setup beyond just assigning variables (memory layout, defaults). */
+    /* Call LoadSettings to initialize internal state (memory layout, defaults).
+       Without this call, complex grammars (Visser3) crash with SIGSEGV.
+       DisplayItems=1 is set so PrintResult writes text output to TEH[OutputWindow].
+       For complex grammars that cause stack overflow, the caller should pass
+       DisplayItems=0 via bp3_load_settings() before bp3_produce(). */
     {
         FILE* f = fopen("/tmp_init_settings.json", "w");
         if(f) {
-            fputs("{\"DisplayItems\":{\"name\":\"Display items\",\"value\":\"0\",\"boolean\":\"1\"}}", f);
+            fputs("{\"DisplayItems\":{\"name\":\"Display items\",\"value\":\"1\",\"boolean\":\"1\"}}", f);
             fclose(f);
             LoadSettings("/tmp_init_settings.json", FALSE);
             remove("/tmp_init_settings.json");

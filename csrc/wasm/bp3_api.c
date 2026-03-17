@@ -424,90 +424,141 @@ static int json_escape(char *dst, int maxlen, const char *src, int srclen) {
     return i;
 }
 
+extern long wasm_last_kmax;
+
+/* Control token storage for timed_tokens */
+typedef struct { const char *start; int len; int after_n; } ControlEntry;
+#define MAX_CONTROLS 256
+static ControlEntry ctrl_buf[MAX_CONTROLS];
+
+/* Helper: parse text tokens, skip delimiters, handle parentheses */
+static const char* next_token(const char *p, const char **tok_start, int *tok_len) {
+    while(*p && (*p == ' ' || *p == '\t' || *p == '\n' || *p == '\r')) p++;
+    if(!*p) return NULL;
+    if(*p == '{' || *p == '}' || *p == ',') { *tok_start = NULL; *tok_len = 0; return p + 1; }
+    *tok_start = p;
+    int pd = 0;
+    while(*p) {
+        if(*p == '(') pd++;
+        else if(*p == ')') { pd--; if(pd <= 0) { p++; break; } }
+        else if(pd == 0 && (*p == ' ' || *p == '\t' || *p == '\n' ||
+                *p == '\r' || *p == '{' || *p == '}' || *p == ',')) break;
+        p++;
+    }
+    *tok_len = (int)(p - *tok_start);
+    return p;
+}
+
 EMSCRIPTEN_KEEPALIVE
 const char* bp3_get_timed_tokens(void) {
-    int pos = 0;
-    int remaining, written;
-    int count = 0;
-    long inst_idx = 2;  /* p_Instance[0,1] are reserved */
-    char escaped[512];
+    int pos = 0, remaining, written, count = 0;
+    int has_inst, n_controls, sounding_seen, sounding_emitted, ctrl_idx;
+    long kmax, k, start_ms, end_ms;
+    int j, tl;
+    char escaped[512], note_name[64];
+    const char *text, *p, *ts, *name;
 
     pos += snprintf(token_json_buffer + pos, TOKEN_JSON_BUF_SIZE - pos, "[");
 
-    /* Get the text result — this contains ALL tokens in order */
-    const char *text = bp3_get_result();
-    if(text == NULL || text[0] == '\0') {
-        token_json_buffer[pos++] = ']';
-        token_json_buffer[pos] = '\0';
-        return token_json_buffer;
+    has_inst = (p_Instance != NULL && *p_Instance != NULL && wasm_last_kmax > 1);
+    kmax = wasm_last_kmax;
+    text = bp3_get_result();
+
+    if(!has_inst) {
+        /* No timing data — text-only tokens */
+        if(text == NULL || text[0] == '\0') goto FINISH_TOKENS;
+        p = text;
+        while((p = next_token(p, &ts, &tl)) != NULL) {
+            if(ts == NULL || tl <= 0 || tl >= 500) continue;
+            remaining = TOKEN_JSON_BUF_SIZE - pos - 2;
+            if(remaining < 300) break;
+            if(count > 0) token_json_buffer[pos++] = ',';
+            json_escape(escaped, sizeof(escaped), ts, tl);
+            written = snprintf(token_json_buffer + pos, remaining,
+                "{\"token\":\"%s\",\"start\":0,\"end\":0}", escaped);
+            if(written > 0 && written < remaining) { pos += written; count++; }
+        }
+        goto FINISH_TOKENS;
     }
 
-    int has_inst = (p_Instance != NULL && *p_Instance != NULL && Maxevent > 2);
-
-    const char *p = text;
-    while(*p) {
-        /* Skip whitespace */
-        while(*p && (*p == ' ' || *p == '\t' || *p == '\n' || *p == '\r')) p++;
-        if(!*p) break;
-
-        /* Skip structural delimiters — they're not tokens */
-        if(*p == '{' || *p == '}' || *p == ',') { p++; continue; }
-
-        /* Extract one token */
-        const char *tok_start = p;
-        int paren_depth = 0;
-        while(*p) {
-            if(*p == '(') paren_depth++;
-            else if(*p == ')') { paren_depth--; if(paren_depth <= 0) { p++; break; } }
-            else if(paren_depth == 0 && (*p == ' ' || *p == '\t' || *p == '\n' ||
-                    *p == '\r' || *p == '{' || *p == '}' || *p == ',')) break;
-            p++;
-        }
-        int tok_len = p - tok_start;
-        if(tok_len <= 0 || tok_len >= 500) continue;
-
-        /* Determine if this token is a control (starts with _) */
-        int is_control = (tok_start[0] == '_');
-
-        /* Get timing from p_Instance */
-        long start_ms = 0, end_ms = 0;
-
-        if(has_inst && !is_control) {
-            /* Sounding token (note or silence): consume next p_Instance entry */
-            while(inst_idx < Maxevent && (*p_Instance)[inst_idx].object == 0)
-                inst_idx++;
-            if(inst_idx < Maxevent) {
-                start_ms = (long)(*p_Instance)[inst_idx].starttime;
-                end_ms = (long)(*p_Instance)[inst_idx].endtime;
-                inst_idx++;
-            }
-        } else if(has_inst && is_control) {
-            /* Control token: peek at next sounding event's start time */
-            long peek = inst_idx;
-            while(peek < Maxevent && (*p_Instance)[peek].object == 0)
-                peek++;
-            if(peek < Maxevent) {
-                start_ms = (long)(*p_Instance)[peek].starttime;
-                end_ms = start_ms;
+    /* First pass: collect controls from text with their position */
+    n_controls = 0;
+    sounding_seen = 0;
+    if(text != NULL && text[0] != '\0') {
+        p = text;
+        while((p = next_token(p, &ts, &tl)) != NULL) {
+            if(ts == NULL || tl <= 0) continue;
+            if(ts[0] == '_' && n_controls < MAX_CONTROLS) {
+                ctrl_buf[n_controls].start = ts;
+                ctrl_buf[n_controls].len = tl;
+                ctrl_buf[n_controls].after_n = sounding_seen;
+                n_controls++;
+            } else {
+                sounding_seen++;
             }
         }
+    }
 
-        /* Write JSON */
+    /* Second pass: iterate p_Instance[2..kmax] and emit tokens with timing.
+       object encoding: 0=empty, 1=silence, 2..Jbol=terminal, >=16384=note, -1=end */
+    sounding_emitted = 0;
+    ctrl_idx = 0;
+    for(k = 2; k <= kmax; k++) {
+        j = (*p_Instance)[k].object;
+        if(j == 0) continue;
+        if(j == -1) break;
+
+        start_ms = (long)(*p_Instance)[k].starttime;
+        end_ms = (long)(*p_Instance)[k].endtime;
+
+        /* Emit controls that come before this sounding token */
+        while(ctrl_idx < n_controls && ctrl_buf[ctrl_idx].after_n <= sounding_emitted) {
+            remaining = TOKEN_JSON_BUF_SIZE - pos - 2;
+            if(remaining < 300) goto FINISH_TOKENS;
+            if(count > 0) token_json_buffer[pos++] = ',';
+            json_escape(escaped, sizeof(escaped), ctrl_buf[ctrl_idx].start, ctrl_buf[ctrl_idx].len);
+            written = snprintf(token_json_buffer + pos, remaining,
+                "{\"token\":\"%s\",\"start\":%ld,\"end\":%ld}", escaped, start_ms, start_ms);
+            if(written > 0 && written < remaining) { pos += written; count++; }
+            ctrl_idx++;
+        }
+
+        /* Get token name */
+        if(j == 1) {
+            name = "-";
+        } else if(j >= 16384) {
+            PrintThisNote((*p_Instance)[k].scale, j - 16384, -1, -1, note_name);
+            name = note_name;
+        } else if(j > 1 && j < Jbol && p_Bol != NULL && (*p_Bol)[j] != NULL
+                  && *((*p_Bol)[j]) != NULL) {
+            name = *((*p_Bol)[j]);
+        } else {
+            name = "?";
+        }
+
+        remaining = TOKEN_JSON_BUF_SIZE - pos - 2;
+        if(remaining < 300) goto FINISH_TOKENS;
+        if(count > 0) token_json_buffer[pos++] = ',';
+        json_escape(escaped, sizeof(escaped), name, strlen(name));
+        written = snprintf(token_json_buffer + pos, remaining,
+            "{\"token\":\"%s\",\"start\":%ld,\"end\":%ld}", escaped, start_ms, end_ms);
+        if(written > 0 && written < remaining) { pos += written; count++; }
+        sounding_emitted++;
+    }
+
+    /* Emit remaining controls */
+    while(ctrl_idx < n_controls) {
         remaining = TOKEN_JSON_BUF_SIZE - pos - 2;
         if(remaining < 300) break;
         if(count > 0) token_json_buffer[pos++] = ',';
-
-        json_escape(escaped, sizeof(escaped), tok_start, tok_len);
+        json_escape(escaped, sizeof(escaped), ctrl_buf[ctrl_idx].start, ctrl_buf[ctrl_idx].len);
         written = snprintf(token_json_buffer + pos, remaining,
-            "{\"token\":\"%s\",\"start\":%ld,\"end\":%ld}",
-            escaped, start_ms, end_ms);
-
-        if(written > 0 && written < remaining) {
-            pos += written;
-            count++;
-        } else break;
+            "{\"token\":\"%s\",\"start\":0,\"end\":0}", escaped);
+        if(written > 0 && written < remaining) { pos += written; count++; }
+        ctrl_idx++;
     }
 
+FINISH_TOKENS:
     token_json_buffer[pos++] = ']';
     token_json_buffer[pos] = '\0';
     return token_json_buffer;

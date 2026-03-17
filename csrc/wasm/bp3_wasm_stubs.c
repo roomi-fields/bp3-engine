@@ -11,6 +11,9 @@
 #include "-BP3.h"
 #include "-BP3decl.h"
 
+/* Global: kmax from last TimeSet call, used by bp3_get_timed_tokens() */
+long wasm_last_kmax = 0;
+
 /* ============================================================
  * MIDIdriver.c stubs
  * ============================================================ */
@@ -260,6 +263,7 @@ int PlayBuffer1(tokenbyte ***pp_buff, int onlypianoroll) {
     emscripten_log(EM_LOG_CONSOLE, "PlayBuffer1: calling TimeSet...");
     SetTimeOn = TRUE; nmax = 0;
     result = TimeSet(pp_buff, &kmax, &tmin, &tmax, &maxseq, &nmax, p_imaxseq, maxseqapprox);
+    wasm_last_kmax = kmax;
     emscripten_log(EM_LOG_CONSOLE, "PlayBuffer1: TimeSet result=%d kmax=%ld nmax=%d", result, kmax, nmax);
     SetTimeOn = FALSE;
     if(result != OK && result != AGAIN) {

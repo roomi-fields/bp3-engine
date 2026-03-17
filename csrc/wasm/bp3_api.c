@@ -406,61 +406,101 @@ int bp3_get_midi_event_count(void) {
 }
 
 /* ---- Timed tokens extraction ---- */
-/* Reads p_Instance[] (filled by TimeSet) + p_Bol[] (terminal names)
-   to produce a JSON array of { token, start, end, vel, chan, trans, ins } */
+/* Correlates text output (all token names including controls, silences)
+   with p_Instance[] timing (filled by TimeSet for sounding objects).
+   Produces: [{"token":"_vel(80)","start":0,"end":0}, {"token":"C4","start":0,"end":1000}, ...] */
 
 #define TOKEN_JSON_BUF_SIZE (512 * 1024)
 static char token_json_buffer[TOKEN_JSON_BUF_SIZE];
+
+/* Escape a string for JSON output */
+static int json_escape(char *dst, int maxlen, const char *src, int srclen) {
+    int i = 0;
+    for(int s = 0; s < srclen && i < maxlen - 2; s++) {
+        if(src[s] == '"' || src[s] == '\\') dst[i++] = '\\';
+        dst[i++] = src[s];
+    }
+    dst[i] = '\0';
+    return i;
+}
 
 EMSCRIPTEN_KEEPALIVE
 const char* bp3_get_timed_tokens(void) {
     int pos = 0;
     int remaining, written;
     int count = 0;
+    long inst_idx = 2;  /* p_Instance[0,1] are reserved */
+    char escaped[512];
 
     pos += snprintf(token_json_buffer + pos, TOKEN_JSON_BUF_SIZE - pos, "[");
 
-    if(p_Instance == NULL || *p_Instance == NULL || Maxevent < 3) {
+    /* Get the text result — this contains ALL tokens in order */
+    const char *text = bp3_get_result();
+    if(text == NULL || text[0] == '\0') {
         token_json_buffer[pos++] = ']';
         token_json_buffer[pos] = '\0';
         return token_json_buffer;
     }
 
-    for(long k = 2; k < Maxevent; k++) {
-        int j = (*p_Instance)[k].object;
-        if(j == 0) continue;
-        if(j < 0) j = -j;
+    int has_inst = (p_Instance != NULL && *p_Instance != NULL && Maxevent > 2);
 
-        /* Get terminal name from p_Bol, or reconstruct from MIDI key */
-        const char *name = "?";
-        static char note_name[64];
-        if(j >= 16384) {
-            /* Simple note: MIDI key encoded as object - 16384.
-               Use PrintThisNote to get the symbolic name (C4, Do3, sa6...) */
-            int key = j - 16384;
-            int scale = (*p_Instance)[k].scale;
-            PrintThisNote(scale, midiKey, -1, -1, note_name);
-            name = note_name;
-        } else if(j > 1 && j < Jbol && p_Bol != NULL && (*p_Bol)[j] != NULL
-           && *((*p_Bol)[j]) != NULL) {
-            name = *((*p_Bol)[j]);
+    const char *p = text;
+    while(*p) {
+        /* Skip whitespace */
+        while(*p && (*p == ' ' || *p == '\t' || *p == '\n' || *p == '\r')) p++;
+        if(!*p) break;
+
+        /* Skip structural delimiters — they're not tokens */
+        if(*p == '{' || *p == '}' || *p == ',') { p++; continue; }
+
+        /* Extract one token */
+        const char *tok_start = p;
+        int paren_depth = 0;
+        while(*p) {
+            if(*p == '(') paren_depth++;
+            else if(*p == ')') { paren_depth--; if(paren_depth <= 0) { p++; break; } }
+            else if(paren_depth == 0 && (*p == ' ' || *p == '\t' || *p == '\n' ||
+                    *p == '\r' || *p == '{' || *p == '}' || *p == ',')) break;
+            p++;
+        }
+        int tok_len = p - tok_start;
+        if(tok_len <= 0 || tok_len >= 500) continue;
+
+        /* Determine if this token is a control (starts with _) */
+        int is_control = (tok_start[0] == '_');
+
+        /* Get timing from p_Instance */
+        long start_ms = 0, end_ms = 0;
+
+        if(has_inst && !is_control) {
+            /* Sounding token (note or silence): consume next p_Instance entry */
+            while(inst_idx < Maxevent && (*p_Instance)[inst_idx].object == 0)
+                inst_idx++;
+            if(inst_idx < Maxevent) {
+                start_ms = (long)(*p_Instance)[inst_idx].starttime;
+                end_ms = (long)(*p_Instance)[inst_idx].endtime;
+                inst_idx++;
+            }
+        } else if(has_inst && is_control) {
+            /* Control token: peek at next sounding event's start time */
+            long peek = inst_idx;
+            while(peek < Maxevent && (*p_Instance)[peek].object == 0)
+                peek++;
+            if(peek < Maxevent) {
+                start_ms = (long)(*p_Instance)[peek].starttime;
+                end_ms = start_ms;
+            }
         }
 
+        /* Write JSON */
         remaining = TOKEN_JSON_BUF_SIZE - pos - 2;
-        if(remaining < 256) break;
-
+        if(remaining < 300) break;
         if(count > 0) token_json_buffer[pos++] = ',';
 
+        json_escape(escaped, sizeof(escaped), tok_start, tok_len);
         written = snprintf(token_json_buffer + pos, remaining,
-            "{\"token\":\"%s\",\"start\":%ld,\"end\":%ld,"
-            "\"vel\":%d,\"chan\":%d,\"trans\":%d,\"ins\":%d}",
-            name,
-            (long)(*p_Instance)[k].starttime,
-            (long)(*p_Instance)[k].endtime,
-            (int)(*p_Instance)[k].velocity,
-            (int)(*p_Instance)[k].channel,
-            (int)(*p_Instance)[k].transposition,
-            (int)(*p_Instance)[k].instrument);
+            "{\"token\":\"%s\",\"start\":%ld,\"end\":%ld}",
+            escaped, start_ms, end_ms);
 
         if(written > 0 && written < remaining) {
             pos += written;
@@ -475,11 +515,23 @@ const char* bp3_get_timed_tokens(void) {
 
 EMSCRIPTEN_KEEPALIVE
 int bp3_get_timed_token_count(void) {
+    const char *text = bp3_get_result();
+    if(text == NULL) return 0;
     int count = 0;
-    if(p_Instance == NULL || *p_Instance == NULL || Maxevent < 3)
-        return 0;
-    for(long k = 2; k < Maxevent; k++) {
-        if((*p_Instance)[k].object != 0) count++;
+    const char *p = text;
+    while(*p) {
+        while(*p && (*p == ' ' || *p == '\t' || *p == '\n' || *p == '\r')) p++;
+        if(!*p) break;
+        if(*p == '{' || *p == '}' || *p == ',') { p++; continue; }
+        int pd = 0;
+        while(*p) {
+            if(*p == '(') pd++;
+            else if(*p == ')') { pd--; if(pd <= 0) { p++; break; } }
+            else if(pd == 0 && (*p == ' ' || *p == '\t' || *p == '\n' ||
+                    *p == '\r' || *p == '{' || *p == '}' || *p == ',')) break;
+            p++;
+        }
+        count++;
     }
     return count;
 }

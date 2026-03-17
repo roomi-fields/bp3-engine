@@ -133,9 +133,7 @@ int bp3_init(void) {
     TraceMIDIinteraction = FALSE;
     TimeStopped = Oldtimestopped = 0L;
     MIDIsyncDelay = 380;
-    DisplayItems = FALSE;  /* FALSE avoids stack overflow on complex grammars (Visser3).
-                               Output is captured via BPPrintMessage(odDisplay) callback
-                               into output_buffer, retrieved by bp3_get_result(). */
+    DisplayItems = TRUE;
 
     NoteOffInputFilter = NoteOnInputFilter = KeyPressureInputFilter =
     ControlTypeInputFilter = ProgramTypeInputFilter =
@@ -190,10 +188,7 @@ int bp3_init(void) {
     CopyStringToTextHandle(TEH[wStartString], "S\n");
 
     /* Call LoadSettings to initialize internal state (memory layout, defaults).
-       Without this call, complex grammars (Visser3) crash with SIGSEGV.
-       DisplayItems=1 is set so PrintResult writes text output to TEH[OutputWindow].
-       For complex grammars that cause stack overflow, the caller should pass
-       DisplayItems=0 via bp3_load_settings() before bp3_produce(). */
+       Without this call, complex grammars (Visser3) crash with SIGSEGV. */
     {
         FILE* f = fopen("/tmp_init_settings.json", "w");
         if(f) {

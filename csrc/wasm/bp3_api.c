@@ -133,7 +133,9 @@ int bp3_init(void) {
     TraceMIDIinteraction = FALSE;
     TimeStopped = Oldtimestopped = 0L;
     MIDIsyncDelay = 380;
-    DisplayItems = TRUE;
+    DisplayItems = FALSE;  /* Must be FALSE in WASM — TRUE causes stack overflow
+                               on complex grammars (Visser3: 7593 tokens).
+                               Output is retrieved via bp3_get_result() from TEH[OutputWindow]. */
 
     NoteOffInputFilter = NoteOnInputFilter = KeyPressureInputFilter =
     ControlTypeInputFilter = ProgramTypeInputFilter =
@@ -186,6 +188,19 @@ int bp3_init(void) {
 
     ReseedOrShuffle(NEWSEED);
     CopyStringToTextHandle(TEH[wStartString], "S\n");
+
+    /* Call LoadSettings with minimal defaults to initialize internal state.
+       Without this, complex grammars (Visser3) crash — LoadSettings performs
+       essential setup beyond just assigning variables (memory layout, defaults). */
+    {
+        FILE* f = fopen("/tmp_init_settings.json", "w");
+        if(f) {
+            fputs("{\"DisplayItems\":{\"name\":\"Display items\",\"value\":\"0\",\"boolean\":\"1\"}}", f);
+            fclose(f);
+            LoadSettings("/tmp_init_settings.json", FALSE);
+            remove("/tmp_init_settings.json");
+        }
+    }
 
     bp3_initialized = 1;
     emscripten_log(EM_LOG_CONSOLE, "bp3_init: complete");

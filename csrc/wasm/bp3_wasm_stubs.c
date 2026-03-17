@@ -7,6 +7,7 @@
  */
 
 #include <math.h>
+#include <emscripten.h>
 #include "-BP3.h"
 #include "-BP3decl.h"
 
@@ -217,6 +218,7 @@ int PlayBuffer1(tokenbyte ***pp_buff, int onlypianoroll) {
     tokenbyte **p_b;
 
     length = LengthOf(pp_buff);
+    emscripten_log(EM_LOG_CONSOLE, "PlayBuffer1: length=%ld", length);
     if(length < 1) return(OK);
     CurrentChannel = 1;
 
@@ -234,15 +236,18 @@ int PlayBuffer1(tokenbyte ***pp_buff, int onlypianoroll) {
     ShowMessages = TRUE;
 
     /* PolyMake: resolve polymetric expressions */
+    emscripten_log(EM_LOG_CONSOLE, "PlayBuffer1: calling PolyMake...");
     while((result = PolyMake(pp_buff, &maxseqapprox, YES)) == AGAIN) {};
+    emscripten_log(EM_LOG_CONSOLE, "PlayBuffer1: PolyMake result=%d", result);
     if(result == EMPTY) { result = OK; goto SORTIR; }
     if(result != OK) {
-        /* WASM: don't abort production for MIDI extraction failures */
         result = OK; goto SORTIR;
     }
 
     /* Allocate event space */
+    emscripten_log(EM_LOG_CONSOLE, "PlayBuffer1: calling MakeEventSpace...");
     if((result = MakeEventSpace(&p_imaxseq)) != OK) {
+        emscripten_log(EM_LOG_CONSOLE, "PlayBuffer1: MakeEventSpace FAILED");
         result = OK; goto SORTIR;
     }
 
@@ -252,8 +257,10 @@ int PlayBuffer1(tokenbyte ***pp_buff, int onlypianoroll) {
     }
 
     /* TimeSet: compute start/end times for all sound objects */
+    emscripten_log(EM_LOG_CONSOLE, "PlayBuffer1: calling TimeSet...");
     SetTimeOn = TRUE; nmax = 0;
     result = TimeSet(pp_buff, &kmax, &tmin, &tmax, &maxseq, &nmax, p_imaxseq, maxseqapprox);
+    emscripten_log(EM_LOG_CONSOLE, "PlayBuffer1: TimeSet result=%d kmax=%ld nmax=%d", result, kmax, nmax);
     SetTimeOn = FALSE;
     if(result != OK && result != AGAIN) {
         /* WASM: graceful fallback — no MIDI events but don't abort */

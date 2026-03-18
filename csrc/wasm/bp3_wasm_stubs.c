@@ -266,7 +266,6 @@ int PlayBuffer1(tokenbyte ***pp_buff, int onlypianoroll) {
     }
 
     /* TimeSet: compute start/end times for all sound objects */
-    emscripten_log(EM_LOG_CONSOLE, "PlayBuffer1: calling TimeSet...");
     SetTimeOn = TRUE; nmax = 0;
     result = TimeSet(pp_buff, &kmax, &tmin, &tmax, &maxseq, &nmax, p_imaxseq, maxseqapprox);
     wasm_last_kmax = kmax;

@@ -293,6 +293,50 @@ Les grammaires Visser3/5, ShapesInRhythm, Watch_What_Happens nécessitent leurs 
 
 `DisplayItems=TRUE` est nécessaire pour que `PrintResult()` écrive le résultat texte dans `TEH[OutputWindow]`. Mais pour les grammaires complexes, le `PolyMake` dans `PrintResult` est désactivé (`#ifdef __BP3_WASM__`) pour éviter un stack overflow.
 
+### OCT et terminaux custom — incompatibilité de durée
+
+Quand l'alphabet contient `OCT` (ex: `C0 --> C1 --> C2 --> ...`), les notes sont encodées comme `T25` (16384 + MIDI key) et les terminaux custom comme `T3` (index dans p_Bol). Ce mélange cause un bug : les terminaux custom ont durée 0 dans `p_Instance` malgré `p_MIDIsize > 0` et `p_Dur > 0`. Le problème vient de `FillPhaseDiagram` / `TimeSet` qui traitent différemment les T3 quand des T25 sont présents.
+
+**Solution adoptée** : ne pas utiliser `OCT` dans l'alphabet. Tous les terminaux (notes incluses) sont des bols customs. BP3 fait l'ordonnancement symbolique — le dispatcher JavaScript interprète les noms (`C2` → note MIDI 36, `env1` → ADSR filter). C'est cohérent avec la philosophie BPscript.
+
+## Notes pour Bernard — code mort et observations
+
+### ResizeObjectSpace : bloc `reset` jamais exécuté
+
+Dans `GetRelease.c`, `ResizeObjectSpace()` contient un bloc de reset des prototypes (lignes ~1109-1131) qui n'est jamais exécuté :
+
+```c
+reset = 0;        // ← toujours 0
+if(reset) {       // ← jamais vrai
+    for(j=2; j < Jbol && j < maxsounds; j++) {
+        ptr = (Handle)(*pp_MIDIcode)[j];
+        MyDisposeHandle(&ptr);
+        // ... libération de toutes les structures prototypes ...
+    }
+}
+```
+
+Ce code est-il intentionnellement désactivé ou est-ce un reste de debug ?
+
+### vfprintf(stdout) bypasse gOutDestinations
+
+Dans `ConsoleMessages.c`, `BPPrintMessage()` utilise `gOutDestinations[]` pour les canaux d'affichage, sauf pour `odError` et `odInfo` qui écrivent directement sur `stdout` :
+
+```c
+if(dest & odError) {
+    vfprintf(stdout, format, args);  // ← bypass gOutDestinations[odiError]
+}
+if(dest & odInfo) {
+    result = vfprintf(stdout, format, args);  // ← bypass gOutDestinations[odiInfo]
+}
+```
+
+Les lignes `vfprintf(gOutDestinations[odiError], ...)` et `vfprintf(gOutDestinations[odiInfo], ...)` sont commentées. C'est probablement intentionnel (debug direct sur stdout) mais ça empêche la redirection de ces canaux.
+
+### OCT + terminaux custom : timing incorrect
+
+Quand un alphabet contient à la fois des entrées `OCT` (notes avec `-->`) et des terminaux simples (sans `-->`), les terminaux simples reçoivent une durée 0 dans `FillPhaseDiagram` même si `p_MIDIsize[j] > 0`. Le même terminal fonctionne correctement (durée = prodtempo) quand l'alphabet ne contient pas d'entrées `OCT`. Nous n'avons pas identifié la cause exacte dans le pipeline.
+
 ## Suite de tests
 
 ```bash

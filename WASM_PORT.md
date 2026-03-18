@@ -177,8 +177,9 @@ produce();
 
 #### bp3_get_timed_tokens() — Tokens horodatés
 
-Retourne tous les tokens de la production avec leur timing, en JSON. Deux sources combinées :
-- **p_Instance[]** (rempli par `TimeSet`) : timing précis pour chaque objet sonnant (notes, silences, terminaux custom)
+Retourne **tous** les tokens de la production avec leur timing, en JSON. Trois sources combinées :
+- **p_Instance[]** (rempli par `TimeSet`) : timing précis pour les notes et terminaux custom
+- **Détection de gaps** : les silences ne sont pas stockés dans p_Instance — ils sont détectés comme des gaps entre deux objets consécutifs (`start[k] > end[k-1]`)
 - **Sortie texte** (`bp3_get_result()`) : extraction des tokens de contrôle (`_vel()`, `_chan()`, etc.) qui ne sont pas dans `p_Instance`
 
 Format :
@@ -186,16 +187,20 @@ Format :
 [
   {"token":"_vel(120)", "start":0, "end":0},
   {"token":"C4", "start":0, "end":1000},
-  {"token":"D4", "start":1000, "end":2000},
-  {"token":"E4", "start":3000, "end":4000}
+  {"token":"-", "start":1000, "end":2000},
+  {"token":"D4", "start":2000, "end":3000},
+  {"token":"-", "start":3000, "end":4000},
+  {"token":"E4", "start":4000, "end":5000}
 ]
 ```
 
-Décodage des noms :
-- `object == 1` → silence `-`
-- `object >= 16384` → note MIDI, nom récupéré via `PrintThisNote(scale, key)` selon NoteConvention
-- `object 2..Jbol` → terminal custom, nom dans `p_Bol[j]`
-- Contrôles (`_vel`, `_chan`, `_script`...) : timestamp = début du prochain objet sonnant, durée = 0
+Contenu :
+- **Notes** : `object >= 16384` dans p_Instance → nom via `PrintThisNote(scale, key)` selon NoteConvention
+- **Terminaux custom** : `object 2..Jbol` dans p_Instance → nom dans `p_Bol[j]` (ex: `env1`, `Kick`)
+- **Silences** : détectés comme gaps temporels entre objets → `{"token":"-", "start":gap_start, "end":gap_end}`. Les doubles silences (`- -`) sont fusionnés en un seul gap.
+- **Contrôles** : extraits du texte (`_vel`, `_chan`, `_script`...) → timestamp = début du prochain objet sonnant, durée = 0
+
+**Note** : `FillPhaseDiagram` de Bernard ne crée pas d'entrée p_Instance pour les silences — ils ne consomment pas de `kobj`. Le silence est implicite dans le timing. Notre code le rend explicite.
 
 #### Capture de la sortie
 
@@ -262,9 +267,10 @@ Flags de tolérance pour le C K&R de Bernard :
 | Return values | `OK=1, MISSED=0, ABORT=-4, TRUE=1, FALSE=0` (OK=1, pas 0 !) |
 | Window indices | `wGrammar=0, wAlphabet=1, wStartString=2, wTrace=5, wData=7, OutputWindow=wData` |
 | NoteConvention | `ENGLISH=0, FRENCH=1, INDIAN=2` |
-| Token encoding | Notes = `16384 + MIDI_key`, terminaux custom = index dans `p_Bol[j]`, silence = 1 |
+| Token encoding | Notes = `16384 + MIDI_key`, terminaux custom = index dans `p_Bol[j]` |
+| Silence dans p_Instance | Pas d'entrée propre — c'est un gap temporel entre deux objets |
 | Durée | `p_Dur[j]` en ms, `p_Tref[j]` = durée de référence |
-| Son | `p_MIDIsize[j] > 0` requis pour que `FillPhaseDiagram` traite un objet comme "sonnant" |
+| Objet sonnant | `p_MIDIsize[j] > 0` requis pour que `FillPhaseDiagram` alloue du temps à un terminal |
 
 ## Limitations connues
 

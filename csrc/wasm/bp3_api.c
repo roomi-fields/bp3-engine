@@ -573,6 +573,7 @@ const char* bp3_get_timed_tokens(void) {
        object encoding: 0=empty, 1=silence, 2..Jbol=terminal, >=16384=note, -1=end */
     sounding_emitted = 0;
     ctrl_idx = 0;
+    long prev_end_ms = 0;
     for(k = 2; k <= kmax; k++) {
         j = (*p_Instance)[k].object;
         if(j == 0) continue;
@@ -580,6 +581,18 @@ const char* bp3_get_timed_tokens(void) {
 
         start_ms = (long)(*p_Instance)[k].starttime;
         end_ms = (long)(*p_Instance)[k].endtime;
+
+        /* Detect silence gaps: if this object starts after the previous one ended,
+           emit a "-" token for the gap. Only for sequential (non-polymetric) tokens. */
+        if(start_ms > prev_end_ms && prev_end_ms > 0) {
+            remaining = TOKEN_JSON_BUF_SIZE - pos - 2;
+            if(remaining < 300) goto FINISH_TOKENS;
+            if(count > 0) token_json_buffer[pos++] = ',';
+            written = snprintf(token_json_buffer + pos, remaining,
+                "{\"token\":\"-\",\"start\":%ld,\"end\":%ld}", prev_end_ms, start_ms);
+            if(written > 0 && written < remaining) { pos += written; count++; }
+            sounding_emitted++;  /* silence counts as sounding for control positioning */
+        }
 
         /* Emit controls that come before this sounding token */
         while(ctrl_idx < n_controls && ctrl_buf[ctrl_idx].after_n <= sounding_emitted) {
@@ -614,6 +627,7 @@ const char* bp3_get_timed_tokens(void) {
             "{\"token\":\"%s\",\"start\":%ld,\"end\":%ld}", escaped, start_ms, end_ms);
         if(written > 0 && written < remaining) { pos += written; count++; }
         sounding_emitted++;
+        if(end_ms > prev_end_ms) prev_end_ms = end_ms;
     }
 
     /* Emit remaining controls */

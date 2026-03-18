@@ -299,6 +299,76 @@ int bp3_load_csound_resources(const char* content) {
     return (r == OK) ? 0 : -3;
 }
 
+/* ---- Deferred object duration ---- */
+/* Stored before produce, applied after grammar compilation */
+#define MAX_DEFERRED_DURATIONS 128
+static struct { char name[64]; int duration_ms; } deferred_durations[MAX_DEFERRED_DURATIONS];
+static int n_deferred_durations = 0;
+
+/* Apply deferred durations after grammar compilation (p_Bol is populated) */
+void apply_deferred_durations(void) {
+    int i, j, l, found;
+    MIDIcode **p_midi;
+
+    if(n_deferred_durations == 0) return;
+    if(p_Bol == NULL || Jbol < 3) return;
+
+    for(i = 0; i < n_deferred_durations; i++) {
+        found = -1;
+        for(j = 2; j < Jbol; j++) {
+            if((*p_Bol)[j] == NULL || *((*p_Bol)[j]) == NULL) continue;
+            l = strlen(*((*p_Bol)[j]));
+            if(l > 0 && strncmp(deferred_durations[i].name, *((*p_Bol)[j]), l) == 0
+               && deferred_durations[i].name[l] == '\0') {
+                found = j;
+                break;
+            }
+        }
+        if(found < 0) continue;
+        j = found;
+
+        if(p_Dur != NULL) (*p_Dur)[j] = (long)deferred_durations[i].duration_ms;
+        if(p_Tref != NULL) (*p_Tref)[j] = (long)deferred_durations[i].duration_ms;
+
+        /* Allocate minimal MIDIcode so FillPhaseDiagram treats it as sounding */
+        if(pp_MIDIcode != NULL && p_MIDIsize != NULL && (*p_MIDIsize)[j] == 0) {
+            p_midi = (MIDIcode**)GiveSpace((Size)(2 * sizeof(MIDIcode)));
+            if(p_midi != NULL) {
+                (*p_midi)[0].time = 0;
+                (*p_midi)[0].byte = 0x90;
+                (*p_midi)[0].sequence = 0;
+                (*p_midi)[1].time = (Milliseconds)deferred_durations[i].duration_ms;
+                (*p_midi)[1].byte = 0x80;
+                (*p_midi)[1].sequence = 0;
+                (*pp_MIDIcode)[j] = p_midi;
+                (*p_MIDIsize)[j] = 2;
+            }
+        }
+
+        emscripten_log(EM_LOG_CONSOLE, "Applied duration %dms to '%s' (index %d)",
+                       deferred_durations[i].duration_ms, deferred_durations[i].name, j);
+    }
+    n_deferred_durations = 0;
+}
+
+/* bp3_set_object_duration: declare a terminal as a sounding object with duration.
+   Call AFTER bp3_load_alphabet() and BEFORE bp3_produce().
+   The duration is applied after grammar compilation during bp3_produce().
+   name: terminal name (must exist in alphabet)
+   duration_ms: duration in milliseconds (> 0)
+   Returns 0 on success, <0 on error. */
+EMSCRIPTEN_KEEPALIVE
+int bp3_set_object_duration(const char* name, int duration_ms) {
+    if(name == NULL || duration_ms <= 0) return -1;
+    if(n_deferred_durations >= MAX_DEFERRED_DURATIONS) return -2;
+
+    strncpy(deferred_durations[n_deferred_durations].name, name, 63);
+    deferred_durations[n_deferred_durations].name[63] = '\0';
+    deferred_durations[n_deferred_durations].duration_ms = duration_ms;
+    n_deferred_durations++;
+    return 0;
+}
+
 EMSCRIPTEN_KEEPALIVE
 int bp3_produce(void) {
     int result;

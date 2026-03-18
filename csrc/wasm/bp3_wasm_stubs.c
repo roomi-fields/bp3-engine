@@ -178,6 +178,9 @@ int ExpandSelection(int w) {
     return OK;
 }
 
+/* Defined in bp3_api.c — apply deferred object durations */
+extern void apply_deferred_durations(void);
+
 int PlayBuffer(tokenbyte ***pp_buff, int onlypianoroll) {
     int r;
     int savedPanic;
@@ -185,6 +188,9 @@ int PlayBuffer(tokenbyte ***pp_buff, int onlypianoroll) {
     if(Panic || CheckEmergency() != OK) return(ABORT);
     if(Jbol < 3) NoAlphabet = TRUE;
     else NoAlphabet = FALSE;
+
+    /* Apply deferred durations now — grammar is compiled, p_Bol is valid */
+    apply_deferred_durations();
 
     /* Save Panic state — WASM PlayBuffer must not propagate ABORT
        from MIDI extraction failures to the text production pipeline */

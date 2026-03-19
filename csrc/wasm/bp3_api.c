@@ -299,6 +299,47 @@ int bp3_load_csound_resources(const char* content) {
     return (r == OK) ? 0 : -3;
 }
 
+/* bp3_load_prototypes: load sound object prototypes from -so./-mi. file content.
+   Must be called AFTER bp3_load_alphabet() and BEFORE bp3_produce().
+   Uses Bernard's LoadObjectPrototypes() which properly initializes all
+   sound object structures (p_Dur, p_MIDIsize, pp_MIDIcode, p_Type, etc.) */
+EMSCRIPTEN_KEEPALIVE
+int bp3_load_prototypes(const char* content) {
+    if(!content || content[0] == '\0') return -1;
+
+    /* Strip <HTML>...</HTML> tags from the content.
+       Bernard's PHP interface wraps terminal names in HTML tags.
+       The native build strips them via HTML.c which we don't include. */
+    int len = strlen(content);
+    char *cleaned = (char*)malloc(len + 1);
+    if(!cleaned) return -2;
+    int i = 0, j = 0;
+    while(i < len) {
+        if(content[i] == '<' && (strncmp(&content[i], "<HTML>", 6) == 0 ||
+                                  strncmp(&content[i], "<html>", 6) == 0)) {
+            i += 6;  /* skip <HTML> */
+        } else if(content[i] == '<' && (strncmp(&content[i], "</HTML>", 7) == 0 ||
+                                         strncmp(&content[i], "</html>", 7) == 0)) {
+            i += 7;  /* skip </HTML> */
+        } else {
+            cleaned[j++] = content[i++];
+        }
+    }
+    cleaned[j] = '\0';
+
+    FILE* f = fopen("/tmp_prototypes.txt", "w");
+    if(!f) { free(cleaned); return -2; }
+    fputs(cleaned, f);
+    fclose(f);
+    free(cleaned);
+
+    strcpy(FileName[iObjects], "/tmp_prototypes.txt");
+    extern int LoadObjectPrototypes(int checkversion, int tryname);
+    int r = LoadObjectPrototypes(0, 1);
+    remove("/tmp_prototypes.txt");
+    return (r == OK) ? 0 : -3;
+}
+
 /* ---- Deferred object duration ---- */
 /* Stored before produce, applied after grammar compilation */
 #define MAX_DEFERRED_DURATIONS 128

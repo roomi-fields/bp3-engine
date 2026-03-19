@@ -15,6 +15,16 @@
 long wasm_last_kmax = 0;
 
 /* ============================================================
+ * PlayThings.c stubs
+ * ============================================================ */
+
+/* ChangedProtoType — from PlayThings.c, resets paste flag after prototype change */
+int ChangedProtoType(int j) {
+    (*p_PasteDone)[j] = FALSE;
+    return(OK);
+}
+
+/* ============================================================
  * MIDIdriver.c stubs
  * ============================================================ */
 
@@ -156,10 +166,51 @@ int ChannelEvent(int e) {
     return (status >= 0x80 && status <= 0xE0);
 }
 
-int MIDItoPrototype(int a, int b, int c, MIDIcode** d, long e) {
-    BP_NOT_USED(a); BP_NOT_USED(b); BP_NOT_USED(c);
-    BP_NOT_USED(d); BP_NOT_USED(e);
-    return MISSED;
+/* MIDItoPrototype — simplified WASM version.
+   Stores MIDI codes from p_b into prototype j.
+   Full version in MIDIstuff.c does FormatMIDIstream + PointToDuration.
+   We skip the filtering/formatting and just copy the data. */
+int MIDItoPrototype(int zerostart, int filter, int j, MIDIcode **p_b, long imax) {
+    long nbytes, i;
+    Milliseconds lasttime;
+    MIDIcode **ptr1;
+    Handle ptr;
+    double preroll, postroll;
+
+    (void)zerostart; (void)filter;
+
+    if(imax <= 0) {
+        (*p_MIDIsize)[j] = ZERO;
+        (*p_Dur)[j] = ZERO;
+        return(OK);
+    }
+
+    /* Allocate and copy MIDI data */
+    if((ptr1 = (MIDIcode**)GiveSpace((Size)(imax * sizeof(MIDIcode)))) == NULL)
+        return(ABORT);
+
+    for(i = 0; i < imax; i++) {
+        (*ptr1)[i].time = (*p_b)[i].time;
+        (*ptr1)[i].byte = (*p_b)[i].byte;
+        (*ptr1)[i].sequence = (*p_b)[i].sequence;
+    }
+
+    /* Replace existing prototype data */
+    ptr = (Handle)(*pp_MIDIcode)[j];
+    if(ptr != NULL) MyDisposeHandle(&ptr);
+    (*pp_MIDIcode)[j] = ptr1;
+
+    /* Set size, type, and duration */
+    (*p_MIDIsize)[j] = imax;
+    (*p_Type)[j] |= 1;  /* flag as MIDI object */
+
+    /* Duration = last event time - preroll + postroll */
+    GetPrePostRoll(j, &preroll, &postroll);
+    lasttime = (*ptr1)[imax - 1].time;
+    (*p_Dur)[j] = lasttime - (Milliseconds)preroll + (Milliseconds)postroll;
+
+    PointMIDI = TRUE;
+    return(OK);
 }
 
 /* ============================================================

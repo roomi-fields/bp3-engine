@@ -1,0 +1,22 @@
+{
+  "NoteConvention": {
+    "name": "NoteConvention",
+    "value": "2",
+    "boolean": "0"
+  },
+  "C4key": {
+    "name": "C4key",
+    "value": "60",
+    "boolean": "0"
+  },
+  "A4freq": {
+    "name": "A4freq",
+    "value": "440.0",
+    "boolean": "0"
+  },
+  "DisplayItems": {
+    "name": "DisplayItems",
+    "value": "1",
+    "boolean": "1"
+  }
+}

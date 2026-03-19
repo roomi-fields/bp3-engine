@@ -34,3 +34,5 @@ dist*/bp3.js
 # Task files
 # tasks.json
 # tasks/
+*.o
+bp

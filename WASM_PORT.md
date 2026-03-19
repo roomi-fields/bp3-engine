@@ -399,6 +399,13 @@ Si un terminal n'est ni une note ni un sound object, `FillPhaseDiagram` (ligne 6
 
 **4. Notre hack `bp3_get_timed_tokens()`** → corrèle la sortie texte avec `p_Instance[]` pour reconstruire les tokens horodatés. Fonctionne pour les notes et les ~5 premiers sound objects, mais dépend du bon fonctionnement de `FillPhaseDiagram`.
 
+**5. Durée absolue vs relative au tempo** → les notes (T25) reçoivent une durée proportionnelle au tempo (`prodtempo = 60000 / BPM`). Les sound objects custom reçoivent `p_Dur` comme durée **absolue** — elle ne suit pas le tempo. Exemple à 120 BPM :
+- Notes : `C4:500ms, D4:500ms, E4:500ms` (tempo = 500ms/beat) ✅
+- Custom avec `p_Dur=1000` : `bol1:1000ms, bol2:1000ms, bol3:500ms` ❌ (les 2 premiers ignorent le tempo, le dernier est tronqué pour tenir dans le temps total)
+- Custom avec `p_Dur=500` : `bol1:500ms, bol2:500ms, bol3:500ms` (coïncidence avec le tempo)
+
+Il n'y a pas de moyen de dire "ce terminal dure 1 beat" — seulement "ce terminal dure N millisecondes". Le `dilationratio` de `TimeSet` est censé ajuster, mais il ne fonctionne pas comme pour les notes.
+
 ### Ce qu'on a besoin de Bernard
 
 **Question centrale** : quel est le mécanisme correct dans BP3 pour qu'un terminal custom (pas une note, pas un instrument Csound) occupe du temps dans la grille temporelle et reçoive des timestamps via `TimeSet` ?
@@ -408,6 +415,7 @@ Sous-questions :
 2. Pourquoi `FillPhaseDiagram` donne durée 0 à certains indices de p_Instance quand `p_MIDIsize[j] = 2` et `p_Dur[j] = 1000` sont vérifiés juste avant `TimeSet` ?
 3. Est-ce que `Encode()` est censé matcher les notes de toutes les conventions simultanément ? Si oui, comment déclarer un terminal qui ressemble à une note (ex: `re4`) sans qu'il soit converti en T25 ?
 4. Existe-t-il un mécanisme plus simple que les prototypes `-mi.xxx` pour donner une durée à un terminal — par exemple via l'alphabet ou un flag dans les settings ?
+5. Comment faire pour qu'un sound object ait une durée relative au tempo (comme les notes T25 qui utilisent `prodtempo`) plutôt qu'une durée absolue en millisecondes (`p_Dur`) ?
 
 ### Ce qui fonctionne
 

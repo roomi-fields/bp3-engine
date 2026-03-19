@@ -299,116 +299,66 @@ Quand l'alphabet contient `OCT` (ex: `C0 --> C1 --> C2 --> ...`), les notes sont
 
 **Solution adoptée** : ne pas utiliser `OCT` dans l'alphabet. Tous les terminaux (notes incluses) sont des bols customs. BP3 fait l'ordonnancement symbolique — le dispatcher JavaScript interprète les noms (`C2` → note MIDI 36, `env1` → ADSR filter). C'est cohérent avec la philosophie BPscript.
 
-## Observations sur le code — questions pour Bernard
+## Problème ouvert : BP3 comme ordonnanceur symbolique pur
 
-En travaillant sur le portage, nous avons noté quelques comportements du code qui nous ont posé question. Ce ne sont probablement pas des bugs mais plutôt des choix de conception dont nous n'avons pas le contexte — toute clarification serait bienvenue.
+### Objectif
 
-### ResizeObjectSpace : bloc de reset désactivé
-
-Dans `GetRelease.c`, `ResizeObjectSpace()` contient un bloc de libération des prototypes (lignes ~1109-1131) qui semble intentionnellement désactivé (`reset = 0`). On se demandait si c'est un mécanisme prévu pour une réinitialisation future, ou si le reset se fait ailleurs dans le pipeline ?
-
-```c
-reset = 0;
-if(reset) {
-    for(j=2; j < Jbol && j < maxsounds; j++) {
-        ptr = (Handle)(*pp_MIDIcode)[j];
-        MyDisposeHandle(&ptr);
-        // ...
-    }
-}
-```
-
-### Sorties odError et odInfo directement sur stdout
-
-Dans `ConsoleMessages.c`, `BPPrintMessage()` route la plupart des canaux via `gOutDestinations[]`, mais `odError` et `odInfo` écrivent directement sur `stdout` (les lignes passant par `gOutDestinations` sont commentées). Nous avons dû ajouter un `#ifndef __BP3_WASM__` autour de ces écritures car en WASM chaque `vfprintf(stdout)` traverse la frontière WASM/JavaScript et, dans les cas de récursion profonde (`Compute.c`), ça épuise le stack JavaScript. Est-ce qu'il y a une raison pour laquelle ces deux canaux ne passent pas par `gOutDestinations` ?
-
-### OCT + terminaux custom : timing incorrect
-
-Quand un alphabet contient à la fois des entrées `OCT` (notes avec `-->`) et des terminaux simples (sans `-->`), les terminaux simples reçoivent une durée 0 dans `FillPhaseDiagram` même si `p_MIDIsize[j] > 0`. Le même terminal fonctionne correctement (durée = prodtempo) quand l'alphabet ne contient pas d'entrées `OCT`. Nous n'avons pas identifié la cause exacte dans le pipeline.
-
-### Encode() matche les noms de notes de toutes les conventions
-
-`Encode()` reconnaît automatiquement les noms de notes (English, French, Indian) suivis d'un chiffre d'octave, indépendamment du `NoteConvention` actif et de l'alphabet chargé. Par exemple, `re4` est toujours reconnu comme la note indienne "re" octave 4 et encodé comme T25, même si `NoteConvention = ENGLISH` et que `re4` est déclaré comme terminal custom dans l'alphabet.
-
-Le pattern problématique : **exactement 1-2 lettres matchant un nom de note + chiffre d'octave**. Les noms de 3+ lettres qui ne commencent pas par un nom de note sont safe.
-
-Noms de notes reconnus par `Encode()` :
-- English : `C, D, E, F, G, A, B` + altérations `C#, Db, Eb, F#, Gb, Ab, Bb`
-- French : `do, re, mi, fa, sol, la, si` + altérations
-- Indian : `sa, re, ga, ma, pa, dha, ni` + altérations `rek, gak, dhak, nik, ma#, pa#, dha#`
-
-**Question pour Bernard** : est-ce que `Encode()` est censé matcher les notes de toutes les conventions simultanément, ou seulement celle indiquée par `NoteConvention` ? Si c'est intentionnel, existe-t-il un mécanisme pour forcer un terminal à être traité comme un bol custom et non comme une note ?
-
-### Sound objects custom : durée 0 au-delà de ~5 terminaux
-
-Quand on crée des sound objects custom via `bp3_set_object_duration()` (qui alloue un `pp_MIDIcode[j]` minimal avec `p_MIDIsize[j] = 2` et `p_Dur[j] > 0`), les premiers terminaux (indices 2-6 environ) reçoivent une durée correcte dans `p_Instance`, mais les suivants ont `endtime == starttime` (durée 0).
-
-Vérification : juste avant `TimeSet`, tous les indices ont bien `p_MIDIsize = 2` et `p_Dur = 1000`. Le problème est dans `FillPhaseDiagram` ou `TimeSet` qui ne propagent pas la durée pour tous les objets.
-
-Testé avec des noms neutres (`bol1..bol12`, aucun match note) :
-- 3 terminaux : tous OK
-- 5 terminaux : tous OK
-- 8 terminaux : indices 2-5 OK, indices 6-9 durée 0
-- 12 terminaux : seuls 3-4 ont une durée non-nulle
-
-Ce comportement se produit aussi bien en WASM qu'en natif (non vérifié — à confirmer avec Bernard).
-
-**Question pour Bernard** : est-ce que les sound objects nécessitent une initialisation supplémentaire au-delà de `p_MIDIsize > 0` et `p_Dur > 0` pour que `FillPhaseDiagram` leur alloue du temps ? Peut-être un flag dans `p_Type[j]`, ou une structure `p_Tpict[j]`, ou un prototype complet chargé via `LoadObjectPrototypes()` ?
-
-## Blocage actuel — aide demandée à Bernard
-
-### Notre objectif
-
-Utiliser le moteur BP3 **uniquement comme ordonnanceur symbolique** : il dérive la grammaire, résout la polymétrie, calcule les timestamps — et on récupère la liste des terminaux horodatés. Tout le reste (son, MIDI, Csound, audio) est repoussé à l'extérieur (dispatcher JavaScript). BP3 n'a pas besoin de savoir ce que les terminaux signifient.
+Utiliser le moteur BP3 **uniquement pour l'ordonnancement symbolique** : dérivation, polymétrie, calcul des timestamps. Tout le reste (son, MIDI, Csound) est géré à l'extérieur par JavaScript. BP3 n'a pas besoin de savoir ce que les terminaux signifient — on veut récupérer des noms symboliques horodatés.
 
 ### Le problème fondamental
 
-Pour que BP3 calcule des timestamps, un terminal doit passer par `FillPhaseDiagram` → `TimeSet`, ce qui nécessite que BP3 le considère comme un **objet sonnant**. Mais les seuls objets sonnants reconnus par BP3 sont :
+Pour que BP3 calcule des timestamps, un terminal doit passer par `FillPhaseDiagram` → `TimeSet`, ce qui nécessite que BP3 le considère comme un **objet sonnant**. Mais les seuls objets sonnants reconnus sont :
 - Les **notes** (T25, `16384 + MIDI_key`) — reconnues automatiquement par `Encode()`
 - Les **sound objects** avec prototype MIDI (T3, `p_MIDIsize[j] > 0`)
 
-Si un terminal n'est ni une note ni un sound object, `FillPhaseDiagram` (ligne 630) le convertit en silence (`p = 1`) et il ne reçoit pas de temps.
+Si un terminal n'est ni l'un ni l'autre, `FillPhaseDiagram` (ligne 630) le convertit en silence et il ne reçoit pas de temps.
 
-### Les 4 impasses
+### Approches tentées et résultats
 
-**1. Alphabet standard (OCT, notes western/indiennes)** → les notes sont reconnues et horodatées, MAIS :
-- Elles sont converties en MIDI (`16384 + key`) — le nom symbolique est perdu
-- `Encode()` matche les notes de TOUTES les conventions (English + French + Indian) simultanément, même quand `NoteConvention` est setté. Des noms comme `re4`, `sa4`, `do3` sont capturés comme notes indiennes/françaises même dans un contexte English.
-- Les terminaux custom (CV, enveloppes, drums) mélangés avec les notes dans l'alphabet OCT ont durée 0
+**1. Alphabet standard (OCT)** — les notes sont horodatées, mais :
+- Converties en MIDI (`16384 + key`) → le nom symbolique est perdu dans `p_Instance`
+- `Encode()` matche les notes de toutes les conventions (English + French + Indian) simultanément, indépendamment de `NoteConvention`. Un terminal `re4` est capturé comme note indienne même en contexte English.
+- Les terminaux custom mélangés avec les notes OCT ont durée 0
+- **Contournement** : `PrintThisNote()` pour reconstruire le nom depuis le MIDI key. Fonctionne pour les notes standard.
 
-**2. Sound objects custom** (`bp3_set_object_duration`) → on alloue un `pp_MIDIcode[j]` minimal pour simuler un prototype. MAIS :
-- Ça ne fonctionne que pour ~5 terminaux. Au-delà, `FillPhaseDiagram`/`TimeSet` donne durée 0 malgré `p_MIDIsize > 0` et `p_Dur > 0` correctement settés.
-- Le format des vrais prototypes (`-mi.xxx`) est trop complexe pour être généré programmatiquement (568 lignes par terminal)
-- Probable qu'il manque une initialisation que `LoadObjectPrototypes()` fait et que notre hack ne fait pas
+**2. Sound objects simulés** (`bp3_set_object_duration`) — allocation d'un `pp_MIDIcode[j]` minimal pour simuler un prototype :
+- Fonctionne pour ≤5 terminaux
+- Au-delà, `FillPhaseDiagram`/`TimeSet` donne durée 0 malgré `p_MIDIsize > 0` et `p_Dur > 0` vérifiés juste avant `TimeSet`
+- Le format des vrais prototypes (`-mi.xxx`) est trop complexe pour être généré programmatiquement
+- Probable qu'il manque une initialisation que `LoadObjectPrototypes()` fait
 
-**3. Alphabet custom (noms non-note)** → les terminaux ne sont reconnus ni comme notes ni comme sound objects :
-- Le texte est produit correctement (`Kick Hat Hat Snare`)
-- MAIS aucun timestamp — `FillPhaseDiagram` les traite comme des silences, `p_Instance` est vide
-- On a contourné en ajoutant `bp3_set_object_duration` mais ça retombe dans l'impasse #2
+**3. Alphabet custom (noms non-note, sans OCT)** — les terminaux ne sont ni notes ni sound objects :
+- Le texte est produit correctement
+- Aucun timestamp → `FillPhaseDiagram` les traite comme des silences
+- Contournable par `bp3_set_object_duration` mais limité à ~5 terminaux (retombe dans #2)
 
-**4. Notre hack `bp3_get_timed_tokens()`** → corrèle la sortie texte avec `p_Instance[]` pour reconstruire les tokens horodatés. Fonctionne pour les notes et les ~5 premiers sound objects, mais dépend du bon fonctionnement de `FillPhaseDiagram`.
+**4. Durée absolue vs relative au tempo** — les notes (T25) suivent `prodtempo` (proportionnel au BPM). Les sound objects custom utilisent `p_Dur` en millisecondes absolues :
+- À 120 BPM : notes = 500ms/beat ✅, custom `p_Dur=1000` = 1000ms ❌ (ne suit pas le tempo)
+- Pas de mécanisme identifié pour donner une durée relative au tempo à un sound object
 
-**5. Durée absolue vs relative au tempo** → les notes (T25) reçoivent une durée proportionnelle au tempo (`prodtempo = 60000 / BPM`). Les sound objects custom reçoivent `p_Dur` comme durée **absolue** — elle ne suit pas le tempo. Exemple à 120 BPM :
-- Notes : `C4:500ms, D4:500ms, E4:500ms` (tempo = 500ms/beat) ✅
-- Custom avec `p_Dur=1000` : `bol1:1000ms, bol2:1000ms, bol3:500ms` ❌ (les 2 premiers ignorent le tempo, le dernier est tronqué pour tenir dans le temps total)
-- Custom avec `p_Dur=500` : `bol1:500ms, bol2:500ms, bol3:500ms` (coïncidence avec le tempo)
+**5. Reconnaissance de noms de notes** — `Encode()` matche automatiquement tout nom de 1-2 lettres suivi d'un chiffre comme une note (toutes conventions confondues). Noms safe : 3+ lettres non-note avant le chiffre (ex: `bolC4`, `sndRe4`). Caractères acceptés dans les noms : lettres, chiffres, `#`, `@`, `%`, `'`, `"`. Refusés : `_`, `-`, `.`, `^`, `~`, `!`, `*`, `+`.
 
-Il n'y a pas de moyen de dire "ce terminal dure 1 beat" — seulement "ce terminal dure N millisecondes". Le `dilationratio` de `TimeSet` est censé ajuster, mais il ne fonctionne pas comme pour les notes.
+### Solution actuelle (partielle)
 
-### Ce qu'on a besoin de Bernard
+Pour ≤5 terminaux custom, le flux fonctionne :
 
-**Question centrale** : quel est le mécanisme correct dans BP3 pour qu'un terminal custom (pas une note, pas un instrument Csound) occupe du temps dans la grille temporelle et reçoive des timestamps via `TimeSet` ?
+```javascript
+bp3_init();
+bp3_load_alphabet("bolC4\nbolD4\nenv1\n");  // noms de 3+ lettres
+bp3_set_object_duration("bolC4", 1000);
+bp3_set_object_duration("bolD4", 1000);
+bp3_set_object_duration("env1", 1000);
+bp3_load_grammar("ORD\ngram#1[1] S --> {bolC4 bolD4, env1 env1}\n");
+bp3_produce();
+bp3_get_timed_tokens();
+// → bolC4:0-1000, bolD4:1000-2000, env1:0-1000, env1:1000-2000
+```
 
-Sous-questions :
-1. Est-ce que `LoadObjectPrototypes()` fait une initialisation spécifique que notre `bp3_set_object_duration()` ne fait pas ? (au-delà de `p_MIDIsize`, `p_Dur`, `pp_MIDIcode`)
-2. Pourquoi `FillPhaseDiagram` donne durée 0 à certains indices de p_Instance quand `p_MIDIsize[j] = 2` et `p_Dur[j] = 1000` sont vérifiés juste avant `TimeSet` ?
-3. Est-ce que `Encode()` est censé matcher les notes de toutes les conventions simultanément ? Si oui, comment déclarer un terminal qui ressemble à une note (ex: `re4`) sans qu'il soit converti en T25 ?
-4. Existe-t-il un mécanisme plus simple que les prototypes `-mi.xxx` pour donner une durée à un terminal — par exemple via l'alphabet ou un flag dans les settings ?
-5. Comment faire pour qu'un sound object ait une durée relative au tempo (comme les notes T25 qui utilisent `prodtempo`) plutôt qu'une durée absolue en millisecondes (`p_Dur`) ?
+Le dispatcher JavaScript traduit ensuite `bolC4` → note MIDI 60, `env1` → ADSR filter, etc.
 
-### Ce qui fonctionne
+### Ce qui fonctionne bien
 
-Malgré ces blocages, le portage WASM est fonctionnel pour :
+Le portage WASM est fonctionnel pour :
 - Les grammaires de Bernard (107 testées, ~100 passent)
 - La production textuelle (résultat de dérivation)
 - Les événements MIDI (notes, timing, vélocité, canaux)

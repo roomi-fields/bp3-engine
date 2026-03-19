@@ -337,6 +337,35 @@ Les lignes `vfprintf(gOutDestinations[odiError], ...)` et `vfprintf(gOutDestinat
 
 Quand un alphabet contient à la fois des entrées `OCT` (notes avec `-->`) et des terminaux simples (sans `-->`), les terminaux simples reçoivent une durée 0 dans `FillPhaseDiagram` même si `p_MIDIsize[j] > 0`. Le même terminal fonctionne correctement (durée = prodtempo) quand l'alphabet ne contient pas d'entrées `OCT`. Nous n'avons pas identifié la cause exacte dans le pipeline.
 
+### Encode() matche les noms de notes de toutes les conventions
+
+`Encode()` reconnaît automatiquement les noms de notes (English, French, Indian) suivis d'un chiffre d'octave, indépendamment du `NoteConvention` actif et de l'alphabet chargé. Par exemple, `re4` est toujours reconnu comme la note indienne "re" octave 4 et encodé comme T25, même si `NoteConvention = ENGLISH` et que `re4` est déclaré comme terminal custom dans l'alphabet.
+
+Le pattern problématique : **exactement 1-2 lettres matchant un nom de note + chiffre d'octave**. Les noms de 3+ lettres qui ne commencent pas par un nom de note sont safe.
+
+Noms de notes reconnus par `Encode()` :
+- English : `C, D, E, F, G, A, B` + altérations `C#, Db, Eb, F#, Gb, Ab, Bb`
+- French : `do, re, mi, fa, sol, la, si` + altérations
+- Indian : `sa, re, ga, ma, pa, dha, ni` + altérations `rek, gak, dhak, nik, ma#, pa#, dha#`
+
+**Question pour Bernard** : est-ce que `Encode()` est censé matcher les notes de toutes les conventions simultanément, ou seulement celle indiquée par `NoteConvention` ? Si c'est intentionnel, existe-t-il un mécanisme pour forcer un terminal à être traité comme un bol custom et non comme une note ?
+
+### Sound objects custom : durée 0 au-delà de ~5 terminaux
+
+Quand on crée des sound objects custom via `bp3_set_object_duration()` (qui alloue un `pp_MIDIcode[j]` minimal avec `p_MIDIsize[j] = 2` et `p_Dur[j] > 0`), les premiers terminaux (indices 2-6 environ) reçoivent une durée correcte dans `p_Instance`, mais les suivants ont `endtime == starttime` (durée 0).
+
+Vérification : juste avant `TimeSet`, tous les indices ont bien `p_MIDIsize = 2` et `p_Dur = 1000`. Le problème est dans `FillPhaseDiagram` ou `TimeSet` qui ne propagent pas la durée pour tous les objets.
+
+Testé avec des noms neutres (`bol1..bol12`, aucun match note) :
+- 3 terminaux : tous OK
+- 5 terminaux : tous OK
+- 8 terminaux : indices 2-5 OK, indices 6-9 durée 0
+- 12 terminaux : seuls 3-4 ont une durée non-nulle
+
+Ce comportement se produit aussi bien en WASM qu'en natif (non vérifié — à confirmer avec Bernard).
+
+**Question pour Bernard** : est-ce que les sound objects nécessitent une initialisation supplémentaire au-delà de `p_MIDIsize > 0` et `p_Dur > 0` pour que `FillPhaseDiagram` leur alloue du temps ? Peut-être un flag dans `p_Type[j]`, ou une structure `p_Tpict[j]`, ou un prototype complet chargé via `LoadObjectPrototypes()` ?
+
 ## Suite de tests
 
 ```bash

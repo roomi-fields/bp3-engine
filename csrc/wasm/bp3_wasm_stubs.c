@@ -265,11 +265,24 @@ int PlayBuffer1(tokenbyte ***pp_buff, int onlypianoroll) {
         goto RELEASE;
     }
 
+    /* Debug: verify p_MIDIsize before TimeSet */
+    {
+        int dbg;
+        for(dbg = 2; dbg < Jbol && dbg < 20; dbg++) {
+            if((*p_MIDIsize)[dbg] > 0)
+                emscripten_log(EM_LOG_CONSOLE, "pre-TimeSet: p_Bol[%d] MIDIsize=%ld Dur=%ld",
+                    dbg, (long)(*p_MIDIsize)[dbg], (long)(*p_Dur)[dbg]);
+        }
+    }
     /* TimeSet: compute start/end times for all sound objects */
     SetTimeOn = TRUE; nmax = 0;
     result = TimeSet(pp_buff, &kmax, &tmin, &tmax, &maxseq, &nmax, p_imaxseq, maxseqapprox);
     wasm_last_kmax = kmax;
     emscripten_log(EM_LOG_CONSOLE, "PlayBuffer1: TimeSet result=%d kmax=%ld nmax=%d", result, kmax, nmax);
+    for(k = 2; k <= kmax; k++) {
+        emscripten_log(EM_LOG_CONSOLE, "  p_Instance[%ld] obj=%d start=%ld end=%ld",
+            k, (*p_Instance)[k].object, (long)(*p_Instance)[k].starttime, (long)(*p_Instance)[k].endtime);
+    }
     SetTimeOn = FALSE;
     if(result != OK && result != AGAIN) {
         /* WASM: graceful fallback — no MIDI events but don't abort */

@@ -299,39 +299,28 @@ Quand l'alphabet contient `OCT` (ex: `C0 --> C1 --> C2 --> ...`), les notes sont
 
 **Solution adoptée** : ne pas utiliser `OCT` dans l'alphabet. Tous les terminaux (notes incluses) sont des bols customs. BP3 fait l'ordonnancement symbolique — le dispatcher JavaScript interprète les noms (`C2` → note MIDI 36, `env1` → ADSR filter). C'est cohérent avec la philosophie BPscript.
 
-## Notes pour Bernard — code mort et observations
+## Observations sur le code — questions pour Bernard
 
-### ResizeObjectSpace : bloc `reset` jamais exécuté
+En travaillant sur le portage, nous avons noté quelques comportements du code qui nous ont posé question. Ce ne sont probablement pas des bugs mais plutôt des choix de conception dont nous n'avons pas le contexte — toute clarification serait bienvenue.
 
-Dans `GetRelease.c`, `ResizeObjectSpace()` contient un bloc de reset des prototypes (lignes ~1109-1131) qui n'est jamais exécuté :
+### ResizeObjectSpace : bloc de reset désactivé
+
+Dans `GetRelease.c`, `ResizeObjectSpace()` contient un bloc de libération des prototypes (lignes ~1109-1131) qui semble intentionnellement désactivé (`reset = 0`). On se demandait si c'est un mécanisme prévu pour une réinitialisation future, ou si le reset se fait ailleurs dans le pipeline ?
 
 ```c
-reset = 0;        // ← toujours 0
-if(reset) {       // ← jamais vrai
+reset = 0;
+if(reset) {
     for(j=2; j < Jbol && j < maxsounds; j++) {
         ptr = (Handle)(*pp_MIDIcode)[j];
         MyDisposeHandle(&ptr);
-        // ... libération de toutes les structures prototypes ...
+        // ...
     }
 }
 ```
 
-Ce code est-il intentionnellement désactivé ou est-ce un reste de debug ?
+### Sorties odError et odInfo directement sur stdout
 
-### vfprintf(stdout) bypasse gOutDestinations
-
-Dans `ConsoleMessages.c`, `BPPrintMessage()` utilise `gOutDestinations[]` pour les canaux d'affichage, sauf pour `odError` et `odInfo` qui écrivent directement sur `stdout` :
-
-```c
-if(dest & odError) {
-    vfprintf(stdout, format, args);  // ← bypass gOutDestinations[odiError]
-}
-if(dest & odInfo) {
-    result = vfprintf(stdout, format, args);  // ← bypass gOutDestinations[odiInfo]
-}
-```
-
-Les lignes `vfprintf(gOutDestinations[odiError], ...)` et `vfprintf(gOutDestinations[odiInfo], ...)` sont commentées. C'est probablement intentionnel (debug direct sur stdout) mais ça empêche la redirection de ces canaux.
+Dans `ConsoleMessages.c`, `BPPrintMessage()` route la plupart des canaux via `gOutDestinations[]`, mais `odError` et `odInfo` écrivent directement sur `stdout` (les lignes passant par `gOutDestinations` sont commentées). Nous avons dû ajouter un `#ifndef __BP3_WASM__` autour de ces écritures car en WASM chaque `vfprintf(stdout)` traverse la frontière WASM/JavaScript et, dans les cas de récursion profonde (`Compute.c`), ça épuise le stack JavaScript. Est-ce qu'il y a une raison pour laquelle ces deux canaux ne passent pas par `gOutDestinations` ?
 
 ### OCT + terminaux custom : timing incorrect
 

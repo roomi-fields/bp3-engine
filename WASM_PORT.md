@@ -366,6 +366,61 @@ Ce comportement se produit aussi bien en WASM qu'en natif (non vérifié — à 
 
 **Question pour Bernard** : est-ce que les sound objects nécessitent une initialisation supplémentaire au-delà de `p_MIDIsize > 0` et `p_Dur > 0` pour que `FillPhaseDiagram` leur alloue du temps ? Peut-être un flag dans `p_Type[j]`, ou une structure `p_Tpict[j]`, ou un prototype complet chargé via `LoadObjectPrototypes()` ?
 
+## Blocage actuel — aide demandée à Bernard
+
+### Notre objectif
+
+Utiliser le moteur BP3 **uniquement comme ordonnanceur symbolique** : il dérive la grammaire, résout la polymétrie, calcule les timestamps — et on récupère la liste des terminaux horodatés. Tout le reste (son, MIDI, Csound, audio) est repoussé à l'extérieur (dispatcher JavaScript). BP3 n'a pas besoin de savoir ce que les terminaux signifient.
+
+### Le problème fondamental
+
+Pour que BP3 calcule des timestamps, un terminal doit passer par `FillPhaseDiagram` → `TimeSet`, ce qui nécessite que BP3 le considère comme un **objet sonnant**. Mais les seuls objets sonnants reconnus par BP3 sont :
+- Les **notes** (T25, `16384 + MIDI_key`) — reconnues automatiquement par `Encode()`
+- Les **sound objects** avec prototype MIDI (T3, `p_MIDIsize[j] > 0`)
+
+Si un terminal n'est ni une note ni un sound object, `FillPhaseDiagram` (ligne 630) le convertit en silence (`p = 1`) et il ne reçoit pas de temps.
+
+### Les 4 impasses
+
+**1. Alphabet standard (OCT, notes western/indiennes)** → les notes sont reconnues et horodatées, MAIS :
+- Elles sont converties en MIDI (`16384 + key`) — le nom symbolique est perdu
+- `Encode()` matche les notes de TOUTES les conventions (English + French + Indian) simultanément, même quand `NoteConvention` est setté. Des noms comme `re4`, `sa4`, `do3` sont capturés comme notes indiennes/françaises même dans un contexte English.
+- Les terminaux custom (CV, enveloppes, drums) mélangés avec les notes dans l'alphabet OCT ont durée 0
+
+**2. Sound objects custom** (`bp3_set_object_duration`) → on alloue un `pp_MIDIcode[j]` minimal pour simuler un prototype. MAIS :
+- Ça ne fonctionne que pour ~5 terminaux. Au-delà, `FillPhaseDiagram`/`TimeSet` donne durée 0 malgré `p_MIDIsize > 0` et `p_Dur > 0` correctement settés.
+- Le format des vrais prototypes (`-mi.xxx`) est trop complexe pour être généré programmatiquement (568 lignes par terminal)
+- Probable qu'il manque une initialisation que `LoadObjectPrototypes()` fait et que notre hack ne fait pas
+
+**3. Alphabet custom (noms non-note)** → les terminaux ne sont reconnus ni comme notes ni comme sound objects :
+- Le texte est produit correctement (`Kick Hat Hat Snare`)
+- MAIS aucun timestamp — `FillPhaseDiagram` les traite comme des silences, `p_Instance` est vide
+- On a contourné en ajoutant `bp3_set_object_duration` mais ça retombe dans l'impasse #2
+
+**4. Notre hack `bp3_get_timed_tokens()`** → corrèle la sortie texte avec `p_Instance[]` pour reconstruire les tokens horodatés. Fonctionne pour les notes et les ~5 premiers sound objects, mais dépend du bon fonctionnement de `FillPhaseDiagram`.
+
+### Ce qu'on a besoin de Bernard
+
+**Question centrale** : quel est le mécanisme correct dans BP3 pour qu'un terminal custom (pas une note, pas un instrument Csound) occupe du temps dans la grille temporelle et reçoive des timestamps via `TimeSet` ?
+
+Sous-questions :
+1. Est-ce que `LoadObjectPrototypes()` fait une initialisation spécifique que notre `bp3_set_object_duration()` ne fait pas ? (au-delà de `p_MIDIsize`, `p_Dur`, `pp_MIDIcode`)
+2. Pourquoi `FillPhaseDiagram` donne durée 0 à certains indices de p_Instance quand `p_MIDIsize[j] = 2` et `p_Dur[j] = 1000` sont vérifiés juste avant `TimeSet` ?
+3. Est-ce que `Encode()` est censé matcher les notes de toutes les conventions simultanément ? Si oui, comment déclarer un terminal qui ressemble à une note (ex: `re4`) sans qu'il soit converti en T25 ?
+4. Existe-t-il un mécanisme plus simple que les prototypes `-mi.xxx` pour donner une durée à un terminal — par exemple via l'alphabet ou un flag dans les settings ?
+
+### Ce qui fonctionne
+
+Malgré ces blocages, le portage WASM est fonctionnel pour :
+- Les grammaires de Bernard (107 testées, ~100 passent)
+- La production textuelle (résultat de dérivation)
+- Les événements MIDI (notes, timing, vélocité, canaux)
+- Les tokens horodatés pour les grammaires avec ≤5 terminaux custom
+- Le reset complet entre sessions (`bp3_init()`)
+- Les gammes microtonales et la tonalité
+- La polymétrie (synchronisation parfaite)
+- Les contrôles (`_vel`, `_chan`, `_script`) avec timestamp instantané correct
+
 ## Suite de tests
 
 ```bash

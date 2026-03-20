@@ -209,7 +209,12 @@ int MIDItoPrototype(int zerostart, int filter, int j, MIDIcode **p_b, long imax)
     lasttime = (*ptr1)[imax - 1].time;
     (*p_Dur)[j] = lasttime - (Milliseconds)preroll + (Milliseconds)postroll;
 
-    PointMIDI = TRUE;
+    /* Convert point mode (absolute timestamps) to duration mode (relative).
+       LoadObjectPrototypes reads timestamps as absolute values from Eucl().
+       PointToDuration converts them to durations and sets PointMIDI = FALSE.
+       Without this, MIDICheckConsistency fails with "DurationToPoint: Point mode". */
+    if(PointToDuration(pp_MIDIcode, NULL, p_MIDIsize, j) != OK) return(ABORT);
+
     return(OK);
 }
 

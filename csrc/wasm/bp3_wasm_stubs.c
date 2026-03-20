@@ -68,12 +68,7 @@ int MaybeWait(unsigned long time) {
  * MIDIstuff.c stubs
  * ============================================================ */
 
-int FormatMIDIstream(MIDIcode** a, long b, MIDIcode** c, int d,
-                     long e, long* f, int g) {
-    BP_NOT_USED(a); BP_NOT_USED(b); BP_NOT_USED(c);
-    BP_NOT_USED(d); BP_NOT_USED(e); BP_NOT_USED(f); BP_NOT_USED(g);
-    return OK;
-}
+/* FormatMIDIstream — real implementation below in "Ported from MIDIstuff.c" section */
 
 int SendToDriver(int a, int b, int c, Milliseconds d, int e,
                  int* f, MIDI_Event* g) {
@@ -154,67 +149,153 @@ int MakeMIDIFile(OutFileInfo* finfo) {
     return OK;
 }
 
-int ThreeByteChannelEvent(int e) {
-    /* Return whether event is 3-byte: note on/off, aftertouch, control, pitch bend */
-    int status = e & 0xF0;
-    return (status == 0x80 || status == 0x90 || status == 0xA0 ||
-            status == 0xB0 || status == 0xE0);
+/* ThreeByteChannelEvent and ChannelEvent — real implementations below */
+
+/* ---- Ported from MIDIstuff.c ---- */
+
+/* ByteToInt is in Misc.c — no duplicate needed */
+
+int ThreeByteChannelEvent(int c) {
+    if(c < NoteOff) return(NO);
+    if(c == ProgramChange || c == ChannelPressure) return(NO);
+    if(c > PitchBend) return(NO);
+    return(YES);
 }
 
-int ChannelEvent(int e) {
-    int status = e & 0xF0;
-    return (status >= 0x80 && status <= 0xE0);
+int ChannelEvent(int c) {
+    int c0 = c & 0xF0;
+    return (c0 >= NoteOff && c0 <= PitchBend);
 }
 
-/* MIDItoPrototype — simplified WASM version.
-   Stores MIDI codes from p_b into prototype j.
-   Full version in MIDIstuff.c does FormatMIDIstream + PointToDuration.
-   We skip the filtering/formatting and just copy the data. */
+/* FormatMIDIstream — ported from MIDIstuff.c (Bernard Bel).
+   Formats raw MIDI byte stream: normalizes timestamps, handles running status. */
+int FormatMIDIstream(MIDIcode **p_b, long imax, MIDIcode **p_c, int zerostart,
+    long im2, long *p_nbytes, int filter) {
+    long i, ii, time, t0;
+    int b, br, rc, which_control, value1, value2, status;
+
+    time = (*p_b)[0].time;
+    if(zerostart) t0 = time;
+    else t0 = ZERO;
+    for(i = 0; i < imax; i++) {
+        (*p_c)[i].sequence = (*p_b)[i].sequence;
+        if((*p_b)[i].time < time) (*p_b)[i].time = time - t0;
+        else {
+            time = (*p_b)[i].time;
+            (*p_b)[i].time -= t0;
+        }
+    }
+    ii = ZERO;
+    i = -1; br = 0;
+
+NEXTBYTE:
+    if(ii >= im2) return(MISSED);
+    i++; if(i >= imax) goto QUIT;
+    b = ByteToInt((*p_b)[i].byte);
+    time = (*p_b)[i].time;
+
+    if(b == TimingClock) goto NEXTBYTE;
+    if(b == SystemExclusive) {
+        br = 0;
+        while(((b = (*p_b)[i].byte) != EndSysEx) && i < imax - 1) i++;
+        goto NEXTBYTE;
+    }
+
+    if(!filter) {
+        (*p_c)[ii].time = time;
+        (*p_c)[ii].byte = b;
+        (*p_c)[ii++].sequence = (*p_b)[i].sequence;
+        goto NEXTBYTE;
+    }
+
+    if(b < NoteOff || br == PitchBend || br == ProgramChange || br == ChannelPressure) {
+        if(br == 0) goto NEXTBYTE;
+        (*p_c)[ii].time = time;
+        (*p_c)[ii].byte = br + rc;
+        (*p_c)[ii++].sequence = 0;
+        if(ii >= im2) return(MISSED);
+        value1 = (*p_c)[ii].byte = ByteToInt((*p_b)[i].byte);
+        (*p_c)[ii++].sequence = (*p_b)[i].sequence;
+        if(ii >= im2) return(MISSED);
+        if(br == ProgramChange || br == ChannelPressure) {
+            br = 0;
+            goto NEXTBYTE;
+        }
+        i++; if(i >= imax) goto QUIT;
+        (*p_c)[ii].time = time;
+        value2 = (*p_c)[ii].byte = ByteToInt((*p_b)[i].byte);
+        (*p_c)[ii++].sequence = (*p_b)[i].sequence;
+        if(br == PitchBend) br = 0;
+        goto NEXTBYTE;
+    }
+    if(b >= SystemExclusive) goto NEXTBYTE;
+    rc = b % 16;
+    b -= rc;
+    if(b == ControlChange) {
+        (*p_c)[ii].time = time;
+        (*p_c)[ii].byte = b + rc;
+        (*p_c)[ii++].sequence = (*p_b)[i].sequence;
+        i++; if(i >= imax) goto QUIT;
+        (*p_c)[ii].time = time;
+        which_control = (*p_c)[ii].byte = ByteToInt((*p_b)[i].byte);
+        (*p_c)[ii++].sequence = (*p_b)[i].sequence;
+        i++; if(i >= imax) goto QUIT;
+        (*p_c)[ii].time = time;
+        (*p_c)[ii].byte = ByteToInt((*p_b)[i].byte);
+        (*p_c)[ii++].sequence = (*p_b)[i].sequence;
+        goto NEXTBYTE;
+    }
+
+    br = b;
+    if(ThreeByteChannelEvent(b) || b == ProgramChange || b == ChannelPressure || b == PitchBend) {
+        goto NEXTBYTE;
+    }
+    br = 0;
+    goto NEXTBYTE;
+
+QUIT:
+    *p_nbytes = ii;
+    return(OK);
+}
+
+/* MIDItoPrototype — ported from MIDIstuff.c (Bernard Bel).
+   Stores MIDI codes to prototype j via FormatMIDIstream + PointToDuration. */
 int MIDItoPrototype(int zerostart, int filter, int j, MIDIcode **p_b, long imax) {
-    long nbytes, i;
-    Milliseconds lasttime;
+    long im2, nbytes;
     MIDIcode **ptr1;
     Handle ptr;
     double preroll, postroll;
 
-    (void)zerostart; (void)filter;
-
-    if(imax <= 0) {
-        (*p_MIDIsize)[j] = ZERO;
-        (*p_Dur)[j] = ZERO;
-        return(OK);
-    }
-
-    /* Allocate and copy MIDI data */
-    if((ptr1 = (MIDIcode**)GiveSpace((Size)(imax * sizeof(MIDIcode)))) == NULL)
+    im2 = 2L * imax;
+    if((ptr1 = (MIDIcode**)GiveSpace((Size)(im2 * sizeof(MIDIcode)))) == NULL)
         return(ABORT);
 
-    for(i = 0; i < imax; i++) {
-        (*ptr1)[i].time = (*p_b)[i].time;
-        (*ptr1)[i].byte = (*p_b)[i].byte;
-        (*ptr1)[i].sequence = (*p_b)[i].sequence;
-    }
+    /* WASM: force filter=FALSE — our generated MIDI data is already clean
+       (no running status, no SysEx). The filter is designed for real MIDI
+       recordings from Bernard's PHP interface. */
+    if(FormatMIDIstream(p_b, imax, ptr1, zerostart, im2, &nbytes, FALSE) != OK)
+        return(MISSED);
 
-    /* Replace existing prototype data */
     ptr = (Handle)(*pp_MIDIcode)[j];
     if(ptr != NULL) MyDisposeHandle(&ptr);
+    (*pp_MIDIcode)[j] = NULL;
     (*pp_MIDIcode)[j] = ptr1;
 
-    /* Set size, type, and duration */
-    (*p_MIDIsize)[j] = imax;
-    (*p_Type)[j] |= 1;  /* flag as MIDI object */
-
-    /* Duration = last event time - preroll + postroll */
     GetPrePostRoll(j, &preroll, &postroll);
-    lasttime = (*ptr1)[imax - 1].time;
-    (*p_Dur)[j] = lasttime - (Milliseconds)preroll + (Milliseconds)postroll;
-
-    /* Convert point mode (absolute timestamps) to duration mode (relative).
-       LoadObjectPrototypes reads timestamps as absolute values from Eucl().
-       PointToDuration converts them to durations and sets PointMIDI = FALSE.
-       Without this, MIDICheckConsistency fails with "DurationToPoint: Point mode". */
-    if(PointToDuration(pp_MIDIcode, NULL, p_MIDIsize, j) != OK) return(ABORT);
-
+    if(nbytes > 0) {
+        (*p_MIDIsize)[j] = nbytes;
+        (*p_Type)[j] |= 1;
+        (*p_Dur)[j] = ((*((*pp_MIDIcode)[j]))[nbytes - 1].time) - preroll + postroll;
+        ptr1 = (*pp_MIDIcode)[j];
+        MySetHandleSize((Handle*)&ptr1, (Size)(nbytes * sizeof(MIDIcode)));
+        (*pp_MIDIcode)[j] = ptr1;
+        PointMIDI = TRUE;
+        if(PointToDuration(pp_MIDIcode, NULL, p_MIDIsize, j) != OK) return(ABORT);
+    } else {
+        PointMIDI = FALSE;
+        (*p_MIDIsize)[j] = ZERO;
+        (*p_Dur)[j] = ZERO;
+    }
     return(OK);
 }
 

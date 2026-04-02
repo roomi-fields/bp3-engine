@@ -53,20 +53,19 @@ int SetObjectParams(int isobject,int level,int nseq,short** p_articul,long k,int
 	double v0,v1;
 	Coordinates **ptr;
 
+
 	if(k < 2) {
 		BPPrintMessage(0,odError,"=> Err. SetObjectParams(). k < 2\n");
-		return(ABORT); // Fixed by BB 2021-02-26
+		return(ABORT);
 		}
 	if(nseq >= Maxconc) {
 		BPPrintMessage(0,odError,"=> Err. SetObjectParams(). nseq >= Maxconc\n");
-		return(ABORT); // Fixed by BB 2021-02-26
+		return(ABORT);
 		}
-
 	if((*p_Instance)[k].contparameters.values != NULL) {
 		BPPrintMessage(0,odError,"=> Err. SetObjectParams(). (*p_Instance)[k].contparameters.values != NULL\n");
-		return(ABORT); // Fixed by BB 2021-02-26
+		return(ABORT);
 		}
-
 	(*p_Instance)[k].contparameters.values = NULL;
 	(*p_Instance)[k].contparameters.number = 0;
 	if(trace_set_variation) BPPrintMessage(1,odInfo,"$$$$$\n");
@@ -77,7 +76,6 @@ int SetObjectParams(int isobject,int level,int nseq,short** p_articul,long k,int
 			return(ABORT);
 		(*p_Instance)[k].contparameters.values = currentinstancevalues;
 		(*p_Instance)[k].contparameters.number = n;
-		
 		if((*p_contparameters)[level].values == NULL) {
 			BPPrintMessage(0,odError,"=> Err. SetObjectParams(). (*p_contparameters)[level].values == NULL\n");
 			return(ABORT);
@@ -133,12 +131,10 @@ int SetObjectParams(int isobject,int level,int nseq,short** p_articul,long k,int
 				}
 			(*currentinstancevalues)[i].v0 = v0;
 			(*currentinstancevalues)[i].v1 = v1;
-			// BPPrintMessage(0,odInfo,"-> start value v0 = %ld, end value v1 = %ld\n",(long)v0,(long)v1);
 			(*currentinstancevalues)[i].mode = mode;
 			(*currentinstancevalues)[i].control = (*((*p_contparameters)[level].values))[i].control;
 			(*currentinstancevalues)[i].channel = chan;
 			(*currentinstancevalues)[i].scale = scale;
-			if(trace_scale) BPPrintMessage(0,odInfo,"1) scale = %d\n",scale);
 			(*currentinstancevalues)[i].blockkey = blockkey;
 			(*currentinstancevalues)[i].index = (*((*p_contparameters)[level].values))[i].index;
 			(*currentinstancevalues)[i].imax = ZERO;
@@ -148,7 +144,6 @@ int SetObjectParams(int isobject,int level,int nseq,short** p_articul,long k,int
 			if(h_table == NULL) {
 				BPPrintMessage(0,odError,"=> Err. SetObjectParams(). h_table == NULL\n");
 				}
-			
 			if(isobject && (*h_table)[i].point != NULL) {
 				if((*h_table)[i].offset == 0) {
 					if((ptr=(Coordinates**)
@@ -195,16 +190,12 @@ int SetObjectParams(int isobject,int level,int nseq,short** p_articul,long k,int
 				(*currentinstancevalues)[i].blockkey = p_currentparameters->blockkey;
 			}
 		}
-
 	if(!isobject) (*p_Instance)[k].nseq = nseq;
-	// Otherwise the nseq field has been set in Plot()
-
 	(*p_Instance)[k].velocity = p_currentparameters->currvel;
 	(*p_Instance)[k].rndvel = p_currentparameters->rndvel;
 	(*p_Instance)[k].velcontrol = p_currentparameters->velcontrol;
 	(*p_Instance)[k].randomtime = p_currentparameters->randomtime;
 	(*p_Instance)[k].seed = p_currentparameters->seed;
-
 	if(j < 1 || j >= Jbol || (*p_OkMap)[j]) {
 		(*p_Instance)[k].map0 = p_currentparameters->map0;
 		(*p_Instance)[k].map1 = p_currentparameters->map1;
@@ -225,9 +216,7 @@ int SetObjectParams(int isobject,int level,int nseq,short** p_articul,long k,int
 	if(j < 1 || j >= Jbol) {
 		(*p_Instance)[k].transposition = p_currentparameters->currtranspose;
 		if(p_articul != NULL) {
-		//	if(p_currentparameters->currarticul >= 0)
 				(*p_articul)[k] = p_currentparameters->currarticul;
-		//	else (*p_articul)[k] = MAXINT + p_currentparameters->currarticul;
 			}
 		}
 	else {
@@ -1822,7 +1811,7 @@ int RandomTime(Milliseconds *p_t1,short randomtime,Milliseconds duration,short *
 		*p_dont_randomize = FALSE;
 		return(OK);
 		}
-	x = (2. * rand() * ((float)randomtime)) / ((float)RAND_MAX);
+	x = (2. * bp3_rand() * ((float)randomtime)) / ((float)BP3_RAND_MAX);
 	UsedRandom = TRUE;
 	if(x > randomtime) x = randomtime - x;
 	(*p_t1) += x;

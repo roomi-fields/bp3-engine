@@ -36,7 +36,7 @@
 #ifndef _H_BP3
 #define _H_BP3
 
-#define SHORT_VERSION "3.3.13"
+#define SHORT_VERSION "3.3.19"
 #define IDSTRING ( "Version " SHORT_VERSION " (" __DATE__ " - " __TIME__ ")")
 #define MAXVERSION 31
 
@@ -90,6 +90,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include "bp3_random.h"
 
 typedef	int8_t	sbyte;
 
@@ -849,7 +850,7 @@ typedef enum {
 #define BOLSIZE 30		/* length of terminal name */
 #define MAXFLAG 8		/* default number of flags */
 #define MAXEVENTSCRIPT 8	/* default number of event script lines */
-#define FIELDSIZE 100	/* standard size of field in poly structure */
+#define FIELDSIZE 1000	/* standard size of field in poly structure */
 #define MAXVAR 30		/* initial number of variables in grammar or script */
 #define HOMOSIZE 20		/* length of homomorphism identifier */
 #define MAXDISPL 1000	/* minimum size of display */

@@ -122,11 +122,21 @@ Le guard dans `SaveLoads1.c` (ligne 704, précédemment commenté) a aussi été
 
 ---
 
+### bp3_random.c/.h — RNG portable MSVC (FEEDBACK #31)
+
+Nouveau fichier `bp3_random.c` + `bp3_random.h` : LCG identique à MSVC (`seed * 214013 + 2531011`, `RAND_MAX = 32767`). Remplace tous les appels `rand()`/`srand()`/`RAND_MAX` dans le moteur.
+
+Fichiers modifiés : `Misc.c` (6× srand, 2× rand), `Compute.c` (3× rand, 4× RAND_MAX), `Zouleb.c` (2× rand, 2× RAND_MAX), `SetObjectFeatures.c` (1× rand, 1× RAND_MAX), `MakeSound.c` (1× rand, 1× RAND_MAX), `ScriptUtils.c` (1× srand).
+
+**Impact :** bp3 Linux/WASM produit maintenant les mêmes séquences aléatoires que bp.exe Windows pour le même seed. Score S0=S1 : 26/30 EXACT (était ~18/30).
+
+---
+
 ## Headers modifiés
 
 | Fichier | Changement |
 |---------|-----------|
-| `-BP3.h` | `FIELDSIZE` 100 → 1000 (FEEDBACK #17), version 3.3.19 |
+| `-BP3.h` | `FIELDSIZE` 100 → 1000 (FEEDBACK #17), version 3.3.19, `#include "bp3_random.h"` |
 | `-BP3.proto.h` | Déclarations `BalancedPoly()`, `MakeEmptyTokensSilent()`, `CheckItemProduced(force)` |
 | `-BP3decl.h` | Déclaration `NoTracePath` |
 | `-BP3main.h` | Définition `NoTracePath`, init `NumberMessages = 0` |

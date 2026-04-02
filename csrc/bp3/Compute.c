@@ -159,7 +159,7 @@ int Compute(tokenbyte ***pp_a,int fromigram,int toigram,long *p_length,int *p_re
 		my_sprintf(Message,"NeedZouleb = %ld after Compute(). Should be 0",(long)NeedZouleb);
 		ShowMessage(TRUE,wMessage,Message);
 		}
-	if(ItemNumber == 0) ItemNumber = 1;
+//	if(ItemNumber == 0) ItemNumber = 1;
 	return(r);
 	}
 
@@ -429,11 +429,11 @@ int ComputeInGram(tokenbyte ***pp_a,t_gram *p_gram,int igram,int inrul,long *p_l
 		else {
 			if(trace_compute) BPPrintMessage(0,odInfo,"nb_candidates (2) = %d\n",nb_candidates);
 			if(nb_candidates > 1) {
-				randomnumber = rand();
+				randomnumber = bp3_rand();
 				int total = (*p_totwght)[nb_candidates-1];
-				choice = (total + 1) * (randomnumber/((double)RAND_MAX)); // Fixed 2024-07-06
+				choice = (total + 1) * (randomnumber/((double)BP3_RAND_MAX)); // Fixed 2024-07-06
 				if(choice > total) choice = total;
-			if(trace_weights) BPPrintMessage(0,odInfo,"ComputeInGram(%d). choice = %ld nb_candidates =  %d (*p_totwght)[nb_candidates-1] = %ld, randomnumber = %ld RAND_MAX = %ld\n",igram,(long)choice,nb_candidates,(long)(*p_totwght)[nb_candidates-1],(long)randomnumber,(long)RAND_MAX);
+			if(trace_weights) BPPrintMessage(0,odInfo,"ComputeInGram(%d). choice = %ld nb_candidates =  %d (*p_totwght)[nb_candidates-1] = %ld, randomnumber = %ld BP3_RAND_MAX = %ld\n",igram,(long)choice,nb_candidates,(long)(*p_totwght)[nb_candidates-1],(long)randomnumber,(long)BP3_RAND_MAX);
 				UsedRandom = TRUE;
 				j = 0;
 				while(choice > (*p_totwght)[j]) { // Fixed 2024-07-06
@@ -482,9 +482,9 @@ int ComputeInGram(tokenbyte ***pp_a,t_gram *p_gram,int igram,int inrul,long *p_l
 				continue;
 				}
 			j = 0;
-			randomnumber = rand();
+			randomnumber = bp3_rand();
 			UsedRandom = TRUE;
-			irul = 1 + (subgram.number_rule - 1) * (randomnumber / ((double)RAND_MAX));
+			irul = 1 + (subgram.number_rule - 1) * (randomnumber / ((double)BP3_RAND_MAX));
 			rule = (*(subgram.p_rule))[irul];
 			irep = 0;
 			if((rule.w == 0) ||
@@ -774,7 +774,8 @@ int ComputeInGram(tokenbyte ***pp_a,t_gram *p_gram,int igram,int inrul,long *p_l
 			goto QUIT;
 			}
 	//	BPPrintMessage(0,odInfo,"\nfoundone = %d, UseEachSub = %d, DisplayItems = %d, PlaySelectionOn =%d\n",foundone,UseEachSub,DisplayItems,PlaySelectionOn);
-		if(UseEachSub && foundone && !PlaySelectionOn && DisplayItems) { // Added by BB 7 Nov 2020
+		int done_print = FALSE;
+		if(UseEachSub && foundone && !PlaySelectionOn && DisplayItems) {
 			datamode = DisplayMode(pp_b,&ifunc,&hastabs);
 			long length = LengthOf(pp_b);
 		//	BPPrintMessage(0,odError,"Subst ItemNumber = %d length = %ld datamode = %d hastabs = %d ifunc = %d\n",ItemNumber,length,datamode,hastabs,ifunc);
@@ -789,12 +790,22 @@ int ComputeInGram(tokenbyte ***pp_a,t_gram *p_gram,int igram,int inrul,long *p_l
 					}
 				}
 			if(NumberCharsData < MAXCHARDATA) {
-				if((rep=PrintResult(datamode && hastabs,OutputWindow,hastabs,ifunc,pp_b)) != OK) {
-					BPPrintMessage(0,odError,"=> Error calling PrintResult(2) in Compute.c\n");
-					goto QUIT;
+				if(changed && BalancedPoly(pp_b)) { // 2026-03-31
+		//			BPPrintMessage(1,odInfo,"@ PrintResult()\n");
+					ItemNumber++;
+					if((MaxItemsProduce > 0) && ItemNumber > MaxItemsProduce) {
+						BPPrintMessage(1,odInfo,"👉 %ld items have been produced\n",(long)(ItemNumber - 1L));
+						rep = OK;
+						goto QUIT;
+						}
+					if((rep=PrintResult(datamode && hastabs,OutputWindow,hastabs,ifunc,pp_b)) != OK) {
+						BPPrintMessage(0,odError,"=> Error calling PrintResult(2) in Compute.c\n");
+						goto QUIT;
+						}
+					Print(OutputWindow,"\n");
+					done_print = TRUE;
+					NumberCharsData += 20;
 					}
-				Print(OutputWindow,"\n");
-				NumberCharsData += 20;
 				}
 		//	if(length > 0) BPPrintMessage(1,odInfo,"\n");
 			}
@@ -811,22 +822,29 @@ int ComputeInGram(tokenbyte ***pp_a,t_gram *p_gram,int igram,int inrul,long *p_l
 				}
 			}
 		lastpos = leftpos = ZERO; incmark = 0;
-		if(UseEachSub) { 
+		if(UseEachSub) {
 			if(foundone && !PlaySelectionOn && DisplayItems) {
 				datamode = DisplayMode(pp_a,&ifunc,&hastabs);
 			//	BPPrintMessage(0,odInfo,"OutputWindow\n");
 			//	BPPrintMessage(0,odError,"ItemNumber = %d datamode = %d hastabs = %d ifunc = %d\n",ItemNumber,datamode,hastabs,ifunc);
-				if(NumberCharsData < MAXCHARDATA) {
-					if((rep=PrintResult(datamode && hastabs,OutputWindow,hastabs,ifunc,pp_a)) != OK) {
+				if(!done_print && changed && NumberCharsData < MAXCHARDATA) {
+				//	BPPrintMessage(1,odInfo,"@@ PrintResult()\n");
+					ItemNumber++;
+					if((MaxItemsProduce > 0) && ItemNumber > MaxItemsProduce) {
+						BPPrintMessage(1,odInfo,"👉 %ld items have been produced\n",(long)(ItemNumber - 1L));
+						rep = OK;
+				//		goto QUIT;
+						}
+					if((rep = PrintResult(datamode && hastabs,OutputWindow,hastabs,ifunc,pp_a)) != OK) {
 						BPPrintMessage(0,odError,"=> Error calling PrintResult(3) in Compute.c\n");
 						goto QUIT;
 						}
-				//	Print(OutputWindow,"\n");
+					Print(OutputWindow,"\n");
 					NumberCharsData += 20;
 					}
 			//	BPPrintMessage(0,odError,"@\n");  // odError to force printing if Improvize
 				}
-			if(!SkipFlag) {
+			if(foundone && !SkipFlag && changed) { // "changed" 2026-03-31
 				if((p_c = (tokenbyte**)
 					GiveSpace((Size) MyGetHandleSize((Handle)*pp_b))) == NULL) {
 					rep = ABORT;
@@ -835,6 +853,7 @@ int ComputeInGram(tokenbyte ***pp_a,t_gram *p_gram,int igram,int inrul,long *p_l
 				if(CopyBuf(pp_b,pp_c) == ABORT) return(ABORT);
 			/*	PrintResult(datamode && hastabs,OutputWindow,hastabs,ifunc,pp_c);
 				Print(OutputWindow," (2)\n"); */
+			//	BPPrintMessage(1,odInfo,"@@ ShowItem() ItemNumber = %ld, MaxItemsProduce = %d\n",ItemNumber,MaxItemsProduce);
 				rep = ShowItem(igram,p_gram,TRUE,pp_c,(*p_repeat),mode,FALSE);
 				MyDisposeHandle((Handle*)pp_c);
 				if(rep == ABORT) {
@@ -1838,10 +1857,10 @@ long Insert(int grtype,tokenbyte ***pp_origin,tokenbyte ***pp_dest,t_rule rule,l
 	case 0:	{						/* RND rule */
 			UsedRandom = TRUE;
 			do {
-				randomnumber = rand();
+				randomnumber = bp3_rand();
 				posdif = ((*p_lengthorigin) - pos - 1);
 				pos1 = pos + 2 * (int)(posdif
-				* (randomnumber / ((double)RAND_MAX) / 2.));
+				* (randomnumber / ((double)BP3_RAND_MAX) / 2.));
 			/*	if(!Improvize && !Interactive && time_end_compute > 0L && getClockTime() > time_end_compute) {
 					EmergencyExit = TRUE;
 					BPPrintMessage(0,odInfo,"=> (3) Maximum allowed time (%d seconds) has been spent in Insert(). Stopped computing...\n➡ This limit can be modified in the settings\n\n",MaxConsoleTime);

@@ -13,6 +13,21 @@
 #include "-BP3.h"
 #include "-BP3decl.h"
 
+/* Accumulated instance type — defined in bp3_wasm_stubs.c */
+typedef struct {
+    short object;
+    Milliseconds starttime, endtime;
+    char velocity, channel;
+    int scale;
+    short transposition;
+    short xpandkey, xpandval;
+    char lastistranspose;
+} WasmInstanceAccum;
+
+/* Debug: expose trace_compute toggle for SUB loop investigation */
+extern int trace_compute;
+extern int trace_weights;
+
 /* Forward declarations for ConsoleMain.c functions */
 extern void ConsoleInit(BPConsoleOpts* opts);
 extern void ConsoleMessagesInit(void);
@@ -159,7 +174,7 @@ int bp3_init(void) {
     emscripten_log(EM_LOG_CONSOLE, "bp3_init: Inits() OK");
 
     TraceMemory = FALSE;
-    MaxMIDIMessages = 1000L;
+    MaxMIDIMessages = 50000L;  /* 1000 was too small for complex grammars (765432=1646 events, NotReich=1160) */
     eventStack = (MIDI_Event*)malloc(MaxMIDIMessages * sizeof(MIDI_Event));
     if(eventStack == NULL) {
         return -2;
@@ -175,7 +190,10 @@ int bp3_init(void) {
     TimeSettingTime = (time_t)0L;
     time(&ProductionStartTime);
 
-    /* Enable MIDI event generation path so PlayBuffer gets called */
+    /* Always TRUE in WASM: enables PlayBuffer path which handles both
+       MIDI extraction (musical grammars) and TimeSet (timed tokens).
+       For text-only grammars, PlayBuffer runs but produces 0 MIDI events
+       naturally (no T25 objects). bp3_set_write_midi() can override. */
     WriteMIDIfile = TRUE;
 
     /* Reset production state */
@@ -188,8 +206,9 @@ int bp3_init(void) {
     CopyStringToTextHandle(TEH[wStartString], "S\n");
 
     /* Call LoadSettings to initialize internal state (memory layout, defaults).
-       Without this call, complex grammars (Visser3) crash with SIGSEGV. */
-    {
+       Without this call, complex grammars (Visser3) crash with SIGSEGV.
+       Only on first init — re-init already has the state from previous cycle. */
+    if(!bp3_initialized) {
         FILE* f = fopen("/tmp_init_settings.json", "w");
         if(f) {
             fputs("{\"DisplayItems\":{\"name\":\"Display items\",\"value\":\"1\",\"boolean\":\"1\"}}", f);
@@ -225,9 +244,11 @@ int bp3_load_alphabet(const char* text) {
     return 0;
 }
 
-/* bp3_load_settings: kept for backward compatibility but should not be used.
-   LoadSettings() expects Bernard's -se format, not arbitrary JSON.
-   Use bp3_load_settings_params() instead. */
+/* bp3_load_settings: load settings from Bernard's JSON format.
+   Parses the full -se.xxx JSON (84+ parameters) via cJSON in LoadSettings().
+   Works with JSON files from Bernard's PHP interface (starting with '{').
+   Does NOT work with old text-format -se files (BP2 legacy starting with '//').
+   For minimal settings (6 params), use bp3_load_settings_params() instead. */
 EMSCRIPTEN_KEEPALIVE
 int bp3_load_settings(const char* json_content) {
     if(!json_content || json_content[0] == '\0') return -1;
@@ -248,6 +269,26 @@ int bp3_load_settings(const char* json_content) {
    seed: random seed (0 = don't change)
    maxTime: max computation time in seconds (0 = no limit)
 */
+/* bp3_set_write_midi: enable/disable MIDI output (PlayBuffer path).
+   Must be called AFTER bp3_load_alphabet() for musical grammars.
+   Only enable for grammars with musical notes (English/French/Indian).
+   Text-only grammars (look-and-say, gramgene) must NOT enable this. */
+EMSCRIPTEN_KEEPALIVE
+void bp3_set_write_midi(int enable) {
+    WriteMIDIfile = enable ? TRUE : FALSE;
+}
+
+/* bp3_set_seed: set random seed without touching any other settings.
+   Use after bp3_load_settings() to override the seed for reproducibility. */
+EMSCRIPTEN_KEEPALIVE
+void bp3_set_seed(int seed) {
+    if(seed > 0) {
+        Seed = (unsigned)(((long)seed) % 32768L);
+        bp3_srand(Seed);
+        UsedRandom = FALSE;
+    }
+}
+
 EMSCRIPTEN_KEEPALIVE
 int bp3_load_settings_params(int noteConvention, int quantize, int timeRes,
                               int natureOfTime, int seed, int maxTime) {
@@ -258,7 +299,11 @@ int bp3_load_settings_params(int noteConvention, int quantize, int timeRes,
 
     if(seed > 0) {
         Seed = (unsigned)(((long)seed) % 32768L);
-        ReseedOrShuffle(seed);
+        /* Use bp3_srand(Seed) directly, matching native's ResetRandom().
+           ReseedOrShuffle(seed) computes (Seed+seed)%32768 which gives
+           a different effective seed (e.g. seed=1 → bp3_srand(2) instead of bp3_srand(1)). */
+        bp3_srand(Seed);
+        UsedRandom = FALSE;
     }
 
     if(maxTime > 0) MaxConsoleTime = (long)maxTime;
@@ -285,6 +330,54 @@ int bp3_load_tonality(const char* content) {
     return (r == OK) ? 0 : -3;
 }
 
+/* bp3_provision_file: write any file content to the Emscripten virtual filesystem.
+   This is the generic mechanism for providing auxiliary files that the engine
+   resolves internally during compilation and production:
+   - "-mi.xxx" (MIDI prototypes, referenced from -ho. files)
+   - "-or.xxx" (orchestra definitions)
+   - "-tb.xxx" (time base patterns)
+   - "-in.xxx" (interactive MIDI)
+   - "-gl.xxx" (glossary)
+   - Any other file the engine might try to fopen()
+
+   The filename should match exactly what the grammar/alphabet references
+   (e.g. "-mi.dhati" for a grammar referencing -ho.dhati which contains "-mi.dhati").
+   Files are written to the root of the Emscripten filesystem "/".
+
+   Call this BEFORE bp3_load_grammar() so files are available during compilation.
+   Returns 0 on success, -1 if empty, -2 if write fails. */
+EMSCRIPTEN_KEEPALIVE
+int bp3_provision_file(const char* filename, const char* content) {
+    if(!filename || !content) return -1;
+    char path[512];
+    /* Write to root "/" so fopen("filename") or fopen("/filename") both find it */
+    snprintf(path, sizeof(path), "/%s", filename);
+    FILE* f = fopen(path, "w");
+    if(!f) return -2;
+    fputs(content, f);
+    fclose(f);
+    emscripten_log(EM_LOG_CONSOLE, "bp3_provision_file: wrote %d bytes to %s",
+                   (int)strlen(content), path);
+    return 0;
+}
+
+EMSCRIPTEN_KEEPALIVE
+int bp3_load_object_prototypes(const char* content) {
+    if(!content || content[0] == '\0') return -1;
+    /* Write -mi. content to virtual filesystem, then call LoadObjectPrototypes.
+       This loads MIDI prototypes for sound objects (durations, channels, velocities)
+       which are referenced by -ho. alphabet files. Without this, sound objects
+       get default 1-beat duration and timings are uniform/wrong. */
+    FILE* f = fopen("/tmp_prototypes.txt", "w");
+    if(!f) return -2;
+    fputs(content, f);
+    fclose(f);
+    strcpy(FileName[iObjects], "/tmp_prototypes.txt");
+    int r = LoadObjectPrototypes(0, 1);
+    remove("/tmp_prototypes.txt");
+    return (r == OK) ? 0 : (r == MISSED) ? -4 : -3;
+}
+
 EMSCRIPTEN_KEEPALIVE
 int bp3_load_csound_resources(const char* content) {
     if(!content || content[0] == '\0') return -1;
@@ -297,117 +390,6 @@ int bp3_load_csound_resources(const char* content) {
     int r = LoadCsoundInstruments(0, 1);
     remove("/tmp_csound.txt");
     return (r == OK) ? 0 : -3;
-}
-
-/* bp3_load_prototypes: load sound object prototypes from -so./-mi. file content.
-   Must be called AFTER bp3_load_alphabet() and BEFORE bp3_produce().
-   Uses Bernard's LoadObjectPrototypes() which properly initializes all
-   sound object structures (p_Dur, p_MIDIsize, pp_MIDIcode, p_Type, etc.) */
-EMSCRIPTEN_KEEPALIVE
-int bp3_load_prototypes(const char* content) {
-    if(!content || content[0] == '\0') return -1;
-
-    /* Strip <HTML>...</HTML> tags from the content.
-       Bernard's PHP interface wraps terminal names in HTML tags.
-       The native build strips them via HTML.c which we don't include. */
-    int len = strlen(content);
-    char *cleaned = (char*)malloc(len + 1);
-    if(!cleaned) return -2;
-    int i = 0, j = 0;
-    while(i < len) {
-        if(content[i] == '<' && (strncmp(&content[i], "<HTML>", 6) == 0 ||
-                                  strncmp(&content[i], "<html>", 6) == 0)) {
-            i += 6;  /* skip <HTML> */
-        } else if(content[i] == '<' && (strncmp(&content[i], "</HTML>", 7) == 0 ||
-                                         strncmp(&content[i], "</html>", 7) == 0)) {
-            i += 7;  /* skip </HTML> */
-        } else {
-            cleaned[j++] = content[i++];
-        }
-    }
-    cleaned[j] = '\0';
-
-    FILE* f = fopen("/tmp_prototypes.txt", "w");
-    if(!f) { free(cleaned); return -2; }
-    fputs(cleaned, f);
-    fclose(f);
-    free(cleaned);
-
-    strcpy(FileName[iObjects], "/tmp_prototypes.txt");
-    extern int LoadObjectPrototypes(int checkversion, int tryname);
-    int r = LoadObjectPrototypes(0, 1);
-    remove("/tmp_prototypes.txt");
-    return (r == OK) ? 0 : -3;
-}
-
-/* ---- Deferred object duration ---- */
-/* Stored before produce, applied after grammar compilation */
-#define MAX_DEFERRED_DURATIONS 128
-static struct { char name[64]; int duration_ms; } deferred_durations[MAX_DEFERRED_DURATIONS];
-static int n_deferred_durations = 0;
-
-/* Apply deferred durations after grammar compilation (p_Bol is populated) */
-void apply_deferred_durations(void) {
-    int i, j, l, found;
-    MIDIcode **p_midi;
-
-    if(n_deferred_durations == 0) return;
-    if(p_Bol == NULL || Jbol < 3) return;
-
-    for(i = 0; i < n_deferred_durations; i++) {
-        found = -1;
-        for(j = 2; j < Jbol; j++) {
-            if((*p_Bol)[j] == NULL || *((*p_Bol)[j]) == NULL) continue;
-            l = strlen(*((*p_Bol)[j]));
-            if(l > 0 && strncmp(deferred_durations[i].name, *((*p_Bol)[j]), l) == 0
-               && deferred_durations[i].name[l] == '\0') {
-                found = j;
-                break;
-            }
-        }
-        if(found < 0) continue;
-        j = found;
-
-        if(p_Dur != NULL) (*p_Dur)[j] = (long)deferred_durations[i].duration_ms;
-        if(p_Tref != NULL) (*p_Tref)[j] = (long)deferred_durations[i].duration_ms;
-
-        /* Allocate minimal MIDIcode so FillPhaseDiagram treats it as sounding */
-        if(pp_MIDIcode != NULL && p_MIDIsize != NULL && (*p_MIDIsize)[j] == 0) {
-            p_midi = (MIDIcode**)GiveSpace((Size)(2 * sizeof(MIDIcode)));
-            if(p_midi != NULL) {
-                (*p_midi)[0].time = 0;
-                (*p_midi)[0].byte = 0x90;
-                (*p_midi)[0].sequence = 0;
-                (*p_midi)[1].time = (Milliseconds)deferred_durations[i].duration_ms;
-                (*p_midi)[1].byte = 0x80;
-                (*p_midi)[1].sequence = 0;
-                (*pp_MIDIcode)[j] = p_midi;
-                (*p_MIDIsize)[j] = 2;
-            }
-        }
-
-        emscripten_log(EM_LOG_CONSOLE, "Applied duration %dms to '%s' (index %d)",
-                       deferred_durations[i].duration_ms, deferred_durations[i].name, j);
-    }
-    n_deferred_durations = 0;
-}
-
-/* bp3_set_object_duration: declare a terminal as a sounding object with duration.
-   Call AFTER bp3_load_alphabet() and BEFORE bp3_produce().
-   The duration is applied after grammar compilation during bp3_produce().
-   name: terminal name (must exist in alphabet)
-   duration_ms: duration in milliseconds (> 0)
-   Returns 0 on success, <0 on error. */
-EMSCRIPTEN_KEEPALIVE
-int bp3_set_object_duration(const char* name, int duration_ms) {
-    if(name == NULL || duration_ms <= 0) return -1;
-    if(n_deferred_durations >= MAX_DEFERRED_DURATIONS) return -2;
-
-    strncpy(deferred_durations[n_deferred_durations].name, name, 63);
-    deferred_durations[n_deferred_durations].name[63] = '\0';
-    deferred_durations[n_deferred_durations].duration_ms = duration_ms;
-    n_deferred_durations++;
-    return 0;
 }
 
 EMSCRIPTEN_KEEPALIVE
@@ -426,9 +408,15 @@ int bp3_produce(void) {
     NumberMessages = 0;
     eventCount = 0;  /* Clear MIDI events from previous production */
 
-    /* Disable Improvize mode in WASM — no real-time MIDI available.
-       Without this, Improvize grammars loop 20+ items then return ABORT. */
-    Improvize = FALSE;
+    /* Clear timed token accumulator */
+    extern long wasm_accum_count;
+    extern Milliseconds wasm_accum_time_offset;
+    wasm_accum_count = 0;
+    wasm_accum_time_offset = 0;
+
+    /* Improvize mode: let the engine loop up to MaxItemsProduce items.
+       In non-rtMIDI mode (WASM), ProduceItems loops and returns ABORT
+       when MaxItemsProduce is reached — this is normal, not an error. */
 
     /* Redirect stdout to /dev/null during production to avoid JS stack overflow.
        Every printf/fprintf(stdout) in BP3's C code triggers a WASM→JS syscall (fd_write).
@@ -477,7 +465,7 @@ const char* bp3_get_messages(void) {
 
 /* ---- MIDI event extraction ---- */
 
-#define MIDI_JSON_BUF_SIZE (512 * 1024)
+#define MIDI_JSON_BUF_SIZE (4 * 1024 * 1024)  /* 4MB for up to 50K events */
 static char midi_json_buffer[MIDI_JSON_BUF_SIZE];
 
 EMSCRIPTEN_KEEPALIVE
@@ -571,8 +559,13 @@ const char* bp3_get_timed_tokens(void) {
 
     pos += snprintf(token_json_buffer + pos, TOKEN_JSON_BUF_SIZE - pos, "[");
 
-    has_inst = (p_Instance != NULL && *p_Instance != NULL && wasm_last_kmax > 1);
-    kmax = wasm_last_kmax;
+    /* Use accumulated instances if available (Improvize mode) */
+    extern WasmInstanceAccum *wasm_accum;
+    extern long wasm_accum_count;
+    int use_accum = (wasm_accum != NULL && wasm_accum_count > 0);
+
+    has_inst = use_accum || (p_Instance != NULL && *p_Instance != NULL && wasm_last_kmax > 1);
+    kmax = use_accum ? wasm_accum_count : wasm_last_kmax;
     text = bp3_get_result();
 
     if(!has_inst) {
@@ -610,18 +603,31 @@ const char* bp3_get_timed_tokens(void) {
         }
     }
 
-    /* Second pass: iterate p_Instance[2..kmax] and emit tokens with timing.
+    /* Second pass: iterate instances and emit tokens with timing.
+       When use_accum is set, read from the accumulated buffer (all Improvize items).
+       Otherwise, read from p_Instance[2..kmax] (single item).
        object encoding: 0=empty, 1=silence, 2..Jbol=terminal, >=16384=note, -1=end */
     sounding_emitted = 0;
     ctrl_idx = 0;
     long prev_end_ms = 0;
-    for(k = 2; k <= kmax; k++) {
-        j = (*p_Instance)[k].object;
+    long k_start = use_accum ? 0 : 2;
+    long k_end = use_accum ? wasm_accum_count : kmax;
+    for(k = k_start; k <= k_end; k++) {
+        int inst_scale;
+        if(use_accum) {
+            if(k >= wasm_accum_count) break;
+            j = wasm_accum[k].object;
+            start_ms = (long)wasm_accum[k].starttime;
+            end_ms = (long)wasm_accum[k].endtime;
+            inst_scale = wasm_accum[k].scale;
+        } else {
+            j = (*p_Instance)[k].object;
+            start_ms = (long)(*p_Instance)[k].starttime;
+            end_ms = (long)(*p_Instance)[k].endtime;
+            inst_scale = (*p_Instance)[k].scale;
+        }
         if(j == 0) continue;
         if(j == -1) break;
-
-        start_ms = (long)(*p_Instance)[k].starttime;
-        end_ms = (long)(*p_Instance)[k].endtime;
 
         /* Detect silence gaps: if this object starts after the previous one ended,
            emit a "-" token for the gap. Only for sequential (non-polymetric) tokens. */
@@ -651,7 +657,19 @@ const char* bp3_get_timed_tokens(void) {
         if(j == 1) {
             name = "-";
         } else if(j >= 16384) {
-            PrintThisNote((*p_Instance)[k].scale, j - 16384, -1, -1, note_name);
+            int midiKey = j - 16384;
+            int trans = use_accum ? wasm_accum[k].transposition : (*p_Instance)[k].transposition;
+            short xpk = use_accum ? wasm_accum[k].xpandkey : (*p_Instance)[k].xpandkey;
+            short xpv = use_accum ? wasm_accum[k].xpandval : (*p_Instance)[k].xpandval;
+            char lit = use_accum ? wasm_accum[k].lastistranspose : (*p_Instance)[k].lastistranspose;
+            if(lit) {
+                if(trans != 0) TransposeKey(&midiKey, trans);
+                midiKey = ExpandKey(midiKey, xpk, xpv);
+            } else {
+                midiKey = ExpandKey(midiKey, xpk, xpv);
+                if(trans != 0) TransposeKey(&midiKey, trans);
+            }
+            PrintThisNote(inst_scale, midiKey, -1, -1, note_name);
             name = note_name;
         } else if(j > 1 && j < Jbol && p_Bol != NULL && (*p_Bol)[j] != NULL
                   && *((*p_Bol)[j]) != NULL) {
@@ -710,4 +728,41 @@ int bp3_get_timed_token_count(void) {
         count++;
     }
     return count;
+}
+
+/* ---- Debug API for SUB loop investigation ---- */
+
+EMSCRIPTEN_KEEPALIVE
+void bp3_set_trace(int compute, int weights) {
+    trace_compute = compute;
+    trace_weights = weights;
+}
+
+EMSCRIPTEN_KEEPALIVE
+const char* bp3_get_flag_state(void) {
+    /* Dump current flag values for debugging K-param issues */
+    static char flagbuf[4096];
+    int pos = 0;
+    pos += snprintf(flagbuf + pos, sizeof(flagbuf) - pos, "{\"Jflag\":%d,\"Flagthere\":%d,\"Varweight\":%d",
+                    Jflag, Flagthere, Varweight);
+    if(Jflag > 0 && p_Flag != NULL) {
+        pos += snprintf(flagbuf + pos, sizeof(flagbuf) - pos, ",\"flags\":[");
+        for(int i = 1; i <= Jflag && i < 20; i++) {
+            if(i > 1) flagbuf[pos++] = ',';
+            pos += snprintf(flagbuf + pos, sizeof(flagbuf) - pos, "%ld", (long)(*p_Flag)[i]);
+        }
+        pos += snprintf(flagbuf + pos, sizeof(flagbuf) - pos, "]");
+    }
+    if(Jflag > 0 && p_Flagname != NULL) {
+        pos += snprintf(flagbuf + pos, sizeof(flagbuf) - pos, ",\"names\":[");
+        for(int i = 1; i <= Jflag && i < 20; i++) {
+            if(i > 1) flagbuf[pos++] = ',';
+            const char *name = ((*p_Flagname)[i] != NULL && *((*p_Flagname)[i]) != NULL)
+                               ? *((*p_Flagname)[i]) : "?";
+            pos += snprintf(flagbuf + pos, sizeof(flagbuf) - pos, "\"%s\"", name);
+        }
+        pos += snprintf(flagbuf + pos, sizeof(flagbuf) - pos, "]");
+    }
+    pos += snprintf(flagbuf + pos, sizeof(flagbuf) - pos, "}");
+    return flagbuf;
 }

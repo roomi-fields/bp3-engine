@@ -14,15 +14,32 @@
 /* Global: kmax from last TimeSet call, used by bp3_get_timed_tokens() */
 long wasm_last_kmax = 0;
 
-/* ============================================================
- * PlayThings.c stubs
- * ============================================================ */
+/* Accumulated instances across Improvize items for timed tokens.
+   p_Instance is overwritten by each TimeSet call, so we copy relevant
+   fields after each PlayBuffer1 into this accumulator. */
+typedef struct {
+    short object;
+    Milliseconds starttime, endtime;
+    char velocity, channel;
+    int scale;
+    short transposition;
+    short xpandkey, xpandval;
+    char lastistranspose;
+} WasmInstanceAccum;
 
-/* ChangedProtoType — from PlayThings.c, resets paste flag after prototype change */
-int ChangedProtoType(int j) {
-    (*p_PasteDone)[j] = FALSE;
-    return(OK);
-}
+WasmInstanceAccum *wasm_accum = NULL;
+long wasm_accum_count = 0;
+long wasm_accum_capacity = 0;
+/* Time offset for Improvize: each item's timestamps are relative,
+   we shift them by the cumulative duration of prior items. */
+Milliseconds wasm_accum_time_offset = 0;
+
+/* ============================================================
+ * RNG: now using bp3_random.c (MSVC-compatible LCG) included via -BP3.h.
+ * The glibc TYPE_3 implementation that was here has been removed.
+ * All engine code now calls bp3_rand()/bp3_srand()/BP3_RAND_MAX
+ * instead of rand()/srand()/RAND_MAX.
+ * ============================================================ */
 
 /* ============================================================
  * MIDIdriver.c stubs
@@ -68,7 +85,18 @@ int MaybeWait(unsigned long time) {
  * MIDIstuff.c stubs
  * ============================================================ */
 
-/* FormatMIDIstream — real implementation below in "Ported from MIDIstuff.c" section */
+int FormatMIDIstream(MIDIcode **p_b, long imax, MIDIcode **p_c, int zerostart,
+    long im2, long *p_nbytes, int filter) {
+    BP_NOT_USED(p_b); BP_NOT_USED(imax); BP_NOT_USED(p_c); BP_NOT_USED(zerostart);
+    BP_NOT_USED(im2); BP_NOT_USED(p_nbytes); BP_NOT_USED(filter);
+    return OK;
+}
+
+int MIDItoPrototype(int zerostart, int filter, int j, MIDIcode **p_b, long imax) {
+    BP_NOT_USED(zerostart); BP_NOT_USED(filter); BP_NOT_USED(j);
+    BP_NOT_USED(p_b); BP_NOT_USED(imax);
+    return OK;
+}
 
 int SendToDriver(int a, int b, int c, Milliseconds d, int e,
                  int* f, MIDI_Event* g) {
@@ -149,156 +177,6 @@ int MakeMIDIFile(OutFileInfo* finfo) {
     return OK;
 }
 
-/* ThreeByteChannelEvent and ChannelEvent — real implementations below */
-
-/* ---- Ported from MIDIstuff.c ---- */
-
-/* ByteToInt is in Misc.c — no duplicate needed */
-
-int ThreeByteChannelEvent(int c) {
-    if(c < NoteOff) return(NO);
-    if(c == ProgramChange || c == ChannelPressure) return(NO);
-    if(c > PitchBend) return(NO);
-    return(YES);
-}
-
-int ChannelEvent(int c) {
-    int c0 = c & 0xF0;
-    return (c0 >= NoteOff && c0 <= PitchBend);
-}
-
-/* FormatMIDIstream — ported from MIDIstuff.c (Bernard Bel).
-   Formats raw MIDI byte stream: normalizes timestamps, handles running status. */
-int FormatMIDIstream(MIDIcode **p_b, long imax, MIDIcode **p_c, int zerostart,
-    long im2, long *p_nbytes, int filter) {
-    long i, ii, time, t0;
-    int b, br, rc, which_control, value1, value2, status;
-
-    time = (*p_b)[0].time;
-    if(zerostart) t0 = time;
-    else t0 = ZERO;
-    for(i = 0; i < imax; i++) {
-        (*p_c)[i].sequence = (*p_b)[i].sequence;
-        if((*p_b)[i].time < time) (*p_b)[i].time = time - t0;
-        else {
-            time = (*p_b)[i].time;
-            (*p_b)[i].time -= t0;
-        }
-    }
-    ii = ZERO;
-    i = -1; br = 0;
-
-NEXTBYTE:
-    if(ii >= im2) return(MISSED);
-    i++; if(i >= imax) goto QUIT;
-    b = ByteToInt((*p_b)[i].byte);
-    time = (*p_b)[i].time;
-
-    if(b == TimingClock) goto NEXTBYTE;
-    if(b == SystemExclusive) {
-        br = 0;
-        while(((b = (*p_b)[i].byte) != EndSysEx) && i < imax - 1) i++;
-        goto NEXTBYTE;
-    }
-
-    if(!filter) {
-        (*p_c)[ii].time = time;
-        (*p_c)[ii].byte = b;
-        (*p_c)[ii++].sequence = (*p_b)[i].sequence;
-        goto NEXTBYTE;
-    }
-
-    if(b < NoteOff || br == PitchBend || br == ProgramChange || br == ChannelPressure) {
-        if(br == 0) goto NEXTBYTE;
-        (*p_c)[ii].time = time;
-        (*p_c)[ii].byte = br + rc;
-        (*p_c)[ii++].sequence = 0;
-        if(ii >= im2) return(MISSED);
-        value1 = (*p_c)[ii].byte = ByteToInt((*p_b)[i].byte);
-        (*p_c)[ii++].sequence = (*p_b)[i].sequence;
-        if(ii >= im2) return(MISSED);
-        if(br == ProgramChange || br == ChannelPressure) {
-            br = 0;
-            goto NEXTBYTE;
-        }
-        i++; if(i >= imax) goto QUIT;
-        (*p_c)[ii].time = time;
-        value2 = (*p_c)[ii].byte = ByteToInt((*p_b)[i].byte);
-        (*p_c)[ii++].sequence = (*p_b)[i].sequence;
-        if(br == PitchBend) br = 0;
-        goto NEXTBYTE;
-    }
-    if(b >= SystemExclusive) goto NEXTBYTE;
-    rc = b % 16;
-    b -= rc;
-    if(b == ControlChange) {
-        (*p_c)[ii].time = time;
-        (*p_c)[ii].byte = b + rc;
-        (*p_c)[ii++].sequence = (*p_b)[i].sequence;
-        i++; if(i >= imax) goto QUIT;
-        (*p_c)[ii].time = time;
-        which_control = (*p_c)[ii].byte = ByteToInt((*p_b)[i].byte);
-        (*p_c)[ii++].sequence = (*p_b)[i].sequence;
-        i++; if(i >= imax) goto QUIT;
-        (*p_c)[ii].time = time;
-        (*p_c)[ii].byte = ByteToInt((*p_b)[i].byte);
-        (*p_c)[ii++].sequence = (*p_b)[i].sequence;
-        goto NEXTBYTE;
-    }
-
-    br = b;
-    if(ThreeByteChannelEvent(b) || b == ProgramChange || b == ChannelPressure || b == PitchBend) {
-        goto NEXTBYTE;
-    }
-    br = 0;
-    goto NEXTBYTE;
-
-QUIT:
-    *p_nbytes = ii;
-    return(OK);
-}
-
-/* MIDItoPrototype — ported from MIDIstuff.c (Bernard Bel).
-   Stores MIDI codes to prototype j via FormatMIDIstream + PointToDuration. */
-int MIDItoPrototype(int zerostart, int filter, int j, MIDIcode **p_b, long imax) {
-    long im2, nbytes;
-    MIDIcode **ptr1;
-    Handle ptr;
-    double preroll, postroll;
-
-    im2 = 2L * imax;
-    if((ptr1 = (MIDIcode**)GiveSpace((Size)(im2 * sizeof(MIDIcode)))) == NULL)
-        return(ABORT);
-
-    /* WASM: force filter=FALSE — our generated MIDI data is already clean
-       (no running status, no SysEx). The filter is designed for real MIDI
-       recordings from Bernard's PHP interface. */
-    if(FormatMIDIstream(p_b, imax, ptr1, zerostart, im2, &nbytes, FALSE) != OK)
-        return(MISSED);
-
-    ptr = (Handle)(*pp_MIDIcode)[j];
-    if(ptr != NULL) MyDisposeHandle(&ptr);
-    (*pp_MIDIcode)[j] = NULL;
-    (*pp_MIDIcode)[j] = ptr1;
-
-    GetPrePostRoll(j, &preroll, &postroll);
-    if(nbytes > 0) {
-        (*p_MIDIsize)[j] = nbytes;
-        (*p_Type)[j] |= 1;
-        (*p_Dur)[j] = ((*((*pp_MIDIcode)[j]))[nbytes - 1].time) - preroll + postroll;
-        ptr1 = (*pp_MIDIcode)[j];
-        MySetHandleSize((Handle*)&ptr1, (Size)(nbytes * sizeof(MIDIcode)));
-        (*pp_MIDIcode)[j] = ptr1;
-        PointMIDI = TRUE;
-        if(PointToDuration(pp_MIDIcode, NULL, p_MIDIsize, j) != OK) return(ABORT);
-    } else {
-        PointMIDI = FALSE;
-        (*p_MIDIsize)[j] = ZERO;
-        (*p_Dur)[j] = ZERO;
-    }
-    return(OK);
-}
-
 /* ============================================================
  * PlayThings.c stubs
  * ============================================================ */
@@ -315,8 +193,12 @@ int ExpandSelection(int w) {
     return OK;
 }
 
-/* Defined in bp3_api.c — apply deferred object durations */
-extern void apply_deferred_durations(void);
+int ChangedProtoType(int j) {
+    /* Stub: in native, updates UI when a prototype changes.
+       In WASM, nothing to do — no UI to update. */
+    BP_NOT_USED(j);
+    return OK;
+}
 
 int PlayBuffer(tokenbyte ***pp_buff, int onlypianoroll) {
     int r;
@@ -325,9 +207,6 @@ int PlayBuffer(tokenbyte ***pp_buff, int onlypianoroll) {
     if(Panic || CheckEmergency() != OK) return(ABORT);
     if(Jbol < 3) NoAlphabet = TRUE;
     else NoAlphabet = FALSE;
-
-    /* Apply deferred durations now — grammar is compiled, p_Bol is valid */
-    apply_deferred_durations();
 
     /* Save Panic state — WASM PlayBuffer must not propagate ABORT
        from MIDI extraction failures to the text production pipeline */
@@ -347,8 +226,10 @@ int PlayBuffer(tokenbyte ***pp_buff, int onlypianoroll) {
     r = PlayBuffer1(pp_buff, onlypianoroll);
     if(!PlaySelectionOn && ItemNumber > INT_MAX) ItemNumber = 1L;
 
-    /* In WASM, never let MIDI extraction failure abort text production */
-    if(r == ABORT || r == EXIT) {
+    /* In WASM non-Improvize mode, don't let MIDI extraction failure abort
+       text production. But in Improvize mode, ABORT from PlayBuffer is the
+       normal signal to stop the loop — propagate it. */
+    if(!Improvize && (r == ABORT || r == EXIT)) {
         Panic = savedPanic;
         r = OK;
     }
@@ -391,7 +272,8 @@ int PlayBuffer1(tokenbyte ***pp_buff, int onlypianoroll) {
     }
 
     /* Allocate event space */
-    emscripten_log(EM_LOG_CONSOLE, "PlayBuffer1: calling MakeEventSpace...");
+    emscripten_log(EM_LOG_CONSOLE, "PlayBuffer1: calling MakeEventSpace... Maxevent=%ld Maxconc=%ld Jbol=%ld",
+        (long)Maxevent, (long)Maxconc, (long)Jbol);
     if((result = MakeEventSpace(&p_imaxseq)) != OK) {
         emscripten_log(EM_LOG_CONSOLE, "PlayBuffer1: MakeEventSpace FAILED");
         result = OK; goto SORTIR;
@@ -411,19 +293,63 @@ int PlayBuffer1(tokenbyte ***pp_buff, int onlypianoroll) {
                     dbg, (long)(*p_MIDIsize)[dbg], (long)(*p_Dur)[dbg]);
         }
     }
-    /* TimeSet: compute start/end times for all sound objects */
-    SetTimeOn = TRUE; nmax = 0;
-    result = TimeSet(pp_buff, &kmax, &tmin, &tmax, &maxseq, &nmax, p_imaxseq, maxseqapprox);
-    wasm_last_kmax = kmax;
-    emscripten_log(EM_LOG_CONSOLE, "PlayBuffer1: TimeSet result=%d kmax=%ld nmax=%d", result, kmax, nmax);
-    for(k = 2; k <= kmax; k++) {
-        emscripten_log(EM_LOG_CONSOLE, "  p_Instance[%ld] obj=%d start=%ld end=%ld",
-            k, (*p_Instance)[k].object, (long)(*p_Instance)[k].starttime, (long)(*p_Instance)[k].endtime);
+
+    /* Guard: skip TimeSet when the buffer has no recognizable sound tokens.
+       After PolyMake, the buffer may contain only T0/T1/T2 structural
+       markers (polymetric, UseEachSub intermediate steps, graphics mode).
+       FillPhaseDiagram crashes (OOB) on these in WASM.
+       When T4 (variables) or T3+ tokens are present, let TimeSet proceed
+       — native handles T4 fine (converts to silent objects). */
+    {
+        long expanded_len = length;
+        long scan;
+        int t4_count = 0, known_count = 0;
+        for(scan = 0; scan < expanded_len; scan += 2) {
+            tokenbyte m = (**pp_buff)[scan];
+            if(m == T4) t4_count++;
+            else if(m >= T3) known_count++;
+        }
+        if(known_count == 0 && t4_count == 0 && expanded_len > 0) {
+            result = OK;
+            goto SORTIR;
+        }
     }
+
+    /* Remember where this item's events start (for dedup within this item only) */
+    long eventCountAtItemStart = eventCount;
+
+    /* Match native MakeSound behavior: increment ItemNumber when writing MIDI.
+       In native, MakeSound.c:124 does ItemNumber++ when WriteMIDIfile||OutCsound.
+       This is IN ADDITION to the ItemNumber++ in ProduceItems.c:285 (Improvize loop).
+       Without this, the WASM Improvize loop runs 2x more items than native. */
+    if(WriteMIDIfile || OutCsound) {
+        ItemNumber++;
+        /* Native MakeSound.c:126-128: early return if max items reached.
+           Without this, WASM processes one extra item beyond MaxItemsProduce. */
+        if((MaxItemsProduce > 0) && ItemNumber > MaxItemsProduce) {
+            result = OK;
+            goto SORTIR;
+        }
+    }
+
+    /* TimeSet: compute start/end times for all sound objects */
+    SetTimeOn = TRUE; nmax = 0; kmax = 0;
+    result = TimeSet(pp_buff, &kmax, &tmin, &tmax, &maxseq, &nmax, p_imaxseq, maxseqapprox);
     SetTimeOn = FALSE;
     if(result != OK && result != AGAIN) {
         /* WASM: graceful fallback — no MIDI events but don't abort */
+        emscripten_log(EM_LOG_CONSOLE, "PlayBuffer1: TimeSet FAILED result=%d — skipping MIDI extraction", result);
+        kmax = 0;
         goto RELEASE;
+    }
+    wasm_last_kmax = kmax;
+    emscripten_log(EM_LOG_CONSOLE, "PlayBuffer1: TimeSet result=%d kmax=%ld nmax=%d", result, kmax, nmax);
+    {   long dbg_max = (kmax < 50) ? kmax : 50;
+        for(k = 2; k <= dbg_max; k++) {
+            emscripten_log(EM_LOG_CONSOLE, "  p_Instance[%ld] obj=%d start=%ld end=%ld",
+                k, (*p_Instance)[k].object, (long)(*p_Instance)[k].starttime, (long)(*p_Instance)[k].endtime);
+        }
+        if(kmax > 50) emscripten_log(EM_LOG_CONSOLE, "  ... (%ld more instances)", kmax - 50);
     }
     result = OK;
 
@@ -442,6 +368,20 @@ int PlayBuffer1(tokenbyte ***pp_buff, int onlypianoroll) {
                 continue;
             }
 
+            /* Apply _transpose and _keyxpand — match native MakeSound.c:421-423.
+               lastistranspose controls order: if TRUE, transpose first then expand;
+               if FALSE, expand first then transpose. */
+            int trans = (*p_Instance)[k].transposition;
+            short xpk = (*p_Instance)[k].xpandkey;
+            short xpv = (*p_Instance)[k].xpandval;
+            if((*p_Instance)[k].lastistranspose) {
+                if(trans != 0) TransposeKey(&midiKey, trans);
+                midiKey = ExpandKey(midiKey, xpk, xpv);
+            } else {
+                midiKey = ExpandKey(midiKey, xpk, xpv);
+                if(trans != 0) TransposeKey(&midiKey, trans);
+            }
+
             if(midiKey < 0 || midiKey > 127) continue;
 
             Milliseconds startMs = (*p_Instance)[k].starttime;
@@ -450,10 +390,28 @@ int PlayBuffer1(tokenbyte ***pp_buff, int onlypianoroll) {
             int chan = (*p_Instance)[k].channel;
             int scale = (*p_Instance)[k].scale;
 
-            if(vel <= 0) vel = 64;
+            if(vel <= 0) continue;  /* vel=0 in native = NoteOff (silent note, e.g. _vel(0) do#4) */
             if(vel > 127) vel = 127;
             if(chan < 1) chan = 1;
             if(chan > 16) chan = 16;
+
+            /* Deduplicate: skip if same note+time+channel already emitted.
+               p_Instance contains entries for ALL polymetric sequences (nmax).
+               The same note at the same time appears once per sequence.
+               Native MakeSound iterates differently and emits each note once. */
+            {
+                int dup = FALSE;
+                long ec;
+                for(ec = eventCountAtItemStart; ec < eventCount; ec++) {
+                    if((eventStack[ec].status & 0xF0) == NoteOn
+                       && (eventStack[ec].status & 0x0F) == ((chan - 1) & 0x0F)
+                       && eventStack[ec].time == startMs
+                       && eventStack[ec].data1 == (unsigned char)midiKey) {
+                        dup = TRUE; break;
+                    }
+                }
+                if(dup) continue;
+            }
 
             /* NoteOn event */
             if(eventCount < eventCountMax) {
@@ -479,6 +437,65 @@ int PlayBuffer1(tokenbyte ***pp_buff, int onlypianoroll) {
                 eventCount++;
             }
         }
+    }
+
+    /* Accumulate instances for timed tokens (Improvize only: multiple items).
+       p_Instance is overwritten by each TimeSet call, so we must copy here.
+       Non-Improvize grammars: bp3_get_timed_tokens reads p_Instance directly.
+       Dedup polymetric duplicates: when nmax > 1, p_Instance contains entries
+       for ALL concurrent sequences — the same note appears once per sequence.
+       Native MakeSound processes each unique note once; we replicate that here. */
+    if(Improvize && p_Instance != NULL && kmax > 1) {
+        long accum_item_start = wasm_accum_count;  /* dedup within this item */
+        Milliseconds item_max_end = 0;
+        for(k = 2; k <= kmax; k++) {
+            j = (*p_Instance)[k].object;
+            if(j <= 0) continue;
+            if(j == -1) break;
+            /* Skip vel=0 instances (silent notes, e.g. _vel(0) do#4) */
+            if((*p_Instance)[k].velocity == 0) continue;
+            /* Dedup: skip if same object+starttime+channel+transposition already in this item.
+               Must include transposition: same object (e.g. C3) at same time but different
+               transpositions produces different notes (e.g. Visser3 style). */
+            {
+                int dup = 0;
+                long di;
+                Milliseconds st = (*p_Instance)[k].starttime + wasm_accum_time_offset;
+                char ch = (*p_Instance)[k].channel;
+                short tr = (*p_Instance)[k].transposition;
+                for(di = accum_item_start; di < wasm_accum_count; di++) {
+                    if(wasm_accum[di].object == j
+                       && wasm_accum[di].starttime == st
+                       && wasm_accum[di].channel == ch
+                       && wasm_accum[di].transposition == tr) {
+                        dup = 1; break;
+                    }
+                }
+                if(dup) continue;
+            }
+            /* Grow accumulator if needed */
+            if(wasm_accum_count >= wasm_accum_capacity) {
+                long newcap = wasm_accum_capacity ? wasm_accum_capacity * 2 : 512;
+                WasmInstanceAccum *newbuf = (WasmInstanceAccum*)realloc(wasm_accum, newcap * sizeof(WasmInstanceAccum));
+                if(!newbuf) break;
+                wasm_accum = newbuf;
+                wasm_accum_capacity = newcap;
+            }
+            wasm_accum[wasm_accum_count].object = j;
+            wasm_accum[wasm_accum_count].starttime = (*p_Instance)[k].starttime + wasm_accum_time_offset;
+            wasm_accum[wasm_accum_count].endtime = (*p_Instance)[k].endtime + wasm_accum_time_offset;
+            wasm_accum[wasm_accum_count].velocity = (*p_Instance)[k].velocity;
+            wasm_accum[wasm_accum_count].channel = (*p_Instance)[k].channel;
+            wasm_accum[wasm_accum_count].scale = (*p_Instance)[k].scale;
+            wasm_accum[wasm_accum_count].transposition = (*p_Instance)[k].transposition;
+            wasm_accum[wasm_accum_count].xpandkey = (*p_Instance)[k].xpandkey;
+            wasm_accum[wasm_accum_count].xpandval = (*p_Instance)[k].xpandval;
+            wasm_accum[wasm_accum_count].lastistranspose = (*p_Instance)[k].lastistranspose;
+            if((*p_Instance)[k].endtime > item_max_end)
+                item_max_end = (*p_Instance)[k].endtime;
+            wasm_accum_count++;
+        }
+        wasm_accum_time_offset += item_max_end;
     }
 
 RELEASE:

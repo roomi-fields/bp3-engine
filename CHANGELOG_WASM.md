@@ -56,18 +56,11 @@ Lit depuis l'accumulateur multi-items (`wasm_accum`) quand disponible (mode Impr
 
 ## bp3_wasm_stubs.c — Stubs et implémentations
 
-### RNG glibc-compatible
+### RNG — Évolution glibc → MSVC LCG portable
 
-Remplacement du LCG simple de musl par le générateur TYPE_3 non-linéaire à rétroaction additive de glibc (degré 31). Musl et glibc produisent des séquences complètement différentes pour le même seed — causant des divergences sur toutes les grammaires avec sélection pondérée (SUB, RND).
+**Phase 1 (2026-03-31) :** Remplacement du LCG simple de musl par le générateur TYPE_3 glibc (degré 31) pour aligner WASM sur le natif Linux.
 
-```c
-static int32_t glibc_state[DEG_3 + 1];  // 31+1 entries
-static int glibc_fptr = SEP_3;           // 3
-static int glibc_rptr = 0;
-```
-
-`srand()` : seed → warm-up de 310 itérations (identique à glibc).
-`rand()` : `state[fptr] += state[rptr]` → shift right → mask.
+**Phase 2 (2026-04-02) :** Suppression du TYPE_3 glibc, remplacé par `bp3_random.c` dans `csrc/bp3/` — LCG MSVC portable (`seed * 214013 + 2531011`, `BP3_RAND_MAX = 32767`). Tous les appels `rand()`/`srand()`/`RAND_MAX` dans le moteur remplacés par `bp3_rand()`/`bp3_srand()`/`BP3_RAND_MAX`. Aligne natif+WASM sur bp.exe Windows. L'ancienne implémentation glibc dans `bp3_wasm_stubs.c` est supprimée. Les appels `srand()` dans `bp3_api.c` remplacés par `bp3_srand()`.
 
 ### PlayBuffer1 — Pipeline complet
 

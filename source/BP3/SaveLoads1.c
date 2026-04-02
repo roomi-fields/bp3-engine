@@ -634,8 +634,8 @@ int LoadSettings(const char *filename, int startup) {
 		else if(strcmp(key,"Pclock") == 0) Pclock = (double) intvalue;
 		else if(strcmp(key,"Qclock") == 0) Qclock = (double) intvalue;
 		else if(strcmp(key,"Improvize") == 0) Improvize = intvalue;
-		else if(strcmp(key,"Max_items_produced") == 0) MaxItemsProduce = intvalue;
-		else if(strcmp(key,"MaxItemsProduce") == 0) UseEachSub = intvalue;
+		else if(strcmp(key,"MaxItemsProduce") == 0) MaxItemsProduce = intvalue;
+		else if(strcmp(key,"UseEachSub") == 0) UseEachSub = intvalue;
 		else if(strcmp(key,"AllItems") == 0) AllItems = intvalue;
 		else if(strcmp(key,"DisplayProduce") == 0) DisplayProduce = intvalue;
 		else if(strcmp(key,"StepProduce") == 0) StepProduce = intvalue;
@@ -663,7 +663,12 @@ int LoadSettings(const char *filename, int startup) {
 		else if(strcmp(key,"Split_|SplitVariables|") == 0) SplitVariables = intvalue;
 		else if(strcmp(key,"DeftBufferSize") == 0) DeftBufferSize = (long) intvalue;
 		else if(strcmp(key,"MaxConsoleTime") == 0) MaxConsoleTime = (long) intvalue;
-		else if(strcmp(key,"Seed") == 0) Seed = (unsigned) (((long) intvalue) % 32768L);
+		else if(strcmp(key,"Seed") == 0) {
+			unsigned newseed = (unsigned) (((long) intvalue) % 32768L);
+			if(Seed > 0L)
+				BPPrintMessage(1,odInfo,"👉 Seed for randomisation is forced to the value sent in the command line = %u\n",Seed);
+			else Seed = newseed;
+			}
 		else if(strcmp(key,"NoteConvention") == 0) NoteConvention = intvalue;
 		else if(strcmp(key,"GraphicScaleP") == 0) GraphicScaleP = intvalue;
 		else if(strcmp(key,"GraphicScaleQ") == 0) GraphicScaleQ = intvalue;
@@ -696,6 +701,10 @@ int LoadSettings(const char *filename, int startup) {
 		else if(strcmp(key,"LiveSettings") == 0) LiveSettings = intvalue;
 		else if(strcmp(key,"TraceLive") == 0) TraceLive = intvalue;
 		}
+	if(NoTracePath) {
+		ShowObjectGraph = ShowPianoRoll = ShowGraphic = FALSE;
+		BPPrintMessage(0,odInfo,"No graphic due to the absence of a trace path\n");
+		}
 	if(DeftBufferSize < 100) DeftBufferSize = 1000;
 	if(rtMIDI && !ComputeWhilePlay && (AdvanceTime <= 0.)) {
 		AdvanceTime = 0.;
@@ -705,11 +714,12 @@ int LoadSettings(const char *filename, int startup) {
 	BufferSize = DeftBufferSize;
 	SetTempo();
 	if(Seed > 0) {
-		if(!PlaySelectionOn) BPPrintMessage(0,odInfo,"Random seed = %u as per settings\n", Seed);
+/*		if(!PlaySelectionOn) 
+			BPPrintMessage(1,odInfo,"Random seed = %u as per settings\n", Seed); */
 		ResetRandom();
 		}
 	else {
-		if(!PlaySelectionOn) BPPrintMessage(0,odInfo,"Not using a random seed: shuffling the cards\n");
+		if(!PlaySelectionOn) BPPrintMessage(1,odInfo,"Not using a random seed: shuffling the cards\n");
 		Randomize();
 		}
 	if(WriteMIDIfile || rtMIDI) BPPrintMessage(0,odInfo,"Time resolution = %ld ms as per settings\n",Time_res);
@@ -1100,9 +1110,9 @@ NEXTBOL:
 	if(ReadInteger(sofile,&s,&pos) == MISSED) goto ERR;
 	if(trace_load_prototypes) BPPrintMessage(0,odInfo, "Size of MIDI code = %d\n",s);
 	imax = s;
-		(*p_PasteDone)[j] = FALSE;
-		(*p_MIDIsize)[j] = (*p_Ifrom)[j] = ZERO;
-		(*pp_MIDIcode)[j] = NULL;
+	(*p_PasteDone)[j] = FALSE;
+	(*p_MIDIsize)[j] = (*p_Ifrom)[j] = ZERO;
+	(*pp_MIDIcode)[j] = NULL;
 	if(imax > 0) {
 		if((p_b = (MIDIcode**) GiveSpace((Size)sizeof(MIDIcode)*(imax+1))) == NULL) goto ERR;
 		rep = OK;

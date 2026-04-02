@@ -92,6 +92,7 @@ int WarnedBlockKey,WarnedRangeKey;
 
 int PrototypesLoaded = FALSE;
 
+#ifndef __BP3_WASM__
 int main (int argc, char* args[]) {
 	int  result,i,j,this_size;
 	long forgotten_mem, memory_before;
@@ -188,6 +189,9 @@ int main (int argc, char* args[]) {
 
 	result = PrepareProdItemsDestination(&gOptions);
 	if(result == OK) result = PrepareTraceDestination(&gOptions);
+	if(NoTracePath) {
+		ShowObjectGraph = ShowPianoRoll = ShowGraphic = FALSE;
+		}
 	if(result == OK) {
 		// perform the action specified on the command line
 		switch (gOptions.action) {
@@ -324,6 +328,7 @@ CLEANUP:
 	free(eventStack);
 	return EXIT_SUCCESS;
 	}
+#endif /* __BP3_WASM__ */
 
 void CreateDoneFile(void) {
 	FILE * thisfile;
@@ -510,7 +515,9 @@ void CreateImageFile(double time) {
 	ssize_t number;
 	char cwd[4096];
 	
-    if(!ShowGraphic) return;
+    if(!ShowGraphic) {
+		return;
+		}
 	if(imagePtr != NULL) {
 		int result = fflush(imagePtr);
 		if(result != 0) {
@@ -523,10 +530,10 @@ void CreateImageFile(double time) {
 		}
 	imageHits = 0;
 	N_image++;
-//	BPPrintMessage(0,odInfo,"N_image = %d\n",N_image);
+	BPPrintMessage(0,odInfo,"N_image = %d\n",N_image);
 	if(gOptions.outputFiles[ofiTraceFile].name == NULL) {
 		BPPrintMessage(0,odInfo,"=> Cannot create image file because no path is specified and trace mode is not active\n");
-		ShowGraphic = ShowPianoRoll = ShowObjectGraph = FALSE;
+		N_image = 0;
 		return;
 		}
     my_sprintf(line1,"%s",gOptions.outputFiles[ofiTraceFile].name);
@@ -867,6 +874,7 @@ int ParsePostInitArgs(int argc, char* args[], BPConsoleOpts* opts)
 	char* thepath;
 	char* new_thepath;
 
+	Seed = 0L;
 	while(argn < argc) {
 		/* check if it is an input file */
 		argDone = FALSE;
@@ -1001,9 +1009,9 @@ int ParsePostInitArgs(int argc, char* args[], BPConsoleOpts* opts)
 				else if(strcmp(args[argn], "--seed") == 0)	{
 					// look at the next argument for an integer seed
 					if(++argn < argc && isInteger(args[argn]))  {
-						opts->seed = (unsigned int) atol(args[argn]);
+						Seed = opts->seed = (unsigned int) atol(args[argn]);
 						opts->seedProvided = TRUE;
-					}
+						}
 					else {
 						BPPrintMessage(0,odError, "\n=> Missing number after --seed\n\n");
 						return ABORT;
@@ -1176,20 +1184,13 @@ int ApplyArgs(BPConsoleOpts* opts)
 	if(opts->showProduction != NOCHANGE)	DisplayProduce = opts->showProduction;
 	if(opts->noteConvention != NOCHANGE)	NoteConvention = opts->noteConvention;
 	if(opts->midiFileFormat != NOCHANGE)	MIDIfileType = opts->midiFileFormat;
-	if(opts->seedProvided)	{
-		Seed = opts->seed;
-		if(Seed > 0) {
-			BPPrintMessage(0,odInfo, "Random seed = %u as per command line\n", Seed);
+	if(Seed > 0) {
+			BPPrintMessage(0,odInfo, "Random seed = %u\n", Seed);
 			ResetRandom();
-			}
-	/*	else {
-			BPPrintMessage(0,odInfo, "Not using a random seed: shuffling the cards\n");
-			Randomize();
-			} */
-	}
+		}
 	
 	return OK;
-}
+	}
 
 const char* ActionTypeToStr(action_t action)
 {
@@ -1525,6 +1526,7 @@ int PrepareTraceDestination(BPConsoleOpts* opts) {
 	FILE *fout;
 	char output[MAXNAME];
 	// prepare trace output file if requested
+	NoTracePath = TRUE;
 	if(opts->outputFiles[ofiTraceFile].name != NULL) {
 		fout = OpenOutputFile(&(opts->outputFiles[ofiTraceFile]), "w");
 		if(!fout) {
@@ -1542,6 +1544,7 @@ int PrepareTraceDestination(BPConsoleOpts* opts) {
 			strcpy(LiveFolder,"");
 			LiveGrammar = LiveSettings = FALSE;
 			}
+		NoTracePath = FALSE;
 	    }
     return OK;
     }
@@ -1613,7 +1616,7 @@ void StopWaiting(int key,char ch) {
 	return;
 	}
 
-#if !defined(_WIN64)
+#if !defined(_WIN64) && !defined(__BP3_WASM__)
 struct termios orig_termios;
 void disable_raw_mode() {
     // Restore the original terminal settings

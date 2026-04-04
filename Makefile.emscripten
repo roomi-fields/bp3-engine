@@ -10,6 +10,10 @@ CC = emcc
 BP3_SRC = csrc/bp3
 WASM_SRC = csrc/wasm
 
+# Build directory
+BUILD_DIR = build
+OBJ_DIR = $(BUILD_DIR)/obj
+
 # Compiler flags
 CFLAGS = -O2 \
 	-fno-common \
@@ -22,7 +26,7 @@ CFLAGS = -O2 \
 
 # Linker flags
 LDFLAGS = \
-	-s EXPORTED_FUNCTIONS='["_bp3_init","_bp3_load_grammar","_bp3_load_alphabet","_bp3_load_settings","_bp3_load_settings_params","_bp3_load_tonality","_bp3_load_csound_resources","_bp3_produce","_bp3_get_result","_bp3_get_messages","_bp3_get_midi_events","_bp3_get_midi_event_count","_bp3_get_timed_tokens","_bp3_get_timed_token_count","_bp3_set_object_duration","_bp3_load_prototypes","_malloc","_free","_emscripten_stack_get_base","_emscripten_stack_get_end"]' \
+	-s EXPORTED_FUNCTIONS='["_bp3_init","_bp3_load_grammar","_bp3_load_alphabet","_bp3_load_settings","_bp3_load_settings_params","_bp3_load_tonality","_bp3_load_csound_resources","_bp3_produce","_bp3_get_result","_bp3_get_messages","_bp3_get_midi_events","_bp3_get_midi_event_count","_bp3_get_timed_tokens","_bp3_get_timed_token_count","_bp3_load_object_prototypes","_malloc","_free","_emscripten_stack_get_base","_emscripten_stack_get_end"]' \
 	-s EXPORTED_RUNTIME_METHODS='["ccall","cwrap","UTF8ToString","FS"]' \
 	-s ALLOW_MEMORY_GROWTH=1 \
 	-s INITIAL_MEMORY=67108864 \
@@ -65,7 +69,10 @@ BP3_SRCS = \
 	$(BP3_SRC)/SaveLoads1.c \
 	$(BP3_SRC)/SaveLoads3.c \
 	$(BP3_SRC)/SoundObjects2.c \
-	$(BP3_SRC)/SoundObjects3.c
+	$(BP3_SRC)/SoundObjects3.c \
+	$(BP3_SRC)/bp3_random.c \
+	$(BP3_SRC)/bp3_timed_events.c \
+	$(BP3_SRC)/MakeSound.c
 
 # WASM-specific sources
 WASM_SRCS = \
@@ -74,19 +81,35 @@ WASM_SRCS = \
 
 ALL_SRCS = $(BP3_SRCS) $(WASM_SRCS)
 
+# Object files: csrc/bp3/Foo.c → build/obj/Foo.o
+BP3_OBJS = $(patsubst $(BP3_SRC)/%.c,$(OBJ_DIR)/%.o,$(BP3_SRCS))
+WASM_OBJS = $(patsubst $(WASM_SRC)/%.c,$(OBJ_DIR)/wasm_%.o,$(WASM_SRCS))
+ALL_OBJS = $(BP3_OBJS) $(WASM_OBJS)
+
 # Output
-BUILD_DIR = build
 TARGET = $(BUILD_DIR)/bp3.js
+
+# All headers — any header change triggers full rebuild
+HEADERS = $(wildcard $(BP3_SRC)/*.h) $(wildcard $(WASM_SRC)/*.h)
 
 .PHONY: all clean
 
 all: $(TARGET)
 
-$(BUILD_DIR):
-	mkdir -p $(BUILD_DIR)
+$(BUILD_DIR) $(OBJ_DIR):
+	mkdir -p $@
 
-$(TARGET): $(ALL_SRCS) | $(BUILD_DIR)
-	$(CC) $(CFLAGS) $(ALL_SRCS) -o $(TARGET) $(LDFLAGS)
+# Compile BP3 sources
+$(OBJ_DIR)/%.o: $(BP3_SRC)/%.c $(HEADERS) | $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Compile WASM sources
+$(OBJ_DIR)/wasm_%.o: $(WASM_SRC)/%.c $(HEADERS) | $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Link
+$(TARGET): $(ALL_OBJS) | $(BUILD_DIR)
+	$(CC) $(CFLAGS) $(ALL_OBJS) -o $(TARGET) $(LDFLAGS)
 
 clean:
 	rm -rf $(BUILD_DIR)

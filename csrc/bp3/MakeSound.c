@@ -85,6 +85,8 @@ int MakeSound(long *p_kmax,unsigned long imaxstreak,int maxnsequences,
 	w = wGraphic;
 	maxmidibytes5 = MaxMIDIbytes / 5L;
 	oldtcurr = Tcurr;
+	/* ResetTimedEvents NOT here — multi-item grammars call MakeSound per item.
+	   Reset is done once at production start (bp3_produce or PlayBuffer1). */
 	time_pattern = FALSE;
 	scale = -1;
 	if(OutCsound) MIDIsetUpTime = 0;
@@ -1399,6 +1401,10 @@ int MakeSound(long *p_kmax,unsigned long imaxstreak,int maxnsequences,
 							ievent += 2;
 							simplenote = TRUE;
 							}
+						/* Emit timed event BEFORE content transforms (transpose, expand, map)
+						   and BEFORE MIDI-specific processing (p_keyon, velocity, CC) */
+						if(c0 == NoteOn || c0 == NoteOff)
+							EmitTimedEvent(kcurrentinstance, t0 + t1, (c0 == NoteOn) ? 1 : 0);
 						if(c1 > 0) {
 							if((*p_Instance)[kcurrentinstance].lastistranspose)
 								TransposeKey(&c1,trans);

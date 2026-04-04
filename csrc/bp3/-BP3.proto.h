@@ -51,6 +51,21 @@ int Notify(char*,int);
 int FormatMIDIstream(MIDIcode**,long,MIDIcode**,int,long,long*,int);
 int SendToDriver(int,int,int,Milliseconds,int,int*,MIDI_Event*);
 int CaptureMidiEvent(Milliseconds time,int nseq,MIDI_Event *p_e);
+
+/* Timed event buffer — filled by MakeSound, read by consumers */
+typedef struct {
+    long instance;     /* kcurrentinstance */
+    long time_ms;      /* t0 + t1 (temporally corrected, in ms) */
+    int type;          /* 1 = NoteOn, 0 = NoteOff */
+} TimedEvent;
+
+#define MAX_TIMED_EVENTS 65536
+
+extern TimedEvent g_timed_events[];
+extern long g_timed_event_count;
+
+void ResetTimedEvents(void);
+void EmitTimedEvent(long instance, Milliseconds time, int type);
 int CleanUpBuffer(void);
 
 int BPPrintMessage(int, int, const char*, ...);
@@ -434,7 +449,8 @@ int AdjustWeights(void);
 int ProduceAll(t_gram*,tokenbyte***,int);
 int ProduceItems(int,int,int,tokenbyte***);
 int PrintResult(int,int,int,int,tokenbyte***);
-int CheckItemProduced(t_gram*,int,tokenbyte***,long*,int,int);
+int BalancedPoly(tokenbyte***);
+int CheckItemProduced(t_gram*,int,tokenbyte***,long*,int,int,int);
 int AllFollowingItems(t_gram*,tokenbyte***,long****,long****,long*,int,int,int,int,int,int,tokenbyte****,int*,long*,int,unsigned long);
 int PushStack(tokenbyte***,long*****,long*****,long*,tokenbyte*****,int*,long*);
 int PullStack(tokenbyte***,long****,long****,long*,tokenbyte****,int*,long*);
@@ -571,6 +587,7 @@ int GoodHTMLchar(char);
 int NeedsHTMLConversion(char**);
 int TimeSet(tokenbyte***,long*,long*,long*,unsigned long*,int*,unsigned long**,double);
 int FillPhaseDiagram(tokenbyte***,long*,unsigned long*,int*,unsigned long**,double,int*,short**);
+int MakeEmptyTokensSilent(tokenbyte***);
 int UpdateParameter(int,ContParameters**,int,long);
 int IncrementParameter(int,ContParameters**,int,double);
 int MakeNewLineInPhaseTable(int,int*,double**,double,unsigned long**);

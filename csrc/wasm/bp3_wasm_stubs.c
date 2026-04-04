@@ -14,6 +14,53 @@
 /* Global: kmax from last TimeSet call, used by bp3_get_timed_tokens() */
 long wasm_last_kmax = 0;
 
+/* MPE channel tracking — matches native MIDIstuff.c:AssignUniqueChannel().
+   Each MPE note gets a unique channel (1-15). Channel 0 is master. */
+static short wasm_MPEnote[17];      /* Current note on each channel */
+static short wasm_MPEold_note[17];  /* Original note before semitone shift */
+static short wasm_MPEscale[17];     /* Scale index active on each channel */
+static int   wasm_MPEpitch[17];     /* Pitch bend value on each channel */
+
+static void wasm_MPE_reset(void) {
+    int ch;
+    for(ch = 0; ch < 17; ch++) {
+        wasm_MPEnote[ch] = 0;
+        wasm_MPEold_note[ch] = 0;
+        wasm_MPEscale[ch] = -1;
+        wasm_MPEpitch[ch] = -1;
+    }
+}
+
+/* Assign a unique MPE channel for a note.
+   Returns channel 1-15, or -1 if all channels are in use.
+   For NoteOff, finds the channel that has this note+scale. */
+static int wasm_MPE_assign(int isNoteOn, int note, int i_scale, int pitch) {
+    int ch;
+    if(!isNoteOn) {
+        /* NoteOff: find matching channel */
+        for(ch = 1; ch < 16; ch++) {
+            if(wasm_MPEold_note[ch] == note && wasm_MPEscale[ch] == i_scale) {
+                wasm_MPEnote[ch] = 0;
+                wasm_MPEscale[ch] = -1;
+                wasm_MPEpitch[ch] = -1;
+                return ch;
+            }
+        }
+        return 1; /* fallback */
+    }
+    /* NoteOn: find free channel */
+    for(ch = 1; ch < 16; ch++) {
+        if(wasm_MPEnote[ch] == 0 && wasm_MPEscale[ch] == -1) {
+            wasm_MPEnote[ch] = note;
+            wasm_MPEold_note[ch] = note;
+            wasm_MPEscale[ch] = i_scale;
+            wasm_MPEpitch[ch] = pitch;
+            return ch;
+        }
+    }
+    return 1; /* fallback: reuse channel 1 */
+}
+
 /* Accumulated instances across Improvize items for timed tokens.
    p_Instance is overwritten by each TimeSet call, so we copy relevant
    fields after each PlayBuffer1 into this accumulator. */
@@ -30,9 +77,17 @@ typedef struct {
 WasmInstanceAccum *wasm_accum = NULL;
 long wasm_accum_count = 0;
 long wasm_accum_capacity = 0;
-/* Time offset for Improvize: each item's timestamps are relative,
-   we shift them by the cumulative duration of prior items. */
+/* Time offset for multi-item production (Improvize/AllItems): each item's
+   timestamps are relative, we shift them by the cumulative max(endtime) of
+   prior items.  This gives exact ms timestamps from TimeSet.
+   Note: the native MIDI file introduces ±1ms rounding per event due to
+   tick→ms conversion (ms_per_tick != 1.0 exactly), but the WASM timestamps
+   are the correct values. */
 Milliseconds wasm_accum_time_offset = 0;
+/* Same offset applied to MIDI events in eventStack.
+   Separate from wasm_accum_time_offset because the accum is Improvize-only
+   while MIDI events are always extracted. */
+Milliseconds wasm_midi_time_offset = 0;
 
 /* ============================================================
  * RNG: now using bp3_random.c (MSVC-compatible LCG) included via -BP3.h.
@@ -126,9 +181,7 @@ int CloseMIDIFile(void) {
     return OK;
 }
 
-int ChannelConvert(int ch) {
-    return ch;
-}
+/* ChannelConvert — now in real MakeSound.c */
 
 int AllNotesOffAllChannels(int force) {
     BP_NOT_USED(force);
@@ -162,15 +215,7 @@ int NewTrack(void) {
     return OK;
 }
 
-int ClipVelocity(int a, int b, int c, int d) {
-    BP_NOT_USED(a); BP_NOT_USED(b); BP_NOT_USED(c); BP_NOT_USED(d);
-    return OK;
-}
-
-int WaitForLastSounds(long delay) {
-    BP_NOT_USED(delay);
-    return OK;
-}
+/* ClipVelocity, WaitForLastSounds — now in real MakeSound.c */
 
 int MakeMIDIFile(OutFileInfo* finfo) {
     BP_NOT_USED(finfo);
@@ -245,9 +290,12 @@ int PlayBuffer1(tokenbyte ***pp_buff, int onlypianoroll) {
     tokenbyte **p_b;
 
     length = LengthOf(pp_buff);
-    emscripten_log(EM_LOG_CONSOLE, "PlayBuffer1: length=%ld", length);
+    emscripten_log(EM_LOG_CONSOLE, "PlayBuffer1: length=%ld midi_offset=%ld", length, (long)wasm_midi_time_offset);
     if(length < 1) return(OK);
     CurrentChannel = 1;
+
+    /* Reset MPE channel tracking for this item */
+    if(MIDImicrotonality) wasm_MPE_reset();
 
     /* Store item for later restoration */
     p_b = NULL;
@@ -294,34 +342,10 @@ int PlayBuffer1(tokenbyte ***pp_buff, int onlypianoroll) {
         }
     }
 
-    /* Guard: skip TimeSet when the buffer has no recognizable sound tokens.
-       After PolyMake, the buffer may contain only T0/T1/T2 structural
-       markers (polymetric, UseEachSub intermediate steps, graphics mode).
-       FillPhaseDiagram crashes (OOB) on these in WASM.
-       When T4 (variables) or T3+ tokens are present, let TimeSet proceed
-       — native handles T4 fine (converts to silent objects). */
-    {
-        long expanded_len = length;
-        long scan;
-        int t4_count = 0, known_count = 0;
-        for(scan = 0; scan < expanded_len; scan += 2) {
-            tokenbyte m = (**pp_buff)[scan];
-            if(m == T4) t4_count++;
-            else if(m >= T3) known_count++;
-        }
-        if(known_count == 0 && t4_count == 0 && expanded_len > 0) {
-            result = OK;
-            goto SORTIR;
-        }
-    }
-
-    /* Remember where this item's events start (for dedup within this item only) */
-    long eventCountAtItemStart = eventCount;
-
-    /* Match native MakeSound behavior: increment ItemNumber when writing MIDI.
-       In native, MakeSound.c:124 does ItemNumber++ when WriteMIDIfile||OutCsound.
-       This is IN ADDITION to the ItemNumber++ in ProduceItems.c:285 (Improvize loop).
-       Without this, the WASM Improvize loop runs 2x more items than native. */
+    /* Match native MakeSound.c:124 — increment ItemNumber when writing MIDI.
+       New ProduceItems.c delegates ItemNumber management to MakeSound/PlayBuffer1
+       when WriteMIDIfile is TRUE (no more unconditional increment in Improvize loop).
+       ProduceItems.c has a fallback increment only if PlayBuffer1 didn't do it. */
     if(WriteMIDIfile || OutCsound) {
         ItemNumber++;
         /* Native MakeSound.c:126-128: early return if max items reached.
@@ -332,17 +356,41 @@ int PlayBuffer1(tokenbyte ***pp_buff, int onlypianoroll) {
         }
     }
 
-    /* TimeSet: compute start/end times for all sound objects */
+    /* TimeSet: compute start/end times for all sound objects.
+       Matches native PlayThings.c:PlayBuffer1 behavior — no token-type guard.
+       Native calls TimeSet unconditionally; we do the same.
+       WriteMIDIfile check: text-only grammars should call bp3_set_write_midi(0)
+       before produce, which makes PlayBuffer a no-op in native. In WASM we still
+       reach here, so skip TimeSet when there's nothing to time-set. */
+    if(!WriteMIDIfile && !OutCsound) {
+        /* Text-only mode: no MIDI output needed, skip TimeSet entirely
+           (matches native where PlayBuffer is not called without WriteMIDIfile) */
+        result = OK;
+        goto SORTIR;
+    }
     SetTimeOn = TRUE; nmax = 0; kmax = 0;
     result = TimeSet(pp_buff, &kmax, &tmin, &tmax, &maxseq, &nmax, p_imaxseq, maxseqapprox);
     SetTimeOn = FALSE;
-    if(result != OK && result != AGAIN) {
-        /* WASM: graceful fallback — no MIDI events but don't abort */
-        emscripten_log(EM_LOG_CONSOLE, "PlayBuffer1: TimeSet FAILED result=%d — skipping MIDI extraction", result);
+    /* Match native: MISSED → ShowError(37), ABORT/EXIT → goto RELEASE */
+    if(result == MISSED || result == ABORT || result == EXIT) {
+        emscripten_log(EM_LOG_CONSOLE, "PlayBuffer1: TimeSet result=%d — skipping MIDI extraction", result);
+        if(Panic) return(ABORT);
         kmax = 0;
         goto RELEASE;
     }
+    if(result == AGAIN) result = OK;
     wasm_last_kmax = kmax;
+
+    /* MakeSound call DISABLED — modifies global state (t0, t1, Tcurr, p_keyon, etc.)
+       which corrupts subsequent PlayBuffer1 extraction and multi-item processing.
+       EmitTimedEvent infrastructure remains for future S3 use when Bernard fixes #32/#33.
+    if(WriteMIDIfile || OutCsound) {
+        int ms_result = MakeSound(&kmax, maxseq, nmax+1, pp_buff, tmin, tmax, NO, NULL);
+        if(ms_result == ABORT) { result = ABORT; goto RELEASE; }
+        emscripten_log(EM_LOG_CONSOLE, "PlayBuffer1: MakeSound result=%d timed_events=%ld",
+            ms_result, g_timed_event_count);
+    } */
+
     emscripten_log(EM_LOG_CONSOLE, "PlayBuffer1: TimeSet result=%d kmax=%ld nmax=%d", result, kmax, nmax);
     {   long dbg_max = (kmax < 50) ? kmax : 50;
         for(k = 2; k <= dbg_max; k++) {
@@ -353,8 +401,39 @@ int PlayBuffer1(tokenbyte ***pp_buff, int onlypianoroll) {
     }
     result = OK;
 
-    /* === WASM: Extract MIDI events from p_Instance into eventStack === */
+    /* === WASM: Extract MIDI events from p_Instance into eventStack ===
+       Apply wasm_midi_time_offset for inter-item time accumulation.
+       Apply MPE microtonal remapping when MIDImicrotonality is active.
+       Post-extraction: zerostart normalization (subtract min time from all
+       events in this item), matching native FormatMIDIstream behavior. */
+    Milliseconds midi_item_max_end = 0;
+    long eventStart = eventCount;  /* Remember start index for zerostart normalization */
     if(p_Instance != NULL && eventStack != NULL) {
+        /* Pre-MPE dedup tracking: record (key, time) pairs before MPE remapping.
+           MPE assigns unique channels per note, so post-MPE dedup would fail.
+           Allocate based on kmax to handle large grammars (visser5: 1100+ notes). */
+        #define DEDUP_STATIC_MAX 256
+        int dedupKeysStatic[DEDUP_STATIC_MAX];
+        Milliseconds dedupTimesStatic[DEDUP_STATIC_MAX];
+        int *dedupKeys = dedupKeysStatic;
+        Milliseconds *dedupTimes = dedupTimesStatic;
+        long dedupCount = 0;
+        long dedupMax = DEDUP_STATIC_MAX;
+        if(kmax > DEDUP_STATIC_MAX) {
+            dedupKeys = (int *)malloc(kmax * sizeof(int));
+            dedupTimes = (Milliseconds *)malloc(kmax * sizeof(Milliseconds));
+            if(dedupKeys && dedupTimes) {
+                dedupMax = kmax;
+            } else {
+                /* Fallback to static if malloc fails */
+                if(dedupKeys && dedupKeys != dedupKeysStatic) free(dedupKeys);
+                if(dedupTimes && dedupTimes != dedupTimesStatic) free(dedupTimes);
+                dedupKeys = dedupKeysStatic;
+                dedupTimes = dedupTimesStatic;
+                dedupMax = DEDUP_STATIC_MAX;
+            }
+        }
+
         for(k = 2; k <= kmax; k++) {
             j = (*p_Instance)[k].object;
             if(j < 2) continue;  /* Skip silences/markers */
@@ -368,9 +447,7 @@ int PlayBuffer1(tokenbyte ***pp_buff, int onlypianoroll) {
                 continue;
             }
 
-            /* Apply _transpose and _keyxpand — match native MakeSound.c:421-423.
-               lastistranspose controls order: if TRUE, transpose first then expand;
-               if FALSE, expand first then transpose. */
+            /* Apply _transpose and _keyxpand — match native MakeSound.c:421-423. */
             int trans = (*p_Instance)[k].transposition;
             short xpk = (*p_Instance)[k].xpandkey;
             short xpv = (*p_Instance)[k].xpandval;
@@ -384,33 +461,94 @@ int PlayBuffer1(tokenbyte ***pp_buff, int onlypianoroll) {
 
             if(midiKey < 0 || midiKey > 127) continue;
 
-            Milliseconds startMs = (*p_Instance)[k].starttime;
-            Milliseconds endMs = (*p_Instance)[k].endtime;
-            int vel = (*p_Instance)[k].velocity;
+            Milliseconds startMs = (*p_Instance)[k].starttime + wasm_midi_time_offset;
+            Milliseconds endMs = (*p_Instance)[k].endtime + wasm_midi_time_offset;
+            int vel = (unsigned char)(*p_Instance)[k].velocity;
             int chan = (*p_Instance)[k].channel;
             int scale = (*p_Instance)[k].scale;
+            int blockkey = (*p_Instance)[k].blockkey;
 
-            if(vel <= 0) continue;  /* vel=0 in native = NoteOff (silent note, e.g. _vel(0) do#4) */
+            if((*p_Instance)[k].endtime > midi_item_max_end)
+                midi_item_max_end = (*p_Instance)[k].endtime;
+
+            if(vel == 0) continue;
             if(vel > 127) vel = 127;
             if(chan < 1) chan = 1;
             if(chan > 16) chan = 16;
 
-            /* Deduplicate: skip if same note+time+channel already emitted.
-               p_Instance contains entries for ALL polymetric sequences (nmax).
-               The same note at the same time appears once per sequence.
-               Native MakeSound iterates differently and emits each note once. */
+            /* Deduplicate BEFORE MPE remapping: skip if same note+time already
+               seen in this item. Must happen before MPE because MPE assigns unique
+               channels per note, which would defeat post-MPE dedup.
+               Uses dedupStack (pre-MPE keys) instead of eventStack (post-MPE keys).
+               Native MakeSound processes each unique note once; polymetric sequences
+               produce duplicate instances that must be collapsed here. */
             {
                 int dup = FALSE;
-                long ec;
-                for(ec = eventCountAtItemStart; ec < eventCount; ec++) {
-                    if((eventStack[ec].status & 0xF0) == NoteOn
-                       && (eventStack[ec].status & 0x0F) == ((chan - 1) & 0x0F)
-                       && eventStack[ec].time == startMs
-                       && eventStack[ec].data1 == (unsigned char)midiKey) {
+                long dd;
+                for(dd = 0; dd < dedupCount; dd++) {
+                    if(dedupKeys[dd] == midiKey && dedupTimes[dd] == startMs) {
                         dup = TRUE; break;
                     }
                 }
                 if(dup) continue;
+                if(dedupCount < dedupMax) {
+                    dedupKeys[dedupCount] = midiKey;
+                    dedupTimes[dedupCount] = startMs;
+                    dedupCount++;
+                }
+            }
+
+            /* === MPE microtonal remapping ===
+               Match native MIDIstuff.c:SendToDriver() algorithm:
+               1. Look up scale deviation + blockkey_shift (cents)
+               2. If |correction| >= 100: shift note by semitones
+               3. Assign unique MPE channel
+               4. Emit PitchBend event for remaining cents */
+            int mpe_chan = -1;
+            int correction = 0;
+            int i_scale = 0;
+            if(MIDImicrotonality && scale != 0) {
+                i_scale = FindScale(scale);
+                if(i_scale > 0 && i_scale <= NumberScales) {
+                    correction = (*(*Scale)[i_scale].deviation)[midiKey]
+                               + (*(*Scale)[i_scale].blockkey_shift)[blockkey];
+
+                    /* Semitone shift if |correction| >= 100 cents */
+                    if(correction < -100 || correction >= 100) {
+                        int shift = (int)floor((double)correction / 100.0);
+                        int new_key = midiKey + shift;
+                        if(new_key >= 0 && new_key < 128) {
+                            correction -= 100 * shift;
+                            midiKey = new_key;
+                        } else {
+                            /* Native warns "pitchbender out of range" and
+                               plays the note without MPE correction.
+                               Match that: emit the note as-is, no MPE. */
+                            correction = 0;
+                            i_scale = 0; /* disable MPE for this note */
+                        }
+                    }
+
+                    /* Assign MPE channel */
+                    mpe_chan = wasm_MPE_assign(1, midiKey, i_scale,
+                        8192 + (int)(correction * 0.01 * 8192.0 / 2.0));
+                    if(mpe_chan > 0) chan = mpe_chan;
+                }
+            }
+
+            /* PitchBend event (before NoteOn, as native does) */
+            if(MIDImicrotonality && i_scale > 0 && correction != 0
+               && eventCount < eventCountMax) {
+                unsigned int pbVal = 8192 + (int)(correction * 0.01 * 8192.0 / 2.0);
+                if(pbVal > 16383) pbVal = 16383;
+                eventStack[eventCount].time = startMs;
+                eventStack[eventCount].type = RAW_EVENT;
+                eventStack[eventCount].status = PitchBend | ((chan - 1) & 0x0F);
+                eventStack[eventCount].data1 = pbVal & 0x7F;
+                eventStack[eventCount].data2 = (pbVal >> 7) & 0x7F;
+                eventStack[eventCount].instance = k;
+                eventStack[eventCount].scale = scale;
+                eventCount++;
             }
 
             /* NoteOn event */
@@ -425,7 +563,7 @@ int PlayBuffer1(tokenbyte ***pp_buff, int onlypianoroll) {
                 eventCount++;
             }
 
-            /* NoteOff event */
+            /* NoteOff event — same channel and remapped note as NoteOn */
             if(eventCount < eventCountMax) {
                 eventStack[eventCount].time = endMs;
                 eventStack[eventCount].type = RAW_EVENT;
@@ -437,17 +575,83 @@ int PlayBuffer1(tokenbyte ***pp_buff, int onlypianoroll) {
                 eventCount++;
             }
         }
+        /* Free dynamic dedup arrays if allocated */
+        if(dedupKeys != dedupKeysStatic) free(dedupKeys);
+        if(dedupTimes != dedupTimesStatic) free(dedupTimes);
     }
 
-    /* Accumulate instances for timed tokens (Improvize only: multiple items).
+    /* Zerostart normalization REMOVED (wasm.15).
+       The native MIDI pipeline includes MIDIsetUpTime + grammatical silence
+       in absolute event times.  The WASM reads p_Instance starttimes which
+       already contain those offsets.  Subtracting the min time here destroyed
+       legitimate initial silences (ames: 666ms, watch: 1590ms → 0ms).
+       The native FormatMIDIstream(zerostart=TRUE) subtracts the first byte
+       time from the raw MIDI stream, but that stream includes non-note setup
+       events (ControlChange, Volume) written at MIDIsetUpTime — this is NOT
+       equivalent to subtracting the first NoteOn time from p_Instance. */
+
+    /* === NoteOff-before-re-trigger (p_keyon) ===
+       Match native SendToDriver behavior: when the same key is re-triggered
+       on the same channel, the previous note's NoteOff is truncated to the
+       new NoteOn time.
+       Algorithm: events are emitted in groups per instance (PitchBend?,
+       NoteOn, NoteOff).  NoteOn at index ei has its NoteOff at ei+1 or ei+2.
+       For each NoteOn, find its paired NoteOff, then check if any OTHER
+       NoteOn on the same key+chan starts strictly between this NoteOn and
+       this NoteOff — if so, truncate this NoteOff to the earliest such
+       re-trigger time. */
+    if(eventCount > eventStart) {
+        long ei, ej;
+        for(ei = eventStart; ei < eventCount; ei++) {
+            if((eventStack[ei].status & 0xF0) != NoteOn) continue;
+            int onKey  = eventStack[ei].data1;
+            int onChan = eventStack[ei].status & 0x0F;
+            Milliseconds onTime = eventStack[ei].time;
+            /* Find paired NoteOff: same key+chan, next NoteOff after this NoteOn
+               in the event list (they are emitted consecutively per instance). */
+            long offIdx = -1;
+            for(ej = ei + 1; ej < eventCount && ej <= ei + 2; ej++) {
+                if((eventStack[ej].status & 0xF0) == NoteOff
+                   && eventStack[ej].data1 == onKey
+                   && (eventStack[ej].status & 0x0F) == onChan) {
+                    offIdx = ej;
+                    break;
+                }
+            }
+            if(offIdx < 0) continue;
+            Milliseconds offTime = eventStack[offIdx].time;
+            /* Find earliest re-trigger: another NoteOn on same key+chan
+               with time in (onTime, offTime) — strictly between. */
+            Milliseconds earliestRetrigger = offTime;
+            for(ej = eventStart; ej < eventCount; ej++) {
+                if(ej == ei) continue;
+                if((eventStack[ej].status & 0xF0) != NoteOn) continue;
+                if(eventStack[ej].data1 != onKey) continue;
+                if((eventStack[ej].status & 0x0F) != onChan) continue;
+                if(eventStack[ej].time > onTime && eventStack[ej].time < earliestRetrigger) {
+                    earliestRetrigger = eventStack[ej].time;
+                }
+            }
+            if(earliestRetrigger < offTime) {
+                eventStack[offIdx].time = earliestRetrigger;
+            }
+        }
+    }
+
+    /* Accumulate item duration for next item's offset. */
+    wasm_midi_time_offset += midi_item_max_end;
+
+    /* Accumulate instances for timed tokens (multi-item: Improvize or AllItems).
        p_Instance is overwritten by each TimeSet call, so we must copy here.
-       Non-Improvize grammars: bp3_get_timed_tokens reads p_Instance directly.
+       Single-item grammars: bp3_get_timed_tokens reads p_Instance directly
+       (wasm_accum_count stays 0).
        Dedup polymetric duplicates: when nmax > 1, p_Instance contains entries
        for ALL concurrent sequences — the same note appears once per sequence.
        Native MakeSound processes each unique note once; we replicate that here. */
-    if(Improvize && p_Instance != NULL && kmax > 1) {
+    if(p_Instance != NULL && kmax > 1) {
         long accum_item_start = wasm_accum_count;  /* dedup within this item */
         Milliseconds item_max_end = 0;
+        Milliseconds accum_q = wasm_accum_time_offset;
         for(k = 2; k <= kmax; k++) {
             j = (*p_Instance)[k].object;
             if(j <= 0) continue;
@@ -460,7 +664,7 @@ int PlayBuffer1(tokenbyte ***pp_buff, int onlypianoroll) {
             {
                 int dup = 0;
                 long di;
-                Milliseconds st = (*p_Instance)[k].starttime + wasm_accum_time_offset;
+                Milliseconds st = (*p_Instance)[k].starttime + accum_q;
                 char ch = (*p_Instance)[k].channel;
                 short tr = (*p_Instance)[k].transposition;
                 for(di = accum_item_start; di < wasm_accum_count; di++) {
@@ -482,8 +686,8 @@ int PlayBuffer1(tokenbyte ***pp_buff, int onlypianoroll) {
                 wasm_accum_capacity = newcap;
             }
             wasm_accum[wasm_accum_count].object = j;
-            wasm_accum[wasm_accum_count].starttime = (*p_Instance)[k].starttime + wasm_accum_time_offset;
-            wasm_accum[wasm_accum_count].endtime = (*p_Instance)[k].endtime + wasm_accum_time_offset;
+            wasm_accum[wasm_accum_count].starttime = (*p_Instance)[k].starttime + accum_q;
+            wasm_accum[wasm_accum_count].endtime = (*p_Instance)[k].endtime + accum_q;
             wasm_accum[wasm_accum_count].velocity = (*p_Instance)[k].velocity;
             wasm_accum[wasm_accum_count].channel = (*p_Instance)[k].channel;
             wasm_accum[wasm_accum_count].scale = (*p_Instance)[k].scale;
@@ -525,11 +729,43 @@ int ShowPeriods(int w) {
  * MakeSound.c stubs
  * ============================================================ */
 
-int MakeSound(long* a, unsigned long b, int c, tokenbyte*** d,
-              long e, long f, int g, Milliseconds** h) {
-    BP_NOT_USED(a); BP_NOT_USED(b); BP_NOT_USED(c); BP_NOT_USED(d);
-    BP_NOT_USED(e); BP_NOT_USED(f); BP_NOT_USED(g); BP_NOT_USED(h);
-    return OK;
+/* MakeSound stub REMOVED — real MakeSound.c is now compiled for WASM.
+   This enables EmitTimedEvent for timed tokens with temporal corrections
+   (beta, scheduling, cyclic objects). */
+
+/* MIDI utility functions needed by MakeSound — extracted from MIDIstuff.c
+   (MIDIstuff.c itself has too many hardware MIDI dependencies for WASM) */
+int TwoByteEvent(int c) {
+    int c0;
+    if(c < NoteOff) return(NO);
+    if(c == SongSelect) return(YES);
+    c0 = c - c % 16;
+    if(c0 == ProgramChange || c0 == ChannelPressure) return(YES);
+    return(NO);
+}
+
+int ThreeByteChannelEvent(int c) {
+    if(c < NoteOff) return(NO);
+    if(c == ProgramChange || c == ChannelPressure) return(NO);
+    if(c > PitchBend) return(NO);
+    return(YES);
+}
+
+int ThreeByteEvent(int c) {
+    int c0;
+    if(c < NoteOff) return(NO);
+    if(c == SongPosition) return(YES);
+    c0 = c - c % 16;
+    if(ThreeByteChannelEvent(c0)) return(YES);
+    return(NO);
+}
+
+int ChannelEvent(int c) {
+    int c0;
+    if(c < NoteOff) return(NO);
+    c0 = c - c % 16;
+    if(c0 < SystemExclusive) return(YES);
+    return(NO);
 }
 
 int InterruptSound(void) {
@@ -558,10 +794,7 @@ int DrawPianoNote(char* s, int a, int b, Milliseconds c, Milliseconds d,
     return OK;
 }
 
-long Findibm(int a, Milliseconds b, int c) {
-    BP_NOT_USED(a); BP_NOT_USED(b); BP_NOT_USED(c);
-    return 0L;
-}
+/* Findibm — now in real MakeSound.c */
 
 int DrawItemBackground(Rect* r, unsigned long a, int b, int c, int d, int e,
                         Milliseconds** f, long* g, int h, int* i, char* j) {
@@ -571,16 +804,7 @@ int DrawItemBackground(Rect* r, unsigned long a, int b, int c, int d, int e,
     return OK;
 }
 
-double GetTableValue(double a, long b, Coordinates** c, double d, double e) {
-    BP_NOT_USED(a); BP_NOT_USED(b); BP_NOT_USED(c);
-    BP_NOT_USED(d); BP_NOT_USED(e);
-    return 0.0;
-}
-
-double ContinuousParameter(Milliseconds a, int b, ControlStream** c) {
-    BP_NOT_USED(a); BP_NOT_USED(b); BP_NOT_USED(c);
-    return 0.0;
-}
+/* GetTableValue, ContinuousParameter — now in real MakeSound.c */
 
 int GetPartOfTable(XYgraph* a, double b, double c, long d, Coordinates** e) {
     BP_NOT_USED(a); BP_NOT_USED(b); BP_NOT_USED(c);
@@ -614,9 +838,7 @@ double Remap(double val, int a, int b, int* c) {
     return val;
 }
 
-int WaitForEmptyBuffer(void) {
-    return OK;
-}
+/* WaitForEmptyBuffer — now in real MakeSound.c */
 
 /* ============================================================
  * Csound.c / CsoundMaths.c / CsoundScoreMake.c stubs
@@ -750,10 +972,7 @@ int DoScript(int a, char*** b, int c, int d, int e, long* f,
     return OK;
 }
 
-int ExecuteScriptList(p_list** list) {
-    BP_NOT_USED(list);
-    return OK;
-}
+/* ExecuteScriptList — now in real MakeSound.c */
 
 int InterruptScript(void) {
     return OK;
@@ -885,6 +1104,7 @@ int PrintThisNote(int i_scale, int key, int channel, int wind, char* line) {
 
     if(i_scale > NumberScales) {
         BPPrintMessage(0, odError, "=> Error: i_scale (%ld) > NumberScales (%d)\n", (long)i_scale, NumberScales);
+        my_sprintf(line, "<%d>", key);  /* Fallback: show MIDI key */
         return(OK);
     }
 
@@ -981,16 +1201,7 @@ int PrintThisNote(int i_scale, int key, int channel, int wind, char* line) {
  * SendControl stub (MakeSound.c)
  * ============================================================ */
 
-int SendControl(ContinuousControl** a, Milliseconds b, int c, int d,
-                int e, int f, int g, int* h, char*** i,
-                Milliseconds*** j, int*** k, MIDIcontrolstatus** l,
-                PerfParameters**** m) {
-    BP_NOT_USED(a); BP_NOT_USED(b); BP_NOT_USED(c); BP_NOT_USED(d);
-    BP_NOT_USED(e); BP_NOT_USED(f); BP_NOT_USED(g); BP_NOT_USED(h);
-    BP_NOT_USED(i); BP_NOT_USED(j); BP_NOT_USED(k); BP_NOT_USED(l);
-    BP_NOT_USED(m);
-    return OK;
-}
+/* SendControl — now in real MakeSound.c */
 
 /* ============================================================
  * Buffer functions extracted from PlayThings.c (essential for

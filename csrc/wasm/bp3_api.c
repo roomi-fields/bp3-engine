@@ -8,10 +8,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <limits.h>
 #include <emscripten.h>
 
 #include "-BP3.h"
 #include "-BP3decl.h"
+#include "bp3_random.h"
 
 /* Accumulated instance type — defined in bp3_wasm_stubs.c */
 typedef struct {
@@ -249,15 +251,192 @@ int bp3_load_alphabet(const char* text) {
    Works with JSON files from Bernard's PHP interface (starting with '{').
    Does NOT work with old text-format -se files (BP2 legacy starting with '//').
    For minimal settings (6 params), use bp3_load_settings_params() instead. */
+/* LoadSettingsFromString: parse JSON settings directly from a string buffer.
+   Identical logic to LoadSettings() in SaveLoads1.c but skips file I/O.
+   This avoids the fseek/ftell/fread round-trip through Emscripten MEMFS
+   which causes memory corruption in WASM for large JSON payloads. */
+static int LoadSettingsFromString(const char* json_data) {
+    int ch, intvalue;
+    float floatvalue;
+
+    /* Reset defaults — same as LoadSettings lines 553-587 */
+    EndFadeOut = 2.; C4key = 60; A4freq = 440.;
+    Quantize = TRUE;
+    Quantization = 10L;
+    UseBullet = FALSE;
+    Code[7] = '.';
+    MIDIfileType = 1;
+    CsoundFileFormat = UNIX;
+    StrikeAgainDefault = PedalReleaseDefault = TRUE;
+    DeftVolume = DEFTVOLUME;
+    VolumeController = VOLUMECONTROL;
+    DeftVelocity = DEFTVELOCITY;
+    DeftPanoramic = DEFTPANORAMIC;
+    PanoramicController = PANORAMICCONTROL;
+    SamplingRate = SAMPLINGRATE;
+    DefaultBlockKey = 60;
+    ShowObjectGraph = TRUE;
+    ShowAllObjects = FALSE;
+    ShowPianoRoll = FALSE;
+    Token = Oms = FALSE;
+    UseBufferLimit = FALSE;
+    CsoundTrace = FALSE;
+    NoConstraint = FALSE;
+    ResetControllers = FALSE;
+    FileSaveMode = ALLSAME;
+    FileWriteMode = NOW;
+    ProgNrFrom = 1;
+    NotSaidKpress = TRUE;
+    NeverResetWeights = FALSE;
+    ResetFlags = FALSE;
+    ResetWeights = FALSE;
+    NeverResetWeights = FALSE;
+    MinPeriod = 0;
+    MaxConsoleTime = 0;
+
+    int old_livegrammar = LiveGrammar;
+    int old_livesettings = LiveSettings;
+
+    cJSON *json = cJSON_Parse(json_data);
+    if(!json) {
+        BPPrintMessage(0,odError,"=> Could not parse JSON settings: %s\n",cJSON_GetErrorPtr());
+        return MISSED;
+    }
+
+    cJSON *current_element = NULL;
+    cJSON_ArrayForEach(current_element,json) {
+        if(!cJSON_IsObject(current_element)) continue;
+        const char *key = current_element->string;
+        if(key == NULL) continue;
+        cJSON *value_field = cJSON_GetObjectItem(current_element,"value");
+        if(value_field == NULL) continue;
+        if(cJSON_IsString(value_field)) {
+            const char *string_value = cJSON_GetStringValue(value_field);
+            intvalue = atoi(string_value);
+            floatvalue = strtof(string_value, NULL);
+        }
+        else if(cJSON_IsNumber(value_field)) {
+            intvalue = cJSON_GetNumberValue(value_field);
+            floatvalue = cJSON_GetNumberValue(value_field);
+        }
+        else continue;
+
+        /* Setting assignments — same as LoadSettings lines 629-702 */
+        if(strcmp(key,"Quantization") == 0) Quantization = (long) intvalue;
+        else if(strcmp(key,"Quantize") == 0) Quantize = intvalue;
+        else if(strcmp(key,"Time_res") == 0) Time_res = (long) intvalue;
+        else if(strcmp(key,"MIDIsyncDelay") == 0) MIDIsyncDelay = intvalue;
+        else if(strcmp(key,"Nature_of_time") == 0) Nature_of_time = intvalue;
+        else if(strcmp(key,"Pclock") == 0) Pclock = (double) intvalue;
+        else if(strcmp(key,"Qclock") == 0) Qclock = (double) intvalue;
+        else if(strcmp(key,"Improvize") == 0) Improvize = intvalue;
+        else if(strcmp(key,"MaxItemsProduce") == 0) MaxItemsProduce = intvalue;
+        else if(strcmp(key,"UseEachSub") == 0) UseEachSub = intvalue;
+        else if(strcmp(key,"AllItems") == 0) AllItems = intvalue;
+        else if(strcmp(key,"DisplayProduce") == 0) DisplayProduce = intvalue;
+        else if(strcmp(key,"StepProduce") == 0) StepProduce = intvalue;
+        else if(strcmp(key,"TraceMicrotonality") == 0) TraceMicrotonality = intvalue;
+        else if(strcmp(key,"TraceProduce") == 0) TraceProduce = intvalue;
+        else if(strcmp(key,"PlanProduce") == 0) PlanProduce = intvalue;
+        else if(strcmp(key,"DisplayItems") == 0) DisplayItems = intvalue;
+        else if(strcmp(key,"ShowGraphic") == 0) ShowGraphic = intvalue;
+        else if(strcmp(key,"ShowAllObjects") == 0) ShowAllObjects = intvalue;
+        else if(strcmp(key,"AllowRandomize") == 0) AllowRandomize = intvalue;
+        else if(strcmp(key,"DisplayTimeSet") == 0) DisplayTimeSet = intvalue;
+        else if(strcmp(key,"StepTimeSet") == 0) StepTimeSet = intvalue;
+        else if(strcmp(key,"TraceTimeSet") == 0) TraceTimeSet = intvalue;
+        else if(strcmp(key,"TraceNoteOn") == 0) TraceNoteOn = intvalue;
+        else if(strcmp(key,"CsoundTrace") == 0) CsoundTrace = intvalue;
+        else if(strcmp(key,"ResetNotes") == 0) ResetNotes = intvalue;
+        else if(strcmp(key,"ComputeWhilePlay") == 0) ComputeWhilePlay = intvalue;
+        else if(strcmp(key,"AdvanceTime") == 0) AdvanceTime = 1000. * floatvalue;
+        else if(strcmp(key,"TraceMIDIinteraction") == 0) TraceMIDIinteraction = intvalue;
+        else if(strcmp(key,"ResetWeights") == 0) ResetWeights = intvalue;
+        else if(strcmp(key,"ResetFlags") == 0) ResetFlags = intvalue;
+        else if(strcmp(key,"ResetControllers") == 0) ResetControllers = intvalue;
+        else if(strcmp(key,"NoConstraint") == 0) NoConstraint = intvalue;
+        else if(strcmp(key,"SplitTimeObjects") == 0) SplitTimeObjects = intvalue;
+        else if(strcmp(key,"Split_|SplitVariables|") == 0) SplitVariables = intvalue;
+        else if(strcmp(key,"SplitVariables") == 0) SplitVariables = intvalue;
+        else if(strcmp(key,"DeftBufferSize") == 0) DeftBufferSize = (long) intvalue;
+        else if(strcmp(key,"MaxConsoleTime") == 0) MaxConsoleTime = (long) intvalue;
+        else if(strcmp(key,"Seed") == 0) {
+            unsigned newseed = (unsigned) (((long) intvalue) % 32768L);
+            if(Seed > 0L)
+                BPPrintMessage(1,odInfo,"Seed forced to command line value = %u\n",Seed);
+            else Seed = newseed;
+        }
+        else if(strcmp(key,"NoteConvention") == 0) NoteConvention = intvalue;
+        else if(strcmp(key,"GraphicScaleP") == 0) GraphicScaleP = intvalue;
+        else if(strcmp(key,"GraphicScaleQ") == 0) GraphicScaleQ = intvalue;
+        else if(strcmp(key,"EndFadeOut") == 0) EndFadeOut = floatvalue;
+        else if(strcmp(key,"C4key") == 0) C4key = intvalue;
+        else if(strcmp(key,"A4freq") == 0) A4freq = floatvalue;
+        else if(strcmp(key,"StrikeAgainDefault") == 0) StrikeAgainDefault = intvalue;
+        else if(strcmp(key,"PedalReleaseDefault") == 0) PedalReleaseDefault = intvalue;
+        else if(strcmp(key,"DeftVolume") == 0) DeftVolume = intvalue;
+        else if(strcmp(key,"VolumeController") == 0) VolumeController = intvalue;
+        else if(strcmp(key,"DeftVelocity") == 0) DeftVelocity = intvalue;
+        else if(strcmp(key,"DeftPanoramic") == 0) DeftPanoramic = intvalue;
+        else if(strcmp(key,"PanoramicController") == 0) PanoramicController = intvalue;
+        else if(strcmp(key,"SamplingRate") == 0) SamplingRate = intvalue;
+        else if(strcmp(key,"StopPauseContinue") == 0) StopPauseContinue = intvalue;
+        else if(strcmp(key,"DefaultBlockKey") == 0) DefaultBlockKey = intvalue;
+        else if(strcmp(key,"B#_instead_of_C") == 0) NameChoice[0] = intvalue;
+        else if(strcmp(key,"Db_instead_of_C#") == 0) NameChoice[1] = intvalue;
+        else if(strcmp(key,"Eb_instead_of_D#") == 0) NameChoice[3] = intvalue;
+        else if(strcmp(key,"Fb_instead_of_E") == 0) NameChoice[4] = intvalue;
+        else if(strcmp(key,"E#_instead_of_F") == 0) NameChoice[5] = intvalue;
+        else if(strcmp(key,"Gb_instead_of_F#") == 0) NameChoice[6] = intvalue;
+        else if(strcmp(key,"Ab_instead_of_G#") == 0) NameChoice[8] = intvalue;
+        else if(strcmp(key,"Bb_instead_of_A#") == 0) NameChoice[10] = intvalue;
+        else if(strcmp(key,"Cb_instead_of_B") == 0) NameChoice[11] = intvalue;
+        else if(strcmp(key,"ShowObjectGraph") == 0) ShowObjectGraph = intvalue;
+        else if(strcmp(key,"ShowPianoRoll") == 0) ShowPianoRoll = intvalue;
+        else if(strcmp(key,"MinPeriod") == 0) MinPeriod = intvalue;
+        else if(strcmp(key,"LiveGrammar") == 0) LiveGrammar = intvalue;
+        else if(strcmp(key,"LiveSettings") == 0) LiveSettings = intvalue;
+        else if(strcmp(key,"TraceLive") == 0) TraceLive = intvalue;
+    }
+    cJSON_Delete(json);
+
+    /* Post-processing — same as LoadSettings lines 704-767 */
+    if(NoTracePath) {
+        ShowObjectGraph = ShowPianoRoll = ShowGraphic = FALSE;
+    }
+    if(DeftBufferSize < 100) DeftBufferSize = 1000;
+    BufferSize = DeftBufferSize;
+    SetTempo();
+    if(Seed > 0) {
+        ResetRandom();
+    }
+    else {
+        Randomize();
+    }
+    for(ch=0; ch < MAXCHAN; ch++) {
+        (*p_Oldvalue)[ch].volume = 90;
+        (*p_Oldvalue)[ch].panoramic = 64;
+        (*p_Oldvalue)[ch].pressure = 0;
+        (*p_Oldvalue)[ch].pitchbend = DEFTPITCHBEND;
+        (*p_Oldvalue)[ch].modulation = 0;
+    }
+    if(!Quantize) MaxDeltaTime = 20L;
+    else MaxDeltaTime = 2 * Quantization;
+    if(MaxItemsProduce < 2) MaxItemsProduce = 20;
+    if(PlaySelectionOn) Improvize = FALSE;
+    if(AllItems) Improvize = FALSE;
+    if(ShowObjectGraph || ShowPianoRoll) ShowGraphic = TRUE;
+    if(OutBPdata) ShowGraphic = FALSE;
+    if(!ShowGraphic) ShowObjectGraph = ShowPianoRoll = FALSE;
+
+    return OK;
+}
+
 EMSCRIPTEN_KEEPALIVE
 int bp3_load_settings(const char* json_content) {
     if(!json_content || json_content[0] == '\0') return -1;
-    FILE* f = fopen("/tmp_settings.json", "w");
-    if(!f) return -2;
-    fputs(json_content, f);
-    fclose(f);
-    int r = LoadSettings("/tmp_settings.json", FALSE);
-    remove("/tmp_settings.json");
+    int r = LoadSettingsFromString(json_content);
+    emscripten_log(EM_LOG_CONSOLE, "bp3_load_settings: result=%d EmergencyExit=%d", r, EmergencyExit);
     return (r == OK) ? 0 : -3;
 }
 
@@ -408,11 +587,13 @@ int bp3_produce(void) {
     NumberMessages = 0;
     eventCount = 0;  /* Clear MIDI events from previous production */
 
-    /* Clear timed token accumulator */
+    /* Clear timed token accumulator and MIDI time offset */
     extern long wasm_accum_count;
     extern Milliseconds wasm_accum_time_offset;
+    extern Milliseconds wasm_midi_time_offset;
     wasm_accum_count = 0;
     wasm_accum_time_offset = 0;
+    wasm_midi_time_offset = 0;
 
     /* Improvize mode: let the engine loop up to MaxItemsProduce items.
        In non-rtMIDI mode (WASM), ProduceItems loops and returns ABORT
@@ -505,9 +686,14 @@ int bp3_get_midi_event_count(void) {
 }
 
 /* ---- Timed tokens extraction ---- */
-/* Correlates text output (all token names including controls, silences)
-   with p_Instance[] timing (filled by TimeSet for sounding objects).
-   Produces: [{"token":"_vel(80)","start":0,"end":0}, {"token":"C4","start":0,"end":1000}, ...] */
+/* Correlates text output with p_Instance[] timing (filled by TimeSet).
+   When verbose=0 (default): only sounding tokens (notes, named terminals).
+   When verbose=1: also includes control tokens (_vel, _chan...) and silence gaps (-). */
+
+static int wasm_timed_tokens_verbose = 0;
+
+EMSCRIPTEN_KEEPALIVE
+void bp3_set_timed_tokens_verbose(int v) { wasm_timed_tokens_verbose = v; }
 
 #define TOKEN_JSON_BUF_SIZE (512 * 1024)
 static char token_json_buffer[TOKEN_JSON_BUF_SIZE];
@@ -555,7 +741,9 @@ const char* bp3_get_timed_tokens(void) {
     long kmax, k, start_ms, end_ms;
     int j, tl;
     char escaped[512], note_name[64];
+    note_name[0] = '\0';
     const char *text, *p, *ts, *name;
+    int include_controls = wasm_timed_tokens_verbose;
 
     pos += snprintf(token_json_buffer + pos, TOKEN_JSON_BUF_SIZE - pos, "[");
 
@@ -574,6 +762,9 @@ const char* bp3_get_timed_tokens(void) {
         p = text;
         while((p = next_token(p, &ts, &tl)) != NULL) {
             if(ts == NULL || tl <= 0 || tl >= 500) continue;
+            /* In non-verbose mode, skip control tokens (_xxx, /xxx, ?) */
+            if(!include_controls && tl > 0 &&
+               (ts[0] == '_' || ts[0] == '/' || ts[0] == '?')) continue;
             remaining = TOKEN_JSON_BUF_SIZE - pos - 2;
             if(remaining < 300) break;
             if(count > 0) token_json_buffer[pos++] = ',';
@@ -588,7 +779,7 @@ const char* bp3_get_timed_tokens(void) {
     /* First pass: collect controls from text with their position */
     n_controls = 0;
     sounding_seen = 0;
-    if(text != NULL && text[0] != '\0') {
+    if(include_controls && text != NULL && text[0] != '\0') {
         p = text;
         while((p = next_token(p, &ts, &tl)) != NULL) {
             if(ts == NULL || tl <= 0) continue;
@@ -612,6 +803,11 @@ const char* bp3_get_timed_tokens(void) {
     long prev_end_ms = 0;
     long k_start = use_accum ? 0 : 2;
     long k_end = use_accum ? wasm_accum_count : kmax;
+
+    /* Time offset REMOVED (wasm.15).  p_Instance starttimes already include
+       grammatical silences — subtracting the min destroyed legitimate initial
+       offsets (same fix as PlayBuffer1 zerostart removal). */
+    long time_offset = 0;
     for(k = k_start; k <= k_end; k++) {
         int inst_scale;
         if(use_accum) {
@@ -629,29 +825,55 @@ const char* bp3_get_timed_tokens(void) {
         if(j == 0) continue;
         if(j == -1) break;
 
-        /* Detect silence gaps: if this object starts after the previous one ended,
-           emit a "-" token for the gap. Only for sequential (non-polymetric) tokens. */
-        if(start_ms > prev_end_ms && prev_end_ms > 0) {
+        /* Override timing from MakeSound's timed event buffer if available.
+           This provides temporally corrected data (beta, scheduling) that
+           p_Instance starttime/endtime from TimeSet alone don't include. */
+        if(g_timed_event_count > 0 && !use_accum) {
+            long te;
+            int found_on = 0;
+            for(te = 0; te < g_timed_event_count; te++) {
+                if(g_timed_events[te].instance == k) {
+                    if(g_timed_events[te].type == 1 && !found_on) {
+                        start_ms = g_timed_events[te].time_ms;
+                        found_on = 1;
+                    } else if(g_timed_events[te].type == 0) {
+                        end_ms = g_timed_events[te].time_ms;
+                    }
+                }
+            }
+        }
+
+        /* Apply time normalization */
+        start_ms -= time_offset;
+        end_ms -= time_offset;
+
+        /* Detect silence gaps (verbose mode only) */
+        if(include_controls && start_ms > prev_end_ms && prev_end_ms > 0) {
             remaining = TOKEN_JSON_BUF_SIZE - pos - 2;
             if(remaining < 300) goto FINISH_TOKENS;
             if(count > 0) token_json_buffer[pos++] = ',';
             written = snprintf(token_json_buffer + pos, remaining,
                 "{\"token\":\"-\",\"start\":%ld,\"end\":%ld}", prev_end_ms, start_ms);
             if(written > 0 && written < remaining) { pos += written; count++; }
-            sounding_emitted++;  /* silence counts as sounding for control positioning */
+            sounding_emitted++;
         }
 
-        /* Emit controls that come before this sounding token */
-        while(ctrl_idx < n_controls && ctrl_buf[ctrl_idx].after_n <= sounding_emitted) {
-            remaining = TOKEN_JSON_BUF_SIZE - pos - 2;
-            if(remaining < 300) goto FINISH_TOKENS;
-            if(count > 0) token_json_buffer[pos++] = ',';
-            json_escape(escaped, sizeof(escaped), ctrl_buf[ctrl_idx].start, ctrl_buf[ctrl_idx].len);
-            written = snprintf(token_json_buffer + pos, remaining,
-                "{\"token\":\"%s\",\"start\":%ld,\"end\":%ld}", escaped, start_ms, start_ms);
-            if(written > 0 && written < remaining) { pos += written; count++; }
-            ctrl_idx++;
+        /* Emit controls that come before this sounding token (verbose mode only) */
+        if(include_controls) {
+            while(ctrl_idx < n_controls && ctrl_buf[ctrl_idx].after_n <= sounding_emitted) {
+                remaining = TOKEN_JSON_BUF_SIZE - pos - 2;
+                if(remaining < 300) goto FINISH_TOKENS;
+                if(count > 0) token_json_buffer[pos++] = ',';
+                json_escape(escaped, sizeof(escaped), ctrl_buf[ctrl_idx].start, ctrl_buf[ctrl_idx].len);
+                written = snprintf(token_json_buffer + pos, remaining,
+                    "{\"token\":\"%s\",\"start\":%ld,\"end\":%ld}", escaped, start_ms, start_ms);
+                if(written > 0 && written < remaining) { pos += written; count++; }
+                ctrl_idx++;
+            }
         }
+
+        /* Skip silence objects in non-verbose mode */
+        if(j == 1 && !include_controls) continue;
 
         /* Get token name */
         if(j == 1) {
@@ -678,6 +900,20 @@ const char* bp3_get_timed_tokens(void) {
             name = "?";
         }
 
+        /* In non-verbose mode, skip control/performance tokens that exist as
+           alphabet bols (e.g. _vel(64), _chan(1), _legato(20), _transpose(-7),
+           /5, _tempo(...)).  These are not sounding tokens — native MakeSound
+           ignores them during MIDI generation. */
+        if(!include_controls && name != NULL &&
+           (name[0] == '_' || name[0] == '/' || name[0] == '?')) continue;
+
+        /* Skip non-sounding bols: named bols without MIDI content are non-terminals
+           that survived derivation (e.g. X, Y in kss2). They are in p_Instance but
+           not in the alphabet as sound objects. MakeSound.c:850 uses the same check:
+           if(!((*p_Type)[j] & 1)) im = ZERO — i.e. no MIDI events to play. */
+        if(!include_controls && j > 1 && j < 16384 && j < Jbol
+           && p_Type != NULL && !((*p_Type)[j] & 1)) continue;
+
         remaining = TOKEN_JSON_BUF_SIZE - pos - 2;
         if(remaining < 300) goto FINISH_TOKENS;
         if(count > 0) token_json_buffer[pos++] = ',';
@@ -689,8 +925,8 @@ const char* bp3_get_timed_tokens(void) {
         if(end_ms > prev_end_ms) prev_end_ms = end_ms;
     }
 
-    /* Emit remaining controls */
-    while(ctrl_idx < n_controls) {
+    /* Emit remaining controls (verbose mode only) */
+    while(include_controls && ctrl_idx < n_controls) {
         remaining = TOKEN_JSON_BUF_SIZE - pos - 2;
         if(remaining < 300) break;
         if(count > 0) token_json_buffer[pos++] = ',';

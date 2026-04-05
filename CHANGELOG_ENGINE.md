@@ -7,6 +7,13 @@ Chaque section référence le point correspondant dans `FEEDBACK_BERNARD.md` (te
 
 ---
 
+> **2026-04-05 — TOUS LES FIXES CI-DESSOUS ONT ÉTÉ INTÉGRÉS PAR BERNARD DANS SA V3.3.19**
+>
+> `csrc/bp3/` = `source/BP3/` (diff = 0). Ce changelog est maintenant un historique.
+> Les points ouverts non résolus sont dans FEEDBACK_BERNARD.md (#32, #33, #35, #36, #38, #39).
+
+---
+
 ## Bugs corrigés
 
 ### SaveLoads1.c — Clés JSON inversées (FEEDBACK #21)
@@ -121,6 +128,26 @@ Le guard dans `SaveLoads1.c` (ligne 704, précédemment commenté) a aussi été
 **Grammaires corrigées :** vina (segfault), vina2 (segfault), Watch_What_Happens (timeout infini).
 
 ---
+
+### SetObjectFeatures.c — Pitchbend 16384→16383 (fix Bernard, 2026-04-02)
+
+`_pitchbend(+200)` pouvait atteindre la valeur 16384 (hors range MIDI 0–16383). Le moteur retournait `Infpos` (erreur fatale).
+
+Fix de Bernard : clamp `16384→16383`, erreur non-fatale (retourne la valeur clampée au lieu de `Infpos`).
+
+```c
+if(x == 16384) x = 16383;
+// ... range check ...
+if(x < 0) x = 0;
+if(x >= 16384) x = 16383;
+return(x);  // au lieu de return(Infpos)
+```
+
+### ProduceItems.c — Variable `force` non initialisée (2026-04-02)
+
+`force` déclarée mais non initialisée dans `AllFollowingItems()`. En natif (`source/BP3/`), `force = FALSE;` est présent ligne 764. Dans `csrc/bp3/` cette initialisation manquait → valeur garbage → items supplémentaires produits (off-by-one, ex: asymmetric S2=339 vs S1=318).
+
+Fix : ajout `force = FALSE;` après la ligne d'initialisation des autres variables.
 
 ### bp3_random.c/.h — RNG portable MSVC (FEEDBACK #31)
 

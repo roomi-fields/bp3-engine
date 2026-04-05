@@ -11,7 +11,7 @@ GRAM#1[4] Tune --> Canonic   New   A C B D   X23	 End
 GRAM#1[5] Tune --> Canonic   New   A B D C   X34  	 End
 ----------------------------------------------------------
 LIN
-GRAM#2[1] <°> A B C D ?1 End  -->   A B C D [Infinite weight]
+GRAM#2[1] <inf> A B C D ?1 End  -->   A B C D [Infinite weight]
 
  GRAM#2[2] #(?1 ?3 ?2 ?4) ?1 ?2 ?3 ?4  X1234 --> ?1 ?2 ?3 ?4   New   ?1 ?3 ?2 ?4 	X23
  GRAM#2[3] #(?2 ?1 ?4 ?3) ?1 ?2 ?3 ?4  X23 --> ?1 ?2 ?3 ?4   New   ?2 ?1 ?4 ?3 	X1234

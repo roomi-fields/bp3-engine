@@ -49,7 +49,6 @@ long endofselection,size,lengthA;
 unsigned long time_end_compute;
 
 ComputeOn++;
-ResetTimedEvents(); /* Clear timed events buffer once per production run */
 // BPPrintMessage(1,odInfo,"Maximum time allowed = %d seconds\n",MaxConsoleTime);
 if(Improvize && ItemNumber == 0 && !WriteMIDIfile) {
 	 BPPrintMessage(1,odInfo,"\n👉 Most of the messages will be discarded during the improvisation\n");
@@ -206,8 +205,8 @@ if(Improvize) {
 		}
 	if(rtMIDI) {
 	//	ItemNumber++;
-		if(ItemNumber > 10) {
-			if(ShowObjectGraph || ShowPianoRoll) BPPrintMessage(1,odInfo,"👉 Stopped producing graphics after %ld items.\n",(ItemNumber - 1L));
+		if(ItemNumber >= MaxItemsGraphic) {
+			if(ShowObjectGraph || ShowPianoRoll) BPPrintMessage(1,odInfo,"👉 Stopped producing graphics after %ld items.\n",(ItemNumber));
 			ShowPianoRoll = ShowObjectGraph = FALSE;
 			// Do not reset ShowGraphic so that the last image will be finalised
 			}
@@ -294,6 +293,10 @@ if(!PlaySelectionOn && Improvize) {
 			}
 		}
 	else if(rtMIDI && !WriteMIDIfile && !OutCsound) ItemNumber++;
+/*	else {
+		my_sprintf(Message,"Item #%ld\n",(long)(ItemNumber + 1L));
+		FlashInfo(Message);
+		} */
 	if(SkipFlag) goto MAKE;
 	if(!PlaySelectionOn && DisplayItems) {
 		if(NumberCharsData < MAXCHARDATA) {
@@ -303,18 +306,8 @@ if(!PlaySelectionOn && Improvize) {
 			NumberCharsData += 20;
 			}
 		}
-	{	long item_before = ItemNumber;
-		if((rtMIDI || OutCsound || WriteMIDIfile || OutBPdata)
-			&& ((r=PlayBuffer(pp_a,NO)) == ABORT || r == EXIT)) goto QUIT;
-		/* If MakeSound didn't increment ItemNumber (e.g. no derivation), do it here */
-		if((WriteMIDIfile || OutCsound) && ItemNumber == item_before) ItemNumber++;
-		if((WriteMIDIfile || OutCsound) && (MaxItemsProduce > 0) && ItemNumber > MaxItemsProduce) {
-			ShowPianoRoll = ShowObjectGraph = FALSE;
-			Improvize = FALSE;
-			r = OK;
-			goto QUIT;
-			}
-		}
+	if((rtMIDI || OutCsound || WriteMIDIfile || OutBPdata)
+		&& ((r = PlayBuffer(pp_a,NO)) == ABORT || r == EXIT)) goto QUIT;
 	if(ChangedGrammar || ChangedSettings) {
 	//	if(TraceLive && ChangedGrammar) BPPrintMessage(1,odInfo,"Changed grammar\n");
 		ChangedGrammar = ChangedSettings = FALSE;
@@ -762,7 +755,6 @@ int AllFollowingItems(t_gram *p_gram,tokenbyte ***pp_a,long ****p_weight,long **
 	long leftpos,lastpos,incmark,new_pos;
 	long ipos = ZERO;
 	icandidate = nrep = old_gram = old_rul = 0;
-	force = FALSE;
 
 /*	if(!Improvize && !Interactive && time_end_compute > 0L && getClockTime() > time_end_compute) {
 		EmergencyExit = TRUE;
@@ -789,7 +781,10 @@ NEXTPOS:
 	if(trace_produce_all) BPPrintMessage(1,odInfo,"\n%d) NextDerivation igram = %d irul = %d icandidate = %d ipos = %d, irep = %d\n",try_number,igram,irul,icandidate,ipos,irep);
 	if((r = NextDerivation(pp_a,p_length,&igram,&irul,&ipos,&icandidate,mode,time_end_compute)) == OK) {
 		if(trace_produce_all) BPPrintMessage(1,odInfo,"PUSH %d\n",(*p_depth));
-		if(igram > endgram) goto END;
+		if(igram > endgram) {
+			force = FALSE;
+			goto END;
+			}
 		if(PushStack(pp_a,&p_weight,&p_flag,p_length,&p_stack,p_depth,p_maxdepth) != OK) return ABORT;
 		grtype = ORDtype;
 		repeat = TRUE;	// This forces imode to 1 in Insert()
@@ -1828,7 +1823,7 @@ int CheckItemProduced(t_gram *p_gram,int igram,tokenbyte ***pp_a,long *p_length,
 				if((result=Destroy(pp_a)) != OK) goto END;
 				}
 			(*p_length) = LengthOf(pp_a);
-			if((result=PrintResult(datamode && hastabs,OutputWindow,hastabs,ifunc,pp_a)) != OK) goto END;
+			if((result = PrintResult(datamode && hastabs,OutputWindow,hastabs,ifunc,pp_a)) != OK) goto END;
 			Print(OutputWindow,"\n");
 			r = check_and_remove_duplicate_last_line(OutFileName);
 			if(trace_produce_all) BPPrintMessage(1,odInfo,"???\n");
@@ -1836,8 +1831,10 @@ int CheckItemProduced(t_gram *p_gram,int igram,tokenbyte ***pp_a,long *p_length,
 				ItemNumber++;
 				if(trace_produce_all) BPPrintMessage(1,odInfo,"*** %d\n",ItemNumber);
 				if(!template && (rtMIDI || OutCsound || WriteMIDIfile)) {
-					if(trace_produce_all) BPPrintMessage(1,odInfo,"Play #%d\n",ItemNumber);
+				if(trace_produce_all) 
+					BPPrintMessage(1,odInfo,"Play #%d\n",ItemNumber);
 					result = PlayBuffer(pp_a,NO);
+
 					}
 				}
 			if(ItemNumber > MaxItemsProduce) {

@@ -41,8 +41,6 @@
 long Tstart;
 int trace_compute = 0;
 int trace_weights = 0;
-/* long LastTime = ZERO;
-long PianorollShift = ZERO; */
 
 int Compute(tokenbyte ***pp_a,int fromigram,int toigram,long *p_length,int *p_repeat,unsigned long time_end_compute) {
 	int r,igram,inrul,finish,again,outgram,outrul,displayproducemem,level;
@@ -99,6 +97,7 @@ int Compute(tokenbyte ***pp_a,int fromigram,int toigram,long *p_length,int *p_re
 		if(r == MISSED) break;
 		if(r == FINISH) continue;
 		if(finish) {
+	//		BPPrintMessage(1,odInfo,"@@@@ ShowItem()\n");
 			if(!SkipFlag
 				&& (((r = ShowItem(igram,&Gram,FALSE,pp_a,(*p_repeat),PROD,FALSE)) == ABORT)
 					|| r == EXIT || r == STOP)) goto SORTIR;
@@ -587,6 +586,7 @@ int ComputeInGram(tokenbyte ***pp_a,t_gram *p_gram,int igram,int inrul,long *p_l
 			}
 		if((*p_repeat) && (ProduceStackIndex >= ProduceStackDepth)) {
 			(*p_repeat) = PlanProduce = FALSE;
+		//	BPPrintMessage(1,odInfo,"@@@@ ShowItem()\n");
 			if((rep = ShowItem(igram,p_gram,FALSE,pp_a,(*p_repeat),mode,FALSE)) == ABORT
 				|| rep == FINISH || rep == EXIT || rep == STOP) goto QUIT;
 			if(CompleteDecisions ||
@@ -660,7 +660,7 @@ int ComputeInGram(tokenbyte ***pp_a,t_gram *p_gram,int igram,int inrul,long *p_l
 						goto QUIT;
 						}
 					if(CopyBuf(pp_b,pp_c) == ABORT) return(ABORT);
-				//	BPPrintMessage(0,odInfo,"ShowItem()\n");
+			//		BPPrintMessage(1,odInfo,"@ ShowItem()\n");
 					c = ShowItem(igram,p_gram,FALSE,pp_c,(*p_repeat),mode,FALSE);
 					MyDisposeHandle((Handle*)pp_c);
 					if(c == ABORT || c == FINISH || c == EXIT || c == STOP) {
@@ -710,7 +710,7 @@ int ComputeInGram(tokenbyte ***pp_a,t_gram *p_gram,int igram,int inrul,long *p_l
 			}
 		if(mode == PROD && rule.destru) {
 			if((rep=Destroy(pp_a)) != OK) goto QUIT;
-			
+		//	BPPrintMessage(1,odInfo,"@@@ ShowItem()\n");
 			if((rep = ShowItem(igram,p_gram,FALSE,pp_a,(*p_repeat),PROD,FALSE)) == ABORT
 					|| rep == FINISH || rep == EXIT || rep == STOP) goto QUIT;
 			}
@@ -861,6 +861,7 @@ int ComputeInGram(tokenbyte ***pp_a,t_gram *p_gram,int igram,int inrul,long *p_l
 					goto QUIT;
 					}
 				if(rep == ABORT || rep == FINISH || rep == EXIT || rep == STOP) goto QUIT;
+			//	BPPrintMessage(1,odInfo,"@@ end ShowItem()\n");
 				}
 			SkipFlag = FALSE;
 			}
@@ -1302,16 +1303,14 @@ int FindCandidateRules(tokenbyte ***pp_a,t_gram *p_gram,int startfrom,int igram,
 			arg = rule.p_rightarg;
 			}
 		if(CheckEmergency() != OK) return(ABORT);
-		if((grtype != SUBtype && (pos=FindArg(pp_a,grtype,arg,TRUE,&length,meta,instan,rule,
-						mode,time_end_compute)) != -1)
-				|| (grtype == SUBtype && Found(irul,pp_a,grtype,arg,rule.leftoffset,rule.leftnegcontext,&lenc1,
-					leftpos,1,instan,meta,meta1,&istart,&jstart,&length,rule.ismeta,time_end_compute)
+		if((grtype != SUBtype && (pos=FindArg(pp_a,grtype,arg,TRUE,&length,meta,instan,rule,mode,time_end_compute)) != -1)
+				|| (grtype == SUBtype && Found(irul,pp_a,grtype,arg,rule.leftoffset,rule.leftnegcontext,&lenc1,leftpos,1,instan,meta,meta1,&istart,&jstart,&length,rule.ismeta,time_end_compute)
 						&& OkContext(pp_a,grtype,rule,leftpos,length,meta,instan,PROD,time_end_compute))) {
 			(*p_pos)[i] = pos;
 			if(pos == ABORT) return(ABORT);
 			if(grtype == POSLONGtype) (*p_length)[i] = length;
 			if(((grtype != LINtype && grtype != SUBtype) && ((mode == ANAL)
-					|| ((mode == PROD) && (w == INT_MAX || grtype == ORDtype || grtype == SUB1type))))) {
+				|| ((mode == PROD) && (w == INT_MAX || grtype == ORDtype || grtype == SUB1type))))) {
 				(*p_candidate)[0] = (*p_prefrule)[0] = irul;
 				(*p_totwght)[0] = 1; (*p_pos)[0] = pos;
 				(*p_maxpref) = 1;
@@ -2152,6 +2151,7 @@ int ShowItem(int igram,t_gram *p_gram,int justplay,tokenbyte ***pp_a,int repeat,
 		(*p_ItemStart)[DisplayStackIndex] = lastbyte = GetTextLength(wTrace);
 		SetSelect(lastbyte,lastbyte,TEH[wTrace]);
 		if(NumberCharsTrace < MAXCHARTRACE) {
+	//		BPPrintMessage(1,odInfo,"@@@ PrintResult()\n");
 			if((r=PrintResult(datamode && hastabs,wTrace,hastabs,ifunc,pp_a)) != OK) goto QUIT;
 			Print(wTrace,"\n");
 			NumberCharsTrace += 20;

@@ -33,7 +33,7 @@ GRAM#2[8] <1> ?1 ?2 ?3 ?4  X1234 --> ?1 ?2 ?3 ?4  TR(= ?1 ?2 ?4 ?3 X34)
 
 [Rgle de poids infini:]
 
-// <°> A B C D ?1 F  -->   A B C D  [Fin de l'air: volŽe canonique.]
+// <inf> A B C D ?1 F  -->   A B C D  [Fin de l'air: volŽe canonique.]
 
 [Rgles avec contexte ŽloignŽ, de fort poids:]
 

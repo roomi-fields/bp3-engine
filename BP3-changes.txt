@@ -6,11 +6,31 @@ https://github.com/bolprocessor/bolprocessor/blob/graphics-for-BP3/BP3-changes.t
 Read also the "to-do" file:
 https://raw.githubusercontent.com/bolprocessor/bolprocessor/graphics-for-BP3/BP3-To-Do.txt
 
+2026-03-23 (version 3.3.16)
+The creation of silent sound-objects has been finalised (see the previous version).
+All "sprintf()" functions have been replaced with "snprintf()".
+
+-----
+2026-03-22 (version 3.3.15)
+Terminals that are defined in the alphabet, but not in a sound-object file, will no longer be deleted. Instead, they are converted to silent sound-objects, i.e. sound objects containing neither MIDI nor Csound code. Silent sound-objects have properties similar to those of simple notes. They are displayed in hatched rectangles.
+Any leftover variables are no longer deleted at the end of the production or when reading BP data. Instead, they are also converted into silent sound-objects.
+Consequently, the variable 'Y' appears as silences in the derivations of "-gr.koto3", but this has little effect on the sound rendering.
+Check "-da.trySilentSoundObjects" for a demo.
+These silent sound-objects will be used in the WebAssembly environment to connect the Bol Processor to a wide range of sound devices, including SuperCollider.
+Read: https://roomi-fields.com/en/articles/bpscript-under-the-hood-architecture/
+A problem with locating out-time objects has been fixed.
+cJSON.c has been updated.
+
+-----
+2026-03-19 (version 3.3.14)
+This version has the same features as 3.3.13, except that it can be compiled for WebAssembly.
+
+-----
 2026-02-28 (version 3.3.13)
 In the "produce BP data file" mode, no images are displayed.
 In the list of variables at the bottom of a grammar, none of the variables contain a "=" or a ":".
 
-
+-----
 2026-01-11 (version 3.3.12)
 When importing MusicXML files, pedals "sostenuto" (MIDI controller #66) and "soft" (MIDI controller #67) are recognised in addition to "sustain" (MIDI controller #64).
 File data.php has been fixed to avoid a truncation of the "chunk.bpda" file when there are unbound ties in the last chunk.

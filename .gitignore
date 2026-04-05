@@ -1,18 +1,27 @@
-# RTFM local database
-.rtfm/
+# Build artifacts
+build/
+builds/
+*.o
 
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-dev-debug.log
-# Dependency directories
-node_modules/
-# Environment variables
-.env
-# Editor directories and files
+# Compiled binaries (built by build.sh)
+/bp3
+/bp.exe
+/bp3.orig
+/bp3_asan
+/bp3_fs*
+
+# Old build directories
+build_v3.3.*/
+saved_v3.3.*/
+
+# WASM dist binaries
+dist*/bp3.wasm
+dist*/bp3.data
+
+# PHP (Bernard's interface, local only)
+php/
+
+# Editor / IDE
 .idea
 .vscode
 *.suo
@@ -20,21 +29,16 @@ node_modules/
 *.njsproj
 *.sln
 *.sw?
+
 # OS specific
 .DS_Store
 
-# Build artifacts
-build/
+# RTFM local database
+.rtfm/
 
-# WASM binaries in dist (large files)
-dist*/bp3.wasm
-dist*/bp3.data
-dist*/bp3.js
+# Node / JS
+node_modules/
+*.log
 
-# Task files
-# tasks.json
-# tasks/
-*.o
-bp
-MAIL_BERNARD.md
-MAIL_BERNARD*.md
+# Environment
+.env

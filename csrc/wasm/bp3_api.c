@@ -14,6 +14,7 @@
 #include "-BP3.h"
 #include "-BP3decl.h"
 #include "bp3_random.h"
+#include "bp3_timed_events.h"
 
 /* Accumulated instance type — defined in bp3_wasm_stubs.c */
 typedef struct {
@@ -695,6 +696,8 @@ static int wasm_timed_tokens_verbose = 0;
 EMSCRIPTEN_KEEPALIVE
 void bp3_set_timed_tokens_verbose(int v) { wasm_timed_tokens_verbose = v; }
 
+
+
 #define TOKEN_JSON_BUF_SIZE (512 * 1024)
 static char token_json_buffer[TOKEN_JSON_BUF_SIZE];
 
@@ -808,6 +811,8 @@ const char* bp3_get_timed_tokens(void) {
        grammatical silences — subtracting the min destroyed legitimate initial
        offsets (same fix as PlayBuffer1 zerostart removal). */
     long time_offset = 0;
+
+
     for(k = k_start; k <= k_end; k++) {
         int inst_scale;
         if(use_accum) {
@@ -910,7 +915,9 @@ const char* bp3_get_timed_tokens(void) {
         /* Skip non-sounding bols: named bols without MIDI content are non-terminals
            that survived derivation (e.g. X, Y in kss2). They are in p_Instance but
            not in the alphabet as sound objects. MakeSound.c:850 uses the same check:
-           if(!((*p_Type)[j] & 1)) im = ZERO — i.e. no MIDI events to play. */
+           if(!((*p_Type)[j] & 1)) im = ZERO — i.e. no MIDI events to play.
+           NOTE: this filter also blocks silent sound objects (SSO) which have no
+           MIDI prototypes. See FEEDBACK_BERNARD #38 for the terminal distinction problem. */
         if(!include_controls && j > 1 && j < 16384 && j < Jbol
            && p_Type != NULL && !((*p_Type)[j] & 1)) continue;
 

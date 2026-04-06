@@ -592,9 +592,11 @@ int bp3_produce(void) {
     extern long wasm_accum_count;
     extern Milliseconds wasm_accum_time_offset;
     extern Milliseconds wasm_midi_time_offset;
+    extern Milliseconds wasm_kpress_offset;
     wasm_accum_count = 0;
     wasm_accum_time_offset = 0;
     wasm_midi_time_offset = 0;
+    wasm_kpress_offset = 0;
 
     /* Improvize mode: let the engine loop up to MaxItemsProduce items.
        In non-rtMIDI mode (WASM), ProduceItems loops and returns ABORT
@@ -807,10 +809,12 @@ const char* bp3_get_timed_tokens(void) {
     long k_start = use_accum ? 0 : 2;
     long k_end = use_accum ? wasm_accum_count : kmax;
 
-    /* Time offset REMOVED (wasm.15).  p_Instance starttimes already include
-       grammatical silences — subtracting the min destroyed legitimate initial
-       offsets (same fix as PlayBuffer1 zerostart removal). */
-    long time_offset = 0;
+    /* Kpress quantization offset (#35): subtract the one-quantum shift caused
+       by TimeSet's rounding compensation when Kpress >= 2. Unlike the old
+       blanket zerostart (removed in wasm.15), this only corrects the Kpress
+       artifact — grammatical silences are preserved. */
+    extern Milliseconds wasm_kpress_offset;
+    long time_offset = (long)wasm_kpress_offset;
 
 
     for(k = k_start; k <= k_end; k++) {

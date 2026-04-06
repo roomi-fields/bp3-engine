@@ -195,6 +195,9 @@ Ajout de `#include <emscripten.h>` pour `emscripten_log()` et les macros runtime
 | NoteOff-before-re-trigger | visser-shapes | Tronque NoteOff quand la même clé+canal est retriggée avant la fin — match natif p_keyon/SendToDriver. Corrige chevauchement de notes polymétriques |
 | Zerostart REMOVED (wasm.15) | ames, watch | Le zerostart soustrayait le min time local, détruisant les silences initiaux grammaticaux (ames: 666ms→0ms, watch: 1590ms→0ms). p_Instance.starttime inclut déjà les silences — pas besoin de normalisation |
 | Dedup keep-longest (#33) | visser5, visser-waves | Quand deux instances polymétriques du même pitch commencent au même moment, garde la plus longue durée (met à jour le NoteOff). Match le comportement natif p_keyon (NoteOff au dernier release). visser5: 16 diffs → 1 |
+| Kpress quantization offset (#35) | acceleration, visser3, visser-shapes | Quand Kpress≥2, la compensation d'arrondis de TimeSet (ligne 195) écrase T[0] avec T[1], décalant tous les timestamps d'un quantum. Le natif corrige via FormatMIDIstream(zerostart). Le WASM soustrait maintenant le min starttime de p_Instance quand Kpress≥2 (wasm_kpress_offset). 3 grammaires TIMING→EXACT |
+
+**Score parité wasm.3 (2026-04-06) :** S1 vs S2: 26E/9T/0C/1Count. S2 vs S3: 29E/4T/3C. S3 vs S4: 33E/1T/2Count. S4: 36/36. S5: 33/36.
 
 **Score parité wasm.15 :** 27/37 EXACT, 5 TIMING_DIFF within tolerance, 4 TIMING_DIFF vrais, 1 COUNT_DIFF, seed=1.
 

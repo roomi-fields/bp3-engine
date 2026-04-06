@@ -89,6 +89,12 @@ Milliseconds wasm_accum_time_offset = 0;
    while MIDI events are always extracted. */
 Milliseconds wasm_midi_time_offset = 0;
 
+/* Kpress quantization offset: when Kpress >= 2, TimeSet's rounding
+   compensation shifts all T[] values by one quantum (T[0] gets overwritten
+   with T[1]). Native corrects via FormatMIDIstream(zerostart). We subtract
+   this offset when reading p_Instance timestamps. */
+Milliseconds wasm_kpress_offset = 0;
+
 /* ============================================================
  * RNG: now using bp3_random.c (MSVC-compatible LCG) included via -BP3.h.
  * The glibc TYPE_3 implementation that was here has been removed.
@@ -401,6 +407,25 @@ int PlayBuffer1(tokenbyte ***pp_buff, int onlypianoroll) {
     }
     result = OK;
 
+    /* Compute Kpress quantization offset (#35) for this item.
+       When Kpress >= 2, TimeSet's rounding compensation shifts T[0] by one
+       quantum. Find min starttime and store as wasm_kpress_offset. */
+    if(Kpress >= 2.0 && wasm_kpress_offset == 0) {
+        Milliseconds min_start = -1;
+        long ks;
+        for(ks = 2; ks <= kmax; ks++) {
+            int obj = (*p_Instance)[ks].object;
+            if(obj == -1) break;
+            if(obj < 2) continue;
+            Milliseconds st = (*p_Instance)[ks].starttime;
+            if(min_start < 0 || st < min_start) min_start = st;
+        }
+        if(min_start > 0) {
+            wasm_kpress_offset = min_start;
+            emscripten_log(EM_LOG_CONSOLE, "PlayBuffer1: Kpress=%.0f, kpress_offset=%ldms", Kpress, (long)min_start);
+        }
+    }
+
     /* === WASM: Extract MIDI events from p_Instance into eventStack ===
        Apply wasm_midi_time_offset for inter-item time accumulation.
        Apply MPE microtonal remapping when MIDImicrotonality is active.
@@ -466,8 +491,8 @@ int PlayBuffer1(tokenbyte ***pp_buff, int onlypianoroll) {
 
             if(midiKey < 0 || midiKey > 127) continue;
 
-            Milliseconds startMs = (*p_Instance)[k].starttime + wasm_midi_time_offset;
-            Milliseconds endMs = (*p_Instance)[k].endtime + wasm_midi_time_offset;
+            Milliseconds startMs = (*p_Instance)[k].starttime - wasm_kpress_offset + wasm_midi_time_offset;
+            Milliseconds endMs = (*p_Instance)[k].endtime - wasm_kpress_offset + wasm_midi_time_offset;
 
 
             int vel = (unsigned char)(*p_Instance)[k].velocity;

@@ -194,6 +194,7 @@ Ajout de `#include <emscripten.h>` pour `emscripten_log()` et les macros runtime
 | Dedup dynamique | visser5 | Tableaux dedup alloués dynamiquement (kmax) au lieu de DEDUP_STATIC_MAX=256 |
 | NoteOff-before-re-trigger | visser-shapes | Tronque NoteOff quand la même clé+canal est retriggée avant la fin — match natif p_keyon/SendToDriver. Corrige chevauchement de notes polymétriques |
 | Zerostart REMOVED (wasm.15) | ames, watch | Le zerostart soustrayait le min time local, détruisant les silences initiaux grammaticaux (ames: 666ms→0ms, watch: 1590ms→0ms). p_Instance.starttime inclut déjà les silences — pas besoin de normalisation |
+| Dedup keep-longest (#33) | visser5, visser-waves | Quand deux instances polymétriques du même pitch commencent au même moment, garde la plus longue durée (met à jour le NoteOff). Match le comportement natif p_keyon (NoteOff au dernier release). visser5: 16 diffs → 1 |
 
 **Score parité wasm.15 :** 27/37 EXACT, 5 TIMING_DIFF within tolerance, 4 TIMING_DIFF vrais, 1 COUNT_DIFF, seed=1.
 

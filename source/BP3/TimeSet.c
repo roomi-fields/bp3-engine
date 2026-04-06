@@ -144,6 +144,7 @@ int SetTimeObjects(int bigitem,unsigned long **p_imaxseq,unsigned long maxseq,in
 	long *p_kmx,long *p_tmin,long *p_tmax,short **p_articul)
 
 {
+if(getenv("BP3_DEBUG")) fprintf(stderr,"@@@ SetTimeObjects CALLED bigitem=%d maxseq=%lu\n", bigitem, maxseq);
 int nseq,r,rep,BTflag,result,stepthis,first,dirtymem,compiledmem,nature_time,a,j,key,last_line,outtimeevents;
 long **ptr;
 long k;
@@ -174,7 +175,8 @@ for(nseq=0; nseq <= (*p_nmax); nseq++) {
 	
 in = 1.; jn = ZERO;
 period = ((double) Pclock) * 1000. * CorrectionFactor / Qclock;
-// BPPrintMessage(0,odInfo,"Pclock = %ld Qclock = %ld, CorrectionFactor = %.3f\n",(long)Pclock,(long)Qclock,CorrectionFactor);
+if(getenv("BP3_DEBUG")) fprintf(stderr,"@@@ TimeSet: Pclock=%ld Qclock=%ld CF=%.15f period=%.15f Ratio=%.15f Kpress=%.1f nature=%d maxseq=%ld nmax=%d\n",
+	(long)Pclock,(long)Qclock,CorrectionFactor,period,Ratio,Kpress,nature_time,(long)maxseq,(*p_nmax));
 
 // if(trace_timeset)
 BPPrintMessage(0,odInfo,"Setting time streaks on %d lines\n",(*p_nmax));
@@ -186,6 +188,8 @@ while(TRUE) {
 		jn = jj;		/* Write only once */
 		if(nature_time == STRIATED) {
 			(*p_T)[jn] = (Milliseconds) ((period * (in - 1.)) / Ratio);
+			if(getenv("BP3_DEBUG")) fprintf(stderr,"@@@ jn=%ld in=%.1f T=%ld result=%.15f\n",
+				(long)jn, in, (long)(*p_T)[jn], (period*(in-1.))/Ratio);
 			// BPPrintMessage(0,odError,"jn = %ld (*p_T)[jn] = %ld in = %ld period = %.0f Ratio = %.0f\n",(long)jn,(long)(*p_T)[jn],(long)in,(double)period,(double)Ratio);
 			if(Kpress > 2) { // Compensates roundings // Added by BB 2021-03-21
 				if(jn > 0) (*p_T)[jn-1] = (*p_T)[jn];

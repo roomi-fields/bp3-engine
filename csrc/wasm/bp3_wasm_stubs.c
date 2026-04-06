@@ -415,21 +415,26 @@ int PlayBuffer1(tokenbyte ***pp_buff, int onlypianoroll) {
         #define DEDUP_STATIC_MAX 256
         int dedupKeysStatic[DEDUP_STATIC_MAX];
         Milliseconds dedupTimesStatic[DEDUP_STATIC_MAX];
+        long dedupNoteOffStatic[DEDUP_STATIC_MAX];  /* eventStack index of NoteOff */
         int *dedupKeys = dedupKeysStatic;
         Milliseconds *dedupTimes = dedupTimesStatic;
+        long *dedupNoteOff = dedupNoteOffStatic;
         long dedupCount = 0;
         long dedupMax = DEDUP_STATIC_MAX;
         if(kmax > DEDUP_STATIC_MAX) {
             dedupKeys = (int *)malloc(kmax * sizeof(int));
             dedupTimes = (Milliseconds *)malloc(kmax * sizeof(Milliseconds));
-            if(dedupKeys && dedupTimes) {
+            dedupNoteOff = (long *)malloc(kmax * sizeof(long));
+            if(dedupKeys && dedupTimes && dedupNoteOff) {
                 dedupMax = kmax;
             } else {
                 /* Fallback to static if malloc fails */
                 if(dedupKeys && dedupKeys != dedupKeysStatic) free(dedupKeys);
                 if(dedupTimes && dedupTimes != dedupTimesStatic) free(dedupTimes);
+                if(dedupNoteOff && dedupNoteOff != dedupNoteOffStatic) free(dedupNoteOff);
                 dedupKeys = dedupKeysStatic;
                 dedupTimes = dedupTimesStatic;
+                dedupNoteOff = dedupNoteOffStatic;
                 dedupMax = DEDUP_STATIC_MAX;
             }
         }
@@ -463,6 +468,8 @@ int PlayBuffer1(tokenbyte ***pp_buff, int onlypianoroll) {
 
             Milliseconds startMs = (*p_Instance)[k].starttime + wasm_midi_time_offset;
             Milliseconds endMs = (*p_Instance)[k].endtime + wasm_midi_time_offset;
+
+
             int vel = (unsigned char)(*p_Instance)[k].velocity;
             int chan = (*p_Instance)[k].channel;
             int scale = (*p_Instance)[k].scale;
@@ -476,12 +483,10 @@ int PlayBuffer1(tokenbyte ***pp_buff, int onlypianoroll) {
             if(chan < 1) chan = 1;
             if(chan > 16) chan = 16;
 
-            /* Deduplicate BEFORE MPE remapping: skip if same note+time already
-               seen in this item. Must happen before MPE because MPE assigns unique
-               channels per note, which would defeat post-MPE dedup.
-               Uses dedupStack (pre-MPE keys) instead of eventStack (post-MPE keys).
-               Native MakeSound processes each unique note once; polymetric sequences
-               produce duplicate instances that must be collapsed here. */
+            /* Deduplicate BEFORE MPE remapping: when same note+time appears
+               on multiple polymetric lines, keep the longest duration.
+               Matches native MakeSound p_keyon behavior (NoteOff at last release).
+               Must happen before MPE because MPE assigns unique channels per note. */
             {
                 int dup = FALSE;
                 long dd;
@@ -490,10 +495,18 @@ int PlayBuffer1(tokenbyte ***pp_buff, int onlypianoroll) {
                         dup = TRUE; break;
                     }
                 }
-                if(dup) continue;
+                if(dup) {
+                    /* Keep longest: update NoteOff time if this instance ends later */
+                    if(dedupNoteOff[dd] >= 0 && dedupNoteOff[dd] < eventCount
+                       && endMs > eventStack[dedupNoteOff[dd]].time) {
+                        eventStack[dedupNoteOff[dd]].time = endMs;
+                    }
+                    continue;
+                }
                 if(dedupCount < dedupMax) {
                     dedupKeys[dedupCount] = midiKey;
                     dedupTimes[dedupCount] = startMs;
+                    dedupNoteOff[dedupCount] = -1;  /* Updated after NoteOff is emitted */
                     dedupCount++;
                 }
             }
@@ -565,6 +578,8 @@ int PlayBuffer1(tokenbyte ***pp_buff, int onlypianoroll) {
 
             /* NoteOff event — same channel and remapped note as NoteOn */
             if(eventCount < eventCountMax) {
+                /* Record NoteOff index for dedup longest-duration update */
+                if(dedupCount > 0) dedupNoteOff[dedupCount - 1] = eventCount;
                 eventStack[eventCount].time = endMs;
                 eventStack[eventCount].type = RAW_EVENT;
                 eventStack[eventCount].status = NoteOff | ((chan - 1) & 0x0F);
@@ -578,6 +593,7 @@ int PlayBuffer1(tokenbyte ***pp_buff, int onlypianoroll) {
         /* Free dynamic dedup arrays if allocated */
         if(dedupKeys != dedupKeysStatic) free(dedupKeys);
         if(dedupTimes != dedupTimesStatic) free(dedupTimes);
+        if(dedupNoteOff != dedupNoteOffStatic) free(dedupNoteOff);
     }
 
     /* Zerostart normalization REMOVED (wasm.15).

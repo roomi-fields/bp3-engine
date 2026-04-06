@@ -923,6 +923,9 @@ int Fix(int nseq,Milliseconds **p_time1,Milliseconds **p_time2,int nature_time) 
 						}
 					// BPPrintMessage(0,odInfo,"Fix() simple note or silence k = %ld j = %ld, i = %ld alpha = %.2f t1 = %ldms t2 = %ldms\n",(long)k,(long)j,(long)i,(*p_Instance)[k].alpha,(long)t1,(long)t2);
 					}
+				if(getenv("BP3_DEBUG") && t1 >= 80000 && t1 <= 86000)
+					fprintf(stderr,"@@@ Fix nseq=%d k=%ld j=%ld i=%ld alpha=%.15f t1=%ld t2=%ld T[i]=%ld\n",
+						nseq,(long)k,(long)j,(long)i,(*p_Instance)[k].alpha,(long)t1,(long)t2,(long)(*p_T)[i]);
 				}
 			else {
 				/* Out-time sound-object */
@@ -1048,6 +1051,9 @@ if(nature_time == STRIATED || nseq == 0) {
 OKALPHA1:
 		if(alpha < 0.) alpha = 0.;
 		if(beta < 0.) beta = 0.;
+		if(getenv("BP3_DEBUG") && (*p_T)[i] >= 80000 && (*p_T)[i] <= 86000)
+			fprintf(stderr,"@@@ CalcAlpha nseq=%d k=%ld j=%ld i=%ld inext=%ld alpha=%.15f T[i]=%ld T[inext]=%ld d=%.2f\n",
+				nseq,(long)k,(long)j,(long)i,(long)inext,alpha,(long)(*p_T)[i],(long)(*p_T)[inext],d);
 		(*p_Instance)[k].alpha = alpha;
 		if(trace_object_features)
 			BPPrintMessage(0,odInfo,"Calculate_alpha() nseq = %d k = %d i = %ld inext = %ld alpha = %.2f\n",nseq,k,i,inext,alpha);

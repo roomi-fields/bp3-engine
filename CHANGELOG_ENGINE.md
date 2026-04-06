@@ -14,7 +14,34 @@ Chaque section référence le point correspondant dans `FEEDBACK_BERNARD.md` (te
 
 ---
 
-## Bugs corrigés
+## Bugs corrigés (post v3.3.19)
+
+### GetRelease.c — Mémoire non initialisée p_DefaultChannel (#39)
+
+**Root cause :** `CreateObjectSpace()` n'initialise `p_DefaultChannel` que pour j=0,1 (boucle ligne 939).
+Les indices 2..jmax restent non initialisés après `GiveSpace`. De plus, `ResizeObjectSpace()` n'initialise
+les nouveaux slots que si `Nature_of_time == SMOOTH` (condition 2024-07-25), excluant les grammaires STRIATED.
+
+**Symptôme :** Avec ASLR, `p_DefaultChannel[j]` contient des valeurs aléatoires (64, 96...) →
+`'X' has channel 64. Should be 1..16` → crash MIDI intermittent (~30-40% des runs).
+
+**Fix (3 points dans GetRelease.c) :**
+1. `MakeSoundObjectSpace()` : ajout `(*p_DefaultChannel)[j] = 0` dans la boucle j=2..jmax (ligne 936)
+2. `ResizeObjectSpace()` : `memset(*p_DefaultChannel, 0, maxsounds)` après `MySetHandleSize` (ligne 1099).
+   Nécessaire car `Jbol` est déjà mis à jour quand on arrive dans ResizeObjectSpace — la boucle d'init
+   conditionnelle (j=Jbol..maxsounds) ne couvre pas les slots fraîchement alloués.
+3. `ResizeObjectSpace()` : suppression de la condition `Nature_of_time == SMOOTH` (ligne 1142) pour que
+   l'init complète des propriétés s'exécute pour toutes les grammaires, pas seulement SMOOTH.
+
+**Grammaires corrigées :** kss2 (50/50 déterministe), look-and-say (50/50 déterministe).
+Workaround `setarch x86_64 -R` retiré de s1_native.cjs.
+
+**Affecte les 3 targets** (linux, windows, wasm) via `csrc/bp3/GetRelease.c`.
+Le bug ne se manifeste pas en WASM (Emscripten zero-init le heap) mais le fix est correct partout.
+
+---
+
+## Bugs corrigés (intégrés dans v3.3.19)
 
 ### SaveLoads1.c — Clés JSON inversées (FEEDBACK #21)
 

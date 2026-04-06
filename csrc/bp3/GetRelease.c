@@ -934,6 +934,7 @@ int MakeSoundObjectSpace(void) {
 	
 	for(j=2; j < jmax; j++) { // 2026-03-21
 		(*p_MIDIsize)[j] = (*p_CsoundSize)[j] = ZERO;
+		(*p_DefaultChannel)[j] = 0;  // fix #39: was uninitialized, caused random channel values with ASLR
 		}
 
 	for(j=0; j < 2 ; j++) {
@@ -1094,6 +1095,12 @@ int ResizeObjectSpace(int reset,int maxsounds,int addbol) {
 	MySetHandleSize((Handle*)&p_Ifrom,(Size)maxsounds*sizeof(int));
 	MySetHandleSize((Handle*)&p_Quan,(Size)maxsounds*sizeof(double));
 	MySetHandleSize((Handle*)&p_DefaultChannel,(Size)maxsounds*sizeof(char));
+	/* fix #39: zero-fill p_DefaultChannel after resize. New bytes from realloc
+	   are uninitialized — with ASLR they get random values (32, 64, 96...)
+	   causing "'X' has channel 64. Should be 1..16". Safe to zero-fill all
+	   because legitimate channel values are loaded later by LoadObjectPrototypes. */
+	if(p_DefaultChannel != NULL && *p_DefaultChannel != NULL)
+		memset(*p_DefaultChannel, 0, (size_t)maxsounds * sizeof(char));
 	MySetHandleSize((Handle*)&p_PasteDone,(Size)maxsounds*sizeof(char));
 	MySetHandleSize((Handle*)&p_Tref,(Size)maxsounds*sizeof(long));
 	MySetHandleSize((Handle*)&p_Tpict,(Size)maxsounds*sizeof(long));
@@ -1136,7 +1143,7 @@ int ResizeObjectSpace(int reset,int maxsounds,int addbol) {
 		}
 
 	// Create objects for time patterns
-	if(Jbol < maxsounds && Nature_of_time == SMOOTH) {  //  2024-07-25
+	if(Jbol < maxsounds) {  // Was: && Nature_of_time == SMOOTH — fix #39: init needed for ALL grammars
 		if(Jbol >= 2) j = Jbol;
 		else j = 2;
 		//	BPPrintMessage(0,odInfo,"Running time patterns in ResizeObjectSpace() Jbol = %ld maxsounds = %ld\n",(long)Jbol,(long)maxsounds);

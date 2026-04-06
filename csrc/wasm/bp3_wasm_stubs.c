@@ -437,23 +437,12 @@ int PlayBuffer1(tokenbyte ***pp_buff, int onlypianoroll) {
     }
     result = OK;
 
-    /* Compute Kpress quantization offset (#35) for this item.
-       When Kpress >= 2, TimeSet's rounding compensation shifts T[0] by one
-       quantum. Find min starttime and store as wasm_kpress_offset. */
-    if(Kpress >= 2.0 && wasm_kpress_offset == 0) {
-        Milliseconds min_start = -1;
-        long ks;
-        for(ks = 2; ks <= kmax; ks++) {
-            int obj = (*p_Instance)[ks].object;
-            if(obj == -1) break;
-            if(obj < 2) continue;
-            Milliseconds st = (*p_Instance)[ks].starttime;
-            if(min_start < 0 || st < min_start) min_start = st;
-        }
-        if(min_start > 0) {
-            wasm_kpress_offset = min_start;
-            emscripten_log(EM_LOG_CONSOLE, "PlayBuffer1: Kpress=%.0f, kpress_offset=%ldms", Kpress, (long)min_start);
-        }
+    /* Kpress quantization offset (#35): when Kpress >= 2, TimeSet's rounding
+       compensation (T[jn-1]=T[jn]) shifts T[0] by one quantum. Subtract
+       exactly one quantum (Quantization, typically 10ms). */
+    if(Kpress >= 2.0 && wasm_kpress_offset == 0 && Quantization > 0) {
+        wasm_kpress_offset = Quantization;
+        emscripten_log(EM_LOG_CONSOLE, "PlayBuffer1: Kpress=%.0f, kpress_offset=%ldms (=Quantization)", Kpress, (long)Quantization);
     }
 
     /* === WASM: Extract MIDI events from p_Instance into eventStack ===

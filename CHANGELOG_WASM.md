@@ -196,8 +196,9 @@ Ajout de `#include <emscripten.h>` pour `emscripten_log()` et les macros runtime
 | Zerostart REMOVED (wasm.15) | ames, watch | Le zerostart soustrayait le min time local, détruisant les silences initiaux grammaticaux (ames: 666ms→0ms, watch: 1590ms→0ms). p_Instance.starttime inclut déjà les silences — pas besoin de normalisation |
 | Dedup keep-longest (#33) | visser5, visser-waves | Quand deux instances polymétriques du même pitch commencent au même moment, garde la plus longue durée (met à jour le NoteOff). Match le comportement natif p_keyon (NoteOff au dernier release). visser5: 16 diffs → 1 |
 | Kpress quantization offset (#35) | acceleration, visser3, visser-shapes | Quand Kpress≥2, la compensation d'arrondis de TimeSet (ligne 195) écrase T[0] avec T[1], décalant tous les timestamps d'un quantum. Le natif corrige via FormatMIDIstream(zerostart). Le WASM soustrait maintenant le min starttime de p_Instance quand Kpress≥2 (wasm_kpress_offset). 3 grammaires TIMING→EXACT |
+| T47 SSO detection (#38) | (aucune régression) | Scan pp_buff pour tags T47 après PolyMake, construit wasm_is_sso[]. bp3_api.c filtre les non-terminaux (p_Type & 1 == 0) SAUF les SSO marqués T47. Prépare l'émission correcte des silent sound objects (variables restantes traitées comme SSO par Bernard v3.3.19). |
 
-**Score parité wasm.3 (2026-04-06) :** S1 vs S2: 26E/9T/0C/1Count. S2 vs S3: 29E/4T/3C. S3 vs S4: 33E/1T/2Count. S4: 36/36. S5: 33/36.
+**Score parité wasm.4 (2026-04-06) :** S1 vs S2: 26E/9T/0C/1Count. S2 vs S3: 29E/4T/3C. S3 vs S4: 33E/1T/2Count. S4: 36/36. S5: 33/36.
 
 **Score parité wasm.15 :** 27/37 EXACT, 5 TIMING_DIFF within tolerance, 4 TIMING_DIFF vrais, 1 COUNT_DIFF, seed=1.
 
@@ -239,7 +240,11 @@ Ajout de `#include <emscripten.h>` pour `emscripten_log()` et les macros runtime
 | v3.3.18-wasm.17 | 2026-04-04 16:57 | S5 fixes: @improvize/@allitems, flag spacing ASCII, @timepatterns |
 | v3.3.18-wasm.18 | 2026-04-04 18:06 | Runtime controls: transpose, scale, rotate, keyxpand + dynamic dispatcher |
 | v3.3.18-wasm.19 | 2026-04-05 | Intégration Bernard v3.3.19 (FillPhaseDiagram MakeEmptyTokensSilent refactoré, etc.) — build manuel, non fiable |
-| v3.3.18-wasm.20 | 2026-04-05 14:33 | Rebuild propre via build.sh. Merge Bernard v3.3.19 + tous nos fixes WASM. Non-reg 36/36 EXACT S0→S4. **build actuel** |
+| v3.3.18-wasm.20 | 2026-04-05 14:33 | Rebuild propre via build.sh. Merge Bernard v3.3.19 + tous nos fixes WASM. Non-reg 36/36 EXACT S0→S4. |
+| v3.3.19-wasm.1 | 2026-04-05 | Build propre Bernard v3.3.19 via build.sh, publish GitHub |
+| v3.3.19-wasm.2 | 2026-04-06 | Fix #33 dedup keep-longest (visser5), traces BP3_DEBUG conditionnées |
+| v3.3.19-wasm.3 | 2026-04-06 | Fix #35 Kpress quantization offset (acceleration, visser3, visser-shapes → EXACT) |
+| v3.3.19-wasm.4 | 2026-04-06 | Bernard T47 intégré + T47 SSO detection WASM (wasm_is_sso[]). Non-reg 36/36. **build actuel** |
 
 Note : les builds v3.3.19-wasm.* qui existaient étaient mal nommés — ils étaient basés sur la branche `wasm` (fork de v3.3.13+v3.3.15), pas sur le v3.3.19 de Bernard. Renommés en v3.3.18-wasm.3/4.
 

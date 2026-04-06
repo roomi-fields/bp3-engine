@@ -916,14 +916,17 @@ const char* bp3_get_timed_tokens(void) {
         if(!include_controls && name != NULL &&
            (name[0] == '_' || name[0] == '/' || name[0] == '?')) continue;
 
-        /* Skip non-sounding bols: named bols without MIDI content are non-terminals
-           that survived derivation (e.g. X, Y in kss2). They are in p_Instance but
-           not in the alphabet as sound objects. MakeSound.c:850 uses the same check:
-           if(!((*p_Type)[j] & 1)) im = ZERO — i.e. no MIDI events to play.
-           NOTE: this filter also blocks silent sound objects (SSO) which have no
-           MIDI prototypes. See FEEDBACK_BERNARD #38 for the terminal distinction problem. */
+        /* Skip non-sounding bols UNLESS they are SSO (T47).
+           T47 bols are "remaining variables processed as silent sound objects"
+           (Bernard 2026-04-06). They have no MIDI prototype (p_Type & 1 == 0)
+           but are legitimate terminals to emit. wasm_is_sso[] is populated by
+           scanning pp_buff for T47 tags in PlayBuffer1 after PolyMake. */
         if(!include_controls && j > 1 && j < 16384 && j < Jbol
-           && p_Type != NULL && !((*p_Type)[j] & 1)) continue;
+           && p_Type != NULL && !((*p_Type)[j] & 1)) {
+            extern char wasm_is_sso[];
+            extern int wasm_sso_scanned;
+            if(!wasm_sso_scanned || !wasm_is_sso[j]) continue;
+        }
 
         remaining = TOKEN_JSON_BUF_SIZE - pos - 2;
         if(remaining < 300) goto FINISH_TOKENS;

@@ -95,6 +95,14 @@ Milliseconds wasm_midi_time_offset = 0;
    this offset when reading p_Instance timestamps. */
 Milliseconds wasm_kpress_offset = 0;
 
+/* T47 / SSO detection: after PolyMake resolves pp_buff, we scan the
+   tokenbyte stream for T47 tags and mark the corresponding bol indices.
+   bp3_get_timed_tokens uses this to distinguish SSO (emit) from
+   non-terminal residuals (skip). Reset at each PlayBuffer1 call. */
+#define WASM_SSO_MAX 4096
+char wasm_is_sso[WASM_SSO_MAX];  /* 1 = bol j is SSO (T47), 0 = not */
+int wasm_sso_scanned = 0;  /* set after scan */
+
 /* ============================================================
  * RNG: now using bp3_random.c (MSVC-compatible LCG) included via -BP3.h.
  * The glibc TYPE_3 implementation that was here has been removed.
@@ -323,6 +331,28 @@ int PlayBuffer1(tokenbyte ***pp_buff, int onlypianoroll) {
     if(result == EMPTY) { result = OK; goto SORTIR; }
     if(result != OK) {
         result = OK; goto SORTIR;
+    }
+
+    /* Scan pp_buff for T47 tags to identify SSO (silent sound objects).
+       T47 = remaining variable processed as SSO (Bernard 2026-04-06).
+       Format: tokenbyte pairs [tag, param] — T47 with param = bol index. */
+    {
+        size_t buf_size = MyGetHandleSize((Handle)*pp_buff) / sizeof(tokenbyte);
+        tokenbyte *buf = **pp_buff;
+        memset(wasm_is_sso, 0, sizeof(wasm_is_sso));
+        wasm_sso_scanned = 1;
+        int sso_count = 0;
+        size_t bi;
+        for(bi = 0; bi + 1 < buf_size; bi += 2) {
+            if(buf[bi] == T47) {
+                int p = buf[bi + 1];
+                if(p > 1 && p < WASM_SSO_MAX) {
+                    if(!wasm_is_sso[p]) { wasm_is_sso[p] = 1; sso_count++; }
+                }
+            }
+        }
+        if(sso_count > 0)
+            emscripten_log(EM_LOG_CONSOLE, "PlayBuffer1: T47 scan found %d SSO bols", sso_count);
     }
 
     /* Allocate event space */

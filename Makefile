@@ -29,7 +29,7 @@ MINGW    = x86_64-w64-mingw32-gcc
 EMCC     = emcc
 
 # === Shared compiler flags ===
-CFLAGS_COMMON = -O2 -fno-common
+CFLAGS_COMMON = -O2 -g -fno-common
 
 # Native flags (Linux + Windows)
 NATIVE_CFLAGS = $(CFLAGS_COMMON) -I$(NATIVE_SRC) -MMD -MP

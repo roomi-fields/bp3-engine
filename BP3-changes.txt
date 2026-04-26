@@ -6,8 +6,60 @@ https://github.com/bolprocessor/bolprocessor/blob/graphics-for-BP3/BP3-changes.t
 Read also the "to-do" file:
 https://raw.githubusercontent.com/bolprocessor/bolprocessor/graphics-for-BP3/BP3-To-Do.txt
 
+2026-04-20 -> 2026-04-22 (version 3.4.2)
+This version infers rule weights from the analysis of sets of examples.
+Read the documentation: https://bolprocessor.org/learning-rule-weights/
+The concept of "true BP grammar" has been expanded by disregarding performance controls.
+Character '\334' is now ignored  in the C code.
+An important bug, which has so far gone unnoticed, was fixed in copy_grammars().
+LengthOf() has been optimised again.
+In the interface, better handling of files with incorrect write permissions (MacOS and Linux).
+Don't forget to update the PHP interface:
+https://github.com/bolprocessor/php-frontend/
+
+-----
+2026-04-11 -> 2026-04-17 (version 3.4.1)
+This version creates templates in "true BP grammars" — read https://bolprocessor.org/bol-processor-grammars/.
+The interface displays a "Create templates" if the grammar has this property.
+Check the examples -da.dhahatite/-gr.dhahatite and -da.dhin-/-gr.dhin-, which are explained on this page: https://bolprocessor.org/parsing-items/.
+Rule weight learning from sets of examples will soon be implemented.
+
+-----
+2026-04-09 (version 3.4.0)
+This is the first version of BP3 that can analyse (parse) items against a grammar. This feature has been inherited from BP1 and BP2. However, parsing only works with true BP grammars.
+The production of templates in grammars will be made available in the next version.
+
+-----
+2026-04-02 -> 2026-04-06 (version 3.3.19)
+Many small changes have been made to deal more precisely with the "max items produced" parameter. Consistency is required for comparative tests in the WebAssembly environment.
+The "max items displayed" setting in the interface also allows you to indicate the maximum number of items that can be shown in images. Previously, this value was fixed at 10.
+A problem with changing the start string (on "grammar.php") has been fixed.
+Problems in ResizeObjectSpace() have been fixed.
+For geeks(1): The calculation of random numbers has been customised to create identical sequences under MacOS, Windows and Linux. See file "bp3_random.c".
+For geeks(2): In "FillPhaseDiagrams.c", "SetObjectFeatures.c" and "Graphic.c", remaining variables (processed as silent sound-objects) are tagged with T47 instead of T4.
+For geeks(3): You can now send a command line to the console from within the 'bolprocessor' folder instead of 'bolprocessor/php' which is used by the PHP interface. Click the "console's instruction" link for details.
+
+-----
+2026-03-26 (version 3.3.18)
+1) The console can now be called with shorter commands that do not declare a trace folder. In this case, neither a trace file nor an image is produced.
+For instance, you can use the following command line:
+../bp produce -se ../ctests/-se.Visser2 -gr ../ctests/-gr.acceleration --midiout ../my_output/test.mid --seed 1
+Or you can use the following command line:
+../bp produce -se ../ctests/-se.Visser2 -gr ../ctests/-gr.acceleration --midiout ../my_output/test.mid --traceout ../temp_bolprocessor/trace_f45ac19623_-gr.acceleration.txt
+If the command line contains a "--seed" option, this is used instead of the seed value in the settings file.
+2) The PolyExpand() function in Polymetric.c is no longer recursive. Instead, it uses a push/pop procedure on a heap table to avoid stack overflows in the WASM environment. This results in a slight increase in speed (about 14%).
+
+-----
+2026-03-24 (version 3.3.17)
+Fixed problems displaying (BP data) items in Improvize mode. The limit is now taken into account.
+A few fixed on the PHP interface to deal with (very) old files.
+Don't forget to update the PHP interface:
+https://github.com/bolprocessor/php-frontend/
+
+-----
 2026-03-23 (version 3.3.16)
 The creation of silent sound-objects has been finalised (see the previous version).
+Read: https://bolprocessor.org/silent-sound-objects/
 All "sprintf()" functions have been replaced with "snprintf()".
 
 -----
@@ -34,8 +86,6 @@ In the list of variables at the bottom of a grammar, none of the variables conta
 2026-01-11 (version 3.3.12)
 When importing MusicXML files, pedals "sostenuto" (MIDI controller #66) and "soft" (MIDI controller #67) are recognised in addition to "sustain" (MIDI controller #64).
 File data.php has been fixed to avoid a truncation of the "chunk.bpda" file when there are unbound ties in the last chunk.
-Don't forget to update the PHP interface:
-https://github.com/bolprocessor/php-frontend/
 
 -----
 2026-01-10 (version 3.3.11)

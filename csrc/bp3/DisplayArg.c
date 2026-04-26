@@ -38,6 +38,7 @@
 
 #include "-BP3decl.h"
 
+int trace_template = 0;
 
 int PrintArg(int datamode,int istemplate,int ret,char showtempo,int ifunc,int nocode,FILE *f,int wind,
 	tokenbyte ***pp_b, tokenbyte ***pp_a) {
@@ -45,7 +46,7 @@ int PrintArg(int datamode,int istemplate,int ret,char showtempo,int ifunc,int no
 /* datamode = TRUE: space according to metre, FALSE: no space */
 /* nocode = FALSE: copy pp_a to file f, if not NULL, or window 'wind' */
 /* nocode = TRUE and istemplate = FALSE: copy pp_a without structure to array pp_b... */
-/* istemplate = TRUE: match istemplate in pp_a against item in pp_b... */
+/* istemplate = TRUE: match template in pp_a against item in pp_b... */
 /* ... and replace '_' in istemplate with terminals in pp_b. */
 /* showtempo: add prolongational gaps using "Prod" */
 /* ret = TRUE: print a 'return' at the end */
@@ -83,9 +84,14 @@ int PrintArg(int datamode,int istemplate,int ret,char showtempo,int ifunc,int no
 
 	if(istemplate) {
 		nocode = TRUE;
-		/* Skip section markers in the beginning, match only speeds */
-		for(ia=ZERO; ;ia+=2L) {	/* Scan the template */
+		/* Skip section markers in the beginning, including speed */
+		for(ia = ZERO; ; ia += 2L) {	/* Scan the template */
 			m = (**pp_a)[ia]; p = (**pp_a)[ia+1];
+	/*		if(trace_template) {
+				sprintf(Message,"@++ ia = %ld, m = %d, p = %d\n",ia,m,p);
+				Print(wTrace,Message);
+				} */
+
 			if(m == TEND && p == TEND) break;
 			if(m == T1) continue;
 			if(m != T0) break;
@@ -97,6 +103,7 @@ int PrintArg(int datamode,int istemplate,int ret,char showtempo,int ifunc,int no
 					}
 				else tempo = 0.;
 				ia += 4L;
+				if(trace_template) Print(wTrace,"@++\n");
 				continue;
 				}
 			if(p == 25) {		/* '\' */
@@ -182,23 +189,28 @@ int PrintArg(int datamode,int istemplate,int ret,char showtempo,int ifunc,int no
 				}
 			break;
 			}
-		if(tempo != tempo2) {
-			r = MISSED; goto QUIT;
-			}
+	/*	if(tempo != tempo2) { // 2026-04-15
+			r = MISSED;
+			if(trace_template) Print(wTrace,"@++ tempo != tempo2\n");
+			goto QUIT;
+			} */
 		}
+	// BPPrintMessage(1,odInfo,"@ PrintArg() datamode = %d, showtempo = %d, istemplate = %d, nocode = %d, wind = %d\n",datamode,showtempo,istemplate,nocode,wind);
 	if((datamode || showtempo) && !istemplate) {
 		// If tempo is greater than 1 and there is no fractional gap we will print periods
 		// print_periods = 0 don't print
 		// print_periods = 1 print periods
 		// print_periods = 2 don't print
-		// print_periods = 3 print also section markers '�'
+		// print_periods = 3 print also section markers '•'
 		
+		// BPPrintMessage(1,odInfo,"@@  PrintArg() datamode = %d, showtempo = %d, istemplate = %d, nocode = %d, wind = %d\n",datamode,showtempo,istemplate,nocode,wind);
 		setting_section2 = TRUE;
 		if(datamode) print_periods = 2;
 		firsttempo = 0.;
 		scale = 1.;
 		for(i=ZERO; ;i+=2L) {
 			m = (int)(**pp_a)[i]; p = (int)(**pp_a)[i+1];
+	//		BPPrintMessage(1,odInfo,"m = %d, p = %d\n",m,p);
 			if(m == TEND && p == TEND) break;
 			if(setting_section2 && m == T1) continue;
 			if(m == T1 && (**pp_a)[i+2] == T1 && (**pp_a)[i+4] == T0 && (**pp_a)[i+5] == 11) {
@@ -271,7 +283,6 @@ int PrintArg(int datamode,int istemplate,int ret,char showtempo,int ifunc,int no
 	else prodtempo = 0.;
 	speed = 1.;
 	scale = 1.;
-
 	if((*pp_a) == NULL && !nocode) {
 		r = Display('\0',nhomo,levpar,homoname,depth,&maxib,pp_a,&ia,istemplate,
 			(tokenbyte)0,(tokenbyte)0,0,pp_b,&ib,f,th," << Not encoded >> ",NULL,-1);
@@ -308,10 +319,6 @@ int PrintArg(int datamode,int istemplate,int ret,char showtempo,int ifunc,int no
 		}
 	else {
 		if(th != NULL) {
-	#if WASTE_FORGET_THIS
-			WEFeatureFlag(weFInhibitRecal,weBitClear,th);
-			if(wasactive) Activate(th);
-	#endif
 			if(r == OK && print_periods && pos > 0 && pos < (Prod/firstscale)) {
 				for(i=pos; i < (Prod/firstscale); i++) {
 					if(OutChar(f,th,'-') != OK) {
@@ -330,6 +337,7 @@ int PrintArg(int datamode,int istemplate,int ret,char showtempo,int ifunc,int no
 	if(th != NULL) {
 		CheckTextSize(wind);
 		}
+	if(trace_template) Print(wTrace,"@++ ==========\n");
 	return(r);
 	}
 
@@ -386,26 +394,28 @@ int PrintArgSub(PrintargType *p_printarg,unsigned long *p_maxib,TextHandle th,
 		}
 	else p_sequence = NULL;
 
+	// BPPrintMessage(1,odInfo,"@@ PrintArgSub()\n");
+
 	for(i=ia; ; i+=2L) {
 		m = (int)(**pp_a)[i]; p = (int)(**pp_a)[i+1];
-//		if(nocode) BPPrintMessage(0,odInfo,"@@@ m = %d, p = %d\n",m,p);
+	//	BPPrintMessage(0,odInfo,"@++ m = %d, p = %d\n",m,p);
 		if(m == TEND && p == TEND) break;
+/*	sprintf(Message,"@++ m = %d, p = %d\n",m,p);
+		Print(wTrace,Message); */
 		if(m == T3 || m == T47 || m == T25) {
-			if((r=CheckPeriodOrLine(print_periods,p_newline,p_newsection,f,th,&beat,numberprolongations,
-					&sp)) != OK) goto SORTIR;
+			if((r=CheckPeriodOrLine(print_periods,p_newline,p_newsection,f,th,&beat,numberprolongations,&sp)) != OK) goto SORTIR;
 			}
-		if(m == T0 && setting_section && (p == 3 || p == 11)) {	/* '+'  or initial '/' */
+		if(m == T0 && setting_section && (p == 3 || p == 11)) {	// '+'  or initial '/'
 			if(datamode) {
 				if((*p_itab) >= MAXTAB) {
-					BPPrintMessage(0,odError,"Too many tab sections: check '.+.+./.' in begining");
+					BPPrintMessage(0,odError,"=> Too many tab sections: check '.+.+./.' in begining\n");
 					r = ABORT; goto SORTIR;
 					}
 				tab[(*p_itab)++] = n;
 				for(j=(*p_itab); j < MAXTAB; j++) tab[j] = 0;
 				}
 			if(((!datamode || setting_section) || nocode || prodtempo == 0.) && p != 11) {
-				if((r=Display(Code[p],nhomo,levpar,homoname,depth,p_maxib,pp_a,&i,istemplate,
-						m,p,nocode,pp_b,p_ib,f,th,"%c",NULL,-1)) != OK) {
+				if((r = Display(Code[p],nhomo,levpar,homoname,depth,p_maxib,pp_a,&i,istemplate,m,p,nocode,pp_b,p_ib,f,th,"%c",NULL,-1)) != OK) {
 					goto SORTIR;
 					}
 				sp = 0;
@@ -416,25 +426,25 @@ int PrintArgSub(PrintargType *p_printarg,unsigned long *p_maxib,TextHandle th,
 		if(m == T0 && p > 10) {
 			if(istemplate) {
 				switch(p) {
-					case 11: /* '/' speed up */
+					case 11: // '/' speed up
 						mm = (**pp_b)[*p_ib];
 						pp = (**pp_b)[*p_ib+1];
-						if(mm == T0 && pp == 21) { /* '*' scale up */
+						if(mm == T0 && pp == 21) { // '*' scale up
 							s = GetScalingValue((*pp_b),*p_ib);
-							if(s == 1.) {	/* Skip '*1' */
+							if(s == 1.) {	// Skip '*1'
 								(*p_ib) += 6L;
 								}
 							}
 						break;
 					}
-				if((r=Display('\0',nhomo,levpar,homoname,depth,p_maxib,pp_a,&i,istemplate,m,
-						p,nocode,pp_b,p_ib,f,th,"",NULL,-1)) != OK) {
+				if((r=Display('\0',nhomo,levpar,homoname,depth,p_maxib,pp_a,&i,istemplate,m,p,nocode,pp_b,p_ib,f,th,"",NULL,-1)) != OK) {
 					goto SORTIR;
 					}
 				continue;
 				}
 			switch(p) {
-				case 11: /* '/' speed up */
+				case 11: // '/' speed up
+					// OutChar(f,th,'@');
 					speed = GetScalingValue((*pp_a),i);
 					if((*p_scale) != 0.) {
 						tempo = speed / (*p_scale);
@@ -651,12 +661,12 @@ DONESPEED:
 		if(m == T25) {	/* Simple note */
 			if(!nocode && sp != 4 && sp && (sp < 3 || (datamode && *(p_speed) < 2.)
 				|| SplitTimeObjects)) if(Space(f,th,&sp) != OK) {
-						r = ABORT; goto SORTIR;
-						}
+					r = ABORT; goto SORTIR;
+					}
 			p += 16384;
 			goto TERMINAL;
 			}
-		if((m == T3 || m == T47) && p < Jbol && p_Bol != NULL) {				/* Terminal */
+		if((m == T3 || m == T47) && p < Jbol && p_Bol != NULL) {	// Terminal
 			if(!nocode && sp != 4 && sp && (sp < 3 || SplitTimeObjects))
 				if(Space(f,th,&sp) != OK) {
 					r = ABORT; goto SORTIR;
@@ -666,20 +676,13 @@ TERMINAL:
 			for(n=nhomo; n >= 1; n--) {
 				h = homoname[n];
 				if(h >= Jhomo) {
-					{
-						BPPrintMessage(0,odError,"=> Err. PrintArgSub(). h >= Jhomo");
-						r = ABORT; goto SORTIR;
-						}
+					BPPrintMessage(0,odError,"=> Err. PrintArgSub(). h >= Jhomo");
+					r = ABORT; goto SORTIR;
 					}
 				if(depth[n] < levpar) p = Image(h,p);
 				}
 			if(p >= 16384) m = T25;
 			else m = T3; // Check for T47, 2026-04-06
-		/*	if(!nocode && UseTextColor) {
-				if(p < 2) Reformat(wind,-1,-1,-1,&Black,NO,NO);	// '-' or '_'
-				else	if(p < 16384) Reformat(wind,-1,-1,-1,&Color[TerminalC],NO,NO);
-						else Reformat(wind,-1,-1,-1,&Color[NoteC],NO,NO);
-				} */
 			if(ifunc && !nocode && p < Jbol && (*((*p_Bol)[p]))[0] == '\'') {
 				for(j=1; (*((*p_Bol)[p]))[j] != '\''; j++) {
 					if(OutChar(f,th,(*((*p_Bol)[p]))[j]) != OK) {
@@ -1154,14 +1157,15 @@ PRINTPROLONGATIONS:
 						}
 					}
 				}
-			if(!datamode && (p == 12 || p == 13 || p == 14 || p == 7)) /* '{', '}', comma, '�' */
+			if(!datamode && (p == 12 || p == 13 || p == 14 || p == 7)) /* '{', '}', comma, '•' */
 				forceshowtempo = TRUE;
 			if(p == 22 || p == 23) continue;	/* Temporary bracket '|' */
 			if(nocode) {
 				if(p == 12) {	/* '{' */
 					(*p_sequence)[level] = FALSE;
 					}
-				if(p == 7 || (p > 11 && p < 20)) {		/* '�', '{', '}', comma */
+				if(p == 7 || (p > 11 && p < 20)) {		/* '•', '{', '}', comma */
+			//		BPPrintMessage(1,odInfo,"@ PrintArgSub\n");
 					if((*p_sequence)[level]) {
 						if(p == 13 || p == 14) {				/* '}', comma */
 							(*p_sequence)[level] = FALSE;
@@ -1172,8 +1176,7 @@ PRINTPROLONGATIONS:
 								}
 							}
 						}
-					if((r=Display('\0',nhomo,levpar,homoname,depth,p_maxib,pp_a,&i,istemplate,m,p,nocode,
-							pp_b,p_ib,f,th,"",NULL,-1)) != OK) {
+					if((r=Display('\0',nhomo,levpar,homoname,depth,p_maxib,pp_a,&i,istemplate,m,p,nocode,pp_b,p_ib,f,th,"",NULL,-1)) != OK) {
 						goto SORTIR;
 						}
 					if((p == 12 || p == 14) && !(*p_sequence)[level]
@@ -1662,13 +1665,13 @@ return(OK);
 int PrintPeriod(FILE* f,TextHandle th)
 {
 if(UseBullet) {
-	if(SplitTimeObjects) {
+	if(TRUE || SplitTimeObjects) { // 2026-04-13
 		 if(OutChar(f,th,' ') != OK) return(ABORT);
-		 if(OutChar(f,th,'.') != OK) return(ABORT); // Fixed by BB 2022-02-20
+		 if(OutChar(f,th,'.') != OK) return(ABORT);
 		 if(OutChar(f,th,' ') != OK) return(ABORT);
 		}
 	else {
-		 if(OutChar(f,th,'.') != OK) return(ABORT); // Fixed by BB 2022-02-20
+		 if(OutChar(f,th,'.') != OK) return(ABORT);
 		}
 	}
 else {
@@ -1698,16 +1701,12 @@ return(OK);
 }
 
 
-int Display(char thechar,int nhomo,int levpar,int* homoname,int* depth,unsigned long *p_maxib,
-	tokenbyte ***pp_a,
-	unsigned long *p_i,int istemplate,tokenbyte m,tokenbyte p,int nocode,
-	tokenbyte ***pp_b,unsigned long *p_ib,FILE *f,TextHandle th,char *format,char **p_smthing,
-	long integ) {
+int Display(char thechar,int nhomo,int levpar,int* homoname,int* depth,unsigned long *p_maxib,tokenbyte ***pp_a,unsigned long *p_i,int istemplate,tokenbyte m,tokenbyte p,int nocode,tokenbyte ***pp_b,unsigned long *p_ib,FILE *f,TextHandle th,char *format,char **p_smthing,long integ) {
 
 	char s[255];
 	tokenbyte mm,pp,**ptr;
 	int n,h,px,py;
-//	BPPrintMessage(1,odInfo,"@@@ m = %d, p = %d, thechar = %s\n",m,p,thechar);
+	
 	if(nocode) {
 		if(!istemplate) {
 			if((*p_ib) > ((*p_maxib)-16L)) {
@@ -1728,7 +1727,7 @@ int Display(char thechar,int nhomo,int levpar,int* homoname,int* depth,unsigned 
 			/* pp_a is istemplate, pp_b is item without structure */
 	POSITION:
 			if((**pp_b)[*p_ib] == T0 && (**pp_b)[(*p_ib)+1] == 7) {
-				(*p_ib) += 2;		/* Skip '�' */
+				(*p_ib) += 2;		/* Skip '•' */
 				goto POSITION;
 				}
 			if((**pp_b)[*p_ib] == TEND && (**pp_b)[(*p_ib)+1] == TEND) return(MISSED);
@@ -1773,12 +1772,14 @@ int Display(char thechar,int nhomo,int levpar,int* homoname,int* depth,unsigned 
 			}
 		}
 	else {
+	//	BPPrintMessage(1,odInfo,"@@@ m = %d, p = %d\n",m,p);
 		if(m == T25) {
 			PrintThisNote(-1,p,0,-1,s);
 			goto PRINT;
 			}
 		if(integ == -1) {
 			if(p_smthing != NULL) {
+			//	BPPrintMessage(1,odInfo,"@ smthing = %s\n",*p_smthing);
 				my_sprintf(s,format,*p_smthing);
 				}
 			else {
@@ -1789,17 +1790,23 @@ int Display(char thechar,int nhomo,int levpar,int* homoname,int* depth,unsigned 
 				}
 			}
 		else {
+		//	BPPrintMessage(1,odInfo,"@ integ = %ld\n",integ);
 			my_sprintf(s,format,(long)integ);
 			}
 	PRINT:
+	// BPPrintMessage(1,odInfo,"@  Display %s\n",s);
 		if(f == stdout) {
+	//		BPPrintMessage(1,odInfo,"@@  Display %s\n",s);
 			if(th == NULL) {
-				BPPrintMessage(0,odError,"=> Err. Display");
+				BPPrintMessage(0,odError,"=> Err. Display()\n");
 				return(ABORT);
 				}
 			TextInsert(s,(long)strlen(s),th);
 			}
-		else fprintf(f,"%s",s); //  Fixed by BB 2022-02-20
+		else {
+	//		fprintf(f,"%s",s); //  Fixed by BB 2022-02-20
+			BPPrintMessage(1,odInfo,"@@  Display %s\n",s);
+			}
 		}
 	return(OK);
 	}

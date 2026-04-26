@@ -84,7 +84,7 @@ int Inits(void) {
 	Option = TickDone = FoundNote = GotAlert = UsedRandom = SaidTooComplex = FALSE;
 	POLYconvert = OkShowExpand = FALSE;
 	NewOrchestra = TRUE;
-	ItemNumber = ZERO;
+	ItemNumber = TemplateNumber = ZERO;
 	MaxItemsProduce = 20;
 	MaxItemsGraphic = 10;
 	AssignedTempoCsoundFile = FALSE;
@@ -208,16 +208,19 @@ int Inits(void) {
 		= ShowGraphic = ComputeWhilePlay = NeverResetWeights = FALSE;
 	SynchronizeStart = CyclicPlay = NoConstraint = AllItems
 	 = CsoundTrace = WillRandomize = FALSE;
+	AllTemplates = TRUE;
 	ResetWeights = ResetFlags = ResetControllers = ShowMessages
 		= AllowRandomize = TRUE;
 	NoteConvention = ENGLISH;
 	Offscreen = FALSE;
 	Nw = -1; Ndiagram = Npicture = 0;
 	LastEditWindow = OutputWindow = wData;
+	// SetSelect(ZERO,ZERO,TEH[wData]);
 	LastComputeWindow = wGrammar;
 	LastAction = NO;
 	Ke = log((double) 2.) / 64.;
 	strcpy(Message,"");
+	strcpy(TraceOutFilePath,"");
 	/* PictFrame.top = topDrawPrototype;
 	PictFrame.left = leftDrawPrototype;
 	PictFrame.bottom = bottomDrawPrototype;
@@ -319,6 +322,7 @@ int Inits(void) {
 	p_MemGram = p_MemRul = p_VarStatus = NULL;
 	p_MemPos = p_LastStackIndex = NULL;
 	p_ItemStart = p_ItemEnd = NULL;
+	p_Scrap = NULL;
 	pp_Scrap = &p_Scrap;
 	p_StringList = NULL; pp_StringList = &p_StringList; NrStrings = 0;
 	if(ResetScriptQueue() != OK) return(ABORT);
@@ -638,20 +642,18 @@ return(OK);
 }
 
 /* Non-Carbon version just creates TextHandles to use */
-int SetUpWindow(int w)
-{	
+int SetUpWindow(int w) {	
 	if(w < 0 || w >= WMAX) {
-		BPPrintMessage(0,odError,"Internal problem in setting up text buffers!");
+		BPPrintMessage(0,odError,"=> Internal problem in setting up text buffers! w = %d\n",w);
 		return(ABORT);
-	}
-	
+		}
 	if(Editable[w]) {
 		TEH[w] = NewTextHandle();
 		if(TEH[w] == NULL) return(ABORT);
-	}
+		}
 	else TEH[w] = NULL;
 	return(OK);
-}
+	}
 
 int LoadStrings(void) {
 	long max;

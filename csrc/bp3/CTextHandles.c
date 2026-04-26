@@ -159,33 +159,32 @@ int TextGetSelection(TextOffset* start,TextOffset* end, TextHandle th)
 	return OK;
 }
 
-int SetSelect(TextOffset start,TextOffset end, TextHandle th)
-{
+int SetSelect(TextOffset start,TextOffset end, TextHandle th) {
 	long maxoffset;
 
 	/* clamp range to text bounds */
 	maxoffset = GetTextHandleLength(th);
 	if(start < ZERO) {
-		BPPrintMessage(0,odError,"=> Err. SetSelect(). start < ZERO");
+		BPPrintMessage(0,odError,"=> Err. SetSelect(). start < ZERO\n");
 		start = ZERO;
 	}
 	else if(start > maxoffset) {
-		BPPrintMessage(0,odError,"=> Err. SetSelect(). start > maxoffset");
+		BPPrintMessage(0,odError,"=> Err. SetSelect(). start > maxoffset, start = %ld\n",(long)start);
 		start = maxoffset;
 	}
 	if(end < ZERO) {
-		BPPrintMessage(0,odError,"=> Err. SetSelect(). end < ZERO");
+		BPPrintMessage(0,odError,"=> Err. SetSelect(). end < ZERO\n");
 		end = ZERO;
 	}
 	else if(end > maxoffset) {
-		BPPrintMessage(0,odError,"=> Err. SetSelect(). end > maxoffset");
+		BPPrintMessage(0,odError,"=> Err. SetSelect(). end > maxoffset, end = %ld, maxoffset = %ld\n",(long)end,maxoffset);
 		end = maxoffset;
 	}
 
 	(*th)->selStart = start;
 	(*th)->selEnd = end;
 	return OK;
-}
+	}
 
 long GetTextLength(int w)
 {
@@ -245,8 +244,7 @@ int TextDelete(int w)
 	return OK;
 }
 
-int TextInsert(char *s,long length,TextHandle th)
-{
+int TextInsert(char *s,long length,TextHandle th) {
 	int w, od;
 	
 	BP_NOT_USED(length);
@@ -254,19 +252,21 @@ int TextInsert(char *s,long length,TextHandle th)
 	// find window index
 	for (w = 0; w < WMAX; ++w) {
 		if(th == TEH[w])  break;
-	}
+		}
 	switch (w)	{
 		case wGrammar:	od = odTrace; break;
 		case wData:		od = odDisplay; break;
 		case wTrace:	od = odTrace; break;
-		default:		od = odInfo; break;
-	}
+		case wWeights:	od = odWeights; break;
+	//	default:		od = odInfo; break;
+		default:		od = odDisplay; break; // 2026-04-19
+		}
 	if(od == odInfo) {
 		BPPrintMessage(0,od, "TextInsert(%s): %s\n", (w < WMAX) ? WindowName[w] : "", s);
-	}
+		}
 	else {
-		BPPrintMessage(0,od, "%s", s);
-	}
-	
+		// if(w == wWeights) BPPrintMessage(1,odInfo,"@@ s = %s",s);
+		BPPrintMessage(1,od,"%s",s);
+		}
 	return OK;
-}
+	}

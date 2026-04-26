@@ -94,6 +94,9 @@ A structure of "sound-objects" represented as a "polymetric expression".
         in the 'Misc' menu].
 • Many commented examples will be found in "-da.checkPoly".
 • Read https://bolprocessor.org/polymetric-structure/
+### Structural markers
+• The glyphs '+', ':', ';', and '=' can be used in grammar rules as structural markers.
+• See for instance "-gr.dhadhatite" using '+'.
 ### Undetermined rests
 • These are notated '_rest'.
     The old notation '…' (be careful: this is a single character, not three periods!)
@@ -301,6 +304,13 @@ In "production", there are three derivation modes for rules in a "subgrammar":
 • RIGHT: the position of the derivation is the rightmost occurrence of the left argument
     of this rule;
 • If a "subgrammar" is of "LIN" type then all rules are applied in "LEFT" mode.
+### Rule weight
+• Each rule may be assigned a weight in the range 0..32767. These are used when there are multiple rules in the "RND", "LIN", "SUB" or "SUB1" grammars.
+• The weight value is indicated between angle brackets, e.g. <43>. The default weight is 127. A rule with a weight of 0 is inactive.
+• The probability of selecting a rule is the ratio of its weight to the sum of the weights of the eligible rules (whose left argument is found in the work string).
+• Weights in the range 0..127 can be set using MIDI controllers and parameters K1, K2, etc.
+• Weights can be infinite and are notated as <inf>. A rule with an infinite weight will always be included in the selected rules if its left argument is found in the work string.
+• Weights can be dynamically controlled: any rule can be given a positive or negative weight increment each time it is applied. For example, a rule with a weight of <100-30> will have successive weights of 100, 70, 40, 10 and 0 and therefore cannot be applied more than four times in the same production.
 ### Programmed grammars
 See "flags"
 ### Flags
@@ -1638,8 +1648,7 @@ Multiplies the tempo by 'x'
     "E5 F5" is performed at tempo 3 = 1.5 * 2.
 • The above example shows that speed change is relative.
     Thus, '_tempo(2)' is not the strict equivalent of '/2' (the obsolete "tempo marker"
-    notation) although it should replace it in most cases. "Tempo markers" are kept only
-    for compatibility with old BP3 projects.
+    notation) although it should replace it in most cases.
 ### Variable arguments
 Some "performance controls", "tools", and rule weights in a grammar, can be given arguments
     notated K1, K2, ... Kx.

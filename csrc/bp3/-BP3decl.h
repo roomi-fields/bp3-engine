@@ -125,7 +125,7 @@ extern Milliseconds TabfileStart;
 extern long ProduceStackDepth,ProduceStackIndex,DisplayStackIndex,
 	**p_LastStackIndex,**p_MemPos;
 extern long **p_ItemStart,**p_ItemEnd,CompileDate,ComputeStart,MaxComputeTime,
-	ComputeTime,ItemNumber,Interrupted,MaxDeriv,Sel1,Sel2,AssignedTempoCsoundFile;
+	ComputeTime,ItemNumber,TemplateNumber,Interrupted,MaxDeriv,Sel1,Sel2,AssignedTempoCsoundFile;
 extern int Nplay,SynchroSignal,Quantize,IgnoreCase,
 	MatchWords,TargetWindow,GraphicScaleP,GraphicScaleQ;
 extern long Time_res,Quantization,MaxDeltaTime;
@@ -168,9 +168,9 @@ extern long MidiLen_pos,**p_Tref,**p_Tpict;
 extern dword MIDItracklength,Midi_msg;
 extern Milliseconds OldMIDIfileTime;
 extern unsigned long LapWait,WhenItStarted;
-extern int ****p_Image,****p_NoteImage,MaxGram,MaxRul,SplitTimeObjects,SplitVariables,Token,
+extern int ****p_Image,****p_NoteImage,MaxGram,MaxRul,SplitTimeObjects,SplitVariables,SplitLines,Token,
 	SpaceOn,
-	VariableOn,N_err,nstore,NumberTables,OkShowExpand,Improvize,ComputeWhilePlay,Varweight,
+	VariableOn,N_err,nstore,NumberTables,OkShowExpand,Improvize,Analyzing,ComputeWhilePlay,Varweight,
 	TransposeInput,TransposeValue,
 	Flagthere,ResetDone,BolsInGrammar,NoAlphabet,**p_Ifrom,PointCsound,PointMIDI,
 	**p_Resolution,
@@ -226,7 +226,7 @@ extern char LiveFolder[MAXNAME];
 extern double SpeedRange,Ke,CorrectionFactor;
 
 extern int DeriveFurther,DeriveFurtherKey,DeriveFurtherChan,ResetWeights,NeverResetWeights,
-	ResetWeightKey,ResetWeightChan,ResetFlags,ResetControllers,AllItems,JustCompiled,
+	ResetWeightKey,ResetWeightChan,ResetFlags,ResetControllers,AllItems,AllTemplates,JustCompiled,
 	PlayKey,PlayChan,RepeatKey,RepeatChan,EndRepeatKey,EndRepeatChan,IgnoreUndefinedVariables,
 	EverKey,EverChan,QuitKey,QuitChan,MuteOnKey,MuteOnChan,MuteOffKey,MuteOffChan,
 	UseEachSubKey,UseEachSubChan,
@@ -246,6 +246,7 @@ extern TextOffset UndoPos;
 extern long CountOn;
 extern unsigned long WaitStartDate,WaitEndDate;
 extern char Message[MAXLIN],TheName[MAXNAME];
+extern char TraceOutFilePath[MAXLIN];
 extern char DateMark[6];
 // extern PolyHandle p_Diagram[MAXDIAGRAM];
 extern int Ndiagram,ObjectMode,ObjectTry;
@@ -315,6 +316,7 @@ extern int CompiledGr,CompiledPt,CompiledAl,CompiledIn,
 	CompiledCsObjects,CompiledRegressions,LoadedIn,LoadedCsoundInstruments,
 	Interactive,NotFoundMetronom,NotFoundNatureTime;
 extern int NotBPCase[MAXNOTBPCASES];
+extern int Grammar_has_periods;
 extern int Hmin[WMAX],Hmax[WMAX],Hzero[WMAX],Vmin[WMAX],Vmax[WMAX],Vzero[WMAX];
 extern int Created[WMAX];
 extern char FileName[WMAX][MAXNAME+1],CsFileName[MAXNAME+1],MIDIfileName[MAXNAME+1],
@@ -392,6 +394,7 @@ extern int MIDIflush(int,int);
 
 extern char PathToMidiFile[MAXLIN];
 extern int SetMidiFileNr;
+extern int WeightsFileExists;
 
 extern BPConsoleOpts gOptions;
 

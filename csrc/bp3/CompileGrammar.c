@@ -50,6 +50,7 @@ int CompileGrammar(int verbose,t_gram* p_gram) {
 	Handle ptr1;
 
 	dummy = ZERO;
+	Grammar_has_periods = FALSE;
 	strcpy(LastSeen_scale,"");
 	if(CheckEmergency() != OK) {
 		Panic = TRUE; return(ABORT);
@@ -169,25 +170,25 @@ int CompileGrammar(int verbose,t_gram* p_gram) {
 		}
 	p_line = NULL;
 	InitThere = 0; p_InitScriptLine = NULL;
-	while(ReadLine(YES,wGrammar,&pos,posmax,&p_line,&gap) == OK) {
+	while(ReadLine(NO,YES,wGrammar,&pos,posmax,&p_line,&gap) == OK) {
 		if((*p_line)[0] == '\0') goto NEXTLINE;
 		if(Mystrcmp(p_line,"DATA:") == 0) break;
 		if(Mystrcmp(p_line,"COMMENT:") == 0) break;
 		if(Mystrcmp(p_line,"TIMEPATTERNS:") == 0) {
 			do {
-				if(ReadLine(YES,wGrammar,&pos,posmax,&p_line,&gap) != OK) goto END;
+				if(ReadLine(NO,YES,wGrammar,&pos,posmax,&p_line,&gap) != OK) goto END;
 				if((*p_line)[0] == '\0') continue;
 				}
 			while((*p_line)[0] != '-' || (*p_line)[1] != '-');
 			goto NEXTLINE;
 			}
 		if(Mystrcmp(p_line,"TEMPLATES:") == 0) {
+			p_gram->hasTEMP = TRUE;
 			do {
-				if(ReadLine(YES,wGrammar,&pos,posmax,&p_line,&gap) != OK) goto END;
+				if(ReadLine(NO,YES,wGrammar,&pos,posmax,&p_line,&gap) != OK) goto END;
 				if((*p_line)[0] == '\0') continue;
 				}
 			while((*p_line)[0] != '-' || (*p_line)[1] != '-');
-			p_gram->hasTEMP = TRUE;
 			goto NEXTLINE;
 			}
 		p = &((*p_line)[0]); q = &(InitToken[0]);
@@ -248,6 +249,9 @@ int CompileGrammar(int verbose,t_gram* p_gram) {
 			}
 			
 		/* Skip headers */
+		p = &(*p_line)[0]; q = &(FilePrefix[wData][0]);
+		if((Match(TRUE,p_line,&q,4)) && p_gram->number_gram == 1
+			&& (*(p_gram->p_subgram))[1].number_rule == 0) goto NEXTLINE;
 		p = &(*p_line)[0]; q = &(FilePrefix[wAlphabet][0]);
 		if((Match(TRUE,p_line,&q,4)) && p_gram->number_gram == 1
 			&& (*(p_gram->p_subgram))[1].number_rule == 0) goto NEXTLINE;
@@ -269,7 +273,12 @@ int CompileGrammar(int verbose,t_gram* p_gram) {
 		p = &(*p_line)[0]; q = &(FilePrefix[wCsoundResources][0]);
 		if((Match(TRUE,p_line,&q,4)) && p_gram->number_gram == 1
 			&& (*(p_gram->p_subgram))[1].number_rule == 0) goto NEXTLINE;
+
 		p = &(*p_line)[0]; q = &(FilePrefix[wTonality][0]);
+		if((Match(TRUE,p_line,&q,4)) && p_gram->number_gram == 1
+			&& (*(p_gram->p_subgram))[1].number_rule == 0) goto NEXTLINE;
+
+		p = &(*p_line)[0]; q = &(FilePrefix[wWeights][0]);
 		if((Match(TRUE,p_line,&q,4)) && p_gram->number_gram == 1
 			&& (*(p_gram->p_subgram))[1].number_rule == 0) goto NEXTLINE;
 		p = &(*p_line)[0]; q = &(FilePrefix[iMidiDriver][0]);
@@ -318,7 +327,8 @@ int CompileGrammar(int verbose,t_gram* p_gram) {
 
 	END:
 	MyDisposeHandle((Handle*)&p_line);
-	if(verbose) BPPrintMessage(0,odInfo,"Parsing completed\n");
+//	if(verbose) 
+	BPPrintMessage(0,odInfo,"Parsing completed\n");
 
 	// DisplayGrammar(p_gram,wData,TRUE,TRUE);
 
@@ -330,12 +340,13 @@ int CompileGrammar(int verbose,t_gram* p_gram) {
 		Panic =  TRUE; // 2024-06-18
 		return(ABORT);
 		} */
-	if((*(p_gram->p_subgram))[p_gram->number_gram].number_rule < 1) {
+/*	if((*(p_gram->p_subgram))[p_gram->number_gram].number_rule < 1) {
+		// 2026-04-11
 		ptr = (t_rule**) (*(p_gram->p_subgram))[p_gram->number_gram].p_rule;
 		MyDisposeHandle((Handle*)&ptr);
 		(*(p_gram->p_subgram))[p_gram->number_gram].p_rule = NULL;
 		p_gram->number_gram--;
-		}
+		} */
 	MaxGram = p_gram->number_gram;
 	if(p_gram->number_gram == 0) {
 		ptr1 = (Handle) p_gram->p_subgram;
@@ -359,18 +370,19 @@ int CompileGrammar(int verbose,t_gram* p_gram) {
 		NotBPCase[8] = FALSE;
 		for(i=0; i < MAXNOTBPCASES; i++) {
 			if(NotBPCase[i]) {
-				p_gram->trueBP = FALSE; break;
+				p_gram->trueBP = FALSE;
+				break;
 				}
 			}
 		if(InsertGramCorrections) InsertSubgramTypes(p_gram);
-		ResetRuleWeights(p_gram,0);
+		ResetRuleWeights(p_gram,0); // w = weight
 		if(CompileOn) CompileOn--;
 		return(OK);
 		}
 	else {
-		if(verbose) ShowSelect(CENTRE,wTrace);
 		p_gram->trueBP = p_gram->hasTEMP = p_gram->hasproc = FALSE;
 		if(CompileOn) CompileOn--;
+	//	BPPrintMessage(1,odInfo,"@@@@@@##\n");
 		return(N_err == 0);
 		}
 	}
@@ -387,13 +399,13 @@ pos = posline = ZERO;
 posmax = GetTextLength(wGrammar);
 igram = 1; irul = 0; found = FALSE;
 p_line = NULL;
-while(ReadLine(YES,wGrammar,&pos,posmax,&p_line,&gap) == OK) {
+while(ReadLine(NO,YES,wGrammar,&pos,posmax,&p_line,&gap) == OK) {
 	if((*p_line)[0] == '\0') goto NEXTLINE;
 	if(Mystrcmp(p_line,"DATA:") == 0) break;
 	if(Mystrcmp(p_line,"COMMENT:") == 0) break;
 	if(Mystrcmp(p_line,"TIMEPATTERNS:") == 0) {
 		do {
-			if(ReadLine(YES,wGrammar,&pos,posmax,&p_line,&gap) != OK) goto END;
+			if(ReadLine(NO,YES,wGrammar,&pos,posmax,&p_line,&gap) != OK) goto END;
 			if((*p_line)[0] == '\0') continue;
 			}
 		while((*p_line)[0] != '-' || (*p_line)[1] != '-');
@@ -401,7 +413,7 @@ while(ReadLine(YES,wGrammar,&pos,posmax,&p_line,&gap) == OK) {
 		}
 	if(Mystrcmp(p_line,"TEMPLATES:") == 0) {
 		do {
-			if(ReadLine(YES,wGrammar,&pos,posmax,&p_line,&gap) != OK) goto END;
+			if(ReadLine(NO,YES,wGrammar,&pos,posmax,&p_line,&gap) != OK) goto END;
 			if((*p_line)[0] == '\0') continue;
 			}
 		while((*p_line)[0] != '-' || (*p_line)[1] != '-');
@@ -724,7 +736,7 @@ int UpdateProcedureIndex(int jproc,int igram,int irul,int ig,int ir,int mode) {
 	pos = posline = ZERO;
 	posmax = GetTextLength(wGrammar);
 	p_line = NULL;
-	while(ReadLine(YES,wGrammar,&pos,posmax,&p_line,&gap) == OK) {
+	while(ReadLine(NO,YES,wGrammar,&pos,posmax,&p_line,&gap) == OK) {
 	//	PleaseWait();
 		if((*p_line)[0] == '\0') goto NEXTLINE;
 		i = 0;
@@ -902,7 +914,7 @@ int ReadAlphabet(int justcount) {
 
 	p_line = NULL;
 	my_sprintf(operatorbetweenquotes,"\'%s\'",Arrowstring);
-	while(ReadLine(YES,wAlphabet,&pos,posmax,&p_line,&gap) == OK) {
+	while(ReadLine(NO,YES,wAlphabet,&pos,posmax,&p_line,&gap) == OK) {
 		if((*p_line)[0] != '\0' && strstr(*p_line,Arrowstring) != NULLSTR
 				&& strstr(*p_line,operatorbetweenquotes) == NULLSTR) {
 			/*  Arrow is there and it is not between single quotes (check is incomplete) $$$ */
@@ -912,7 +924,7 @@ int ReadAlphabet(int justcount) {
 		}
 	MyDisposeHandle((Handle*)&p_line);
 	pos = ZERO; foundoperatorthere = FALSE;
-	while(ReadLine(YES,wAlphabet,&pos,posmax,&p_line,&gap) == OK) {
+	while(ReadLine(NO,YES,wAlphabet,&pos,posmax,&p_line,&gap) == OK) {
 		if((*p_line)[0] == '\0' || (*p_line)[0] == '\r') goto NEXTLINE;
 		if(trace_compile_alphabet) BPPrintMessage(0,odInfo,"Reading: %s\n",(*p_line));
 		operatorinline = FALSE;
@@ -965,7 +977,7 @@ int ReadAlphabet(int justcount) {
 			}
 		if(Mystrcmp(p_line,"TIMEPATTERNS:") == 0) {
 			do {
-				if(ReadLine(YES,wAlphabet,&pos,posmax,&p_line,&gap) != OK) goto END;
+				if(ReadLine(NO,YES,wAlphabet,&pos,posmax,&p_line,&gap) != OK) goto END;
 				if((*p_line)[0] == '\0') {
 					goto NEXTLINE;
 					}
@@ -1047,7 +1059,7 @@ pos = ZERO;
 posmax = GetTextLength(wGrammar);
 p_line = NULL;
 PleaseWait();
-while(ReadLine(YES,wGrammar,&pos,posmax,&p_line,&gap) == OK) {
+while(ReadLine(NO,YES,wGrammar,&pos,posmax,&p_line,&gap) == OK) {
 	if((*p_line)[0] == '\0') continue;
 	rem = FALSE;
 	for(i=0; i < MyHandleLen(p_line)-3; i++) {
@@ -1056,7 +1068,7 @@ while(ReadLine(YES,wGrammar,&pos,posmax,&p_line,&gap) == OK) {
 		if(rem) continue;
 		if(MySpace((*p_line)[i]) && (*p_line)[i+1] == '\'') j++;
 		if((*p_line)[i] == '<' && (*p_line)[i+1] == '<') j++;
-		if((*p_line)[i] == '\334' && (*p_line)[i+1] == '\334') j++;
+	//	if((*p_line)[i] == '\334' && (*p_line)[i+1] == '\334') j++;
 		}
 	}
 MyDisposeHandle((Handle*)&p_line);
@@ -1548,7 +1560,8 @@ if(beforefirstrule && irul == 0) {
 	}
 *p_irul = (*(p_gram->p_subgram))[igram].number_rule = ++irul;
 i = incweight = 0;
-if((**ptr) == '<' || (**ptr) == '\334') {
+if((**ptr) == '<') {
+// if((**ptr) == '<' || (**ptr) == '\334') {
 	if((w=GetArgument(1,ptr,&incweight,&initparam,&foundk,&x,&u,&v)) == INT_MAX){
 		return(20);
 		}
@@ -1653,7 +1666,7 @@ if((pp_rightp=Encode(p_gram,FALSE,FALSE,igram,irul,pp3,pp4,p_plx,p_prx,&meta,2,
 	else return(15); /* error in argument */
 	}
 if(h_flag != NULL && (type == SUBtype || type == SUB1type || type == POSLONGtype)) return(49);
-/* ClearMarkers(&pp_rightp); */
+if(Analyzing) ClearMarkers(&pp_rightp,TRUE); // 2026-04-17
 (*((*(p_gram->p_subgram))[igram].p_rule))[irul].p_rightarg = pp_rightp;
 (*((*(p_gram->p_subgram))[igram].p_rule))[irul].p_rightflag = h_flag;
 if(h_flag != NULL) NotBPCase[6] = TRUE;
@@ -1681,39 +1694,32 @@ return(0);
 }
 
 
-int ShowNotBP(t_gram* p_gram)
-{
-int i,j=1;
-static char *err[] = {
-"Rule(s) with 'lambda', 'empty', 'null' or 'nil' as right argument",	/* 0 */
-" ", 		/* 1 */
-"'SUB' or 'SUB1' or 'POSLONG' substitutions(s)",	/* 2 */
-"No rule is valid for parsing.  Use '<->' instead of '-->'", /* 3 */
-"Item contains polymetric structure(s)",		/* 4 */
-"'<Kx>' controlled rule weight(s)",	/* 5 */
-"'/flag/' programmed grammar(s)",	/* 6 */
-"Using tool(s): '_destru','_goto','_failed','_repeat','_retro','_rndseq'", /* 7 */
-"Grammar is empty!",	/* 8 */
-"Period notation is not handled in grammars"	/* 9 $$$ suppressed */
-	};
+int ShowNotBP(t_gram* p_gram) {
+	int i,j=1;
+	static char *err[] = {
+	"Rule(s) with 'lambda', 'empty', 'null' or 'nil' as right argument",	/* 0 */
+	" ", 		/* 1 */
+	"'SUB' or 'SUB1' or 'POSLONG' substitutions(s)",	/* 2 */
+	"No rule is valid for parsing.  Use '<->' instead of '-->'", /* 3 */
+	"Item contains polymetric structure(s)",		/* 4 */
+	"'<Kx>' controlled rule weight(s)",	/* 5 */
+	"'/flag/' programmed grammar(s)",	/* 6 */
+	"Using tool(s): '_destru','_goto','_failed','_repeat','_retro','_rndseq','_keyxpand','_stepOn','_stepOff','_stop'", /* 7 */
+	"Grammar is empty!",	/* 8 */
+	"Period notation is not handled in grammars"	/* 9 $$$ suppressed */
+		};
 
-if(!CompiledGr || p_gram->trueBP) return(OK);
-BPActivateWindow(SLOW,wTrace);
-my_sprintf(Message,"\nThis is not a true BP grammar.\nThe following features are not standard:\n");
-Print(wTrace,Message);
-for(i=0; i < MAXNOTBPCASES; i++) {
-	if(NotBPCase[i]) {
-		my_sprintf(Message,"[%ld] %s\n",(long)j,err[i]);
-		Print(wTrace,Message);
-		j++;
+	if(!CompiledGr || p_gram->trueBP) return(OK);
+	BPPrintMessage(0,odError,"=> This is not a true BP grammar.\nThe following features are not standard:\n");
+	for(i=0; i < MAXNOTBPCASES; i++) {
+		if(NotBPCase[i]) {
+			BPPrintMessage(0,odError,"[%ld] %s\n",(long)j,err[i]);
+			j++;
+			}
 		}
+	BPPrintMessage(0,odError,"\n");
+	return(MISSED);
 	}
-ShowSelect(CENTRE,wTrace);
-if(!ScriptExecOn) BPPrintMessage(0,odError,"Not a true BP grammar...");
-else PrintBehind(wTrace,"Not a true BP grammar...\n");
-return(MISSED);
-}
-
 
 int MaintainSelectionInGrammar(long pos,int dif) {
 	if(pos <= GramSelStart) GramSelStart += dif;
@@ -1968,9 +1974,9 @@ void copy_grammar(t_gram *dest, t_gram *src, int verbose) {
                     if (m == TEND && p == TEND) break;
                 	}
                 // Allocate memory for the token array
-                dest_rule->p_leftarg = (tokenbyte **)malloc(sizeof(tokenbyte *));
+				dest_rule->p_leftarg = (tokenbyte **)GiveSpace((Size)(leftarg_count * sizeof(tokenbyte)));
                 if (!dest_rule->p_leftarg) {
-                    if(verbose) BPPrintMessage(0,odError, "=> Memory allocation failed for left arg tokens\n");
+                    if(verbose) BPPrintMessage(0,odError, "=> GiveSpace failedfailed for left arg tokens\n");
                     return;
                 	}
                 *dest_rule->p_leftarg = (tokenbyte *)malloc(leftarg_count * sizeof(tokenbyte));
@@ -1996,9 +2002,9 @@ void copy_grammar(t_gram *dest, t_gram *src, int verbose) {
                     if (m == TEND && p == TEND) break;
                 	}
                 // Allocate memory for the token array
-                dest_rule->p_rightarg = (tokenbyte **)malloc(sizeof(tokenbyte *));
-                if (!dest_rule->p_rightarg) {
-                    if(verbose) BPPrintMessage(0,odError, "=> Memory allocation failed for right arg tokens\n");
+				dest_rule->p_rightarg = (tokenbyte **)GiveSpace((Size)(rightarg_count * sizeof(tokenbyte)));
+                if (dest_rule->p_rightarg == NULL) {
+                    if(verbose) BPPrintMessage(0,odError, "=> GiveSpace failed for right arg tokens\n");
                     return;
                 	}
                 *dest_rule->p_rightarg = (tokenbyte *)malloc(rightarg_count * sizeof(tokenbyte));
@@ -2043,9 +2049,9 @@ void copy_grammar(t_gram *dest, t_gram *src, int verbose) {
                         if (m == TEND && p == TEND) break;
                     	}
                     // Allocate memory for the token array
-                    (*dest_rule->p_leftcontext)->p_arg = (tokenbyte **)malloc(sizeof(tokenbyte *));
-                    if (!(*dest_rule->p_leftcontext)->p_arg) {
-                        if(verbose) BPPrintMessage(0,odError, "=> Memory allocation failed for left context args\n");
+					(*dest_rule->p_leftcontext)->p_arg = (tokenbyte **)GiveSpace((Size)(arg_count * sizeof(tokenbyte)));
+                    if ((*dest_rule->p_leftcontext)->p_arg == NULL) {
+                        if(verbose) BPPrintMessage(0,odError, "=> GiveSpace failed for left context arg tokens\n");
                         return;
                     	}
                     *(*dest_rule->p_leftcontext)->p_arg = (tokenbyte *)malloc(arg_count * sizeof(tokenbyte));
@@ -2102,11 +2108,9 @@ void copy_grammar(t_gram *dest, t_gram *src, int verbose) {
                         if(verbose) BPPrintMessage(0,odError, "=> Memory allocation failed for right context args\n");
                         return;
                     	}
-                    *(*dest_rule->p_rightcontext)->p_arg = (tokenbyte *)malloc(arg_count * sizeof(tokenbyte));
-                    if (!*(*dest_rule->p_rightcontext)->p_arg) {
-                        if(verbose) BPPrintMessage(0,odError, "=> Memory allocation failed for right context arg tokens\n");
-                        free((*dest_rule->p_rightcontext)->p_arg);
-                        (*dest_rule->p_rightcontext)->p_arg = NULL;
+					(*dest_rule->p_rightcontext)->p_arg = (tokenbyte **)GiveSpace((Size)(arg_count * sizeof(tokenbyte)));
+                    if ((*dest_rule->p_rightcontext)->p_arg == NULL) {
+                        if(verbose) BPPrintMessage(0,odError, "=> GiveSpace failed for right context arg tokens\n");
                         return;
                     	}
                //     BPPrintMessage(1,odInfo,"Right context igram = %d, irule = %d, arg_count = %d sign = %d\n",igram,irul,arg_count,(*dest_rule->p_rightcontext)->sign);

@@ -933,6 +933,7 @@ int ExpandSelection(int w) {
 
 
 int ShowPeriods(int w)
+// Not used any more
 {
 int r,finish,ifunc,hastabs;
 tokenbyte **p_a;
@@ -967,23 +968,15 @@ while(origin < end) {
 		while(isspace(GetTextChar(w,oldend))) oldend--;
 		oldend++;
 		SetSelect(oldorigin,oldend,TEH[w]);
-#if BP_CARBON_GUI_FORGET_THIS
-		// FIXME: this destroys the contents of the clipboard
-		// so we need another way to remember the deleted text for Undo-ing
-		TextCopy(w);
-#endif /* BP_CARBON_GUI_FORGET_THIS */
 		LastAction = SPACESELECTION;
 		UndoWindow = w;
 		TextGetSelection(&UndoPos, &dummy, TEH[w]);
 		TextDelete(w);
 		while((r=PolyMake(&p_a,&maxseq,NO)) == AGAIN);
 		if(r == ABORT || r == EXIT) goto BAD;
-		r = PrintArg(DisplayMode(&p_a,&ifunc,&hastabs),FALSE,FALSE,TRUE,FALSE,FALSE,stdout,w,pp_Scrap,&p_a);
+		int datamode = DisplayMode(&p_a,&ifunc,&hastabs);
+		r = PrintArg(datamode,FALSE,FALSE,TRUE,FALSE,FALSE,stdout,w,pp_Scrap,&p_a);
 		if(r != OK) goto BAD;
-#if BP_CARBON_GUI_FORGET_THIS
-		BPActivateWindow(SLOW,w);
-		UpdateDirty(TRUE,w);
-#endif /* BP_CARBON_GUI_FORGET_THIS */
 		TextGetSelection(&dummy, &newend, TEH[w]);
 		end += newend - oldend;
 		origin += newend - oldend;
@@ -999,19 +992,34 @@ MyDisposeHandle((Handle*)&p_a);
 return(r);
 }
 
-
-long LengthOf(tokenbyte ***pp_X) {
-    if(*pp_X == NULL) return -1L;
-    size_t imax = MyGetHandleSize((Handle)*pp_X) / sizeof(tokenbyte);
-    tokenbyte *tokens = **pp_X;
-    long i = 0;
-    while (i < imax - 1) {  // Ensure there's room for checking the next element
-        if(tokens[i] == TEND && tokens[i + 1] == TEND) return i;  // Return the length up to the first TEND
-        i++;
-    	}
-    return -1L;  // If no termination found, or error case
-	}
-	
+long LengthOf(tokenbyte ***pp_X) {          
+	if(pp_X == NULL || *pp_X == NULL) {
+		BPPrintMessage(0,odError,"=> Err 1 LengthOf()\n");
+		Panic = TRUE;
+		return ZERO;
+		}                        
+	if(**pp_X == NULL) {
+		BPPrintMessage(0,odError,"=> Err 2 LengthOf()\n");
+		Panic = TRUE;
+		return ZERO;
+		}
+	Size sz = MyGetHandleSize((Handle)*pp_X);                     
+	if(sz < 2 * sizeof(tokenbyte)) {
+		BPPrintMessage(0,odError,"=> Err 3 LengthOf()\n");
+		Panic = TRUE;
+		return ZERO;        // trop petit pour TEND TEND
+		}
+	long imax = (long)(sz / sizeof(tokenbyte));
+	long i = ZERO;          
+	tokenbyte *tokens = **pp_X;                                          
+	for(long i = 0; i < imax - 1; i++) {                          
+		if(tokens[i] == TEND && tokens[i + 1] == TEND) return i;  
+		i++;          
+		}
+	BPPrintMessage(0,odError,"=> Err 4 LengthOf()\n");
+	Panic = TRUE;
+	return ZERO;                                                             
+	}                                                                                      
 
 long CopyBuf(tokenbyte ***pp_X,tokenbyte ***pp_Y) {	// Copy X to Y
 	long length;
@@ -1061,7 +1069,7 @@ int SelectionToBuffer(int sequence,int noreturn,int w,tokenbyte ***pp_X,
 	long *p_end,int mode) {
 	char c,*p1,*p2,**ptr,**p_buff,***pp_buff;
 	p_context *p_plx,*p_prx;
-	int i,notargument,meta=0,jbolmem,rep,ret;
+	int i,notargument,meta=0,rep,ret;
 	long origin,end,length;
 	tokenbyte **p_ti;
 
@@ -1072,11 +1080,11 @@ int SelectionToBuffer(int sequence,int noreturn,int w,tokenbyte ***pp_X,
 	MyDisposeHandle((Handle*)pp_X);
 	pp_buff = &p_buff; p_buff = NULL;
 	if(!Editable[w]) return(MISSED);
-	TextGetSelection(&origin, &end, TEH[w]);
+	TextGetSelection(&origin,&end,TEH[w]);
 	*p_end = end;
 	SelectOn = TRUE;
 
-	POSITION:
+POSITION:
 	while(MySpace(c=GetTextChar(w,origin))) {
 		origin++;
 		if(origin == end) {
@@ -1091,6 +1099,7 @@ int SelectionToBuffer(int sequence,int noreturn,int w,tokenbyte ***pp_X,
 		}
 	if(GetTextChar(w,origin) == '[') {
 		while((c=GetTextChar(w,origin)) != ']') {
+		//	BPPrintMessage(0,odInfo,"(%c)",c);
 			origin++;
 			if(origin >= end) {
 				SelectOn = FALSE;
@@ -1113,21 +1122,17 @@ int SelectionToBuffer(int sequence,int noreturn,int w,tokenbyte ***pp_X,
 		goto SORTIR;
 		}
 	*pp_buff = ptr;
-//	BPPrintMessage(0,odInfo,"@@@ Selection %d %d length %d\n",origin,end,length);
 	if(ReadToBuff(YES,noreturn,w,&origin,end,pp_buff) != OK) goto BAD;
 
 	*p_end = origin;
-//	MyLock(TRUE,(Handle)*pp_buff);
 	p1 = **pp_buff; p2 = p1; i = 0; ret = FALSE;
 	// OPTIMIZE? Is all of this "re-checking" necessary? Look at ReadToBuff() - akozar
 	// We'll check it later - BB
 	while(((*p2) != '\0') && (ret || (*p2) != '\r')) {
-		// if((*p2) == '�') ret = TRUE; Fixed by BB 2022-02-18
 		if(!MySpace((*p2))) ret = FALSE;
 		p2++;
 		if(++i > length) {
 			BPPrintMessage(0,odError,"=> Err. SelectionToBuffer(). i > length");
-//			MyUnlock((Handle)*pp_buff);
 			MyDisposeHandle((Handle*)pp_buff);
 			SelectOn = FALSE;
 			Panic = TRUE;
@@ -1135,14 +1140,12 @@ int SelectionToBuffer(int sequence,int noreturn,int w,tokenbyte ***pp_X,
 			}
 		} 
 	if(p1 == p2) {
-		MyUnlock((Handle)*pp_buff);
 		goto BAD;
 		}
-	jbolmem = Jbol;
+	// jbolmem = Jbol;
 	notargument = TRUE;
-//	BPPrintMessage(0,odInfo,"@@@ Encode\n");
+	// BPPrintMessage(1,odInfo,"@@@ Encode\n");
 	p_ti = Encode(&Gram,sequence,notargument,0,0,&p1,&p2,p_plx,p_prx,&meta,0,NULL,FALSE,&rep);
-//	MyUnlock((Handle)*pp_buff);
 	MyDisposeHandle((Handle*)pp_buff);
 	if(p_ti == NULL) {
 		SelectOn = FALSE;
@@ -1161,8 +1164,7 @@ int SelectionToBuffer(int sequence,int noreturn,int w,tokenbyte ***pp_X,
 
 	SORTIR:
 	if(!ScriptExecOn) {
-		BPPrintMessage(0,odError,"No data selected");
-		BPPrintMessage(0,odError,"=> No data selected");
+		BPPrintMessage(0,odError,"=> No data selected\n");
 		}
 	else {
 		PrintBehind(wTrace,"No data selected.\n");
@@ -1172,12 +1174,14 @@ int SelectionToBuffer(int sequence,int noreturn,int w,tokenbyte ***pp_X,
 	}
 
 
-int ReadToBuff(int nocomment,int noreturn,int w,long *p_i,long im,char ***pp_buff)
-/* Read Text buffer */ {
+int ReadToBuff(int nocomment,int noreturn,int w,long *p_i,long im,char ***pp_buff) {
+// Read Text buffer
 	int first;
 	long j,size,k,length;
 	char c,oldc,**ptr;
 
+	Message[0] = '\0'; // This message will be displayed in AnalyzeSelection()
+	size_t len = 0;
 	if(*pp_buff == NULL) {
 		BPPrintMessage(0,odError,"=> Err. ReadToBuff(). *pp_buff == NULL");
 		return(ABORT);
@@ -1203,6 +1207,7 @@ int ReadToBuff(int nocomment,int noreturn,int w,long *p_i,long im,char ***pp_buf
 		}
 	for(j=*p_i,k=0; j < im; j++) {
 		c = GetTextChar(w,j);
+		if (len < MAXLIN - 1) Message[len++] = c;
 		if(nocomment && c == '*' && oldc == '/') {
 			/* Skip C-type remark */
 			oldc = '\0'; j++; k--;
@@ -1221,23 +1226,19 @@ int ReadToBuff(int nocomment,int noreturn,int w,long *p_i,long im,char ***pp_buf
 				j++;
 				}
 			}
-		if(c == '\r' /* && oldc != '�' */) {
+		if(c == '\r' || c == '\n') {
 			if(first || noreturn) continue;
 			else break;
 			}
-		if(c == '\r' /* && oldc == '�' */) {
+		if(c == '\r') {
 			c = ' ';
 			}
 		oldc = c;
 		first = FALSE;
-		if(noreturn && nocomment && c == '[') {
-			j--; break;
-			}
-	//	if(c == '�') (**pp_buff)[k++] = ' ';
 		c = Filter(c);
 		if(Create_set && UnitfilePtr != NULL) fputc(c,UnitfilePtr);
 	//	BPPrintMessage(1,odInfo,"%c",c);
-		if(/* c != '�' && */ (c != '\r' || noreturn)) (**pp_buff)[k++] = c;
+		if(((c != '\r' && c != '\n') || noreturn)) (**pp_buff)[k++] = c;
 		if(k >= size) {
 			if(ThreeOverTwo(&size) != OK) {
 				*p_i = ++j;
@@ -1254,6 +1255,7 @@ int ReadToBuff(int nocomment,int noreturn,int w,long *p_i,long im,char ***pp_buf
 			}
 		}
 	(**pp_buff)[k] = '\0';
+	Message[len] = '\0';
 	*p_i = ++j;
 
 	CLEAN:

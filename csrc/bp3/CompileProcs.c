@@ -1577,13 +1577,16 @@ char x[ARROWLENGTH+1];
 *qq1 = *pp;
 for(operator=0; operator < MAXARROW && strlen(Arrow[operator]) > 0; operator++) {
 	strcpy(x,Arrow[operator]);
-	strcat(x," ");		/* This helps discriminating --> from '-->' */
+	strcat(x," ");	// This helps discriminating --> from '-->'
 	if((i2 = FindPattern(qq1,x,&i3)) > 0) {
 		*qq2 = &((*qq1)[i2-1]);
 		*qq3 = &((*qq1)[i3]);
 		*qq4 = *qq3;
 		*qq4 = GetEnd(qq4);
-		if(operator == 0 || operator == 2) NotBPCase[3] = FALSE; /* '<->', '<--' */
+		if(operator == 0 || operator == 2) {
+			NotBPCase[3] = FALSE; // '<->', '<--'
+			// This rule is valid for analysis
+			}
 		return(operator);
 		}
 	}
@@ -1620,6 +1623,7 @@ rep = MISSED; CompiledPt = FALSE;
 oldjpatt = Jpatt;
 // ShowMessage(TRUE,wMessage,"Looking for time patterns...");
 if((rep=ReleasePatternSpace()) != OK) goto ERR;
+
 if((rep=GetPatterns(wAlphabet,TRUE)) != OK){	/* Just counting patterns */
 	Jpatt = 0; goto ERR;
 	}
@@ -1660,7 +1664,7 @@ if(CompileOn) CompileOn--;
 return(OK);
 
 ERR:
-ShowMessage(TRUE,wMessage,"Can't compile patterns");
+ShowMessage(TRUE,wMessage,"Can't compile time patterns");
 if(CompileOn) CompileOn--;
 return(rep);
 }
@@ -1676,11 +1680,13 @@ done = FALSE;
 pos = ZERO; result = MISSED;
 posmax = GetTextLength(w);
 p_line = NULL;
-while(ReadLine(YES,w,&pos,posmax,&p_line,&gap) == OK) {
+while(ReadLine(NO,YES,w,&pos,posmax,&p_line,&gap) == OK) {
 	if((*p_line)[0] == '\0') continue;
 	if(Mystrcmp(p_line,"TEMPLATES:") == 0) {
+//		BPPrintMessage(1,odInfo,"@@@ patt\n");
 		do {
-			if(ReadLine(YES,wGrammar,&pos,posmax,&p_line,&gap) != OK) return(result);
+//			if(ReadLine(NO,YES,wGrammar,&pos,posmax,&p_line,&gap) != OK) return(result);
+			if(ReadLine(NO,YES,wGrammar,&pos,posmax,&p_line,&gap) != OK) break;
 			if((*p_line)[0] == '\0') continue;
 			}
 		while((*p_line)[0] != '-' || (*p_line)[1] != '-');

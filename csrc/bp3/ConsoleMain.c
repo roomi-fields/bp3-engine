@@ -63,6 +63,7 @@ int LoadInputFiles(const char* pathnames[WMAX]);
 int LoadFileToTextHandle(int,char* pathname,TEHandle th);
 int PrepareProdItemsDestination(BPConsoleOpts* opts);
 int PrepareTraceDestination(BPConsoleOpts* opts);
+int PrepareWeightsDestination(BPConsoleOpts* opts);
 void CloseOutputDestination(int dest, BPConsoleOpts* opts, outfileidx_t fileidx);
 int isInteger(const char* s);
 void extract_and_append(char*,char*);
@@ -91,6 +92,7 @@ int force_messages = 0;
 int WarnedBlockKey,WarnedRangeKey;
 
 int PrototypesLoaded = FALSE;
+int WeightsFileExists = FALSE;
 
 #ifndef __BP3_WASM__
 int main (int argc, char* args[]) {
@@ -149,7 +151,7 @@ int main (int argc, char* args[]) {
 
 	if(Inits() != OK) goto CLEANUP;
 	
-	result = ParsePostInitArgs(argc, args, &gOptions);
+	result = ParsePostInitArgs(argc, args,&gOptions);
 	if(result != OK) return EXIT_SUCCESS;
 	result = LoadInputFiles(gOptions.inputFilenames);
 	if(result != OK) goto CLEANUP;
@@ -175,6 +177,7 @@ int main (int argc, char* args[]) {
 	initTime = FirstEventTime = 0L; // microseconds
 	FirstGrammar = TRUE;
 	InitOn = FALSE;
+	Analyzing = FALSE;
 	time(&SessionStartTime);
 	ProductionTime = ProductionStartTime = PhaseDiagramTime = TimeSettingTime = (time_t) 0L;
 	time(&ProductionStartTime);
@@ -190,6 +193,10 @@ int main (int argc, char* args[]) {
 	result = PrepareProdItemsDestination(&gOptions);
 	if(result == OK)
 		result = PrepareTraceDestination(&gOptions);
+	if(result == OK)
+		result = PrepareWeightsDestination(&gOptions);
+
+
 	if(NoTracePath) {
     	ShowObjectGraph = ShowPianoRoll = ShowGraphic = FALSE;
 		}
@@ -255,11 +262,22 @@ int main (int argc, char* args[]) {
 				else if(Beta && result != OK && result != ABORT) BPPrintMessage(0,odError,"=> PlaySelection() returned errors\n");
 				break;
 			case analyze:
+				BPPrintMessage(0,odInfo,"Analysing this item\n");
+				int learn = WeightsFileExists;
+				Analyzing = TRUE;
 				if(CompileCheck() == OK && ShowNotBP(&Gram) == OK)	{
-					// FIXME: Need to either set a selection or call SelectionToBuffer()
-					// and AnalyzeBuffer() similarly to AnalyzeSelection().
-					result = AnalyzeSelection(FALSE);
+				//	learn = FALSE;
+					if(learn) {
+						BPPrintMessage(1,odInfo,"👉 Learning weights from examples\n");
+						}
+					start = 0;
+					end = GetTextLength(wData);
+					SetSelect(start,end,TEH[wData]);
+					result = AnalyzeSelection(learn);
 					if(result != OK)  BPPrintMessage(0,odError,"=> AnalyzeSelection() returned errors\n");
+					else if(learn) {
+						SaveWeights();
+						}
 					}
 				break;
 			case expand:
@@ -272,10 +290,8 @@ int main (int argc, char* args[]) {
 			case show_beats:
 				break;
 			case templates:
-				if(CompileCheck() == OK && ShowNotBP(&Gram) == OK)	{
-					result = ProduceItems(wStartString,FALSE,TRUE,NULL);
-			//		if(Beta && result != OK) BPPrintMessage(0,odError, "=> ProduceItems() returned errors\n");
-				}
+				result = ProduceItems(wStartString,FALSE,TRUE,NULL);
+				result = OK;
 				break;
 			case no_action:
 				  BPPrintMessage(0,odError, "=> Err. main(): action == no_action\n");
@@ -319,6 +335,7 @@ CLEANUP:
 		}
 	CloseOutputDestination(odDisplay, &gOptions, ofiProdItems);
 	CloseOutputDestination(odTrace, &gOptions, ofiTraceFile);
+	if(WeightsFileExists) CloseOutputDestination(odWeights, &gOptions, ofiWeightsFile);
 	Handle ptr = (Handle) p_Instance;
 	MyDisposeHandle(&ptr);
 	my_fclose(CapturePtr);
@@ -343,8 +360,9 @@ void CreateDoneFile(void) {
 	char* thefile;
 	char* new_thefile;
 	int length;
+	
 	if(gOptions.outputFiles[ofiTraceFile].name != NULL) {
-	//    BPPrintMessage(0,odInfo,"Creating 'done' file: %s\n",gOptions.outputFiles[ofiTraceFile].name);
+	 //   BPPrintMessage(1,odInfo,"Creating 'done' file2: %s\n",gOptions.outputFiles[ofiTraceFile].name);
 		my_sprintf(Message,"%s",gOptions.outputFiles[ofiTraceFile].name);
 		remove_spaces(Message,line);
 		thefile = str_replace(".txt","",line);
@@ -778,9 +796,10 @@ const char gOptionList[] =
 	"  -se fname:        load settings file 'fname'\n"
 	"  -so fname:        load sound-object prototypes file 'fname'\n"
 	"  -cs fname:        load Csound instrument definitions file 'fname'\n"
+	"  -wg fname:        create/modify rule weights file 'fname'\n"
 	"\n"
 	"  These file-type markers currently are recognized but ignored:\n"
-	"      -in  -kb  -md  -mi  -tb  -tr  -wg  +sc \n"
+	"      -in  -kb  -md  -mi  -tb  -tr  +sc \n"
 	"\n"
 /*	"  -de fname        load decisions file 'fname'\n"
 	"  -in fname        load interaction file 'fname'\n"
@@ -806,17 +825,20 @@ const char gOptionList[] =
 /*	"  -s or --start string   use 'string' as the start string (default is \"S\")\n"
 	"  -S startfile           read the start string from file 'startfile'\n" */
 	"  --seed num:             seeds the random number generator with the integer 'num'\n"
-/*	"  --show-production      outputs the work string at each step of producing items\n"
-	"  --trace-production     outputs the work string & selected rule at each step of production\n" */
+	"  --show-production      outputs the work string at each step of producing items\n"
+	"  --trace-production     outputs the work string & selected rule at each step of production\n"
+	"(These options take precedence over the values in the settings file.)\n"
 	"\n"
 	"OPTIONS (Musical):\n"
 	"  --english:              specifies that the input files use English note conventions\n"
 	"  --french:               specifies that the input files use Italian/Spanish/French note conventions\n"
 	"  --indian:               specifies that the input files use Indian note conventions\n"
 	"  --keys:                 specifies that the input files use Midi note numbers\n"
+	"(These options take precedence over the values in the settings file.)\n"
 	"\n"
 	"EXAMPLE OF COMMAND LINE:\n"
-	"./bp produce -se ./ctests/-se.Mozart -o ./temp_bolprocessor/out.txt -gr ./ctests/-gr.Mozart -cs ./csound_resources/-cs.Mozart -to ./tonality_resources/-to.Mozart --rtmidi --traceout ./temp_bolprocessor/trace_f45ac19623_-gr.Mozart.txt --english --seed 4"
+	"./bp produce -se ./ctests/-se.Mozart -o ./temp_bolprocessor/out.txt -gr ./ctests/-gr.Mozart -cs ./csound_resources/-cs.Mozart -to ./tonality_resources/-to.Mozart --rtmidi --traceout ./temp_bolprocessor/trace_my_session_my_project.txt --english --seed 4\n"
+	"(If the --traceout option is not specified, no image is created.)\n"
 	;
 
 void PrintUsage(char* programName)
@@ -895,32 +917,38 @@ int ParsePostInitArgs(int argc, char* args[], BPConsoleOpts* opts)
 		if(args[argn][0] == '-' || args[argn][0] == '+') {
 			// check for matching file prefix
 			arglen = strlen(args[argn]);
+		//	BPPrintMessage(1,odInfo,"@@ arg = %s\n",args[argn]);
 			// FIXME: Need to ignore any path components before the filename when matching prefix
 			for (w = 0; w < WMAX; w++) {
 				// This comparison assumes all prefixes are 3 chars long (not including the '.')
-				if(strncmp(args[argn], FilePrefix[w], 3) == 0) {
+				if(strncmp(args[argn],FilePrefix[w],3) == 0) {
 					if(arglen == 3) {
 						// argument is just the file prefix (eg. "-gr"),
 						// so look at the next argument for the file name
 						if(++argn < argc)  {
-							opts->inputFilenames[w] = args[argn];
+							if(w == wWeights) {
+								opts->outputFiles[ofiWeightsFile].name = args[argn];
+					//			BPPrintMessage(1,odInfo,"@@@ weights, arg = %s\n",args[argn]);
+								}
+							else opts->inputFilenames[w] = args[argn];
+					//		BPPrintMessage(1,odInfo,"@@ w = %d, arg = %s\n",w,args[argn]);
 							argDone = TRUE;
-						}
+							}
 						else {
 							BPPrintMessage(0,odError, "\n=> Missing filename after %s\n\n", args[argn-1]);
 							return ABORT;
+							}
 						}
-					}
 					else if(arglen > 4 && args[argn][3] == '.') {
 						//  argument is a complete file name (with 1+ chars after '.'), so just save it
 						opts->inputFilenames[w] = args[argn];
 						argDone = TRUE;
-					}
+						}
 					// else, check for other options below
 					break;
+					}
 				}
 			}
-		}
 		// check for matching file extension
 		else if((w = FindMatchingFileNameExtension(args[argn])) != wUnknown) {
 			opts->inputFilenames[w] = args[argn];
@@ -959,6 +987,7 @@ int ParsePostInitArgs(int argc, char* args[], BPConsoleOpts* opts)
 					// look at the next argument for the output file name
 					if(++argn < argc)  {
 						opts->outputFiles[ofiTraceFile].name = args[argn];
+						strcpy(TraceOutFilePath,args[argn]);
 						}
 					else {
 						BPPrintMessage(0,odError, "\n=> Missing filename after %s\n\n", args[argn-1]);
@@ -1085,17 +1114,13 @@ int ParsePostInitArgs(int argc, char* args[], BPConsoleOpts* opts)
 					}
 				else if(strcmp(args[argn], "create_set") == 0)	{
 					action = create_set;
-		/*			opts->writeMidiFile = TRUE;
-					gOptions.outputFiles[ofiMidiFile].name = "../my_output/set_-da.Watch_What_Happens_by_Oscar_Peterson[1]/essayer.mid";
-					opts->outOptsChanged = TRUE; */
 					}
-				else if(strcmp(args[argn], "analyze-item") == 0)	{
+				else if(strcmp(args[argn], "analyze") == 0)	{
 					action = analyze;
-					// FIXME: look for the item number in next arg
-				}
+					}
 				else if(strcmp(args[argn], "expand") == 0)	{
 					action = expand;
-				}
+					}
 				else if(strcmp(args[argn], "show-beats") == 0)	{
 					action = show_beats;
 					// FIXME: look for the item number in next arg
@@ -1110,7 +1135,7 @@ int ParsePostInitArgs(int argc, char* args[], BPConsoleOpts* opts)
 					return ABORT;
 					}
 				
-				// more than one action is not allowed
+				// More than one action is not allowed
 				if(action != no_action && opts->action != no_action)	{
 					BPPrintMessage(0,odError, "\n=> Only one action is allowed but two were given: '%s' & '%s'\n\n",ActionTypeToStr(opts->action), ActionTypeToStr(action));
 					return ABORT;
@@ -1156,7 +1181,7 @@ int ParsePostInitArgs(int argc, char* args[], BPConsoleOpts* opts)
 		resultinit = initializeMIDISystem();
 		if(new_thepath != NULL) free(new_thepath);
 		if(resultinit != OK) {
-			Panic = 1;
+			Panic = TRUE;
 			rtMIDI = FALSE;
 			return ABORT;
 			}
@@ -1193,7 +1218,7 @@ int ApplyArgs(BPConsoleOpts* opts)
 	if(opts->traceProduction != NOCHANGE)	{
 		DisplayProduce = opts->traceProduction;
 		TraceProduce = opts->traceProduction;
-	}
+		}
 	// showProduction could be enabled after traceProduction is disabled
 	if(opts->showProduction != NOCHANGE)	DisplayProduce = opts->showProduction;
 	if(opts->noteConvention != NOCHANGE)	NoteConvention = opts->noteConvention;
@@ -1217,7 +1242,7 @@ const char* ActionTypeToStr(action_t action)
 		case play:			return "play";
 		case play_item:		return "play-item";
 		case play_all:		return "play-all";
-		case analyze:		return "analyze-item";
+		case analyze:		return "analyze";
 		case expand:	return "expand";
 		case show_beats:	return "show-beats";
 		case templates:		return "templates";
@@ -1279,7 +1304,7 @@ int LoadInputFiles(const char* pathnames[WMAX]) {
 					BPPrintMessage(0,odInfo, "Reading %s file: %s\n", DocumentTypeName[w], pathnames[w]);
 					result = LoadFileToTextHandle(w,(char*)pathnames[w],TEH[w]);
 					if(result != OK)  {
-						BPPrintMessage(0,odError,"=> You first need to save the Grammar or Data\n");
+						BPPrintMessage(0,odError,"=> This file cannot be loaded. Try saving the grammar or data first.\n");
 						return result;
 						}
 					switch(w) {
@@ -1313,6 +1338,8 @@ int LoadInputFiles(const char* pathnames[WMAX]) {
 					result = LoadObjectPrototypes(0,1);
 					if(result != OK)  return result;
 					break;
+				case iWeights: // Only output
+					break;
 				default:
 					BPPrintMessage(0,odWarning, "Ignoring %.3s %s (%s files are currently unsupported)\n", FilePrefix[w], pathnames[w], DocumentTypeName[w]);
 					break;
@@ -1341,6 +1368,7 @@ int LoadFileToTextHandle(int w,char* pathname,TEHandle th) {
 		  BPPrintMessage(0,odError, "=> Err. LoadFileToTextHandle(): th == NULL\n");
 		return ABORT;
 		}
+	// BPPrintMessage(1,odInfo,"%s\n",pathname);
 	result = OpenAndReadFile((const char*) pathname,&filecontents);
 	// BPPrintMessage(1,odInfo,"%s\n",filecontents);
 	if(result != OK) return result;
@@ -1568,6 +1596,22 @@ int PrepareTraceDestination(BPConsoleOpts* opts) {
 			}
 		NoTracePath = FALSE;
 	//	BPPrintMessage(1,odInfo,"@@@ LiveFolder = %s\n",LiveFolder);
+	    }
+    return OK;
+    }
+
+int PrepareWeightsDestination(BPConsoleOpts* opts) {
+	FILE *fout;
+	char output[MAXNAME];
+	if(opts->outputFiles[ofiWeightsFile].name != NULL) {
+		fout = OpenOutputFile(&(opts->outputFiles[ofiWeightsFile]),"w");
+		if(!fout) {
+			BPPrintMessage(0,odError, "=> Could not create trace file %s\n", opts->outputFiles[ofiWeightsFile].name);
+			return MISSED;
+		    }
+		SetOutputDestinations(odWeights,fout);
+        BPPrintMessage(0,odInfo,"Creating weights file: %s\n",opts->outputFiles[ofiWeightsFile].name);
+		WeightsFileExists = TRUE;
 	    }
     return OK;
     }

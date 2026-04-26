@@ -558,7 +558,7 @@ int LoadSettings(const char *filename, int startup) {
 	EndFadeOut = 2.; C4key = 60; A4freq = 440.;
 	Quantize = TRUE;
 	Quantization = 10L; // milliseconds
-	UseBullet = FALSE;
+	UseBullet = TRUE;
 	Code[7] = '.';
 	MIDIfileType = 1;
 	CsoundFileFormat = UNIX;
@@ -579,9 +579,11 @@ int LoadSettings(const char *filename, int startup) {
 	CsoundTrace = FALSE;
 // 	WriteMIDIfile = FALSE;
 	NoConstraint = FALSE;
+	AllTemplates = TRUE;
 	ResetControllers = FALSE;
 	FileSaveMode = ALLSAME;
 	FileWriteMode = NOW;
+	SplitLines = FALSE;
 	ProgNrFrom = 1;
 	NotSaidKpress = TRUE;
 	NeverResetWeights = FALSE;
@@ -647,6 +649,7 @@ int LoadSettings(const char *filename, int startup) {
 		else if(strcmp(key,"StepProduce") == 0) StepProduce = intvalue;
 		else if(strcmp(key,"TraceMicrotonality") == 0) TraceMicrotonality = intvalue;
 		else if(strcmp(key,"TraceProduce") == 0) TraceProduce = intvalue;
+		else if(strcmp(key,"AllTemplates") == 0) AllTemplates = intvalue;
 		else if(strcmp(key,"PlanProduce") == 0) PlanProduce = intvalue;
 		else if(strcmp(key,"DisplayItems") == 0) DisplayItems = intvalue;
 		else if(strcmp(key,"ShowGraphic") == 0) ShowGraphic = intvalue;
@@ -667,6 +670,7 @@ int LoadSettings(const char *filename, int startup) {
 		else if(strcmp(key,"NoConstraint") == 0) NoConstraint = intvalue;
 		else if(strcmp(key,"SplitTimeObjects") == 0) SplitTimeObjects = intvalue;
 		else if(strcmp(key,"Split_|SplitVariables|") == 0) SplitVariables = intvalue;
+		else if(strcmp(key,"SplitLines") == 0) SplitLines = intvalue;
 		else if(strcmp(key,"DeftBufferSize") == 0) DeftBufferSize = (long) intvalue;
 		else if(strcmp(key,"MaxConsoleTime") == 0) MaxConsoleTime = (long) intvalue;
 		else if(strcmp(key,"Seed") == 0) {
@@ -1072,14 +1076,10 @@ NEXTBOL:
 		(*p_CsoundInstr)[j] = s;
 	if(ReadLong(sofile,&k,&pos) == MISSED) goto ERR;
 	(*p_Tpict)[j] = k;
-	if(iv > 21) { // These are no longer used
+	if(iv > 21) { // These are no longer used (object colors)
 		if(ReadLong(sofile,&k,&pos) == MISSED) goto ERR;
-		// (*p_ObjectColor)[j].red = k;
 		if(ReadLong(sofile,&k,&pos) == MISSED) goto ERR;
-		// (*p_ObjectColor)[j].green = k;
 		if(ReadLong(sofile,&k,&pos) == MISSED) goto ERR;
-		// (*p_ObjectColor)[j].blue = k;
-		if(trace_load_prototypes) BPPrintMessage(0,odInfo, "(*p_ObjectColor)[j].blue = %ld\n",k);
 		}
 	(*pp_CsoundTime)[j] = NULL;
 	(*p_CompiledCsoundScore)[j] = 0; // Added 2024-07-04

@@ -99,7 +99,7 @@ int Compute(tokenbyte ***pp_a,int fromigram,int toigram,long *p_length,int *p_re
 		if(finish) {
 	//		BPPrintMessage(1,odInfo,"@@@@ ShowItem()\n");
 			if(!SkipFlag
-				&& (((r = ShowItem(igram,&Gram,FALSE,pp_a,(*p_repeat),PROD,FALSE)) == ABORT)
+				&& (((r = ShowItem(FALSE,pp_a,(*p_repeat),PROD,FALSE)) == ABORT)
 					|| r == EXIT || r == STOP)) goto SORTIR;
 			StepProduce = DisplayProduce = TRUE;
 			PlanProduce = TraceProduce = finish - 1;
@@ -144,7 +144,7 @@ int Compute(tokenbyte ***pp_a,int fromigram,int toigram,long *p_length,int *p_re
 				if(r != OK) break;
 				}
 			while(level >= 0);
-	//		r = ShowItem(igram,&Gram,FALSE,pp_a,(*p_repeat),PROD,FALSE);
+	//		r = ShowItem(FALSE,pp_a,(*p_repeat),PROD,FALSE);
 	//		PrintArg(FALSE,FALSE,FALSE,FALSE,FALSE,TRUE,stdout,wData,pp_Scrap,pp_a);
 	//		PlayBuffer(pp_a,NO);
 			}
@@ -240,12 +240,13 @@ int ComputeInGram(tokenbyte ***pp_a,t_gram *p_gram,int igram,int inrul,long *p_l
 			rep = ABORT;
 			goto QUIT;
 			}
-		if((rep = ShowItem(igram,p_gram,FALSE,pp_a,(*p_repeat),PROD,FALSE)) == ABORT
+		if((rep = ShowItem(FALSE,pp_a,(*p_repeat),PROD,FALSE)) == ABORT
 				|| rep == FINISH || rep == EXIT || rep == STOP) goto QUIT;
 		}
 	if(subgram.print) {
 		datamode = DisplayMode(pp_a,&ifunc,&hastabs);
-		if((rep=PrintResult(datamode && hastabs,wTrace,hastabs,ifunc,pp_a)) != OK) goto QUIT;
+		hastabs = FALSE; // 2026-04-12
+		if((rep=PrintWorkString(datamode && hastabs,wTrace,hastabs,ifunc,pp_a)) != OK) goto QUIT;
 		Print(wTrace,"\n");
 		}
 	if(subgram.stop) {
@@ -486,9 +487,7 @@ int ComputeInGram(tokenbyte ***pp_a,t_gram *p_gram,int igram,int inrul,long *p_l
 			irul = 1 + (subgram.number_rule - 1) * (randomnumber / ((double)BP3_RAND_MAX));
 			rule = (*(subgram.p_rule))[irul];
 			irep = 0;
-			if((rule.w == 0) ||
-			((*p_pos)[j] = FindArg(pp_a,grtype,rule.p_leftarg,TRUE,p_length,meta,
-								instan,rule,mode,time_end_compute)) == -1) {
+			if((rule.w == 0) || ((*p_pos)[j] = FindArg(pp_a,grtype,rule.p_leftarg,TRUE,p_length,meta,instan,rule,mode,time_end_compute)) == -1) {
 				try++;
 				if(CheckEmergency() != OK) return(ABORT);
 				goto TRY2;
@@ -499,15 +498,15 @@ int ComputeInGram(tokenbyte ***pp_a,t_gram *p_gram,int igram,int inrul,long *p_l
 				}
 			try = 0;
 			}
-		rule = (*(subgram.p_rule))[irul];	/* Added 24/11/97 */
+		rule = (*(subgram.p_rule))[irul];
 		if(TraceProduce) {
 			if(NumberCharsTrace < MAXCHARTRACE) {
-				if(ProduceStackIndex >= 0)
+				if(ProduceStackIndex >= 0 && mode != ANAL)
 					my_sprintf(Message,"\n[Step #%ld] Selected: ",(long)ProduceStackIndex + 1);
 				else
 					my_sprintf(Message,"\nSelected: ");
 				Print(wTrace,Message);
-				ShowRule(p_gram,igram,irul,wTrace,1,NULL,TRUE,TRUE,TRUE);
+				ShowRule(p_gram,igram,irul,wTrace,1,NULL,TRUE,FALSE,FALSE);
 				NumberCharsTrace += strlen(Message);
 				}
 			}
@@ -525,7 +524,8 @@ int ComputeInGram(tokenbyte ***pp_a,t_gram *p_gram,int igram,int inrul,long *p_l
 		if(mode != PROD) goto NOPROD;
 		if((c=rule.print) == 1 || c == 3) {
 			datamode = DisplayMode(pp_a,&ifunc,&hastabs);
-			if((rep=PrintResult(datamode && hastabs,wTrace,hastabs,ifunc,pp_a)) != OK) goto QUIT;
+			hastabs = FALSE; // 2026-04-12
+			if((rep=PrintWorkString(datamode && hastabs,wTrace,hastabs,ifunc,pp_a)) != OK) goto QUIT;
 			Print(wTrace,"\n");
 			}
 		if((c=rule.stop) == 1 || c == 3) {
@@ -587,7 +587,7 @@ int ComputeInGram(tokenbyte ***pp_a,t_gram *p_gram,int igram,int inrul,long *p_l
 		if((*p_repeat) && (ProduceStackIndex >= ProduceStackDepth)) {
 			(*p_repeat) = PlanProduce = FALSE;
 		//	BPPrintMessage(1,odInfo,"@@@@ ShowItem()\n");
-			if((rep = ShowItem(igram,p_gram,FALSE,pp_a,(*p_repeat),mode,FALSE)) == ABORT
+			if((rep = ShowItem(FALSE,pp_a,(*p_repeat),mode,FALSE)) == ABORT
 				|| rep == FINISH || rep == EXIT || rep == STOP) goto QUIT;
 			if(CompleteDecisions ||
 				(Answer("End of known computation.\nContinue",'Y') == YES
@@ -601,7 +601,7 @@ int ComputeInGram(tokenbyte ***pp_a,t_gram *p_gram,int igram,int inrul,long *p_l
 				}
 			}
 		if(grtype != SUBtype && grtype != SUB1type) {
-			if((c = ShowItem(igram,p_gram,FALSE,pp_a,(*p_repeat),mode,FALSE))
+			if((c = ShowItem(FALSE,pp_a,(*p_repeat),mode,FALSE))
 					== ABORT || c == STOP || c == FINISH || c == EXIT) {
 				rep = c;
 				goto QUIT;
@@ -634,7 +634,7 @@ int ComputeInGram(tokenbyte ***pp_a,t_gram *p_gram,int igram,int inrul,long *p_l
 					}
 				}
 			}
-		if(learn) (*((*(p_gram->p_subgram))[igram].p_rule))[irul].w++;
+		if(learn) (*((*(p_gram->p_subgram))[igram].p_rule))[irul].w++; // rule.w += 1
 
 	MORE:	
 		if(Varweight && (grtype != SUBtype) && !shootagain) {
@@ -661,7 +661,7 @@ int ComputeInGram(tokenbyte ***pp_a,t_gram *p_gram,int igram,int inrul,long *p_l
 						}
 					if(CopyBuf(pp_b,pp_c) == ABORT) return(ABORT);
 			//		BPPrintMessage(1,odInfo,"@ ShowItem()\n");
-					c = ShowItem(igram,p_gram,FALSE,pp_c,(*p_repeat),mode,FALSE);
+					c = ShowItem(FALSE,pp_c,(*p_repeat),mode,FALSE);
 					MyDisposeHandle((Handle*)pp_c);
 					if(c == ABORT || c == FINISH || c == EXIT || c == STOP) {
 						if(!(*p_repeat))	{
@@ -683,7 +683,8 @@ int ComputeInGram(tokenbyte ***pp_a,t_gram *p_gram,int igram,int inrul,long *p_l
 			}
 		if(mode == PROD && ((c=rule.print) == 2 || c == 3)) {
 			datamode = DisplayMode(pp_a,&ifunc,&hastabs);
-			if((rep=PrintResult(datamode && hastabs,wTrace,hastabs,ifunc,pp_a)) != OK) goto QUIT;
+			hastabs = FALSE; // 2026-04-12
+			if((rep=PrintWorkString(datamode && hastabs,wTrace,hastabs,ifunc,pp_a)) != OK) goto QUIT;
 			Print(wTrace,"\n");
 			}
 		if(mode == PROD && ((c=rule.stop) == 2 || c == 3)) {
@@ -711,7 +712,7 @@ int ComputeInGram(tokenbyte ***pp_a,t_gram *p_gram,int igram,int inrul,long *p_l
 		if(mode == PROD && rule.destru) {
 			if((rep=Destroy(pp_a)) != OK) goto QUIT;
 		//	BPPrintMessage(1,odInfo,"@@@ ShowItem()\n");
-			if((rep = ShowItem(igram,p_gram,FALSE,pp_a,(*p_repeat),PROD,FALSE)) == ABORT
+			if((rep = ShowItem(FALSE,pp_a,(*p_repeat),PROD,FALSE)) == ABORT
 					|| rep == FINISH || rep == EXIT || rep == STOP) goto QUIT;
 			}
 		if(equalweight && !(*p_repeat) && !PlanProduce) goto TRY2;
@@ -781,8 +782,9 @@ int ComputeInGram(tokenbyte ***pp_a,t_gram *p_gram,int igram,int inrul,long *p_l
 		//	BPPrintMessage(0,odError,"Subst ItemNumber = %d length = %ld datamode = %d hastabs = %d ifunc = %d\n",ItemNumber,length,datamode,hastabs,ifunc);
 			if(TraceProduce) {
 				if(NumberCharsTrace < MAXCHARTRACE) {
-					if((rep=PrintResult(datamode && hastabs,wTrace,hastabs,ifunc,pp_b)) != OK) {
-						BPPrintMessage(0,odError,"=> Error calling PrintResult(1) in Compute.c\n");
+					hastabs = FALSE; // 2026-04-12
+					if((rep=PrintWorkString(datamode && hastabs,wTrace,hastabs,ifunc,pp_b)) != OK) {
+						BPPrintMessage(0,odError,"=> Error calling PrintWorkString(1) in Compute.c\n");
 						goto QUIT;
 						}
 					Print(wTrace,"\n");
@@ -791,18 +793,20 @@ int ComputeInGram(tokenbyte ***pp_a,t_gram *p_gram,int igram,int inrul,long *p_l
 				}
 			if(NumberCharsData < MAXCHARDATA) {
 				if(changed && BalancedPoly(pp_b)) { // 2026-03-31
-		//			BPPrintMessage(1,odInfo,"@ PrintResult()\n");
 					ItemNumber++;
 					if((MaxItemsProduce > 0) && ItemNumber > MaxItemsProduce) {
 						BPPrintMessage(1,odInfo,"👉 %ld items have been produced\n",(long)(ItemNumber - 1L));
 						rep = OK;
 						goto QUIT;
 						}
-					if((rep=PrintResult(datamode && hastabs,OutputWindow,hastabs,ifunc,pp_b)) != OK) {
-						BPPrintMessage(0,odError,"=> Error calling PrintResult(2) in Compute.c\n");
+				hastabs = FALSE; // 2026-04-12
+					// BPPrintMessage(1,odInfo,"@@@ PrintWorkString()\n");
+					if((rep=PrintWorkString(datamode && hastabs,OutputWindow,hastabs,ifunc,pp_b)) != OK) {
+						BPPrintMessage(0,odError,"=> Error calling PrintWorkString(2) in Compute.c\n");
 						goto QUIT;
 						}
 					Print(OutputWindow,"\n");
+					if(SplitLines) Print(OutputWindow,"\n");
 					done_print = TRUE;
 					NumberCharsData += 20;
 					}
@@ -828,18 +832,19 @@ int ComputeInGram(tokenbyte ***pp_a,t_gram *p_gram,int igram,int inrul,long *p_l
 			//	BPPrintMessage(0,odInfo,"OutputWindow\n");
 			//	BPPrintMessage(0,odError,"ItemNumber = %d datamode = %d hastabs = %d ifunc = %d\n",ItemNumber,datamode,hastabs,ifunc);
 				if(!done_print && changed && NumberCharsData < MAXCHARDATA) {
-				//	BPPrintMessage(1,odInfo,"@@ PrintResult()\n");
 					ItemNumber++;
 					if((MaxItemsProduce > 0) && ItemNumber > MaxItemsProduce) {
 						BPPrintMessage(1,odInfo,"👉 %ld items have been produced\n",(long)(ItemNumber - 1L));
 						rep = OK;
 				//		goto QUIT;
 						}
-					if((rep = PrintResult(datamode && hastabs,OutputWindow,hastabs,ifunc,pp_a)) != OK) {
-						BPPrintMessage(0,odError,"=> Error calling PrintResult(3) in Compute.c\n");
+				hastabs = FALSE; // 2026-04-12
+					if((rep = PrintWorkString(datamode && hastabs,OutputWindow,hastabs,ifunc,pp_a)) != OK) {
+						BPPrintMessage(0,odError,"=> Error calling PrintWorkString(3) in Compute.c\n");
 						goto QUIT;
 						}
 					Print(OutputWindow,"\n");
+					if(SplitLines) Print(OutputWindow,"\n");
 					NumberCharsData += 20;
 					}
 			//	BPPrintMessage(0,odError,"@\n");  // odError to force printing if Improvize
@@ -851,10 +856,10 @@ int ComputeInGram(tokenbyte ***pp_a,t_gram *p_gram,int igram,int inrul,long *p_l
 					goto QUIT;
 					}
 				if(CopyBuf(pp_b,pp_c) == ABORT) return(ABORT);
-			/*	PrintResult(datamode && hastabs,OutputWindow,hastabs,ifunc,pp_c);
+			/*	PrintWorkString(datamode && hastabs,OutputWindow,hastabs,ifunc,pp_c);
 				Print(OutputWindow," (2)\n"); */
 			//	BPPrintMessage(1,odInfo,"@@ ShowItem() ItemNumber = %ld, MaxItemsProduce = %d\n",ItemNumber,MaxItemsProduce);
-				rep = ShowItem(igram,p_gram,TRUE,pp_c,(*p_repeat),mode,FALSE);
+			rep = ShowItem(TRUE,pp_c,(*p_repeat),mode,FALSE);
 				MyDisposeHandle((Handle*)pp_c);
 				if(rep == ABORT) {
 					if(!Panic) BPPrintMessage(0,odError,"=> Error calling ShowItem() in Compute.c\n");
@@ -983,8 +988,7 @@ if(DisplayStackIndex > 1) {
 		}
 	if(r == STOP) {
 		if(repeat) {
-			StepProduce = DisplayProduce = PlanProduce
-				= TraceProduce = FALSE;
+			StepProduce = DisplayProduce = PlanProduce = TraceProduce = FALSE;
 			r = OK;	/* Computation should be completed. */
 			}
 		else {
@@ -2129,8 +2133,7 @@ QUIT:
 	return(rep);
 	}
 
-
-int ShowItem(int igram,t_gram *p_gram,int justplay,tokenbyte ***pp_a,int repeat,int mode,int all) {
+int ShowItem(int justplay,tokenbyte ***pp_a,int repeat,int mode,int all) {
 	int r,rep,ifunc,datamode,hastabs;
 	long lastbyte;
 
@@ -2140,8 +2143,12 @@ int ShowItem(int igram,t_gram *p_gram,int justplay,tokenbyte ***pp_a,int repeat,
 		goto QUIT;
 		}
 	if(TraceProduce) {
+		// BPPrintMessage(1,odInfo,"@@@ ShowItem()\n");
 		datamode = DisplayMode(pp_a,&ifunc,&hastabs);
-		if(mode == ANAL || all) datamode = FALSE;
+		if((mode == ANAL) || all) {
+			datamode = FALSE;
+			ifunc = FALSE; // 2026-04-12
+			}
 	//	BPActivateWindow(QUICK,wTrace);
 		if(p_ItemStart == NULL
 				|| DisplayStackIndex >= MyGetHandleSize((Handle)p_ItemStart) / sizeof(long)) {
@@ -2151,8 +2158,9 @@ int ShowItem(int igram,t_gram *p_gram,int justplay,tokenbyte ***pp_a,int repeat,
 		(*p_ItemStart)[DisplayStackIndex] = lastbyte = GetTextLength(wTrace);
 		SetSelect(lastbyte,lastbyte,TEH[wTrace]);
 		if(NumberCharsTrace < MAXCHARTRACE) {
-	//		BPPrintMessage(1,odInfo,"@@@ PrintResult()\n");
-			if((r=PrintResult(datamode && hastabs,wTrace,hastabs,ifunc,pp_a)) != OK) goto QUIT;
+		datamode = FALSE; // 2026-04-12
+			hastabs = FALSE; // 2026-04-12
+			if((r=PrintWorkString(FALSE,wTrace,datamode,ifunc,pp_a)) != OK) goto QUIT;
 			Print(wTrace,"\n");
 			NumberCharsTrace += 20;
 			}
@@ -2166,4 +2174,20 @@ int ShowItem(int igram,t_gram *p_gram,int justplay,tokenbyte ***pp_a,int repeat,
 
 	QUIT:
 	return(r);
+	}
+
+int SaveWeights(void) {
+	// Save current rule weigths to the "-wg" weights file
+	int igram,irul,w;
+	BPPrintMessage(0,odInfo,"Saving rule weights\n");
+	Print(wWeights,"// Rule weights after learning\n");
+	for(igram=1; igram <= Gram.number_gram; igram++) {
+		for(irul=1; irul <= (*(Gram.p_subgram))[igram].number_rule; irul++) {
+			w = (*((*(Gram.p_subgram))[igram].p_rule))[irul].weight;
+			my_sprintf(Message,
+"{\"igram\":%d,\"irul\":%d,\"weight\":\"%d\"}\n",igram,irul,w);
+			Print(wWeights,Message);
+			}
+		}
+	return OK;
 	}

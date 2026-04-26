@@ -11,6 +11,17 @@ Pour l'architecture générale, voir `WASM_PORT.md`.
 
 ### Nouvelles fonctions API
 
+#### `bp3_set_timed_tokens_verbose(int v)` — verbose=2 structure tokens (wasm.9)
+Nouveau niveau verbose=2 qui émet les marqueurs structurels `{`, `}`, `,` comme des pseudo-tokens
+dans le flux timed tokens. Le JS peut reconstruire l'arbre polymétrique à partir de ces marqueurs.
+
+- `{` : start = start du premier enfant, end = end du dernier enfant
+- `}` : start = { start, end = { end
+- `,` : start = start de la voix suivante, end = { end (parent)
+
+Compatible : verbose=0 (sounding only) et verbose=1 (+ contrôles) sont inchangés.
+Implémenté via buffer intermédiaire `emitted_buf[]` + post-pass stack-based pour résoudre les timings.
+
 #### `bp3_set_seed(unsigned int seed)`
 Set le seed aléatoire sans toucher aux autres settings. Utilise `srand(Seed)` directement.
 Permet un seed override après `bp3_load_settings()` pour la reproductibilité des tests.
@@ -20,6 +31,12 @@ Active/désactive la sortie MIDI indépendamment. Nécessaire car `WriteMIDIfile
 
 #### `bp3_provision_file(const char* filename, const char* content)`
 Remplace l'ancien `bp3_load_csound_resources()`. Écrit n'importe quel contenu dans le filesystem virtuel Emscripten. Utilisé pour tous les fichiers auxiliaires : `-mi.` (prototypes MIDI), `-or.` (orchestres), `-tb.` (time bases), `-gl.` (glossaries), `-in.` (interactive MIDI). Doit être appelé avant `bp3_load_grammar()`.
+
+#### `bp3_set_flag(const char* name, long value)` — écriture flag JS→BP3 (wasm.10)
+Permet au dispatcher JS de modifier un flag BP3 par nom. Utilisé par `@map` pour router un CC MIDI vers un flag BP3 (ex: `bp3_set_flag("intensity", 80)`). Le flag est écrit dans le même tableau `p_Flag` que BP3 utilise pour évaluer les guards — la valeur sera vue au prochain `bp3_produce()`. Retourne l'index du flag si trouvé, -1 si non trouvé, -2 si pas de flags.
+
+#### `bp3_get_flag_names()` — liste des flags déclarés (wasm.10)
+Retourne un JSON array des noms de flags déclarés dans la grammaire (`["intensity","mode",...]`). Utilisé par l'UI pour afficher les flags disponibles dans le panneau de mapping CC→flag.
 
 #### `bp3_set_trace(int compute, int weights)` / `bp3_get_flag_state()`
 Fonctions debug pour l'investigation des boucles SUB et des flags K-param. `bp3_get_flag_state()` retourne un dump JSON de l'état des flags (Jflag, Flagthere, Varweight, valeurs, noms).
@@ -195,7 +212,7 @@ Ajout de `#include <emscripten.h>` pour `emscripten_log()` et les macros runtime
 | NoteOff-before-re-trigger | visser-shapes | Tronque NoteOff quand la même clé+canal est retriggée avant la fin — match natif p_keyon/SendToDriver. Corrige chevauchement de notes polymétriques |
 | Zerostart REMOVED (wasm.15) | ames, watch | Le zerostart soustrayait le min time local, détruisant les silences initiaux grammaticaux (ames: 666ms→0ms, watch: 1590ms→0ms). p_Instance.starttime inclut déjà les silences — pas besoin de normalisation |
 | Dedup keep-longest (#33) | visser5, visser-waves | Quand deux instances polymétriques du même pitch commencent au même moment, garde la plus longue durée (met à jour le NoteOff). Match le comportement natif p_keyon (NoteOff au dernier release). visser5: 16 diffs → 1 |
-| Kpress quantization offset (#35) | acceleration, visser3, visser-shapes | Quand Kpress≥2, la compensation d'arrondis de TimeSet (ligne 195) écrase T[0] avec T[1], décalant tous les timestamps d'un quantum. Le natif corrige via FormatMIDIstream(zerostart). Le WASM soustrait maintenant le min starttime de p_Instance quand Kpress≥2 (wasm_kpress_offset). 3 grammaires TIMING→EXACT |
+| Kpress quantization offset (#35) | acceleration, visser3, visser-shapes, watch | Quand Kpress≥2, TimeSet décale T[0] d'un quantum. Le WASM soustrait `Quantization` (10ms) une fois au premier item. Corrigé : l'ancien code soustrayait min_start (strippait le silence initial grammatical de watch=1590ms). |
 | T47 SSO detection (#38) | (aucune régression) | Scan pp_buff pour tags T47 après PolyMake, construit wasm_is_sso[]. bp3_api.c filtre les non-terminaux (p_Type & 1 == 0) SAUF les SSO marqués T47. Prépare l'émission correcte des silent sound objects (variables restantes traitées comme SSO par Bernard v3.3.19). |
 
 **Score parité wasm.4 (2026-04-06) :** S1 vs S2: 26E/9T/0C/1Count. S2 vs S3: 29E/4T/3C. S3 vs S4: 33E/1T/2Count. S4: 36/36. S5: 33/36.

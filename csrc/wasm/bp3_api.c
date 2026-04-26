@@ -691,7 +691,8 @@ int bp3_get_midi_event_count(void) {
 /* ---- Timed tokens extraction ---- */
 /* Correlates text output with p_Instance[] timing (filled by TimeSet).
    When verbose=0 (default): only sounding tokens (notes, named terminals).
-   When verbose=1: also includes control tokens (_vel, _chan...) and silence gaps (-). */
+   When verbose=1: also includes control tokens (_vel, _chan...) and silence gaps (-).
+   When verbose=2: verbose=1 + structural markers {, }, , with timing (polymetric tree). */
 
 static int wasm_timed_tokens_verbose = 0;
 
@@ -721,11 +722,27 @@ typedef struct { const char *start; int len; int after_n; } ControlEntry;
 #define MAX_CONTROLS 256
 static ControlEntry ctrl_buf[MAX_CONTROLS];
 
+/* Structural marker storage for verbose=2 */
+typedef struct { char ch; int after_n; } StructMarker;
+#define MAX_STRUCT_MARKERS 4096
+static StructMarker struct_buf[MAX_STRUCT_MARKERS];
+static int n_struct_markers;
+
+/* Intermediate token buffer for verbose=2 post-pass timing */
+typedef struct { char name[512]; long start; long end; char is_struct; } EmittedToken;
+#define MAX_EMITTED 16384
+static EmittedToken emitted_buf[MAX_EMITTED];
+static int n_emitted;
+
 /* Helper: parse text tokens, skip delimiters, handle parentheses */
 static const char* next_token(const char *p, const char **tok_start, int *tok_len) {
     while(*p && (*p == ' ' || *p == '\t' || *p == '\n' || *p == '\r')) p++;
     if(!*p) return NULL;
-    if(*p == '{' || *p == '}' || *p == ',') { *tok_start = NULL; *tok_len = 0; return p + 1; }
+    if(*p == '{' || *p == '}' || *p == ',') {
+        /* Return structural markers with tok_start pointing to the char and tok_len=1.
+           tok_start==NULL (tok_len==0) means "skip" — used when caller doesn't want them. */
+        *tok_start = p; *tok_len = 1; return p + 1;
+    }
     *tok_start = p;
     int pd = 0;
     while(*p) {
@@ -761,12 +778,18 @@ const char* bp3_get_timed_tokens(void) {
     kmax = use_accum ? wasm_accum_count : wasm_last_kmax;
     text = bp3_get_result();
 
+    int include_struct = (wasm_timed_tokens_verbose >= 2);
+
     if(!has_inst) {
         /* No timing data — text-only tokens */
         if(text == NULL || text[0] == '\0') goto FINISH_TOKENS;
         p = text;
         while((p = next_token(p, &ts, &tl)) != NULL) {
             if(ts == NULL || tl <= 0 || tl >= 500) continue;
+            /* Skip structural markers unless verbose>=2 */
+            if(tl == 1 && (ts[0] == '{' || ts[0] == '}' || ts[0] == ',')) {
+                if(!include_struct) continue;
+            }
             /* In non-verbose mode, skip control tokens (_xxx, /xxx, ?) */
             if(!include_controls && tl > 0 &&
                (ts[0] == '_' || ts[0] == '/' || ts[0] == '?')) continue;
@@ -781,13 +804,23 @@ const char* bp3_get_timed_tokens(void) {
         goto FINISH_TOKENS;
     }
 
-    /* First pass: collect controls from text with their position */
+    /* First pass: collect controls and structural markers from text */
     n_controls = 0;
+    n_struct_markers = 0;
     sounding_seen = 0;
     if(include_controls && text != NULL && text[0] != '\0') {
         p = text;
         while((p = next_token(p, &ts, &tl)) != NULL) {
             if(ts == NULL || tl <= 0) continue;
+            /* Structural markers {, }, , */
+            if(tl == 1 && (ts[0] == '{' || ts[0] == '}' || ts[0] == ',')) {
+                if(include_struct && n_struct_markers < MAX_STRUCT_MARKERS) {
+                    struct_buf[n_struct_markers].ch = ts[0];
+                    struct_buf[n_struct_markers].after_n = sounding_seen;
+                    n_struct_markers++;
+                }
+                continue;
+            }
             if(ts[0] == '_' && n_controls < MAX_CONTROLS) {
                 ctrl_buf[n_controls].start = ts;
                 ctrl_buf[n_controls].len = tl;
@@ -805,6 +838,8 @@ const char* bp3_get_timed_tokens(void) {
        object encoding: 0=empty, 1=silence, 2..Jbol=terminal, >=16384=note, -1=end */
     sounding_emitted = 0;
     ctrl_idx = 0;
+    int struct_idx = 0;
+    n_emitted = 0;
     long prev_end_ms = 0;
     long k_start = use_accum ? 0 : 2;
     long k_end = use_accum ? wasm_accum_count : kmax;
@@ -858,25 +893,42 @@ const char* bp3_get_timed_tokens(void) {
 
         /* Detect silence gaps (verbose mode only) */
         if(include_controls && start_ms > prev_end_ms && prev_end_ms > 0) {
-            remaining = TOKEN_JSON_BUF_SIZE - pos - 2;
-            if(remaining < 300) goto FINISH_TOKENS;
-            if(count > 0) token_json_buffer[pos++] = ',';
-            written = snprintf(token_json_buffer + pos, remaining,
-                "{\"token\":\"-\",\"start\":%ld,\"end\":%ld}", prev_end_ms, start_ms);
-            if(written > 0 && written < remaining) { pos += written; count++; }
+            if(n_emitted < MAX_EMITTED) {
+                strcpy(emitted_buf[n_emitted].name, "-");
+                emitted_buf[n_emitted].start = prev_end_ms;
+                emitted_buf[n_emitted].end = start_ms;
+                emitted_buf[n_emitted].is_struct = 0;
+                n_emitted++;
+            }
             sounding_emitted++;
+        }
+
+        /* Emit structural markers that come before this sounding token (verbose=2) */
+        if(include_struct) {
+            while(struct_idx < n_struct_markers && struct_buf[struct_idx].after_n <= sounding_emitted) {
+                if(n_emitted < MAX_EMITTED) {
+                    emitted_buf[n_emitted].name[0] = struct_buf[struct_idx].ch;
+                    emitted_buf[n_emitted].name[1] = '\0';
+                    emitted_buf[n_emitted].start = 0; /* resolved in post-pass */
+                    emitted_buf[n_emitted].end = 0;
+                    emitted_buf[n_emitted].is_struct = 1;
+                    n_emitted++;
+                }
+                struct_idx++;
+            }
         }
 
         /* Emit controls that come before this sounding token (verbose mode only) */
         if(include_controls) {
             while(ctrl_idx < n_controls && ctrl_buf[ctrl_idx].after_n <= sounding_emitted) {
-                remaining = TOKEN_JSON_BUF_SIZE - pos - 2;
-                if(remaining < 300) goto FINISH_TOKENS;
-                if(count > 0) token_json_buffer[pos++] = ',';
-                json_escape(escaped, sizeof(escaped), ctrl_buf[ctrl_idx].start, ctrl_buf[ctrl_idx].len);
-                written = snprintf(token_json_buffer + pos, remaining,
-                    "{\"token\":\"%s\",\"start\":%ld,\"end\":%ld}", escaped, start_ms, start_ms);
-                if(written > 0 && written < remaining) { pos += written; count++; }
+                if(n_emitted < MAX_EMITTED) {
+                    json_escape(emitted_buf[n_emitted].name, sizeof(emitted_buf[n_emitted].name),
+                        ctrl_buf[ctrl_idx].start, ctrl_buf[ctrl_idx].len);
+                    emitted_buf[n_emitted].start = start_ms;
+                    emitted_buf[n_emitted].end = start_ms;
+                    emitted_buf[n_emitted].is_struct = 0;
+                    n_emitted++;
+                }
                 ctrl_idx++;
             }
         }
@@ -928,27 +980,125 @@ const char* bp3_get_timed_tokens(void) {
             if(!wasm_sso_scanned || !wasm_is_sso[j]) continue;
         }
 
-        remaining = TOKEN_JSON_BUF_SIZE - pos - 2;
-        if(remaining < 300) goto FINISH_TOKENS;
-        if(count > 0) token_json_buffer[pos++] = ',';
-        json_escape(escaped, sizeof(escaped), name, strlen(name));
-        written = snprintf(token_json_buffer + pos, remaining,
-            "{\"token\":\"%s\",\"start\":%ld,\"end\":%ld}", escaped, start_ms, end_ms);
-        if(written > 0 && written < remaining) { pos += written; count++; }
+        if(n_emitted < MAX_EMITTED) {
+            json_escape(emitted_buf[n_emitted].name, sizeof(emitted_buf[n_emitted].name),
+                name, strlen(name));
+            emitted_buf[n_emitted].start = start_ms;
+            emitted_buf[n_emitted].end = end_ms;
+            emitted_buf[n_emitted].is_struct = 0;
+            n_emitted++;
+        }
         sounding_emitted++;
         if(end_ms > prev_end_ms) prev_end_ms = end_ms;
     }
 
+    /* Emit remaining structural markers (verbose=2) */
+    if(include_struct) {
+        while(struct_idx < n_struct_markers && n_emitted < MAX_EMITTED) {
+            emitted_buf[n_emitted].name[0] = struct_buf[struct_idx].ch;
+            emitted_buf[n_emitted].name[1] = '\0';
+            emitted_buf[n_emitted].start = 0;
+            emitted_buf[n_emitted].end = 0;
+            emitted_buf[n_emitted].is_struct = 1;
+            n_emitted++;
+            struct_idx++;
+        }
+    }
+
     /* Emit remaining controls (verbose mode only) */
-    while(include_controls && ctrl_idx < n_controls) {
+    while(include_controls && ctrl_idx < n_controls && n_emitted < MAX_EMITTED) {
+        json_escape(emitted_buf[n_emitted].name, sizeof(emitted_buf[n_emitted].name),
+            ctrl_buf[ctrl_idx].start, ctrl_buf[ctrl_idx].len);
+        emitted_buf[n_emitted].start = 0;
+        emitted_buf[n_emitted].end = 0;
+        emitted_buf[n_emitted].is_struct = 0;
+        n_emitted++;
+        ctrl_idx++;
+    }
+
+    /* Post-pass: resolve structural marker timing (verbose=2).
+       { start = start of first child, end = end of last child before matching }
+       } start = { start, end = { end
+       , start = start of next voice, end = end of next voice (= { end) */
+    if(include_struct && n_emitted > 0) {
+        /* Stack for matching { with } */
+        int brace_stack[256];
+        int sp = 0;
+        for(int i = 0; i < n_emitted; i++) {
+            if(emitted_buf[i].is_struct && emitted_buf[i].name[0] == '{') {
+                if(sp < 256) brace_stack[sp++] = i;
+                /* Find first non-struct token after this { for start time */
+                long first_start = 0;
+                for(int f = i + 1; f < n_emitted; f++) {
+                    if(!emitted_buf[f].is_struct) {
+                        first_start = emitted_buf[f].start;
+                        break;
+                    }
+                }
+                emitted_buf[i].start = first_start;
+            } else if(emitted_buf[i].is_struct && emitted_buf[i].name[0] == '}') {
+                /* Find last non-struct token before this } for end time */
+                long last_end = 0;
+                for(int f = i - 1; f >= 0; f--) {
+                    if(!emitted_buf[f].is_struct && emitted_buf[f].end > 0) {
+                        last_end = emitted_buf[f].end;
+                        break;
+                    }
+                }
+                /* Match with opening { */
+                if(sp > 0) {
+                    int open_idx = brace_stack[--sp];
+                    /* { end = last_end, but could also be the max of all children */
+                    if(last_end > emitted_buf[open_idx].end)
+                        emitted_buf[open_idx].end = last_end;
+                    emitted_buf[i].start = emitted_buf[open_idx].start;
+                    emitted_buf[i].end = emitted_buf[open_idx].end;
+                } else {
+                    emitted_buf[i].start = 0;
+                    emitted_buf[i].end = last_end;
+                }
+            } else if(emitted_buf[i].is_struct && emitted_buf[i].name[0] == ',') {
+                /* , gets the parent { span — find next non-struct for start,
+                   but the end is the parent { end (not yet known).
+                   We'll fix this in a second pass after } is resolved. */
+                long next_start = 0;
+                for(int f = i + 1; f < n_emitted; f++) {
+                    if(!emitted_buf[f].is_struct) {
+                        next_start = emitted_buf[f].start;
+                        break;
+                    }
+                }
+                emitted_buf[i].start = next_start;
+                /* end will be set from parent { after } is resolved */
+                if(sp > 0) {
+                    emitted_buf[i].end = 0; /* placeholder */
+                }
+            }
+        }
+        /* Second structural pass: set , end to parent { end (now resolved) */
+        sp = 0;
+        for(int i = 0; i < n_emitted; i++) {
+            if(emitted_buf[i].is_struct && emitted_buf[i].name[0] == '{') {
+                if(sp < 256) brace_stack[sp++] = i;
+            } else if(emitted_buf[i].is_struct && emitted_buf[i].name[0] == '}') {
+                if(sp > 0) sp--;
+            } else if(emitted_buf[i].is_struct && emitted_buf[i].name[0] == ',') {
+                if(sp > 0) {
+                    emitted_buf[i].end = emitted_buf[brace_stack[sp-1]].end;
+                }
+            }
+        }
+    }
+
+    /* Serialize emitted tokens to JSON */
+    for(int i = 0; i < n_emitted; i++) {
         remaining = TOKEN_JSON_BUF_SIZE - pos - 2;
         if(remaining < 300) break;
         if(count > 0) token_json_buffer[pos++] = ',';
-        json_escape(escaped, sizeof(escaped), ctrl_buf[ctrl_idx].start, ctrl_buf[ctrl_idx].len);
         written = snprintf(token_json_buffer + pos, remaining,
-            "{\"token\":\"%s\",\"start\":0,\"end\":0}", escaped);
+            "{\"token\":\"%s\",\"start\":%ld,\"end\":%ld}",
+            emitted_buf[i].name, emitted_buf[i].start, emitted_buf[i].end);
         if(written > 0 && written < remaining) { pos += written; count++; }
-        ctrl_idx++;
     }
 
 FINISH_TOKENS:
@@ -1015,4 +1165,39 @@ const char* bp3_get_flag_state(void) {
     }
     pos += snprintf(flagbuf + pos, sizeof(flagbuf) - pos, "}");
     return flagbuf;
+}
+
+EMSCRIPTEN_KEEPALIVE
+int bp3_set_flag(const char* name, long value) {
+    /* Set a flag value from JS — used by @map CC→flag.
+     * Returns: flag index if found, -1 if not found, -2 if no flags */
+    if(Jflag <= 0 || p_Flag == NULL || p_Flagname == NULL) return -2;
+
+    for(int i = 1; i <= Jflag && i < 20; i++) {
+        const char *fname = ((*p_Flagname)[i] != NULL && *((*p_Flagname)[i]) != NULL)
+                           ? *((*p_Flagname)[i]) : NULL;
+        if(fname != NULL && strcmp(fname, name) == 0) {
+            (*p_Flag)[i] = value;
+            return i;
+        }
+    }
+    return -1;  /* flag name not found */
+}
+
+EMSCRIPTEN_KEEPALIVE
+const char* bp3_get_flag_names(void) {
+    /* Return JSON array of declared flag names */
+    static char buf[2048];
+    int pos = 0;
+    pos += snprintf(buf, sizeof(buf), "[");
+    if(Jflag > 0 && p_Flagname != NULL) {
+        for(int i = 1; i <= Jflag && i < 20; i++) {
+            if(i > 1) buf[pos++] = ',';
+            const char *name = ((*p_Flagname)[i] != NULL && *((*p_Flagname)[i]) != NULL)
+                               ? *((*p_Flagname)[i]) : "?";
+            pos += snprintf(buf + pos, sizeof(buf) - pos, "\"%s\"", name);
+        }
+    }
+    pos += snprintf(buf + pos, sizeof(buf) - pos, "]");
+    return buf;
 }

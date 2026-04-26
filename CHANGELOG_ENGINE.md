@@ -16,6 +16,88 @@ Chaque section référence le point correspondant dans `FEEDBACK_BERNARD.md` (te
 
 ## Bugs corrigés (post v3.3.19)
 
+### CompileGrammar.c — copy_grammar alloue de "faux Handles" → crash MyGetHandleSize (#45)
+
+**Root cause :** `copy_grammar()` dans `CompileGrammar.c` alloue 4 buffers de règle
+(`p_leftarg`, `p_rightarg`, `p_leftcontext->p_arg`, `p_rightcontext->p_arg`) avec
+`malloc(sizeof(tokenbyte*))` puis `malloc(count * sizeof(tokenbyte))` — un vrai
+"handle Mac-style" (pointeur vers pointeur), PAS un Handle Anthony (`s_handle_priv*`).
+
+Du coup, tout appel ultérieur à `MyGetHandleSize()` sur ces buffers lit `h->size` à
+l'offset 8 octets **hors du malloc de 8 octets** → heap-buffer-overflow. Confirmé par
+AddressSanitizer sur Bernard :
+```
+READ of size 8 at ... (0 bytes after 8-byte region)
+    #0 MyGetHandleSize ConsoleMemory.c:120
+    #1 LengthOf PlayThings.c:1005
+    #2 StructuralRule ProduceItems.c:1082
+    #3 LastStructuralSubgrammar ProduceItems.c:1055
+    allocated by: malloc+copy_grammar CompileGrammar.c:1999
+```
+
+**Symptôme :** Crash systématique du mode `templates` dès qu'une règle contient un
+marqueur structurel (T2, T5, ou opérateurs `+ : ; = / \`) — dépend de l'ASLR ailleurs,
+mais ASan le détecte toujours.
+
+**Fix (csrc/bp3/CompileGrammar.c) :** Remplacement des 4 paires `malloc/malloc` par un
+seul `GiveSpace()` qui construit un vrai `s_handle_priv` :
+
+```c
+// AVANT (×4) :
+dest_rule->p_X = (tokenbyte **)malloc(sizeof(tokenbyte *));
+*dest_rule->p_X = (tokenbyte *)malloc(count * sizeof(tokenbyte));
+memcpy(*dest_rule->p_X, *src_rule->p_X, count * sizeof(tokenbyte));
+
+// APRÈS (×4) :
+dest_rule->p_X = (tokenbyte **)GiveSpace((Size)(count * sizeof(tokenbyte)));
+if (dest_rule->p_X == NULL) { ... return; }
+memcpy(*dest_rule->p_X, *src_rule->p_X, count * sizeof(tokenbyte));
+```
+
+Fonctionnellement identique pour le code appelant (`**p_X` donne toujours les données,
+car `*p_X == h->memblock`), mais maintenant `MyGetHandleSize()` renvoie correctement
+`count * sizeof(tokenbyte)`.
+
+Le bloc de libération miroir (`free(*rule->p_X); free(rule->p_X);`) était déjà
+commenté ("Proposed by Claude AI, not used"). Rien à faire côté dealloc.
+
+**Affecte les 3 targets** (linux, windows, wasm) via `csrc/bp3/CompileGrammar.c`.
+
+---
+
+### FillPhaseDiagram.c — Plot(ANYWHERE) écrase les sentinelles -1 (#42)
+
+**Root cause :** `Plot(ANYWHERE)` cherche un slot libre dans le diagramme de phase avec
+`if(oldk > 1) continue;`. Or le terminateur de séquence `-1` satisfait `oldk <= 1`,
+donc `ANYWHERE` le traite comme un slot libre et l'écrase par un objet `_script()`.
+
+**Symptôme :** Sans terminateur `-1`, la boucle `while(seq[++inext] == 0)` dans
+`Calculate_alpha()` (SetObjectFeatures.c:975) dépasse le buffer → **segfault en natif**,
+**timestamps=0 en WASM** (le crash est attrapé silencieusement).
+Se manifeste quand le diagramme est assez dense (ex: visser-shapes avec 26+ tags `_script(CT N)`).
+
+**Fix (FillPhaseDiagram.c:1995) :**
+```c
+// AVANT :
+if(oldk > 1) continue;
+// APRÈS :
+if(oldk > 1 || oldk == -1) continue; /* Don't overwrite end-of-sequence sentinel */
+```
+
+**Affecte les 3 targets** (linux, windows, wasm) via `csrc/bp3/FillPhaseDiagram.c`.
+
+---
+
+### ScriptUtils.c + console_strings.json — CT catchall pour _script(CT N) (#43)
+
+**Ajout :** `"193 CT _any_"` dans `console_strings.json` (ScriptCommand table) et `case 193: break;`
+dans `DoScript()` (ScriptUtils.c). Permet au moteur d'accepter `_script(CT N)` comme commande
+valide (no-op passthrough) au lieu de les rejeter comme commande inconnue.
+
+**Affecte :** natif (`csrc/bp3/ScriptUtils.c`) + WASM (`csrc/wasm/console_strings.json`).
+
+---
+
 ### GetRelease.c — Mémoire non initialisée p_DefaultChannel (#39)
 
 **Root cause :** `CreateObjectSpace()` n'initialise `p_DefaultChannel` que pour j=0,1 (boucle ligne 939).

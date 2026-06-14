@@ -19,13 +19,15 @@ set -e
 
 # === Paths ===
 ENGINE_DIR="$(cd "$(dirname "$0")" && pwd)"
-EMSDK_ENV="/mnt/d/Claude/emsdk/emsdk_env.sh"
+EMSDK_ENV="/home/romi/dev/bp/emsdk/emsdk_env.sh"
 
-# Deploy destinations
-BPSCRIPT_DIR="/mnt/d/Claude/BPscript"
+# Deploy destinations (migration PC2 natif 2026-06-14 : ex-WSL /mnt/c, /mnt/d morts)
+BPSCRIPT_DIR="/home/romi/dev/bp/BPscript"
 BPSCRIPT_DIST="$BPSCRIPT_DIR/dist"
-BPWEB_DIST="/mnt/d/Claude/BPweb/dist"
-MAMP_DIR="/mnt/c/MAMP/htdocs/bolprocessor"
+# BPweb et MAMP Windows n'existent plus sur PC2 natif. Laissés vides → déploiements
+# gardés par `[ -d ]` donc simplement sautés. Oracle S0 = bp3 natif (plus de bp.exe).
+BPWEB_DIST=""
+MAMP_DIR=""
 
 # Parallelism
 JOBS=$(nproc 2>/dev/null || echo 4)
@@ -97,7 +99,10 @@ if [ $DO_STATUS -eq 1 ]; then
 
     echo ""
     echo -e "${CYAN}=== Deploy Status ===${NC}"
-    for dest in "$BPSCRIPT_DIST/bp3.js" "$BPWEB_DIST/bp3.js" "$MAMP_DIR/bp.exe"; do
+    deploy_checks=("$BPSCRIPT_DIST/bp3.js")
+    [ -n "$BPWEB_DIST" ] && deploy_checks+=("$BPWEB_DIST/bp3.js")
+    [ -n "$MAMP_DIR" ]   && deploy_checks+=("$MAMP_DIR/bp.exe")
+    for dest in "${deploy_checks[@]}"; do
         if [ -f "$dest" ]; then
             echo "  $(ls -l --time-style=long-iso "$dest" | awk '{print $6,$7}') $dest"
         else

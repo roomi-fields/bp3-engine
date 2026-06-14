@@ -48,7 +48,7 @@ int TimeSet(tokenbyte ***pp_buff,long* p_kmx,long *p_tmin,long *p_tmax,unsigned 
 	int* p_nmax,unsigned long **p_imaxseq,double maxseqapprox)
 {
 int i,result,bigitem,maxties,j,missed_ties;
-short **p_articul;
+// short **p_Articul;
 time_t start_time,end_time;
 
 // // HideWindow(Window[wInfo]);
@@ -59,7 +59,7 @@ if(CheckEmergency() != OK) return(ABORT);
 if(!Improvize) Chunk_number++;
 // BPPrintMessage(0,odError,"\nChunk_number = %d\n",Chunk_number);
 
-if((p_articul = (short**) GiveSpace((Size)Maxevent*sizeof(short))) == NULL) return(ABORT);
+if((p_Articul = (short**) GiveSpace((Size)Maxevent*sizeof(short))) == NULL) return(ABORT);
 
 maxties = Jbol + Jpatt;
 // BPPrintMessage(0,odInfo,"\n\n@@ maxties = %d\n\n",maxties);
@@ -85,16 +85,17 @@ for(j = 0; j < MAXINSTRUMENTS; j++)
 
 time(&start_time);
 ProductionTime += start_time - ProductionStartTime;
-result = MakeEmptyTokensSilent(pp_buff);
+result = MakeEmptyTokensSilent(pp_buff,&maxseqapprox);
 if(result != OK) goto SORTIR;
-result = FillPhaseDiagram(pp_buff,p_kmx,p_maxseq,p_nmax,p_imaxseq,maxseqapprox,&bigitem,p_articul);
+// result = FillPhaseDiagram(pp_buff,p_kmx,p_maxseq,p_nmax,p_imaxseq,maxseqapprox,&bigitem,p_Articul);
+result = FillPhaseDiagram(pp_buff,p_kmx,p_maxseq,p_nmax,p_imaxseq,maxseqapprox,&bigitem);
 if(result != OK) goto SORTIR;
 
 time(&end_time);
 PhaseDiagramTime += end_time - start_time;
 
 start_time = end_time;
-result = SetTimeObjects(bigitem,p_imaxseq,*p_maxseq,p_nmax,p_kmx,p_tmin,p_tmax,p_articul);
+result = SetTimeObjects(bigitem,p_imaxseq,*p_maxseq,p_nmax,p_kmx,p_tmin,p_tmax,p_Articul);
 time(&end_time);
 TimeSettingTime += end_time - start_time;
 // ProductionTime += TimeSettingTime;
@@ -102,7 +103,7 @@ TimeSettingTime += end_time - start_time;
 if(trace_timeset) BPPrintMessage(0,odInfo,"End TimeSet() maxseq = %ld\n\n",(long)*p_maxseq);
 
 SORTIR:
-MyDisposeHandle((Handle*)&p_articul);
+MyDisposeHandle((Handle*)&p_Articul);
 
 missed_ties = 0;
 for(j = 0; j <= MAXCHAN; j++) {
@@ -141,10 +142,9 @@ return(result);
 
 
 int SetTimeObjects(int bigitem,unsigned long **p_imaxseq,unsigned long maxseq,int *p_nmax,
-	long *p_kmx,long *p_tmin,long *p_tmax,short **p_articul)
+	long *p_kmx,long *p_tmin,long *p_tmax,short **p_Articul)
 
 {
-if(getenv("BP3_DEBUG")) fprintf(stderr,"@@@ SetTimeObjects CALLED bigitem=%d maxseq=%lu\n", bigitem, maxseq);
 int nseq,r,rep,BTflag,result,stepthis,first,dirtymem,compiledmem,nature_time,a,j,key,last_line,outtimeevents;
 long **ptr;
 long k;
@@ -175,8 +175,7 @@ for(nseq=0; nseq <= (*p_nmax); nseq++) {
 	
 in = 1.; jn = ZERO;
 period = ((double) Pclock) * 1000. * CorrectionFactor / Qclock;
-if(getenv("BP3_DEBUG")) fprintf(stderr,"@@@ TimeSet: Pclock=%ld Qclock=%ld CF=%.15f period=%.15f Ratio=%.15f Kpress=%.1f nature=%d maxseq=%ld nmax=%d\n",
-	(long)Pclock,(long)Qclock,CorrectionFactor,period,Ratio,Kpress,nature_time,(long)maxseq,(*p_nmax));
+// BPPrintMessage(0,odInfo,"Pclock = %ld Qclock = %ld, CorrectionFactor = %.3f\n",(long)Pclock,(long)Qclock,CorrectionFactor);
 
 // if(trace_timeset)
 BPPrintMessage(0,odInfo,"Setting time streaks on %d lines\n",(*p_nmax));
@@ -188,8 +187,6 @@ while(TRUE) {
 		jn = jj;		/* Write only once */
 		if(nature_time == STRIATED) {
 			(*p_T)[jn] = (Milliseconds) ((period * (in - 1.)) / Ratio);
-			if(getenv("BP3_DEBUG")) fprintf(stderr,"@@@ jn=%ld in=%.1f T=%ld result=%.15f\n",
-				(long)jn, in, (long)(*p_T)[jn], (period*(in-1.))/Ratio);
 			// BPPrintMessage(0,odError,"jn = %ld (*p_T)[jn] = %ld in = %ld period = %.0f Ratio = %.0f\n",(long)jn,(long)(*p_T)[jn],(long)in,(double)period,(double)Ratio);
 			if(Kpress > 2) { // Compensates roundings // Added by BB 2021-03-21
 				if(jn > 0) (*p_T)[jn-1] = (*p_T)[jn];
@@ -673,9 +670,9 @@ QUEST2:
 			if(i < ZERO) break;
 			}
 		if(i > ZERO) {
-			a = (*p_articul)[k];
+			a = (*p_Articul)[k];
 			if(a > 127) a = a - 256;
-			if(a > 0 && k > 1) (*p_articul)[k] = 0;
+			if(a > 0 && k > 1) (*p_Articul)[k] = 0;
 			}
 		}
 	}
@@ -696,7 +693,7 @@ for(k=2; k <= (*p_kmx); k++) {
 		continue; // Well, needs to be checked
 		// result = ABORT; goto EXIT1;
 		}
-	a = (*p_articul)[k];
+	a = (*p_Articul)[k];
 	if(a == 0) continue;
 	if(a < -99) a = -99;
 	

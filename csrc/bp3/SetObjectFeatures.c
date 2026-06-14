@@ -43,7 +43,7 @@ int trace_get_duration = 0;
 int trace_set_variation = 0;
 int trace_table = 0;
 
-int SetObjectParams(int isobject,int level,int nseq,short** p_articul,long k,int j,
+int SetObjectParams(int isobject,int level,int nseq,long k,int j,
 	CurrentParameters *p_currentparameters,ContParameters **p_contparameters,
 	Table **h_table) {
 	ParameterSpecs **currentinstancevalues;
@@ -224,19 +224,19 @@ int SetObjectParams(int isobject,int level,int nseq,short** p_articul,long k,int
 	(*p_Instance)[k].part = p_currentparameters->currpart;
 	if(j < 1 || j >= Jbol) {
 		(*p_Instance)[k].transposition = p_currentparameters->currtranspose;
-		if(p_articul != NULL) {
+		if(p_Articul != NULL) {
 		//	if(p_currentparameters->currarticul >= 0)
-				(*p_articul)[k] = p_currentparameters->currarticul;
-		//	else (*p_articul)[k] = MAXINT + p_currentparameters->currarticul;
+				(*p_Articul)[k] = p_currentparameters->currarticul;
+		//	else (*p_Articul)[k] = MAXINT + p_currentparameters->currarticul;
 			}
 		}
 	else {
 		if((*p_OkTransp)[j]) (*p_Instance)[k].transposition = p_currentparameters->currtranspose;
-		if(p_articul != NULL) {
+		if(p_Articul != NULL) {
 			if((*p_OkArticul)[j]) {
 		//		if(p_currentparameters->currarticul >= 0)
-					(*p_articul)[k] = p_currentparameters->currarticul;
-		//		else (*p_articul)[k] = MAXINT + p_currentparameters->currarticul;
+					(*p_Articul)[k] = p_currentparameters->currarticul;
+		//		else (*p_Articul)[k] = MAXINT + p_currentparameters->currarticul;
 				}
 			}
 		}
@@ -923,9 +923,6 @@ int Fix(int nseq,Milliseconds **p_time1,Milliseconds **p_time2,int nature_time) 
 						}
 					// BPPrintMessage(0,odInfo,"Fix() simple note or silence k = %ld j = %ld, i = %ld alpha = %.2f t1 = %ldms t2 = %ldms\n",(long)k,(long)j,(long)i,(*p_Instance)[k].alpha,(long)t1,(long)t2);
 					}
-				if(getenv("BP3_DEBUG") && t1 >= 80000 && t1 <= 86000)
-					fprintf(stderr,"@@@ Fix nseq=%d k=%ld j=%ld i=%ld alpha=%.15f t1=%ld t2=%ld T[i]=%ld\n",
-						nseq,(long)k,(long)j,(long)i,(*p_Instance)[k].alpha,(long)t1,(long)t2,(long)(*p_T)[i]);
 				}
 			else {
 				/* Out-time sound-object */
@@ -1051,9 +1048,6 @@ if(nature_time == STRIATED || nseq == 0) {
 OKALPHA1:
 		if(alpha < 0.) alpha = 0.;
 		if(beta < 0.) beta = 0.;
-		if(getenv("BP3_DEBUG") && (*p_T)[i] >= 80000 && (*p_T)[i] <= 86000)
-			fprintf(stderr,"@@@ CalcAlpha nseq=%d k=%ld j=%ld i=%ld inext=%ld alpha=%.15f T[i]=%ld T[inext]=%ld d=%.2f\n",
-				nseq,(long)k,(long)j,(long)i,(long)inext,alpha,(long)(*p_T)[i],(long)(*p_T)[inext],d);
 		(*p_Instance)[k].alpha = alpha;
 		if(trace_object_features)
 			BPPrintMessage(0,odInfo,"Calculate_alpha() nseq = %d k = %d i = %ld inext = %ld alpha = %.2f\n",nseq,k,i,inext,alpha);
@@ -1546,10 +1540,9 @@ double GetSymbolicDuration(int ignoreconcat,tokenbyte **p_buff,
 	if(trace_get_duration)
 		BPPrintMessage(1,odInfo,"GetSymbolicDuration()\n");
 	if(m_org != T3 && m_org != T47 && m_org != T25 && m_org != T9) {
-		BPPrintMessage(0,odError,"=> Err. GetSymbolicDuration(). m_org = %ld",(long)m_org);
+		BPPrintMessage(0,odError,"=> Err. GetSymbolicDuration(). m_org = %ld\n",(long)m_org);
 		return(0);
 		}
-
 	if((p_duration_of_field = (double**) GiveSpace((Size)(Maxlevel+1)*sizeof(double))) == NULL)
 		goto SORTIR;
 	if((p_duration_org = (double**) GiveSpace((Size)(Maxlevel+1)*sizeof(double))) == NULL)
@@ -1557,7 +1550,6 @@ double GetSymbolicDuration(int ignoreconcat,tokenbyte **p_buff,
 	for(level = 0; level <= Maxlevel; level++) {
 		(*p_duration_of_field)[level] = (*p_duration_org)[level] = 0.;
 		}
-		
 	if(orgspeed == 0.) {
 		BPPrintMessage(0,odError,"=> Err. GetSymbolicDuration(). orgspeed == ZERO");
 		objectduration = 0.;

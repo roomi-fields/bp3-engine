@@ -274,6 +274,10 @@ int CompileGrammar(int verbose,t_gram* p_gram) {
 		if((Match(TRUE,p_line,&q,4)) && p_gram->number_gram == 1
 			&& (*(p_gram->p_subgram))[1].number_rule == 0) goto NEXTLINE;
 
+		p = &(*p_line)[0]; q = &(FilePrefix[wKeyboard][0]);
+		if((Match(TRUE,p_line,&q,4)) && p_gram->number_gram == 1
+			&& (*(p_gram->p_subgram))[1].number_rule == 0) goto NEXTLINE;
+
 		p = &(*p_line)[0]; q = &(FilePrefix[wTonality][0]);
 		if((Match(TRUE,p_line,&q,4)) && p_gram->number_gram == 1
 			&& (*(p_gram->p_subgram))[1].number_rule == 0) goto NEXTLINE;
@@ -1376,8 +1380,7 @@ int CreateBol(int reload,int checknotes,char **p_x, int justcount, int mark, int
 
 
 int ParseGrammarLine(t_gram* p_gram,char** p_line,int *p_onerulefound,int tracecompile,int *p_igram,
-	int *p_irul,int *p_needsnumber,int *p_done)
-{
+	int *p_irul,int *p_needsnumber,int *p_done) {
 int i,j,igram,irul,w,imode,type,operator,incweight,lenc,result,foundk,
 	newsubgram,meta,lenarg,beforefirstrule,proc;
 long initparam,y,u,v;
@@ -1568,7 +1571,7 @@ if((**ptr) == '<') {
 	else {
 		if(foundk) {
 			i = - w - 1;
-			NotBPCase[5] = TRUE;
+			// NotBPCase[5] = TRUE;  2026-04-30
 			if(i < 1 || i >= MAXPARAMCTRL) {
 				my_sprintf(Message,"'<K%ld>' not accepted.  Range [1,%ld]\n",
 					(long)i,(long)MAXPARAMCTRL-1);
@@ -1617,6 +1620,7 @@ if(CheckEnd(**ptr)) return(5);
 (*((*(p_gram->p_subgram))[igram].p_rule))[irul].ctrl = i;
 (*((*(p_gram->p_subgram))[igram].p_rule))[irul].weight = w;
 (*((*(p_gram->p_subgram))[igram].p_rule))[irul].incweight = incweight;
+if(incweight < 0) NotBPCase[5] = TRUE;
 type = (*(p_gram->p_subgram))[igram].type;
 c = NextChar(ptr);
 if(CheckEnd(c)) return(5);
@@ -1689,7 +1693,7 @@ if((i=NumberWildCards(pp_leftp)) < (j=NumberWildCards(pp_rightp))) {
 	}
 *p_done = FALSE;
 *p_onerulefound = TRUE;
-if(tracecompile) ShowRule(p_gram,igram,irul,wTrace,FALSE,NULL,TRUE,TRUE,TRUE);
+if(tracecompile) ShowRule(p_gram,igram,irul,wTrace,FALSE,NULL,TRUE,TRUE,TRUE,FALSE);
 return(0);
 }
 
@@ -1698,22 +1702,22 @@ int ShowNotBP(t_gram* p_gram) {
 	int i,j=1;
 	static char *err[] = {
 	"Rule(s) with 'lambda', 'empty', 'null' or 'nil' as right argument",	/* 0 */
-	" ", 		/* 1 */
+	" ", 		/* 1 suppressed */
 	"'SUB' or 'SUB1' or 'POSLONG' substitutions(s)",	/* 2 */
 	"No rule is valid for parsing.  Use '<->' instead of '-->'", /* 3 */
-	"Item contains polymetric structure(s)",		/* 4 */
-	"'<Kx>' controlled rule weight(s)",	/* 5 */
-	"'/flag/' programmed grammar(s)",	/* 6 */
+	"Rule contains polymetric structure(s)",		/* 4 */
+	"Rule contains decreasing weight",	/* 5 */
+	"Rule contains a '/flag/'",	/* 6 */
 	"Using tool(s): '_destru','_goto','_failed','_repeat','_retro','_rndseq','_keyxpand','_stepOn','_stepOff','_stop'", /* 7 */
 	"Grammar is empty!",	/* 8 */
-	"Period notation is not handled in grammars"	/* 9 $$$ suppressed */
+	"Period notation is not handled in grammars"	/* 9 suppressed */
 		};
 
 	if(!CompiledGr || p_gram->trueBP) return(OK);
 	BPPrintMessage(0,odError,"=> This is not a true BP grammar.\nThe following features are not standard:\n");
 	for(i=0; i < MAXNOTBPCASES; i++) {
 		if(NotBPCase[i]) {
-			BPPrintMessage(0,odError,"[%ld] %s\n",(long)j,err[i]);
+			BPPrintMessage(0,odError,"&nbsp;%d) %s\n",j,err[i]);
 			j++;
 			}
 		}
@@ -1728,41 +1732,40 @@ int MaintainSelectionInGrammar(long pos,int dif) {
 	}
 
 
-int CheckDeterminism(t_gram *p_gram)
-{
-int igram,irul,jrul,newrule,err;
-tokenbyte **leftargi,**leftargj;
-t_subgram subgram;
-t_rule rule;
+int CheckDeterminism(t_gram *p_gram) {
+	int igram,irul,jrul,newrule,err;
+	tokenbyte **leftargi,**leftargj;
+	t_subgram subgram;
+	t_rule rule;
 
-err = 0;
-SelectBehind(GetTextLength(wTrace),GetTextLength(wTrace),TEH[wTrace]);
-PrintBehind(wTrace,"\n");
+	err = 0;
+	SelectBehind(GetTextLength(wTrace),GetTextLength(wTrace),TEH[wTrace]);
+	PrintBehind(wTrace,"\n");
 
-for(igram=1; igram <= p_gram->number_gram; igram++) {
-	subgram = (*(p_gram->p_subgram))[igram];
-	for(irul=1; irul <= subgram.number_rule; irul++) {
-		PleaseWait();
-		rule = (*(subgram.p_rule))[irul];
-		leftargi = rule.p_leftarg;
-		newrule = TRUE;
-		for(jrul=(irul+1); jrul <= subgram.number_rule; jrul++) {
-			rule = (*(subgram.p_rule))[jrul];
-			leftargj = rule.p_leftarg;
-			if(SameBuffer(leftargi,leftargj)) {
-				if(newrule) {
-					newrule = FALSE;
-					Println(wTrace,"The following rules make the grammar non-deterministic:");
-					ShowRule(p_gram,igram,irul,wTrace,FALSE,NULL,TRUE,FALSE,TRUE);
-					err++;
+	for(igram=1; igram <= p_gram->number_gram; igram++) {
+		subgram = (*(p_gram->p_subgram))[igram];
+		for(irul=1; irul <= subgram.number_rule; irul++) {
+			PleaseWait();
+			rule = (*(subgram.p_rule))[irul];
+			leftargi = rule.p_leftarg;
+			newrule = TRUE;
+			for(jrul=(irul+1); jrul <= subgram.number_rule; jrul++) {
+				rule = (*(subgram.p_rule))[jrul];
+				leftargj = rule.p_leftarg;
+				if(SameBuffer(leftargi,leftargj)) {
+					if(newrule) {
+						newrule = FALSE;
+						Println(wTrace,"The following rules make the grammar non-deterministic:");
+						ShowRule(p_gram,igram,irul,wTrace,FALSE,NULL,TRUE,FALSE,TRUE,FALSE);
+						err++;
+						}
+					ShowRule(p_gram,igram,jrul,wTrace,FALSE,NULL,TRUE,FALSE,TRUE,FALSE);
 					}
-				ShowRule(p_gram,igram,jrul,wTrace,FALSE,NULL,TRUE,FALSE,TRUE);
 				}
 			}
 		}
+	return(err == 0);
 	}
-return(err == 0);
-}
 
 
 int SameBuffer(tokenbyte **p_a,tokenbyte **p_b)
@@ -2278,6 +2281,6 @@ void CopyGramcompileToGram(int verbose) {
 	ReleaseGrammarSpace(&Gram_compile,FALSE);
 	if(trace_compile_grammar) {
 		BPPrintMessage(1,odInfo,"This is the grammar:");
-		DisplayGrammar(&Gram,wData,TRUE,TRUE);
+		DisplayGrammar(&Gram,wData,TRUE,TRUE,FALSE);
 		}
 	}

@@ -7,6 +7,32 @@ Chaque section référence le point correspondant dans `FEEDBACK_BERNARD.md` (te
 
 ---
 
+## 2026-06-14 — Intégration upstream Bernard v3.4.4 (`graphics-for-BP3`) + solde du sous-module
+
+Le working-tree était SALE (43 fichiers, ~846 lignes, non committés) depuis la session
+moteur-wasm antérieure. Enquête de provenance : ces modifications portent le moteur de
+**v3.4.2 (HEAD `f3fd899`) à v3.4.4** (`upstream/graphics-for-BP3` @ `d23b8c4`).
+
+- **17 fichiers /19 byte-identiques à l'upstream v3.4.4** : adoption propre (Compute.c,
+  DisplayThings.c, FillPhaseDiagram.c, GetRelease.c, ProduceItems.c, SetObjectFeatures.c,
+  TimeSet.c, DisplayArg.c, SaveLoads1.c, Polymetric.c, Strings.c, Inits.c, Interface2.c,
+  et les 4 en-têtes `-BP3*.h`).
+- **2 fichiers gardent un delta local** (working-tree plus ancien que v3.4.4) :
+  - `ConsoleMain.c` — `chmod 0775 → 0777` sur écriture de fichier (ajustement droits
+    système de fichiers natif). Bénin, conservé en l'état.
+  - `CompileGrammar.c` — ⚠️ **réactive `ReleaseAlphabetSpace()`** que Bernard a désactivé
+    le 2026-05-08 dans v3.4.4 (chemin du crash **#48** sur alphabets à tiret final `do4-`) ;
+    réactive aussi les messages « Alphabet is incorrect… » ; conserve la borne `MAXLIN`
+    au lieu de `strlen`. **Divergence connue vs v3.4.4 — à réconcilier lors d'une prochaine
+    synchro Bernard ; touche au comportement moteur, donc hors du présent solde.**
+
+`csrc/bp3/` et `source/BP3/` portent un jeu de modifications identique (miroir vérifié).
+**Aucun rebuild** : commit de la source uniquement, pour solder le sous-module sale.
+Le `dist` actuellement déployé provient déjà de cet arbre. Re-capture S0/snapshots
+interdite tant que les bugs #48-#52 ne sont pas résolus.
+
+---
+
 > **2026-04-05 — TOUS LES FIXES CI-DESSOUS ONT ÉTÉ INTÉGRÉS PAR BERNARD DANS SA V3.3.19**
 >
 > `csrc/bp3/` = `source/BP3/` (diff = 0). Ce changelog est maintenant un historique.

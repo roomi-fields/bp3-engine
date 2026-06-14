@@ -186,7 +186,7 @@ int main (int argc, char* args[]) {
 	
 	CreateStopFile();
 	SessionTime = clock();
-	if(!gOptions.seedProvided) ReseedOrShuffle(NEWSEED);
+	if(Seed == 0 && !gOptions.seedProvided) ReseedOrShuffle(NEWSEED);
 
 	CopyStringToTextHandle(TEH[wStartString],"S\n");
 
@@ -195,7 +195,6 @@ int main (int argc, char* args[]) {
 		result = PrepareTraceDestination(&gOptions);
 	if(result == OK)
 		result = PrepareWeightsDestination(&gOptions);
-
 
 	if(NoTracePath) {
     	ShowObjectGraph = ShowPianoRoll = ShowGraphic = FALSE;
@@ -345,7 +344,7 @@ CLEANUP:
         if(ProductionTime > 0) BPPrintMessage(0,odInfo, "Production time: %ld seconds\n",(long)ProductionTime);
         if(PhaseDiagramTime > 0) BPPrintMessage(0,odInfo, "Phase-diagram filling time: %ld seconds\n",(long)PhaseDiagramTime);
         if(TimeSettingTime > 0) BPPrintMessage(0,odInfo, "Time-setting time: %ld seconds\n",(long)TimeSettingTime);
-        if(current_time > SessionStartTime && !Panic) BPPrintMessage(0,odInfo, "Total computation time: %ld seconds\n",(long)(current_time-SessionStartTime));
+        if(!Analyzing && current_time > SessionStartTime && !Panic) BPPrintMessage(0,odInfo, "Total computation time: %ld seconds\n",(long)(current_time-SessionStartTime));
         }
 	CreateDoneFile();
 	free(eventStack);
@@ -902,8 +901,7 @@ int ParsePreInitArgs(int argc, char* args[], BPConsoleOpts* opts)
 	
 	Returns ABORT if an error occured or OK if program should continue.
  */
-int ParsePostInitArgs(int argc, char* args[], BPConsoleOpts* opts)
-{
+int ParsePostInitArgs(int argc, char* args[], BPConsoleOpts* opts) {
 	int argn = 1, arglen, w, resultinit, r;
 	int argDone;
 	action_t action = no_action;

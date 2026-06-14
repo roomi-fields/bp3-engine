@@ -112,6 +112,7 @@ void EmitTimedTokensItem(tokenbyte ***pp_buff, long kmax) {
                 midiKey = ExpandKey(midiKey, xpk, xpv);
                 if(trans != 0) TransposeKey(&midiKey, trans);
             }
+            note_name[0] = '\0';  /* init : si scale invalide PrintThisNote n'écrit pas (cf. WASM) */
             PrintThisNote(scale, midiKey, -1, -1, note_name);
             name = note_name;
         } else if(j > 1 && j < Jbol && p_Bol != NULL && (*p_Bol)[j] != NULL

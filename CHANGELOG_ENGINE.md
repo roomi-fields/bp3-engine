@@ -36,6 +36,10 @@ sur les snapshots `s3_timed` existants — AUCUNE re-capture, #48-#52 ouverts) :
   Improvize (±1). À réconcilier lors de la re-génération des oracles (après #48-#52).
 - **Note « durées à méfiance / ConsoleStubs » TRANCHÉE** : les durées natives sont fidèles ;
   les écarts viennent de correctifs post-hoc côté WASM, pas du timing. Note périmée.
+- **Divergence d'AFFICHAGE de nom** (one-scale, tryShruti) : sur gamme invalide
+  (`i_scale > NumberScales`), `PrintThisNote` natif n'écrit rien (nom vide) là où le WASM
+  rendait `<keynum>`. Timing identique. `note_name` est désormais initialisé à `""` avant
+  `PrintThisNote` (comme le WASM) pour éviter un buffer non initialisé. Le natif fait foi.
 
 ---
 

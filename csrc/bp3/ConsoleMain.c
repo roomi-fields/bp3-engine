@@ -48,6 +48,9 @@ char StopfileName[500] = {0};
 char PanicfileName[500] = {0};
 char PausefileName[500] = {0};
 char ContinuefileName[500] = {0};
+/* --tokensout <file> : dump JSON des timed-tokens en sortie native (oracle).
+   Vide = désactivé. Lu par EmitTimedTokensItem (TokensOut.c, natif-only). */
+char TokensOutFile[MAXLIN] = {0};
 
 // function prototypes
 void ConsoleInit(BPConsoleOpts* opts);
@@ -1011,6 +1014,17 @@ int ParsePostInitArgs(int argc, char* args[], BPConsoleOpts* opts) {
 						opts->outputFiles[ofiMidiFile].name = args[argn];
 						strcpy(PathToMidiFile,args[argn]);
 						opts->outOptsChanged = TRUE;
+						}
+					else {
+						BPPrintMessage(0,odError, "\n=> Missing filename after %s\n\n", args[argn-1]);
+						return ABORT;
+						}
+					}
+				else if(strcmp(args[argn], "--tokensout") == 0)	{
+					// dump JSON timed-tokens (oracle natif) — voir TokensOut.c
+					if(++argn < argc)  {
+						strncpy(TokensOutFile, args[argn], MAXLIN-1);
+						TokensOutFile[MAXLIN-1] = '\0';
 						}
 					else {
 						BPPrintMessage(0,odError, "\n=> Missing filename after %s\n\n", args[argn-1]);

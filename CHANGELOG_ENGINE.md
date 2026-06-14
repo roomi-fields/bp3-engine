@@ -7,6 +7,38 @@ Chaque section référence le point correspondant dans `FEEDBACK_BERNARD.md` (te
 
 ---
 
+## 2026-06-14 — Sérialiseur timed-tokens NATIF `--tokensout` (oracle unique)
+
+Cap : `hub/decisions/2026-06-14-oracle-natif-trois-voies.md` (oracle = bp3 natif).
+Le dump JSON des timed-tokens n'existait qu'en API WASM (`bp3_get_timed_tokens`,
+`csrc/wasm/bp3_api.c:760`). Port fidèle en sortie native :
+
+- **`ConsoleMain.c`** (partagé) : flag CLI `--tokensout <fichier>` → global `TokensOutFile`.
+  Symbole défini ici donc présent aussi dans le build WASM (inutilisé) — pas de rupture de lien.
+- **`PlayThings.c`** (natif-only) : appel après `TimeSet` (AVANT `MakeSound`), au même point
+  que le WASM (où MakeSound est désactivé) → iso par construction.
+- **`TokensOut.c`** (NOUVEAU, natif-only) : sérialiseur, port de `bp3_get_timed_tokens` en
+  verbose=0 (tokens sonnants — niveau des snapshots `s3_timed`). Reprend : scan T47/SSO depuis
+  `pp_buff`, offset Kpress `#35` (`Kpress>=2 → −Quantization`), résolution de nom via
+  `PrintThisNote`/`ExpandKey`/`TransposeKey`, filtre contrôles/non-sonnants. Format JSON
+  identique : `[{"token","start","end"}, …]`. Items concaténés (process CLI mono-coup).
+
+Build natif linux OK (TokensOut.o linké). Dépendance de build : `libasound2-dev`
+(installée sur PC2 ; `-BP3.h` inclut `<alsa/asoundlib.h>` sans condition côté Linux).
+
+**Parité de timing natif↔WASM confirmée** (`BPscript/test/s3_native.cjs`, lecture seule,
+sur les snapshots `s3_timed` existants — AUCUNE re-capture, #48-#52 ouverts) :
+- **12 MATCH exacts** dont not-reich (580), visser3 (401), mozart-dice (269), acceleration
+  (Kpress, 78), drum, graphics, time-patterns, livecode1, ames, harmony, vina.
+- **7 DIFF expliqués, hors sérialiseur** : visser5/visser-waves/visser-shapes = couches de
+  correction WASM NON portées (#33 dedup keep-longest, #35) — le natif émet TimeSet brut et
+  fait foi ; kss2/ruwet = divergences moteur connues (budget séparé) ; alan/beatrix-dice =
+  Improvize (±1). À réconcilier lors de la re-génération des oracles (après #48-#52).
+- **Note « durées à méfiance / ConsoleStubs » TRANCHÉE** : les durées natives sont fidèles ;
+  les écarts viennent de correctifs post-hoc côté WASM, pas du timing. Note périmée.
+
+---
+
 ## 2026-06-14 — Intégration upstream Bernard v3.4.4 (`graphics-for-BP3`) + solde du sous-module
 
 Le working-tree était SALE (43 fichiers, ~846 lignes, non committés) depuis la session

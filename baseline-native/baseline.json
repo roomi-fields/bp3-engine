@@ -1,8 +1,33 @@
 {
+ "version": "v2",
+ "figee_le": "2026-07-18",
+ "commit_v1": "579ca59",
+ "productibles": 86,
+ "midi": 52,
+ "texte": 34,
+ "muettes": 27,
+ "total": 113,
+ "ajoutees_depuis_v1": [
+  "dhati2",
+  "dhati3",
+  "gramgene1",
+  "gramgene2",
+  "polyphony1",
+  "simpletemplates",
+  "tryGOTO",
+  "tryLIN",
+  "tryflags2",
+  "tryflags3",
+  "trytemplates",
+  "trytemplates2"
+ ],
+ "perdues_depuis_v1": [],
+ "lot": "piste BP2 — 34 fichiers de reglages convertis (23 BP3-128 + 11 requis)",
  "date": "2026-07-18",
  "binaire": "bp3 v3.4.4 (graphics-for-BP3)",
  "seed": "1",
  "n": 113,
+ "maj": "2026-07-18 — 34 fichiers de reglages convertis (23 BP3-128 + 11 requis), 12 grammaires recuperees",
  "grammaires": [
   {
    "grammaire": "765432",
@@ -2050,6 +2075,5 @@
    "capture": "captures/watch.tokens.json",
    "categorie": null
   }
- ],
- "maj": "2026-07-18 — 34 fichiers de reglages convertis (23 BP3-128 + 11 requis), 12 grammaires recuperees"
+ ]
 }

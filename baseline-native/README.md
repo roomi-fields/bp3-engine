@@ -1,5 +1,20 @@
 # Baseline native « original » — jeu unique, daté, vérifié
 
+## 🔖 **baseline v2 — figée le 2026-07-18 — 86 productibles** (MIDI 52 + TEXTE 34), 27 muettes, 113 au total
+
+| version | figée le | productibles | commit |
+|---|---|---|---|
+| v1 | 2026-07-18 | 74 (MIDI 51 + TEXTE 23) | `579ca59` |
+| **v2** | **2026-07-18** | **86 (MIDI 52 + TEXTE 34)** | ce commit |
+
+**+12 depuis v1, 0 perdue.** Lot : piste BP2, 34 fichiers de réglages convertis.
+Ajoutées : `dhati2`, `dhati3`, `gramgene1`, `gramgene2`, `polyphony1`, `simpletemplates`,
+`tryGOTO`, `tryLIN`, `tryflags2`, `tryflags3`, `trytemplates`, `trytemplates2`.
+
+La baseline grandit **par lots signalés**, pas en continu : chaque version est figée, datée et
+annoncée. Une mesure de conformité doit citer la version sur laquelle elle s'appuie.
+
+
 Étape 1 du plan de reconstruction (demande architecte [80]). Remplace le fouillis
 `s1_native` / `s2_orig` / `s3_native`. **Aucun ancien oracle n'a été touché** : tout est créé
 ici, sous `baseline-native/`.

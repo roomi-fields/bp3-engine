@@ -21,6 +21,20 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
 - **M2** `ouvert` — Couches de correction WASM NON portées en natif : `#33` dédup keep-longest, `#35` offset Kpress, `#32` drift MIDI. Le natif émet le TimeSet brut (fait foi) ; documenter l'écart par cas.
 - **M3** `fait` — `PrintArg→FILE*` ne sort pas les NOMS de jetons (Bernard a commenté le `fprintf` de `Display()`, « Fixed by BB 2022-02-20 »). Conséquence : pas de flag `--textout` dédié possible proprement. Contourné : ordre des jetons texte = `produce -o` (sortie brute lossless). Voir memory `oracle-texte-option-o`.
 
+- **BPE-11** `ouvert` [P2] — CHARGEMENT `-cs` : BLOCAGE > 240 s. Sur `tryCsound` et `vina3`,
+  passer le fichier Csound declare en tete fait BOUCLER le moteur : aucune sortie, aucun message,
+  code 124 apres 240 s (mesure `/usr/bin/time` : 241,2 s). SANS `-cs`, les memes grammaires
+  echouent VITE et proprement : « Error code 15: argument syntax » sur `_ins(3)` / `_ins(Vina)`
+  (2 erreurs pour tryCsound, 1 pour vina3) — la fonction `_ins()` ne resout pas son instrument
+  sans les ressources Csound, ce qui est coherent.
+  REPRO : `./bp3 produce -e -gr <tryCsound sans INIT> --seed 1 -se test-data/-se.tryCsound
+  -cs test-data/-cs.tryCsound -o <sortie>` -> ne rend jamais la main.
+  NB : ces 2 grammaires etaient classees « TIMEOUT > 90 s » avant BPE-7 ; la conversion des
+  reglages a change leur comportement (echec rapide sans `-cs`), mais le blocage avec `-cs`
+  demeure. PAS root-cause : je ne sais pas encore si c'est une boucle infinie ou une lenteur
+  pathologique (cf. #50 `watch` ~257 s, possible meme famille). A instruire avant toute
+  remontee a Bernard.
+
 ## Délégué (action ailleurs, suivi)
 
 - **D1** `en-cours` — Tokeniseur « ordre texte » qui REFLÈTE BP3 (markers `=`/`:`, virgule `{N,…}`) — owner **bpscript** (utilitaire partagé). Si l'alignement exact demande du dev → leur backlog. Réf. CDC `hub/contrats/2026-06-16-sortie-production-texte-kanopi.md` §9.
@@ -92,7 +106,7 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   les utilisent sont toutes `php_ref.blocked` -> ecartees par s0_snapshot.cjs:174. Mais a leur
   deblocage il faudra aligner php_ref sur la valeur du fichier (pour Djinns et Mozartexpression
   j'ai verifie que la valeur du FICHIER est la bonne : production en do/mi/la = french).
-- **BPE-3** `bloqué` [P1] — PORTAGE-HO-CLI — ⚠ **RECADRE 2026-07-18, l'intitule etait trompeur** :  _(bloqué: RECADRE (intitule trompeur) : -ho n est PAS de l homomorphisme — c est l ANCIEN NOM du fichier ALPHABET (FileOldPrefix[1]=-ho. == FilePrefix[1]=-al., meme wAlphabet=1, -BP3main.h:389-392). Le CLI refuse -ho car ConsoleMain.c:925 ne teste que FilePrefix. Fix (A) = 5-10 lignes accepter les vieux prefixes (risque FAIBLE, couvre aussi -mi->-so). MAIS rendement mesure FAIBLE seul (1/10 produit). Le blocage dominant est BPE-6 (reglages vieux format). Homomorphisme = NON-SUJET pour ces grammaires (Atlas avait confirme la syntaxe, c est MOOT ici).)_
+- **BPE-3** `en-cours` [P1] — PORTAGE-HO-CLI — ⚠ **RECADRE 2026-07-18, l'intitule etait trompeur** :  _(en-cours: RESOLU EN DATA/CONFIG — zero C, zero decision Romain. bp3-engine (commit 2f01fbb) : les 11->13 grammaires recuperees par alphabet fourni (config php_ref.alphabet) + 5 fichiers -al derives des -ho (en-tete BP2 retire, corpus). Auto-correction : le mecanisme (C) 'en-tete -ho lu comme regle' etait FAUX (CompileGrammar.c:258 consulte FileOldPrefix, le -ho est deja saute) ; le gain venait de l alphabet. Le C n est necessaire pour AUCUNE. BPE-4 reste valide (-or. dans aucune table). Reliquat (A) accepter -ho au CLI = pur confort, non demande.)_
   `-ho` n'est PAS une feature d'homomorphisme a porter, c'est **l'ancien nom du fichier
   d'ALPHABET**. Preuve : `csrc/bp3/-BP3main.h:392` `FileOldPrefix[1] = "-ho."` vs
   `csrc/bp3/-BP3main.h:389` `FilePrefix[1] = "-al."`, meme index `wAlphabet` (`csrc/bp3/-BP3.h:591`) ;
@@ -137,3 +151,4 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
 - **BPE-7** `ouvert` [P1] — BPE-6 (BLOCAGE DOMINANT) : 84 fichiers -se.* en ANCIEN format BP2 positionnel (vs 59 JSON, 143 total). Le moteur ne lit QUE du JSON -> 'Could not parse JSON settings' (SaveLoads1.c:607) puis exit 0 SILENCIEUX, 0 octet = cargaison de faux 'natif produit rien'. Aucun convertisseur C ; seul le harnais JS convertit (convertOldSettings, s0_snapshot.cjs:44-110). OPTIONS : (a) porter convertOldSettings en C ; (b) convertir le corpus une fois ; (c) harnais convertit partout (mirror du PHP de Bernard). RECO archi = (c) : ni moteur ni corpus touches, on reflète les conditions standard Bernard. DECISION ROMAIN.
 - **BPE-8** `ouvert` [P2] — BPE-4 (-or. prefixe) : 7 grammaires bloquees par un prefixe -or. non reconnu ; retrait = 3 recuperees seches (Djinns 3671o, checkVolMasterSlave 91o, tryKeyXpand 581o). Une ligne. Faible risque.
 - **BPE-9** `ouvert` [P3] — BPE-5 (mojibake) : 3 fichiers -gr cassent la compilation car un mojibake (³ pour >=, Ê, Â) tombe DANS une regle (a, Mozartexpression, Rajeev ; + tryflags3). 20 -gr portent la signature mais seuls ceux ou elle est dans une regle cassent. Nettoyer l encodage.
+- **BPE-10** `ouvert` [P2] — BPE-7-RESIDU-NOTECONV : 3 fichiers -se.* (dhati2, koto1, tryWait) ont une convention de note HORS plage 0/1/2 (=5,5,3) apres conversion (position 47 lue ne contenait pas la convention). Post-JSON, la valeur du FICHIER gagne sur php_ref -> le fix doit etre DANS le fichier. FIX = determiner la BONNE convention par RECOUPEMENT de production (comme Djinns/Mozartexpression) et l ecrire dans le fichier ; si la grammaire est sans note (symboles seuls), retirer la cle (defaut). Affecte dhati2/dhati3/koto1/koto2 (produisent mais spelling possiblement faux).

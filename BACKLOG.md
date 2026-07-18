@@ -103,10 +103,22 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   ordre de 5-10 lignes, risque FAIBLE, couvre aussi `-mi.`->`-so.` ; (B) faire tolerer au
   compilateur d'alphabet l'en-tete BP2 des `-ho.*` (`V.2.5` / `Date: ...` — le `:` declenche
   « Can't accept character ':' in alphabet »), risque MOYEN car c'est la zone du bug #48.
-  ⚠ RENDEMENT REEL MESURE : sur 10 grammaires du lot testees avec reglages convertis + vrai
-  alphabet -ho, **1 seule** produit (tryhomomorphism, 42 o) ; les 9 autres echouent AVANT la
-  compilation, bloquees par BPE-6 (reglages ancien format). Donc porter -ho NE debloquera PAS
-  les 26 oracles. SEQUENCE RECOMMANDEE : BPE-6, puis BPE-4, puis BPE-3. : le CLI bp3 repond 'Unknown option -ho' -> 27 grammaires native-broken sont en fait BLOQUEES par l homomorphisme non porte au CLI (-ho.abc/abc1/checkhomo/cloches1/dhadhatite/dhin--/Frenchnotes/gramgene/keys/notes/tryKeyMap/tryKeyXpand/tryhomomorphism). Statut reel INDETERMINE tant que -ho pas porte. LIE a la decision design homomorphisme cyclique (chaines cyclic:true + depth%period, en attente arbitrage Romain).
+  ⚠⚠ RENDEMENT RE-MESURE 2026-07-18 APRES BPE-7 — MA PREMIERE ESTIMATION (1/10) ETAIT FAUSSE.
+  Elle etait biaisee deux fois : (i) je testais AVANT la conversion des reglages (BPE-7), donc
+  la plupart s'arretaient avant meme de compiler ; (ii) je ne COMMENTAIS PAS la ligne d'en-tete
+  `-ho.` de la grammaire — or cette ligne casse la compilation exactement comme `-or.` :
+  `-ho.` est dans FileOldPrefix, pas dans FilePrefix, donc GetRelease.c:1263 ne la saute pas et
+  le compilateur la lit comme une REGLE (« Error code 8 ... in gram#1 rule 1 »).
+  MESURE CORRECTE (ligne d'en-tete neutralisee + alphabet fourni) : **11 grammaires produisent**
+    via `-al.<X>` existant : checkSUB1 (4 o), dhati2 (248 o), dhati3 (254 o), koto2 (18 o),
+      tryflags3 (9 o), trytemplates (2724 o)
+    via le fichier `-ho.<X>` LUI-MEME comme alphabet, en-tete BP2 retire : dhadhatite (220 o),
+      koto1 (14 o), tryKeyMap (1791 o), trySrand (158 o), tryhomomorphism (42 o)
+  PORTEE DU CORRECTIF, PRECISEE : consulter `FileOldPrefix` EN PLUS de `FilePrefix` en DEUX
+  points — (A) parsing d'arguments `csrc/bp3/ConsoleMain.c:925` (accepter `-ho` en CLI) et
+  (C) saut des lignes d'en-tete `csrc/bp3/GetRelease.c:1263` (ne plus lire `-ho.` comme regle) ;
+  plus (B) tolerance de l'en-tete BP2 dans le compilateur d'alphabet (zone du bug #48).
+  SEQUENCE : BPE-6 (fait) > BPE-4 (fait) > **BPE-3 remonte en priorite** (11 grammaires). : le CLI bp3 repond 'Unknown option -ho' -> 27 grammaires native-broken sont en fait BLOQUEES par l homomorphisme non porte au CLI (-ho.abc/abc1/checkhomo/cloches1/dhadhatite/dhin--/Frenchnotes/gramgene/keys/notes/tryKeyMap/tryKeyXpand/tryhomomorphism). Statut reel INDETERMINE tant que -ho pas porte. LIE a la decision design homomorphisme cyclique (chaines cyclic:true + depth%period, en attente arbitrage Romain).
 - **BPE-7** `ouvert` [P1] — BPE-6 (BLOCAGE DOMINANT) : 84 fichiers -se.* en ANCIEN format BP2 positionnel (vs 59 JSON, 143 total). Le moteur ne lit QUE du JSON -> 'Could not parse JSON settings' (SaveLoads1.c:607) puis exit 0 SILENCIEUX, 0 octet = cargaison de faux 'natif produit rien'. Aucun convertisseur C ; seul le harnais JS convertit (convertOldSettings, s0_snapshot.cjs:44-110). OPTIONS : (a) porter convertOldSettings en C ; (b) convertir le corpus une fois ; (c) harnais convertit partout (mirror du PHP de Bernard). RECO archi = (c) : ni moteur ni corpus touches, on reflète les conditions standard Bernard. DECISION ROMAIN.
 - **BPE-8** `ouvert` [P2] — BPE-4 (-or. prefixe) : 7 grammaires bloquees par un prefixe -or. non reconnu ; retrait = 3 recuperees seches (Djinns 3671o, checkVolMasterSlave 91o, tryKeyXpand 581o). Une ligne. Faible risque.
 - **BPE-9** `ouvert` [P3] — BPE-5 (mojibake) : 3 fichiers -gr cassent la compilation car un mojibake (³ pour >=, Ê, Â) tombe DANS une regle (a, Mozartexpression, Rajeev ; + tryflags3). 20 -gr portent la signature mais seuls ceux ou elle est dans une regle cassent. Nettoyer l encodage.

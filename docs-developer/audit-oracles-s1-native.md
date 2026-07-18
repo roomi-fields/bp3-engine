@@ -81,3 +81,64 @@ alors que les oracles couvrent plusieurs lignes, ce qui produit de faux « diff�
 (`all-items`, `templates`, `checktemplates`, `tryAllItems*`…). Les 13 cas ci-dessus, eux, sont
 établis sur un critère non ambigu — le premier jeton est un mot de message — et ne dépendent
 pas de cette comparaison.
+
+---
+
+# Décompte fiable oracle-vs-binaire (demande [72])
+
+Méthode : **le script `s1_native.cjs` a été exécuté tel quel**, avec `fs.writeFileSync`
+intercepté pour qu'aucun snapshot ne soit écrit. Fidélité totale de la résolution de config,
+de la tokenisation et du filtre — c'est leur code, pas une réimplémentation.
+**Vérifié après coup : 0 fichier `s1_native.json` modifié.**
+
+Le signal de comparaison est celui du script lui-même : `writeSnapshot()` sort **sans écrire**
+quand le nouveau snapshot égale l'ancien (hors champ `date`). Donc :
+« pas d'écriture tentée » = le binaire courant reproduit l'oracle ; « écriture tentée » = il
+produit autre chose.
+
+## Résultat sur les 68 oracles rejouables
+
+| catégorie | n | sens |
+|---|---|---|
+| **reproductibles** | **42** | le binaire courant redonne exactement l'oracle |
+| **suspects** | **19** | le binaire produit autre chose |
+| skippés (exclus dans `grammars.json`) | 7 | non testés, exclusion déjà actée |
+
+8 des 76 n'ont pas pu être rejoués faute de clé dans `grammars.json` — dont `asymmetric1`
+et `checkNegativeContext`. Un oracle dont la grammaire n'est plus déclarée est lui-même un
+signal de provenance.
+
+**Les 19 suspects** : `MyMelody`, `blurb`, `check&`, `checkVolChan`, `dhadhatite1`, `dhati`,
+`dhin1`, `doeslittle`, `gramgene1`, `major-minor`, `mohanam`, `simpletemplates`,
+`transposition1`, `tryMIDIfile`, `tryObjects`, `tryPatternGrammar`, `tryRotate`, `trySrand`,
+`tunings`. **12 sur 19 ont un secours S0**, 7 n'en ont aucun.
+
+Les 7 skippés (`csound`, `dhin`, `livecode2`, `scales`, `transposition`, `tryConsoleMaxTime`,
+`vina3`) n'ont **aucun** secours S0. À noter : l'exclusion de `vina3` porte le motif
+« loading -cs.Vina causes total… » — c'est indépendamment le blocage que j'ai constaté en
+BPE-11.
+
+## ⚠ « Reproductible » ne veut pas dire « correct »
+
+`dhati2` et `dhati3` sont classés reproductibles **alors qu'ils font partie des 13 oracles
+pollués en tête** : le message console qu'ils contiennent est émis à chaque exécution et
+tokenisé pareil, donc l'oracle se reproduit — fidèlement faux.
+
+Les deux axes sont indépendants et doivent être croisés :
+
+| | reproductible | suspect | skippé | non rejouable |
+|---|---|---|---|---|
+| pollué en tête (13) | 2 | 5 | 4 | 2 |
+| propre en tête | 40 | 14 | 3 | 6 |
+
+**Le chiffre utilisable est donc : 40 oracles `s1_native` à la fois reproductibles et propres
+en tête**, sur 76. Soit **53 %**. Les 36 autres relèvent d'au moins un défaut — contenu
+divergent, pollution, exclusion, ou grammaire disparue de la configuration.
+
+## Ce que ça ne dit pas
+
+Un oracle « reproductible et propre » n'est pas certifié juste pour autant : il est cohérent
+avec le binaire **d'aujourd'hui**. Si le binaire a dérivé depuis la capture (64 des 76 datent
+de 2026-04), la cohérence peut être celle de deux erreurs qui coïncident. Trancher cela
+demanderait une référence externe — c'est précisément ce que les bugs #48-#52 interdisent de
+reconstruire pour l'instant.

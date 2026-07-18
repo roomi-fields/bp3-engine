@@ -48,4 +48,27 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   `/K1³200/`. `Ê` (espace insecable corrompu) : `-gr.Mozartexpression` -> « Can't make sense of
   "Êt13Ê=Ê104/100" », Error code 46. NB : S0 patche deja 2 mojibakes (`¥`->`.`, `ž`->`u`,
   s0_snapshot.cjs) mais pas ceux-ci — a corriger dans le corpus, pas dans le harnais.
-- **BPE-3** `ouvert` [P1] — PORTAGE-HO-CLI : le CLI bp3 repond 'Unknown option -ho' -> 27 grammaires native-broken sont en fait BLOQUEES par l homomorphisme non porte au CLI (-ho.abc/abc1/checkhomo/cloches1/dhadhatite/dhin--/Frenchnotes/gramgene/keys/notes/tryKeyMap/tryKeyXpand/tryhomomorphism). Statut reel INDETERMINE tant que -ho pas porte. LIE a la decision design homomorphisme cyclique (chaines cyclic:true + depth%period, en attente arbitrage Romain).
+- **BPE-6** `ouvert` [P1] — REGLAGES-ANCIEN-FORMAT-NON-LUS : le moteur ne lit QUE des reglages JSON.
+  Sur un `-se.*` au format BP2 positionnel il affiche « Could not parse JSON settings »
+  (`csrc/bp3/SaveLoads1.c:607`) puis s'arrete SILENCIEUSEMENT (exit 0, aucune phase « Compiling
+  grammar », 0 octet) — d'ou des faux « natif ne produit rien ». AUCUN convertisseur cote C
+  (grep : rien dans csrc/bp3). Seul le harnais JS convertit (`convertOldSettings`,
+  BPscript/test/s0_snapshot.cjs:44-110). AMPLEUR : **84 fichiers -se.* en ancien format contre
+  59 en JSON** (143 au total). C'est le blocage DOMINANT du bucket, devant -ho et -or.
+  Options : (a) porter convertOldSettings en C, (b) convertir le corpus une fois pour toutes,
+  (c) laisser au harnais. Arbitrage requis.
+- **BPE-3** `ouvert` [P1] — PORTAGE-HO-CLI — ⚠ **RECADRE 2026-07-18, l'intitule etait trompeur** :
+  `-ho` n'est PAS une feature d'homomorphisme a porter, c'est **l'ancien nom du fichier
+  d'ALPHABET**. Preuve : `csrc/bp3/-BP3main.h:392` `FileOldPrefix[1] = "-ho."` vs
+  `csrc/bp3/-BP3main.h:389` `FilePrefix[1] = "-al."`, meme index `wAlphabet` (`csrc/bp3/-BP3.h:591`) ;
+  les fichiers eux-memes se declarent « Alphabet file saved as '-ho.abc' ».
+  POURQUOI LE CLI REFUSE : `csrc/bp3/ConsoleMain.c:925` teste `strncmp(args[argn],FilePrefix[w],3)`
+  et JAMAIS `FileOldPrefix` -> « Unknown option '-ho' ».
+  EFFORT : (A) accepter les anciens prefixes au CLI = etendre cette boucle a `FileOldPrefix`,
+  ordre de 5-10 lignes, risque FAIBLE, couvre aussi `-mi.`->`-so.` ; (B) faire tolerer au
+  compilateur d'alphabet l'en-tete BP2 des `-ho.*` (`V.2.5` / `Date: ...` — le `:` declenche
+  « Can't accept character ':' in alphabet »), risque MOYEN car c'est la zone du bug #48.
+  ⚠ RENDEMENT REEL MESURE : sur 10 grammaires du lot testees avec reglages convertis + vrai
+  alphabet -ho, **1 seule** produit (tryhomomorphism, 42 o) ; les 9 autres echouent AVANT la
+  compilation, bloquees par BPE-6 (reglages ancien format). Donc porter -ho NE debloquera PAS
+  les 26 oracles. SEQUENCE RECOMMANDEE : BPE-6, puis BPE-4, puis BPE-3. : le CLI bp3 repond 'Unknown option -ho' -> 27 grammaires native-broken sont en fait BLOQUEES par l homomorphisme non porte au CLI (-ho.abc/abc1/checkhomo/cloches1/dhadhatite/dhin--/Frenchnotes/gramgene/keys/notes/tryKeyMap/tryKeyXpand/tryhomomorphism). Statut reel INDETERMINE tant que -ho pas porte. LIE a la decision design homomorphisme cyclique (chaines cyclic:true + depth%period, en attente arbitrage Romain).

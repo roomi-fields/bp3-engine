@@ -74,7 +74,7 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   -gr.tryTranspose (`¬`). RESULTAT : Mozartexpression RECUPEREE (0 erreur, 1255 o). Les 4 autres
   progressent sans passer (a: 4 err, tryflags3: 5, tryTranspose: 4, Rajeev: 27) — causes restantes
   distinctes, a trier.
-- **BPE-6/BPE-7** `bloqué` [P1] — REGLAGES-ANCIEN-FORMAT-NON-LUS : le moteur ne lit QUE des reglages JSON.
+- **BPE-6/BPE-7** `en-cours` [P1] — REGLAGES-ANCIEN-FORMAT-NON-LUS : le moteur ne lit QUE des reglages JSON.
   Sur un `-se.*` au format BP2 positionnel il affiche « Could not parse JSON settings »
   (`csrc/bp3/SaveLoads1.c:607`) puis s'arrete SILENCIEUSEMENT (exit 0, aucune phase « Compiling
   grammar », 0 octet) — d'ou des faux « natif ne produit rien ». AUCUN convertisseur cote C
@@ -114,7 +114,15 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   et je refuse de laisser un corpus partage a 40 % corrompu en attendant. BPE-2 (chaine de
   depart) est preserve, il est anterieur. BPE-10 (conventions hors-plage) est annule avec, il
   ne corrigeait qu'un symptome de cette meme conversion.
-  A REFAIRE quand bpscript aura livre le converter corrige (P1, leur territoire) : reconvertir
+  RECONVERSION PARTIELLE FAITE 2026-07-18 (garde de plausibilite bpscript 3476a55) : sur les 84
+  anciens, **28 eligibles reconvertis**, 56 laisses EN L'ETAT (23 a 128 lignes = anomalie de
+  layout non elucidee + 34 suspects de l'audit de plausibilite ; union = 56).
+  Audit apres reconversion : **0 valeur implausible** sur les 28.
+  GAIN MESURE, avant/apres ne differant QUE par ces 28 fichiers : **0 -> 8 grammaires
+  produisent** (Djinns 3671 o, tryKeyMap 1791 o, Mozartexpression 1255 o, tryKeyXpand 581 o,
+  tryRotate 229 o, dhadhatite 220 o, MyMelody 180 o, tryhomomorphism 42 o). **0 regression.**
+  RESTE : les 56 en attente — 23 sur l'anomalie 128 lignes, 34 sur la plausibilite.
+  Reliquat historique (P1, leur territoire) : reconvertir
   les 84, puis re-mesurer le gain (le « 0 -> 8 » annonce est CADUC tant que la conversion est fausse).
   ⚠ A SIGNALER A BPSCRIPT : 8 fichiers ont une convention de note propre qui DIFFERE du
   `php_ref.note_convention` que S0 leur forcait (-se.Djinns 1 vs 0, -se.Mozartexpression 1 vs 0,
@@ -165,7 +173,7 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   Reste eventuellement (A) accepter `-ho` en option CLI (ConsoleMain.c:925 ne consulte que
   FilePrefix) : PUR CONFORT, non necessaire — le harnais passe deja `-al <chemin>`.
   SEQUENCE : BPE-6 (fait) > BPE-4 (fait) > BPE-3 = data/config, PAS de C, PAS d'arbitrage. : le CLI bp3 repond 'Unknown option -ho' -> 27 grammaires native-broken sont en fait BLOQUEES par l homomorphisme non porte au CLI (-ho.abc/abc1/checkhomo/cloches1/dhadhatite/dhin--/Frenchnotes/gramgene/keys/notes/tryKeyMap/tryKeyXpand/tryhomomorphism). Statut reel INDETERMINE tant que -ho pas porte. LIE a la decision design homomorphisme cyclique (chaines cyclic:true + depth%period, en attente arbitrage Romain).
-- **BPE-7** `ouvert` [P1] — BPE-6 (BLOCAGE DOMINANT) : 84 fichiers -se.* en ANCIEN format BP2 positionnel (vs 59 JSON, 143 total). Le moteur ne lit QUE du JSON -> 'Could not parse JSON settings' (SaveLoads1.c:607) puis exit 0 SILENCIEUX, 0 octet = cargaison de faux 'natif produit rien'. Aucun convertisseur C ; seul le harnais JS convertit (convertOldSettings, s0_snapshot.cjs:44-110). OPTIONS : (a) porter convertOldSettings en C ; (b) convertir le corpus une fois ; (c) harnais convertit partout (mirror du PHP de Bernard). RECO archi = (c) : ni moteur ni corpus touches, on reflète les conditions standard Bernard. DECISION ROMAIN.
+- **BPE-7** `bloqué` [P1] — BPE-6 (BLOCAGE DOMINANT) : 84 fichiers -se.* en ANCIEN format BP2 positionnel (vs 59 JSON, 143 total). Le moteur ne lit QUE du JSON -> 'Could not parse JSON settings' (SaveLoads1.c:607) puis exit 0 SILENCIEUX, 0 octet = cargaison de faux 'natif produit rien'. Aucun convertisseur C ; seul le harnais JS convertit (convertOldSettings, s0_snapshot.cjs:44-110). OPTIONS : (a) porter convertOldSettings en C ; (b) convertir le corpus une fois ; (c) harnais convertit partout (mirror du PHP de Bernard). RECO archi = (c) : ni moteur ni corpus touches, on reflète les conditions standard Bernard. DECISION ROMAIN.  _(bloqué: REVERTE (commit cf53c6e) — convertOldSettings a un bug de LAYOUT (suppose 1 layout, corpus en a plusieurs) -> 34/84 fichiers (40%) corrompus (valeurs degenerees). bp3-engine a restaure le corpus pre-conversion, refuse de garder les 50 'plausibles' (heuristique != preuve). En attente du fix converter de bpscript (BPS-24) -> puis reconversion + re-audit plausibilite + re-mesure honnete. Le '+8' est CADUC.)_
 - **BPE-8** `ouvert` [P2] — BPE-4 (-or. prefixe) : 7 grammaires bloquees par un prefixe -or. non reconnu ; retrait = 3 recuperees seches (Djinns 3671o, checkVolMasterSlave 91o, tryKeyXpand 581o). Une ligne. Faible risque.
 - **BPE-9** `ouvert` [P3] — BPE-5 (mojibake) : 3 fichiers -gr cassent la compilation car un mojibake (³ pour >=, Ê, Â) tombe DANS une regle (a, Mozartexpression, Rajeev ; + tryflags3). 20 -gr portent la signature mais seuls ceux ou elle est dans une regle cassent. Nettoyer l encodage.
 - **BPE-10** (ANNULE avec BPE-7) `ouvert` [P2] — BPE-7-RESIDU-NOTECONV : 3 fichiers -se.* (dhati2, koto1, tryWait) ont une convention de note HORS plage 0/1/2 (=5,5,3) apres conversion (position 47 lue ne contenait pas la convention). Post-JSON, la valeur du FICHIER gagne sur php_ref -> le fix doit etre DANS le fichier. FIX = determiner la BONNE convention par RECOUPEMENT de production (comme Djinns/Mozartexpression) et l ecrire dans le fichier ; si la grammaire est sans note (symboles seuls), retirer la cle (defaut). Affecte dhati2/dhati3/koto1/koto2 (produisent mais spelling possiblement faux).

@@ -1,154 +1,172 @@
 # Baseline native « original » — jeu unique, daté, vérifié
 
-## 🔖 **baseline v3 — figée le 2026-07-18 — 88 productibles** (MIDI 54 + TEXTE 34), 25 muettes, 113 au total
+## 🔖 **baseline v5 — figée le 2026-07-18 — capture PAR ACTION**
 
-| version | figée le | productibles | commit |
+**89 productibles** (dont 1 sous réserve → **88 utilisables**), **24 muettes**, **113 au total**.
+Modes natifs : **MIDI 54** · **TEXTE 35**. Actions : **single 59** · **produce-all 30**.
+
+| version | figée le | productibles | MIDI | capture | commit |
+|---|---|---|---|---|---|
+| v1 | 2026-07-18 | 74 | 51 | répétition (N items) | `579ca59` |
+| v2 | 2026-07-18 | 86 | 52 | répétition (N items) | `7a970ac` |
+| v3 | 2026-07-18 | 88 | 54 | répétition (N items) | `b59091c` |
+| **v5** | **2026-07-18** | **89** | **54** | **par action** | ce commit |
+
+**v3 → v5 : +1 productible, 0 perdue, 0 changement de mode natif.** La seule grammaire
+gagnée est `look-and-say`, et elle est **sous réserve** (voir plus bas) : la baseline
+utilisable est donc **strictement identique en couverture** à v3, mais capturée correctement.
+
+> **Il n'y a pas de v4.** Une passe v4 a été produite puis **jetée sans être diffusée** :
+> elle faisait tomber le MIDI de 54 à 17. La raison est expliquée en fin de document —
+> c'est le fait technique le plus important de cette version.
+
+---
+
+## Ce qui change avec v5 : la capture se fait **par action**
+
+Application de la décision `2026-07-18-cardinalite-produce-all-settings-existant-scales`
+(ratifiée, GO Romain), volet ① : *les deux voies répliquent l'**action** du natif.*
+
+`baseline.json` expose donc, pour chaque grammaire, un champ **`action`** :
+
+| action | sens | capture |
+|---|---|---|
+| **`single`** | la grammaire **joue** un morceau | **une** réalisation, **1 item**, graine 1 |
+| **`produce-all`** | production purement **symbolique** | **l'ensemble** énuméré par le moteur |
+
+Champs d'accompagnement, pour que le consommateur voie *pourquoi* :
+`joue`, `items_enumeres`, `enumeration_refusee_par_le_moteur`.
+
+### Le choix de l'action n'est pas une heuristique : c'est le moteur qui tranche
+
+1. On demande d'abord **le jeu** (`produce`, un seul item). Si des jetons minutés sortent,
+   la grammaire joue → **`single`**.
+2. Sinon, production purement symbolique : on demande au moteur d'**énumérer**
+   (`produce-all`). S'il accepte → **`produce-all`**, on capture l'ensemble.
+3. S'il **refuse** — `Can't produce all items in 'SUB' or 'SUB1' or 'POSLONG'`,
+   `csrc/bp3/ProduceItems.c:770` — → **`single`** sur l'item unique.
+
+Aucune décision de notre part à aucune de ces trois étapes.
+
+### Fin de l'artefact de répétition
+
+Les versions v1–v3 capturaient N items (20, 25, 40 selon les réglages). Ce N ne venait
+**pas** de `-o` — qui n'est que le fichier de sortie — mais du réglage `MaxItemsProduce`
+(boucle `csrc/bp3/ProduceItems.c:207`, `:295`, `:1948`).
+
+Sur les 37 grammaires à plusieurs items en v3, **5 seulement** étaient de la vraie
+répétition (`checkBT` : 20 items, 1 seul distinct ; `livecode1`, `livecode2`, `tryObjects`,
+`tryMIDIfile`). Les **32 autres** donnaient des items **réellement différents** —
+`mozart-dice` : 40 sur 40 distincts. Ce n'étaient pas des artefacts, c'était le même
+morceau tiré N fois au hasard.
+
+En `single`, on force **un** item via une **copie** des réglages (`MaxItemsProduce=1`) —
+les fichiers d'origine ne sont jamais modifiés. **Vérifié** sur `koto2`, `gramgene1` et
+`mozart-dice` : l'item unique est **exactement le premier** de l'ancienne série de 20/25/40.
+Préfixe strict, aucun nouveau tirage.
+
+### `mozart-dice` : énumère 40, capturée en `single` — c'est voulu
+
+Elle offre 40 tirages distincts, mais le moteur **refuse** l'énumération dessus (`SUB`).
+Arbitrage architecte : on mesure **le jeu** — une réalisation sous graine fixe — pas les
+40 possibles. Même graine des deux côtés = même tirage = les voies doivent coïncider.
+Conforme à `iso-mesure-le-play`.
+
+---
+
+## ⚠ Pourquoi il n'y a pas de v4 : **l'énumération ne joue pas**
+
+Le fait technique à retenir de cette version.
+
+**`produce-all` n'émet jamais de jetons minutés.** Il énumère des chaînes de symboles ;
+il ne joue pas. La passe v4 demandait l'énumération **en premier** et gardait cette capture
+dès qu'elle réussissait — elle a donc remplacé le jeu par une liste de chaînes sur toutes
+les grammaires qui jouent. Résultat : **MIDI 54 → 17**, 37 grammaires privées de leur
+minutage. Passe **jetée, jamais diffusée**.
+
+Preuve — même grammaire, même graine, même configuration, seul le verbe change :
+
+| grammaire | `produce-all` | `produce` |
+|---|---|---|
+| `tunings` | 0 jeton, 1 item | **16 jetons** |
+| `koto3` | 0 jeton, 0 item | **2 jetons** |
+| `mohanam` | 0 jeton, 16 items | **27 jetons** |
+| `all-items` | 0 jeton, **12 items** | 0 jeton |
+
+La dernière ligne montre la coupure : `all-items` est purement symbolique, l'énumération
+est **sa** vraie action ; les trois autres jouent, et l'énumération leur ferait perdre le jeu.
+
+Le diagnostic vient de **bp3-frontend**, qui avait posé la bonne question avant la mesure :
+« capture d'`asymmetric` vide, MIDI déclaré mais énumération symbolique ? ». Réponse : oui.
+
+---
+
+## Concordance indépendante avec BPx
+
+BPx avait porté le dédoublonnage natif (`csrc/bp3/ProduceItems.c:1975-2038`) et refusait de
+réconcilier ses tests sur sa propre sortie. Les captures v5 tranchent, **au terminal près** :
+
+| grammaire | natif v5 | mesure BPx | ancienne référence |
 |---|---|---|---|
-| v1 | 2026-07-18 | 74 (MIDI 51 + TEXTE 23) | `579ca59` |
-| v2 | 2026-07-18 | 86 (MIDI 52 + TEXTE 34) | `7a970ac` |
-| **v3** | **2026-07-18** | **88 (MIDI 54 + TEXTE 34)** | ce commit |
+| `tryAllItems0` | 8 items / 20 term. | **8 / 20** | 16 / 40 |
+| `tryAllItems1` | 12 / 36 | **12 / 36** | 42 / 134 |
+| `tryPatternGrammar` | 4 / 52 | **4 / 52** | 24 / 312 |
 
-**+12 depuis v1, 0 perdue.** Lot : piste BP2, 34 fichiers de réglages convertis.
-Ajoutées : `dhati2`, `dhati3`, `gramgene1`, `gramgene2`, `polyphony1`, `simpletemplates`,
-`tryGOTO`, `tryLIN`, `tryflags2`, `tryflags3`, `trytemplates`, `trytemplates2`.
+Trois concordances exactes sur deux implémentations indépendantes : ce ne sont pas les
+sorties de BPx qui ont dérivé, ce sont les anciennes références qui étaient périmées.
 
-La baseline grandit **par lots signalés**, pas en continu : chaque version est figée, datée et
-annoncée. Une mesure de conformité doit citer la version sur laquelle elle s'appuie.
+⚠ **Piège** : `gramgene2` et `tryGOTO` ressortent en **`single`**, pas en `produce-all` —
+le moteur ne les énumère pas. Ne pas les traiter comme des ensembles.
 
-
-Étape 1 du plan de reconstruction (demande architecte [80]). Remplace le fouillis
-`s1_native` / `s2_orig` / `s3_native`. **Aucun ancien oracle n'a été touché** : tout est créé
-ici, sous `baseline-native/`.
-
-- **Binaire** : `./bp3` v3.4.4, issu de l'intégration Bernard `graphics-for-BP3` (commit `b094e18`).
-- **Date** : 2026-07-18 · **graine** : 1 · **113 grammaires** (toutes les entrées de
-  `grammars.json` hors `_comment`).
-- **Configuration** : déterministe, type S0 — `php_ref` fait autorité (alphabet / réglages /
-  tonalité / Csound + convention de note) ; à défaut, les dépendances déclarées en tête de
-  grammaire. `-ho.<X>` est traité comme l'ancien nom de l'alphabet.
-- **Fichiers** : `baseline.json` (données), `TABLEAU.md` (tableau lisible), `captures/`
-  (les captures elles-mêmes).
-
-## Compte par modalité
-
-| | n |
-|---|---|
-| **MIDI** (émet des jetons minutés) | **52** |
-| **TEXTE** (production symbolique seule) | **34** |
-| ne produit pas | **27** |
-| **total** | **113** |
+---
 
 ## La modalité est établie sur pièces, pas sur le champ déclaré
 
-Chaque grammaire est lancée **une fois avec les deux sorties** (`--tokensout` *et* `-o`), et la
-modalité retenue est celle qui produit réellement quelque chose.
+La modalité retenue est celle qui produit réellement quelque chose. **9 grammaires avaient
+une modalité déclarée fausse** (inchangé depuis v1) : `Alarm` (midi → TEXTE), `PP`,
+`checkSUB`, `checkSUB.new`, `koto3`, `major-minor`, `negative-context`, `transposition3`,
+`tunings` (toutes text → MIDI).
 
-⚠ **Nuance importante, à ne pas perdre** : `MIDI pur = 0`. Les 51 grammaires « MIDI » émettent
-**aussi** du texte — la sortie `-o` existe dès que la production aboutit. Le discriminant réel
-est donc : *émet-elle des jetons minutés en plus du texte ?* Les 23 « TEXTE » n'en émettent
-aucun.
+⚠ Nuance : **MIDI pur = 0**. Les 54 grammaires « MIDI » émettent **aussi** du texte. Le
+discriminant réel est : *émet-elle des jetons minutés en plus du texte ?*
 
-**9 grammaires avaient une modalité déclarée fausse** :
+## Réserve sur `look-and-say`
 
-| grammaire | déclaré | réel | jetons | mots |
-|---|---|---|---|---|
-| `Alarm` | midi | **TEXTE** | 0 | 26 |
-| `PP` | text | **MIDI** | 26 | 73 |
-| `checkSUB` | text | **MIDI** | 10 | 13 |
-| `checkSUB.new` | text | **MIDI** | 10 | 13 |
-| `koto3` | text | **MIDI** | 22 | 266 |
-| `major-minor` | text | **MIDI** | 24 | 2 |
-| `negative-context` | text | **MIDI** | 6 | 6 |
-| `transposition3` | text | **MIDI** | 66 | 30 |
-| `tunings` | text | **MIDI** | 16 | 16 |
-
-(`testHO2`, cité comme exemple dans la demande, est en réalité correctement déclarée `text` —
-et elle produit bien du texte.)
-
-## Les 39 qui ne produisent pas, par cause
-
-| n | cause | récupérable ? |
-|---|---|---|
-| **13** | réglages en ancien format, non convertis (lot en HOLD de BPE-7) | **oui**, dès la conversion finie |
-| 11 | erreurs de compilation | à trier une par une |
-| 5 | blocage > 90 s sans rendre la main | non — cf. BPE-11 |
-| 3 | aucune sortie, aucun message discriminant | à instruire |
-| 2 | bug moteur #51/#52 (« all weights are nil ») — `Nadaka1`, `look-and-say` | non, amont |
-| 2 | boucle de dérivation (« Calculation overflow, 10000 derivations ») — `checkcontext`, `tryConsoleMaxTime` | non |
-| 2 | fichier Csound déclaré introuvable — `scales`, `tryShruti` | oui, corpus |
-| 1 | mojibake corpus (`Æ1`) — `trySerial` | oui, corpus |
-
-**Le premier gisement est identifié et chiffré : 13 grammaires reviendront dès que les 56
-fichiers de réglages en HOLD seront convertis** (23 au format BP3-128 + 34 suspects de
-plausibilité). C'est le lien direct entre cette baseline et la piste BP2 restée ouverte.
+Seule grammaire gagnée depuis v3, et **inutilisable comme référence** : sa sortie est le
+seul terminal de départ (`'1'`), aucune règle n'a été appliquée. Le bug moteur **#51**
+(« all weights are nil ») reste actif. Elle est marquée `reserve` dans `baseline.json`.
 
 ## Ce que cette baseline est, et ce qu'elle n'est pas
 
-**Elle est** : un état de référence reproductible du binaire courant, à configuration explicite
-et graine fixe, avec une modalité établie sur pièces et un statut motivé pour chaque grammaire.
+**Elle est** : un état de référence reproductible du binaire courant, à configuration
+explicite et graine fixe, avec une action et une modalité établies sur pièces et un statut
+motivé pour chaque grammaire.
 
 **Elle n'est pas** : une certification de justesse. Elle dit ce que le moteur produit
 aujourd'hui, pas ce qu'il devrait produire. Les grammaires touchées par les bugs #48-#52
-produisent une sortie *capturée ici* mais dont la valeur reste sujette à caution — la re-capture
-des anciens oracles reste interdite tant que ces bugs sont ouverts, et cette baseline ne les
-remplace pas sur ce point.
+produisent une sortie *capturée ici* mais dont la valeur reste sujette à caution — la
+re-capture des anciens oracles reste interdite tant que ces bugs sont ouverts, et cette
+baseline ne les remplace pas sur ce point.
 
-## Reproduire
+## Configuration et reproduction
 
-`scratchpad/baseline.py` de la session. Le protocole tient en trois points : grammaire nettoyée
-(en-tête BP2 coupé, lignes `INIT:` retirées), configuration `php_ref`, un seul run par grammaire
-avec `-o` et `--tokensout` simultanés.
+- **Binaire** : `./bp3` v3.4.4, intégration Bernard `graphics-for-BP3` (commit `b094e18`).
+- **Graine** : 1 · **113 grammaires** (toutes les entrées de `grammars.json` hors `_comment`).
+- **Configuration** : `php_ref` fait autorité (alphabet / réglages / tonalité / Csound +
+  convention de note) ; à défaut, les dépendances déclarées en tête de grammaire.
+  `-ho.<X>` est traité comme l'ancien nom de l'alphabet.
+- **Protocole** : grammaire nettoyée (en-tête BP2 coupé, lignes `INIT:` retirées), un run
+  par action, `-o` et `--tokensout` simultanés. Script : `scratchpad/baseline_action.py`.
+- **Fichiers** : `baseline.json` (données), `TABLEAU.md` (tableau lisible), `captures/`.
 
 ## Deux captures tronquées
 
 `livecode2` (815 Mo) et `tryRagas` (76 Mo) produisent un volume pathologique — déjà signalé
 en alerte volume. Leur capture est **tronquée à 2 Mo** pour rester versionnable ; un fichier
 `.TRONQUEE.txt` à côté donne la taille réelle et l'empreinte sha256 du fichier complet.
-Ces deux-là ne doivent pas servir de référence en l'état : le volume est à instruire d'abord.
+Ces deux-là ne doivent pas servir de référence en l'état.
 
-## MAJ 2026-07-18 — piste BP2 : 12 grammaires récupérées
+## Les 24 muettes
 
-34 fichiers de réglages convertis : les **23 au format BP3-128** puis les **11** dont dépendaient
-les grammaires muettes. Résultat : **51/23/39 → 52/34/27**, soit **+12 productrices, 0 régression**.
-
-Revenues : `dhati2`, `dhati3` (80 mots), `gramgene1` (884), `gramgene2` (372), `polyphony1` (73),
-`simpletemplates` (**MIDI**, 16 jetons), `tryGOTO`, `tryLIN`, `tryflags2` (25 chacune),
-`tryflags3` (2), `trytemplates` (442), `trytemplates2` (660).
-
-**Plus aucune grammaire n'est bloquée par le format des réglages.** Le 13ᵉ attendu, `blurb`,
-a bien vu ses réglages convertis mais bascule sur une autre cause : blocage > 90 s.
-
-⚠ **Réserve à connaître sur ces 11 fichiers** : leurs layouts sont anciens (`V.2.5`, `BP2.6.1`)
-et ne correspondent pas à la carte du convertisseur. La garde de plausibilité de bpscript a donc
-**écarté 5 à 6 champs par fichier** (`MaxConsoleTime`, `C4key`, `A4freq`, `VolumeController`,
-`SamplingRate`, parfois `DefaultBlockKey`), qui retombent sur les défauts du moteur — lesquels
-sont les valeurs standard (C4key 60, A4freq 440). Les grammaires produisent, mais ces réglages
-sont **partiels**, pas intégralement fidèles à l'original. Une conversion complète exigerait les
-cartes par version (`if(iv > N)`), cf. `docs-developer/format-se-bp2/`.
-
-Le décalage de 2 lignes dû à l'en-tête `V.x`/`Date:` a été testé et **écarté** : il ne rend pas
-les valeurs plausibles sur ces fichiers. Le problème est bien le layout, pas un offset.
-
-## MAJ v3 — mojibake du corpus : +2 grammaires
-
-Deux corruptions d'encodage corrigées dans les grammaires, cibles **documentées**, pas devinées :
-
-- `Æ` → `t` — noms de motifs temporels. `BP3_help.txt:620` : « Time patterns always start with
-  't' followed with digits », et `BP3_help.txt:1581` donne l'exemple **identique** à la ligne
-  corrompue : `a b _retro {t1 t2 t3,f g}`. (`-gr.trySerial`)
-- `¥` → `.` — délimiteur de temps. C'est la substitution que le harnais S0 applique déjà
-  (`replace(/¥/g,'.')` dans `s0_snapshot.cjs`), et le point est documenté comme délimiteur de
-  battement. (`-gr.trySerial`, `-gr.doeslittle`)
-
-Revenues : **`trySerial`** (MIDI, 8 jetons), **`doeslittle`** (MIDI, 7 jetons).
-Plus aucun `Æ` ni `¥` dans le corpus.
-
-### Correction d'une catégorisation erronée de v2
-
-v2 annonçait « 2 fichiers Csound introuvables — récupérables ». **C'est faux, et je le corrige :**
-`-cs.tryShruti` et `-cs.tryScales` existent bien (ils viennent de l'arbre amont de Bernard), mais
-sont dans un format textuel que le moteur ne lit pas. Surtout, ce n'était pas la vraie cause :
-sans le Csound, `tryShruti` et `scales` échouent quand même sur des terminaux microtonaux
-inconnus (`sa_4`, `fap3`) que le fichier de tonalité ne résout pas non plus.
-**Ces deux-là relèvent de M1** (backlog : « nom de terminal vide sur gamme invalide »), déjà
-ouvert et en attente d'arbitrage. Ce ne sont **pas** des gains rapides.
+Le détail motivé, grammaire par grammaire, est dans `TABLEAU.md`. Le prochain lot annoncé
+reste le **tri des 11 erreurs de compilation**.

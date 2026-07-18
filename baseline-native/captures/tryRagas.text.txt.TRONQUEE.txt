@@ -1,4 +1,3 @@
-Capture TRONQUEE a 2000000 octets pour rester versionnable.
-Taille reelle de la production : 79820680 octets (76.1 Mo)
-Empreinte sha256 (16 car.) du fichier COMPLET : d877fc158c237881
-Production pathologique — cf. alerte volume, a instruire avant tout usage comme reference.
+capture tronquee a 2097152 octets
+taille reelle : 79820680 octets
+sha256 complet : d877fc158c237881bcea0cb46c7c76ceab0c551a357faf0738b188864ec87dae

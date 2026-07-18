@@ -1,115 +1,112 @@
 {
- "version": "v3",
+ "version": "v5",
  "figee_le": "2026-07-18",
- "commit_v1": "579ca59",
- "productibles": 88,
- "midi": 54,
- "texte": 34,
- "muettes": 25,
- "total": 113,
- "ajoutees_depuis_v1": [
-  "dhati2",
-  "dhati3",
-  "gramgene1",
-  "gramgene2",
-  "polyphony1",
-  "simpletemplates",
-  "tryGOTO",
-  "tryLIN",
-  "tryflags2",
-  "tryflags3",
-  "trytemplates",
-  "trytemplates2"
- ],
- "perdues_depuis_v1": [],
- "lot": "corpus — mojibake Æ->t (motifs temporels, BP3_help.txt:620) et ¥->. (delimiteur de temps)",
  "date": "2026-07-18",
  "binaire": "bp3 v3.4.4 (graphics-for-BP3)",
  "seed": "1",
  "n": 113,
- "maj": "2026-07-18 — 34 fichiers de reglages convertis (23 BP3-128 + 11 requis), 12 grammaires recuperees",
+ "capture": "par ACTION : single (le jeu, 1 item, graine fixe) des que la grammaire joue ; produce-all (l ensemble) pour les grammaires purement symboliques quand le moteur accepte d enumerer",
+ "productibles": 89,
+ "produce_all": 30,
+ "single": 59,
  "grammaires": [
   {
    "grammaire": "765432",
    "source": "-gr.765432",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
    "jetons_midi": 823,
    "mots_texte": 1405,
    "items": 1,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": true,
+   "joue": true,
    "config": {
     "-se": "-se.765432"
    },
    "convention": "french",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/765432.tokens.json",
-   "categorie": null
+   "capture": "captures/765432.tokens.json"
   },
   {
    "grammaire": "Alarm",
    "source": "-gr.Alarm",
+   "action": "single",
    "modalite": "TEXTE",
    "produit": true,
    "raison": null,
    "jetons_midi": 0,
    "mots_texte": 26,
    "items": 1,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": true,
+   "joue": false,
    "config": {
     "-al": "-ho.Frenchnotes"
    },
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/Alarm.text.txt",
-   "categorie": null
+   "capture": "captures/Alarm.text.txt"
   },
   {
    "grammaire": "Djinns",
    "source": "-gr.Djinns",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
    "jetons_midi": 895,
    "mots_texte": 851,
    "items": 1,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": true,
+   "joue": true,
    "config": {
     "-se": "-se.Djinns"
    },
    "convention": "french",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/Djinns.tokens.json",
-   "categorie": null
+   "capture": "captures/Djinns.tokens.json"
   },
   {
    "grammaire": "Mozartexpression",
    "source": "-gr.Mozartexpression",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
    "jetons_midi": 251,
    "mots_texte": 27,
    "items": 1,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": true,
+   "joue": true,
    "config": {
     "-se": "-se.Mozartexpression"
    },
    "convention": "french",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/Mozartexpression.tokens.json",
-   "categorie": null
+   "capture": "captures/Mozartexpression.tokens.json"
   },
   {
    "grammaire": "MyMelody",
    "source": "-gr.MyMelody",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
    "jetons_midi": 31,
    "mots_texte": 31,
    "items": 1,
+   "items_enumeres": 20,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-se": "-se.765432",
     "-al": "-ho.Frenchnotes"
@@ -117,36 +114,42 @@
    "convention": "french",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/MyMelody.tokens.json",
-   "categorie": null
+   "capture": "captures/MyMelody.tokens.json"
   },
   {
    "grammaire": "Nadaka-1er-essai",
    "source": "-gr.Nadaka-1er-essai",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
    "jetons_midi": 4,
    "mots_texte": 4,
    "items": 1,
+   "items_enumeres": 1,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-se": "-se.hamsad"
    },
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/Nadaka-1er-essai.tokens.json",
-   "categorie": null
+   "capture": "captures/Nadaka-1er-essai.tokens.json"
   },
   {
    "grammaire": "Nadaka1",
    "source": "-gr.Nadaka1",
+   "action": null,
    "modalite": null,
    "produit": false,
-   "raison": "=> Cannot create path to the expected '_stop' file because no Trace path has bee",
+   "raison": "=> Cannot produce items because all weights are nil in gram#1",
    "jetons_midi": 0,
    "mots_texte": 0,
    "items": 0,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.hamsad"
    },
@@ -158,12 +161,16 @@
   {
    "grammaire": "PP",
    "source": "-gr.PP",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
-   "jetons_midi": 26,
-   "mots_texte": 73,
-   "items": 16,
+   "jetons_midi": 2,
+   "mots_texte": 9,
+   "items": 1,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-se": "-se.koto3",
     "-al": "-al.abc"
@@ -171,18 +178,21 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/PP.tokens.json",
-   "categorie": null
+   "capture": "captures/PP.tokens.json"
   },
   {
    "grammaire": "Rajeev",
    "source": "-gr.Rajeev",
+   "action": null,
    "modalite": null,
    "produit": false,
-   "raison": "27 erreur(s) de compilation : => Cannot create path to the expected '_stop' file because no Trace pa",
+   "raison": "27 erreur(s) de compilation : Variable must start with uppercase character or '|'. Can't make sense ",
    "jetons_midi": 0,
    "mots_texte": 0,
    "items": 0,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.Rajeev"
    },
@@ -194,12 +204,16 @@
   {
    "grammaire": "a",
    "source": "-gr.a",
+   "action": null,
    "modalite": null,
    "produit": false,
-   "raison": "4 erreur(s) de compilation : => Cannot create path to the expected '_stop' file because no Trace pa",
+   "raison": "4 erreur(s) de compilation : Error code 52: Missing slash after /flag/ in gram#2 rule 3",
    "jetons_midi": 0,
    "mots_texte": 0,
    "items": 0,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {},
    "convention": "english",
    "config_source": "php_ref",
@@ -209,12 +223,16 @@
   {
    "grammaire": "a.html",
    "source": "-gr.a.html",
+   "action": null,
    "modalite": null,
    "produit": false,
-   "raison": "6 erreur(s) de compilation : => Cannot create path to the expected '_stop' file because no Trace pa",
+   "raison": "6 erreur(s) de compilation : Error code 8: incorrect expression or bad derivation in gram#1 rule 1",
    "jetons_midi": 0,
    "mots_texte": 0,
    "items": 0,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {},
    "convention": "english",
    "config_source": "php_ref",
@@ -224,120 +242,142 @@
   {
    "grammaire": "acceleration",
    "source": "-gr.acceleration",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
    "jetons_midi": 78,
    "mots_texte": 100,
    "items": 1,
+   "items_enumeres": 1,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-se": "-se.Visser2"
    },
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/acceleration.tokens.json",
-   "categorie": null
+   "capture": "captures/acceleration.tokens.json"
   },
   {
    "grammaire": "acceleration_v2",
    "source": "-gr.acceleration",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
    "jetons_midi": 78,
    "mots_texte": 100,
    "items": 1,
+   "items_enumeres": 1,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-se": "-se.Visser2"
    },
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/acceleration_v2.tokens.json",
-   "categorie": null
+   "capture": "captures/acceleration_v2.tokens.json"
   },
   {
    "grammaire": "alan-dice",
    "source": "-gr.Alan",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
-   "jetons_midi": 5069,
-   "mots_texte": 3421,
-   "items": 20,
+   "jetons_midi": 270,
+   "mots_texte": 181,
+   "items": 1,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": true,
+   "joue": true,
    "config": {
     "-se": "-se.Alan"
    },
    "convention": "french",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/alan-dice.tokens.json",
-   "categorie": null
+   "capture": "captures/alan-dice.tokens.json"
   },
   {
    "grammaire": "all-items",
    "source": "-gr.tryAllItems",
+   "action": "produce-all",
    "modalite": "TEXTE",
    "produit": true,
    "raison": null,
    "jetons_midi": 0,
    "mots_texte": 36,
    "items": 12,
+   "items_enumeres": 12,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.tryAllItems"
    },
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/all-items.text.txt",
-   "categorie": null
+   "capture": "captures/all-items.text.txt"
   },
   {
    "grammaire": "all-items1",
    "source": "-gr.tryAllItems1",
+   "action": "produce-all",
    "modalite": "TEXTE",
    "produit": true,
    "raison": null,
    "jetons_midi": 0,
    "mots_texte": 36,
    "items": 12,
+   "items_enumeres": 12,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.tryAllItems1"
    },
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/all-items1.text.txt",
-   "categorie": null
+   "capture": "captures/all-items1.text.txt"
   },
   {
    "grammaire": "ames",
    "source": "-gr.Ames",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
    "jetons_midi": 11,
    "mots_texte": 7,
    "items": 1,
+   "items_enumeres": 1,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-se": "-se.Ames"
    },
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/ames.tokens.json",
-   "categorie": null
+   "capture": "captures/ames.tokens.json"
   },
   {
    "grammaire": "asymmetric",
    "source": "-gr.asymmetric1",
+   "action": "single",
    "modalite": "TEXTE",
    "produit": true,
    "raison": null,
    "jetons_midi": 0,
-   "mots_texte": 318,
-   "items": 20,
+   "mots_texte": 15,
+   "items": 1,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.asymmetric1",
     "-al": "-al.asymmetric1"
@@ -345,36 +385,42 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/asymmetric.text.txt",
-   "categorie": null
+   "capture": "captures/asymmetric.text.txt"
   },
   {
    "grammaire": "beatrix-dice",
    "source": "-gr.Beatrix",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
-   "jetons_midi": 5069,
-   "mots_texte": 3381,
-   "items": 20,
+   "jetons_midi": 270,
+   "mots_texte": 179,
+   "items": 1,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": true,
+   "joue": true,
    "config": {
     "-se": "-se.Beatrix"
    },
    "convention": "french",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/beatrix-dice.tokens.json",
-   "categorie": null
+   "capture": "captures/beatrix-dice.tokens.json"
   },
   {
    "grammaire": "bells",
    "source": "-gr.bells",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
    "jetons_midi": 16,
    "mots_texte": 17,
    "items": 1,
+   "items_enumeres": 1,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-se": "-se.cloches",
     "-al": "-ho.cloches1"
@@ -382,18 +428,21 @@
    "convention": null,
    "config_source": "en-tete",
    "declare": "midi",
-   "capture": "captures/bells.tokens.json",
-   "categorie": null
+   "capture": "captures/bells.tokens.json"
   },
   {
    "grammaire": "blurb",
    "source": "-gr.blurb",
+   "action": "single",
    "modalite": null,
    "produit": false,
    "raison": "blocage (> 90 s sans rendre la main)",
    "jetons_midi": 0,
    "mots_texte": 0,
    "items": 0,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.blurb",
     "-cs": "-cs.tryCsound"
@@ -406,30 +455,37 @@
   {
    "grammaire": "check&",
    "source": "-gr.check&",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
    "jetons_midi": 4,
    "mots_texte": 6,
    "items": 1,
+   "items_enumeres": 7,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-se": "-se.765432"
    },
    "convention": "french",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/check_.tokens.json",
-   "categorie": null
+   "capture": "captures/check_.tokens.json"
   },
   {
    "grammaire": "checkAllCsound",
    "source": "-gr.checkAllCsound",
+   "action": null,
    "modalite": null,
    "produit": false,
-   "raison": "30 erreur(s) de compilation : => Cannot create path to the expected '_stop' file because no Trace pa",
+   "raison": "30 erreur(s) de compilation : => You probably forgot to create or load a '-cs' instrument file",
    "jetons_midi": 0,
    "mots_texte": 0,
    "items": 0,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.checkAllCsound"
    },
@@ -441,12 +497,16 @@
   {
    "grammaire": "checkBT",
    "source": "-gr.checkBT",
+   "action": "produce-all",
    "modalite": "TEXTE",
    "produit": true,
    "raison": null,
    "jetons_midi": 0,
-   "mots_texte": 80,
-   "items": 20,
+   "mots_texte": 4,
+   "items": 1,
+   "items_enumeres": 1,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.koto3",
     "-al": "-al.abc1"
@@ -454,18 +514,21 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/checkBT.text.txt",
-   "categorie": null
+   "capture": "captures/checkBT.text.txt"
   },
   {
    "grammaire": "checkHomo",
    "source": "-gr.checkHomo",
+   "action": null,
    "modalite": null,
    "produit": false,
-   "raison": "=> Cannot create path to the expected '_stop' file because no Trace path has bee",
+   "raison": "=> Can't compile alphabet",
    "jetons_midi": 0,
    "mots_texte": 0,
    "items": 0,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-al": "-ho.checkhomo"
    },
@@ -477,48 +540,58 @@
   {
    "grammaire": "checkSUB",
    "source": "-gr.checkSUB",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
    "jetons_midi": 10,
    "mots_texte": 13,
    "items": 1,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-al": "-al.abc"
    },
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/checkSUB.tokens.json",
-   "categorie": null
+   "capture": "captures/checkSUB.tokens.json"
   },
   {
    "grammaire": "checkSUB.new",
    "source": "-gr.checkSUB.new",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
    "jetons_midi": 10,
    "mots_texte": 13,
    "items": 1,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-al": "-al.abc"
    },
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/checkSUB.new.tokens.json",
-   "categorie": null
+   "capture": "captures/checkSUB.new.tokens.json"
   },
   {
    "grammaire": "checkSUB1",
    "source": "-gr.checkSUB1",
+   "action": "single",
    "modalite": "TEXTE",
    "produit": true,
    "raison": null,
    "jetons_midi": 0,
    "mots_texte": 2,
    "items": 1,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": true,
+   "joue": false,
    "config": {
     "-se": "-se.checkSUB1",
     "-al": "-al.abc"
@@ -526,18 +599,21 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/checkSUB1.text.txt",
-   "categorie": null
+   "capture": "captures/checkSUB1.text.txt"
   },
   {
    "grammaire": "checkVolChan",
    "source": "-gr.checkVolChan",
+   "action": null,
    "modalite": null,
    "produit": false,
-   "raison": "6 erreur(s) de compilation : => Cannot create path to the expected '_stop' file because no Trace pa",
+   "raison": "6 erreur(s) de compilation : => Incorrect note. (May be wrong note convention)",
    "jetons_midi": 0,
    "mots_texte": 0,
    "items": 0,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-al": "-ho.Frenchnotes"
    },
@@ -549,28 +625,35 @@
   {
    "grammaire": "checkVolMasterSlave",
    "source": "-gr.checkVolMasterSlave",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
    "jetons_midi": 6,
    "mots_texte": 12,
    "items": 1,
+   "items_enumeres": 1,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {},
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/checkVolMasterSlave.tokens.json",
-   "categorie": null
+   "capture": "captures/checkVolMasterSlave.tokens.json"
   },
   {
    "grammaire": "checkcontext",
    "source": "-gr.checkcontext",
+   "action": null,
    "modalite": null,
    "produit": false,
-   "raison": "=> Cannot create path to the expected '_stop' file because no Trace path has bee",
+   "raison": "=> Calculation overflow (10000 derivations): task abandoned. Loop?",
    "jetons_midi": 0,
    "mots_texte": 0,
    "items": 0,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.koto3",
     "-al": "-al.abc"
@@ -583,12 +666,16 @@
   {
    "grammaire": "checkhomo2",
    "source": "-gr.checkhomo2",
+   "action": null,
    "modalite": null,
    "produit": false,
-   "raison": "=> Cannot create path to the expected '_stop' file because no Trace path has bee",
+   "raison": "=> Can't compile alphabet",
    "jetons_midi": 0,
    "mots_texte": 0,
    "items": 0,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-al": "-ho.checkhomo"
    },
@@ -600,12 +687,16 @@
   {
    "grammaire": "checkrests",
    "source": "-gr.checkrests",
+   "action": null,
    "modalite": null,
    "produit": false,
-   "raison": "12 erreur(s) de compilation : => Cannot create path to the expected '_stop' file because no Trace pa",
+   "raison": "12 erreur(s) de compilation : Variable must start with uppercase character or '|'. Can't make sense ",
    "jetons_midi": 0,
    "mots_texte": 0,
    "items": 0,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {},
    "convention": "english",
    "config_source": "php_ref",
@@ -615,12 +706,16 @@
   {
    "grammaire": "cloches1",
    "source": "-gr.cloches1",
+   "action": "single",
    "modalite": null,
    "produit": false,
    "raison": "blocage (> 90 s sans rendre la main)",
    "jetons_midi": 0,
    "mots_texte": 0,
    "items": 0,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.cloches",
     "-al": "-ho.cloches1"
@@ -633,12 +728,16 @@
   {
    "grammaire": "csound",
    "source": "-gr.tryCsound",
+   "action": "single",
    "modalite": null,
    "produit": false,
    "raison": "blocage (> 90 s sans rendre la main)",
    "jetons_midi": 0,
    "mots_texte": 0,
    "items": 0,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.tryCsound",
     "-cs": "-cs.tryCsound"
@@ -651,12 +750,16 @@
   {
    "grammaire": "destru",
    "source": "-gr.tryDESTRU",
+   "action": "produce-all",
    "modalite": "TEXTE",
    "produit": true,
    "raison": null,
    "jetons_midi": 0,
-   "mots_texte": 44,
-   "items": 1,
+   "mots_texte": 48,
+   "items": 2,
+   "items_enumeres": 2,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.tryDESTRU",
     "-al": "-al.abc"
@@ -664,18 +767,21 @@
    "convention": "french",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/destru.text.txt",
-   "categorie": null
+   "capture": "captures/destru.text.txt"
   },
   {
    "grammaire": "dhadhatite",
    "source": "-gr.dhadhatite",
+   "action": "produce-all",
    "modalite": "TEXTE",
    "produit": true,
    "raison": null,
    "jetons_midi": 0,
-   "mots_texte": 32,
-   "items": 4,
+   "mots_texte": 2,
+   "items": 1,
+   "items_enumeres": 1,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.dhadhatite",
     "-al": "-al.dhadhatite"
@@ -683,18 +789,21 @@
    "convention": "french",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/dhadhatite.text.txt",
-   "categorie": null
+   "capture": "captures/dhadhatite.text.txt"
   },
   {
    "grammaire": "dhadhatite1",
    "source": "-gr.dhadhatite1",
+   "action": "produce-all",
    "modalite": "TEXTE",
    "produit": true,
    "raison": null,
    "jetons_midi": 0,
-   "mots_texte": 40,
+   "mots_texte": 2,
    "items": 1,
+   "items_enumeres": 1,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.dhadhatite",
     "-al": "-al.dhadhatite"
@@ -702,18 +811,21 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/dhadhatite1.text.txt",
-   "categorie": null
+   "capture": "captures/dhadhatite1.text.txt"
   },
   {
    "grammaire": "dhadhatite_v2",
    "source": "-gr.dhadhatite",
+   "action": "produce-all",
    "modalite": "TEXTE",
    "produit": true,
    "raison": null,
    "jetons_midi": 0,
-   "mots_texte": 32,
-   "items": 4,
+   "mots_texte": 2,
+   "items": 1,
+   "items_enumeres": 1,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.dhadhatite",
     "-al": "-al.dhadhatite"
@@ -721,18 +833,21 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/dhadhatite_v2.text.txt",
-   "categorie": null
+   "capture": "captures/dhadhatite_v2.text.txt"
   },
   {
    "grammaire": "dhati",
    "source": "-gr.dhati",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
    "jetons_midi": 23,
    "mots_texte": 144,
    "items": 1,
+   "items_enumeres": 20,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-se": "-se.dhati",
     "-al": "-al.dhati"
@@ -740,18 +855,21 @@
    "convention": "french",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/dhati.tokens.json",
-   "categorie": null
+   "capture": "captures/dhati.tokens.json"
   },
   {
    "grammaire": "dhati2",
    "source": "-gr.dhati2",
+   "action": "produce-all",
    "modalite": "TEXTE",
    "produit": true,
    "raison": null,
    "jetons_midi": 0,
-   "mots_texte": 80,
-   "items": 4,
+   "mots_texte": 65,
+   "items": 1,
+   "items_enumeres": 1,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.dhati2",
     "-al": "-al.dhati"
@@ -764,12 +882,16 @@
   {
    "grammaire": "dhati3",
    "source": "-gr.dhati3",
+   "action": "produce-all",
    "modalite": "TEXTE",
    "produit": true,
    "raison": null,
    "jetons_midi": 0,
-   "mots_texte": 80,
-   "items": 4,
+   "mots_texte": 65,
+   "items": 1,
+   "items_enumeres": 1,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.dhati2",
     "-al": "-al.dhati"
@@ -782,12 +904,16 @@
   {
    "grammaire": "dhin",
    "source": "-gr.dhin--",
+   "action": null,
    "modalite": null,
    "produit": false,
-   "raison": "22 erreur(s) de compilation : => Cannot create path to the expected '_stop' file because no Trace pa",
+   "raison": "22 erreur(s) de compilation : Variable must start with uppercase character or '|'. Can't make sense ",
    "jetons_midi": 0,
    "mots_texte": 0,
    "items": 0,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.dhin--",
     "-al": "-al.dhin--"
@@ -800,12 +926,16 @@
   {
    "grammaire": "dhin1",
    "source": "-gr.dhin1",
+   "action": "produce-all",
    "modalite": "TEXTE",
    "produit": true,
    "raison": null,
    "jetons_midi": 0,
-   "mots_texte": 112,
-   "items": 4,
+   "mots_texte": 1940,
+   "items": 20,
+   "items_enumeres": 20,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.dhin--",
     "-al": "-ho.dhin--"
@@ -813,18 +943,21 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/dhin1.text.txt",
-   "categorie": null
+   "capture": "captures/dhin1.text.txt"
   },
   {
    "grammaire": "doeslittle",
    "source": "-gr.doeslittle",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
    "jetons_midi": 7,
    "mots_texte": 11,
    "items": 1,
+   "items_enumeres": 1,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-se": "-se.doeslittle"
    },
@@ -836,28 +969,35 @@
   {
    "grammaire": "drum",
    "source": "-gr.drum",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
    "jetons_midi": 12,
    "mots_texte": 23,
    "items": 1,
+   "items_enumeres": 1,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {},
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/drum.tokens.json",
-   "categorie": null
+   "capture": "captures/drum.tokens.json"
   },
   {
    "grammaire": "ek-do-tin",
    "source": "-gr.12345678",
+   "action": "produce-all",
    "modalite": "TEXTE",
    "produit": true,
    "raison": null,
    "jetons_midi": 0,
    "mots_texte": 99,
    "items": 1,
+   "items_enumeres": 1,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.EkDoTin",
     "-al": "-al.EkDoTin"
@@ -865,36 +1005,42 @@
    "convention": "french",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/ek-do-tin.text.txt",
-   "categorie": null
+   "capture": "captures/ek-do-tin.text.txt"
   },
   {
    "grammaire": "flags",
    "source": "-gr.tryFlags",
+   "action": "produce-all",
    "modalite": "TEXTE",
    "produit": true,
    "raison": null,
    "jetons_midi": 0,
-   "mots_texte": 20,
-   "items": 1,
+   "mots_texte": 400,
+   "items": 20,
+   "items_enumeres": 20,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-al": "-al.abc"
    },
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/flags.text.txt",
-   "categorie": null
+   "capture": "captures/flags.text.txt"
   },
   {
    "grammaire": "gramgene1",
    "source": "-gr.gramgene1",
+   "action": "produce-all",
    "modalite": "TEXTE",
    "produit": true,
    "raison": null,
    "jetons_midi": 0,
-   "mots_texte": 884,
+   "mots_texte": 142,
    "items": 25,
+   "items_enumeres": 25,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.gramgene",
     "-al": "-al.gramgene"
@@ -907,12 +1053,16 @@
   {
    "grammaire": "gramgene2",
    "source": "-gr.gramgene2",
+   "action": "single",
    "modalite": "TEXTE",
    "produit": true,
    "raison": null,
    "jetons_midi": 0,
-   "mots_texte": 372,
-   "items": 25,
+   "mots_texte": 78,
+   "items": 1,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.gramgene",
     "-al": "-al.gramgene"
@@ -925,30 +1075,37 @@
   {
    "grammaire": "graphics",
    "source": "-gr.tryGraphics",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
    "jetons_midi": 6,
    "mots_texte": 7,
    "items": 1,
+   "items_enumeres": 1,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-se": "-se.tryGraphics"
    },
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/graphics.tokens.json",
-   "categorie": null
+   "capture": "captures/graphics.tokens.json"
   },
   {
    "grammaire": "harmony",
    "source": "-gr.tryHarmony",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
    "jetons_midi": 20,
    "mots_texte": 20,
    "items": 1,
+   "items_enumeres": 1,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-se": "-se.tryHarmony",
     "-to": "-to.tryHarmony",
@@ -957,18 +1114,21 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/harmony.tokens.json",
-   "categorie": null
+   "capture": "captures/harmony.tokens.json"
   },
   {
    "grammaire": "keys",
    "source": "-gr.keys",
+   "action": null,
    "modalite": null,
    "produit": false,
    "raison": "aucune sortie, aucun message",
    "jetons_midi": 0,
    "mots_texte": 0,
    "items": 0,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.koto3",
     "-al": "-ho.keys"
@@ -981,12 +1141,16 @@
   {
    "grammaire": "koto1",
    "source": "-gr.koto1",
+   "action": "produce-all",
    "modalite": "TEXTE",
    "produit": true,
    "raison": null,
    "jetons_midi": 0,
-   "mots_texte": 72,
-   "items": 20,
+   "mots_texte": 8,
+   "items": 1,
+   "items_enumeres": 1,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.koto3",
     "-al": "-al.abc1"
@@ -994,18 +1158,21 @@
    "convention": null,
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/koto1.text.txt",
-   "categorie": null
+   "capture": "captures/koto1.text.txt"
   },
   {
    "grammaire": "koto2",
    "source": "-gr.koto2",
+   "action": "produce-all",
    "modalite": "TEXTE",
    "produit": true,
    "raison": null,
    "jetons_midi": 0,
-   "mots_texte": 109,
-   "items": 20,
+   "mots_texte": 8,
+   "items": 1,
+   "items_enumeres": 1,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.koto3",
     "-al": "-al.abc1"
@@ -1013,18 +1180,21 @@
    "convention": null,
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/koto2.text.txt",
-   "categorie": null
+   "capture": "captures/koto2.text.txt"
   },
   {
    "grammaire": "koto3",
    "source": "-gr.koto3",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
-   "jetons_midi": 22,
-   "mots_texte": 266,
-   "items": 20,
+   "jetons_midi": 2,
+   "mots_texte": 15,
+   "items": 1,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-se": "-se.koto3",
     "-al": "-al.abc1"
@@ -1032,89 +1202,106 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/koto3.tokens.json",
-   "categorie": null
+   "capture": "captures/koto3.tokens.json"
   },
   {
    "grammaire": "kss2",
    "source": "-gr.kss2",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
    "jetons_midi": 97,
    "mots_texte": 138,
    "items": 1,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-se": "-se.kss"
    },
    "convention": "indian",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/kss2.tokens.json",
-   "categorie": null
+   "capture": "captures/kss2.tokens.json"
   },
   {
    "grammaire": "livecode1",
    "source": "-gr.livecode1",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
-   "jetons_midi": 540,
-   "mots_texte": 460,
-   "items": 20,
+   "jetons_midi": 27,
+   "mots_texte": 23,
+   "items": 1,
+   "items_enumeres": 1,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-se": "-se.livecode1"
    },
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/livecode1.tokens.json",
-   "categorie": null
+   "capture": "captures/livecode1.tokens.json"
   },
   {
    "grammaire": "livecode2",
    "source": "-gr.livecode2",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
-   "jetons_midi": 580,
-   "mots_texte": 427369900,
-   "items": 20,
+   "jetons_midi": 29,
+   "mots_texte": 1048558,
+   "items": 1,
+   "items_enumeres": 1,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-se": "-se.livecode2"
    },
    "convention": null,
    "config_source": "en-tete",
    "declare": "midi",
-   "capture": "captures/livecode2.tokens.json",
-   "categorie": null
+   "capture": "captures/livecode2.tokens.json"
   },
   {
    "grammaire": "look-and-say",
    "source": "-gr.look-and-say",
-   "modalite": null,
-   "produit": false,
-   "raison": "=> Cannot create path to the expected '_stop' file because no Trace path has bee",
+   "action": "produce-all",
+   "modalite": "TEXTE",
+   "produit": true,
+   "raison": null,
    "jetons_midi": 0,
-   "mots_texte": 0,
-   "items": 0,
+   "mots_texte": 1,
+   "items": 1,
+   "items_enumeres": 1,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.look-and-say"
    },
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": null
+   "capture": "captures/look-and-say.text.txt",
+   "reserve": "production degeneree : la sortie est le seul terminal de depart (\"'1'\"), aucune regle n'a ete appliquee. Le bug moteur #51 (all weights are nil) reste actif ; ne pas s'en servir comme reference."
   },
   {
    "grammaire": "major-minor",
    "source": "-gr.tryMajorMinor",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
    "jetons_midi": 24,
    "mots_texte": 2,
    "items": 1,
+   "items_enumeres": 1,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-se": "-se.tryMajorMinor",
     "-cs": "-cs.Mozart"
@@ -1122,18 +1309,21 @@
    "convention": null,
    "config_source": "en-tete",
    "declare": "text",
-   "capture": "captures/major-minor.tokens.json",
-   "categorie": null
+   "capture": "captures/major-minor.tokens.json"
   },
   {
    "grammaire": "mohanam",
    "source": "-gr.trial.mohanam",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
-   "jetons_midi": 755,
-   "mots_texte": 1173,
-   "items": 20,
+   "jetons_midi": 27,
+   "mots_texte": 41,
+   "items": 1,
+   "items_enumeres": 16,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-se": "-se.trial.mohanam",
     "-al": "-al.trial.mohanam",
@@ -1143,18 +1333,21 @@
    "convention": "indian",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/mohanam.tokens.json",
-   "categorie": null
+   "capture": "captures/mohanam.tokens.json"
   },
   {
    "grammaire": "mozart-dice",
    "source": "-gr.Mozart",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
-   "jetons_midi": 10113,
-   "mots_texte": 6416,
-   "items": 40,
+   "jetons_midi": 269,
+   "mots_texte": 172,
+   "items": 1,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": true,
+   "joue": true,
    "config": {
     "-se": "-se.Mozart",
     "-to": "-to.Mozart",
@@ -1163,18 +1356,21 @@
    "convention": "french",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/mozart-dice.tokens.json",
-   "categorie": null
+   "capture": "captures/mozart-dice.tokens.json"
   },
   {
    "grammaire": "nadaka",
    "source": "-gr.Nadaka",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
    "jetons_midi": 714,
    "mots_texte": 1007,
    "items": 1,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-se": "-se.hamsad",
     "-to": "-to.Nadaka",
@@ -1183,54 +1379,63 @@
    "convention": "indian",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/nadaka.tokens.json",
-   "categorie": null
+   "capture": "captures/nadaka.tokens.json"
   },
   {
    "grammaire": "negative-context",
    "source": "-gr.checkNegativeContext",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
    "jetons_midi": 6,
    "mots_texte": 6,
    "items": 1,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-se": "-se.checkNegativeContext"
    },
    "convention": "french",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/negative-context.tokens.json",
-   "categorie": null
+   "capture": "captures/negative-context.tokens.json"
   },
   {
    "grammaire": "not-reich",
    "source": "-gr.NotReich",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
    "jetons_midi": 580,
    "mots_texte": 565,
    "items": 1,
+   "items_enumeres": 1,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-se": "-se.NotReich"
    },
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/not-reich.tokens.json",
-   "categorie": null
+   "capture": "captures/not-reich.tokens.json"
   },
   {
    "grammaire": "one-scale",
    "source": "-gr.tryOneScale",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
    "jetons_midi": 6,
    "mots_texte": 6,
    "items": 1,
+   "items_enumeres": 1,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-se": "-se.tryOneScale",
     "-to": "-to.tryOneScale",
@@ -1239,18 +1444,21 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/one-scale.tokens.json",
-   "categorie": null
+   "capture": "captures/one-scale.tokens.json"
   },
   {
    "grammaire": "polyphony1",
    "source": "-gr.polyphony1",
+   "action": "produce-all",
    "modalite": "TEXTE",
    "produit": true,
    "raison": null,
    "jetons_midi": 0,
-   "mots_texte": 73,
+   "mots_texte": 76,
    "items": 25,
+   "items_enumeres": 25,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.polyphony1",
     "-al": "-al.abc"
@@ -1263,12 +1471,16 @@
   {
    "grammaire": "repeat",
    "source": "-gr.tryrepeat",
+   "action": "produce-all",
    "modalite": "TEXTE",
    "produit": true,
    "raison": null,
    "jetons_midi": 0,
-   "mots_texte": 9,
-   "items": 1,
+   "mots_texte": 40,
+   "items": 5,
+   "items_enumeres": 5,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.tryrepeat",
     "-al": "-al.abc"
@@ -1276,18 +1488,21 @@
    "convention": "french",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/repeat.text.txt",
-   "categorie": null
+   "capture": "captures/repeat.text.txt"
   },
   {
    "grammaire": "ruwet",
    "source": "-gr.Ruwet",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
-   "jetons_midi": 2528,
-   "mots_texte": 3156,
-   "items": 20,
+   "jetons_midi": 126,
+   "mots_texte": 157,
+   "items": 1,
+   "items_enumeres": 8,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-se": "-se.Ruwet",
     "-al": "-al.Ruwet"
@@ -1295,18 +1510,21 @@
    "convention": "french",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/ruwet.tokens.json",
-   "categorie": null
+   "capture": "captures/ruwet.tokens.json"
   },
   {
    "grammaire": "scales",
    "source": "-gr.tryScales",
+   "action": null,
    "modalite": null,
    "produit": false,
    "raison": "=> Error reading Csound instruments file:  /home/romi/dev/bp/bp3-engine/test-dat",
    "jetons_midi": 0,
    "mots_texte": 0,
    "items": 0,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.tryScales",
     "-cs": "-cs.tryScales"
@@ -1319,30 +1537,37 @@
   {
    "grammaire": "shapes-rhythm",
    "source": "-gr.ShapesInRhythm",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
    "jetons_midi": 1952,
    "mots_texte": 4685,
    "items": 1,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": true,
+   "joue": true,
    "config": {
     "-se": "-se.ShapesInRhythm.QTM"
    },
    "convention": null,
    "config_source": "en-tete",
    "declare": null,
-   "capture": "captures/shapes-rhythm.tokens.json",
-   "categorie": null
+   "capture": "captures/shapes-rhythm.tokens.json"
   },
   {
    "grammaire": "simpletemplates",
    "source": "-gr.simpletemplates",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
-   "jetons_midi": 16,
-   "mots_texte": 33,
-   "items": 3,
+   "jetons_midi": 7,
+   "mots_texte": 11,
+   "items": 1,
+   "items_enumeres": 3,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-se": "-se.simpletemplates"
    },
@@ -1354,64 +1579,77 @@
   {
    "grammaire": "templates",
    "source": "-gr.checktemplates",
+   "action": "produce-all",
    "modalite": "TEXTE",
    "produit": true,
    "raison": null,
    "jetons_midi": 0,
    "mots_texte": 25,
    "items": 5,
+   "items_enumeres": 5,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.checktemplates"
    },
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/templates.text.txt",
-   "categorie": null
+   "capture": "captures/templates.text.txt"
   },
   {
    "grammaire": "testHO2",
    "source": "-gr.testHO2",
+   "action": "produce-all",
    "modalite": "TEXTE",
    "produit": true,
    "raison": null,
    "jetons_midi": 0,
    "mots_texte": 4,
    "items": 1,
+   "items_enumeres": 1,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-al": "-al.abc"
    },
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/testHO2.text.txt",
-   "categorie": null
+   "capture": "captures/testHO2.text.txt"
   },
   {
    "grammaire": "testNC1",
    "source": "-gr.testNC1",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
    "jetons_midi": 6,
    "mots_texte": 7,
    "items": 1,
+   "items_enumeres": 1,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {},
    "convention": null,
    "config_source": "en-tete",
    "declare": "midi",
-   "capture": "captures/testNC1.tokens.json",
-   "categorie": null
+   "capture": "captures/testNC1.tokens.json"
   },
   {
    "grammaire": "testTie7",
    "source": "-gr.testTie7",
+   "action": null,
    "modalite": null,
    "produit": false,
-   "raison": "1 erreur(s) de compilation : => Cannot create path to the expected '_stop' file because no Trace pa",
+   "raison": "1 erreur(s) de compilation : Variable must start with uppercase character or '|'. Can't make sense ",
    "jetons_midi": 0,
    "mots_texte": 0,
    "items": 0,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {},
    "convention": null,
    "config_source": "en-tete",
@@ -1421,30 +1659,37 @@
   {
    "grammaire": "time-patterns",
    "source": "-gr.tryTimePatterns",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
    "jetons_midi": 8,
    "mots_texte": 13,
    "items": 1,
+   "items_enumeres": 1,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-se": "-se.tryTimePatterns"
    },
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/time-patterns.tokens.json",
-   "categorie": null
+   "capture": "captures/time-patterns.tokens.json"
   },
   {
    "grammaire": "transposition",
    "source": "-gr.tryTranspose",
+   "action": null,
    "modalite": null,
    "produit": false,
-   "raison": "2 erreur(s) de compilation : => Cannot create path to the expected '_stop' file because no Trace pa",
+   "raison": "2 erreur(s) de compilation : Variable must start with uppercase character or '|'. Can't make sense ",
    "jetons_midi": 0,
    "mots_texte": 0,
    "items": 0,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.tryTranspose",
     "-al": "-al.tryKeyMap"
@@ -1457,12 +1702,16 @@
   {
    "grammaire": "transposition1",
    "source": "-gr.transposition1",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
    "jetons_midi": 75,
    "mots_texte": 107,
    "items": 1,
+   "items_enumeres": 1,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-se": "-se.transposition3",
     "-al": "-ho.transposition"
@@ -1470,36 +1719,42 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/transposition1.tokens.json",
-   "categorie": null
+   "capture": "captures/transposition1.tokens.json"
   },
   {
    "grammaire": "transposition3",
    "source": "-gr.transposition3",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
    "jetons_midi": 66,
    "mots_texte": 30,
    "items": 1,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-se": "-se.transposition3"
    },
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/transposition3.tokens.json",
-   "categorie": null
+   "capture": "captures/transposition3.tokens.json"
   },
   {
    "grammaire": "tryAllItems0",
    "source": "-gr.tryAllItems0",
+   "action": "produce-all",
    "modalite": "TEXTE",
    "produit": true,
    "raison": null,
    "jetons_midi": 0,
    "mots_texte": 20,
    "items": 8,
+   "items_enumeres": 8,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.tryAllItems0",
     "-al": "-al.abc"
@@ -1507,36 +1762,42 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/tryAllItems0.text.txt",
-   "categorie": null
+   "capture": "captures/tryAllItems0.text.txt"
   },
   {
    "grammaire": "tryAllItems1",
    "source": "-gr.tryAllItems1",
+   "action": "produce-all",
    "modalite": "TEXTE",
    "produit": true,
    "raison": null,
    "jetons_midi": 0,
    "mots_texte": 36,
    "items": 12,
+   "items_enumeres": 12,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.tryAllItems1"
    },
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/tryAllItems1.text.txt",
-   "categorie": null
+   "capture": "captures/tryAllItems1.text.txt"
   },
   {
    "grammaire": "tryConsoleMaxTime",
    "source": "-gr.tryConsoleMaxTime",
+   "action": null,
    "modalite": null,
    "produit": false,
-   "raison": "=> Cannot create path to the expected '_stop' file because no Trace path has bee",
+   "raison": "=> Calculation overflow (10000 derivations): task abandoned. Loop?",
    "jetons_midi": 0,
    "mots_texte": 0,
    "items": 0,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {},
    "convention": "english",
    "config_source": "php_ref",
@@ -1546,12 +1807,16 @@
   {
    "grammaire": "tryCsoundObjects",
    "source": "-gr.tryCsoundObjects",
+   "action": "produce-all",
    "modalite": "TEXTE",
    "produit": true,
    "raison": null,
    "jetons_midi": 0,
    "mots_texte": 2,
    "items": 1,
+   "items_enumeres": 1,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.tryCsoundObjects",
     "-al": "-al.tryCsoundObjects",
@@ -1560,18 +1825,21 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/tryCsoundObjects.text.txt",
-   "categorie": null
+   "capture": "captures/tryCsoundObjects.text.txt"
   },
   {
    "grammaire": "tryGOTO",
    "source": "-gr.tryGOTO",
+   "action": "single",
    "modalite": "TEXTE",
    "produit": true,
    "raison": null,
    "jetons_midi": 0,
-   "mots_texte": 25,
-   "items": 25,
+   "mots_texte": 1,
+   "items": 1,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": true,
+   "joue": false,
    "config": {
     "-se": "-se.tryGOTO",
     "-al": "-al.abc"
@@ -1584,12 +1852,16 @@
   {
    "grammaire": "tryKeyMap",
    "source": "-gr.tryKeyMap",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
    "jetons_midi": 392,
    "mots_texte": 450,
    "items": 1,
+   "items_enumeres": 1,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-se": "-se.tryKeyMap",
     "-al": "-al.tryKeyMap"
@@ -1597,18 +1869,21 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/tryKeyMap.tokens.json",
-   "categorie": null
+   "capture": "captures/tryKeyMap.tokens.json"
   },
   {
    "grammaire": "tryKeyXpand",
    "source": "-gr.tryKeyXpand",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
    "jetons_midi": 91,
    "mots_texte": 120,
    "items": 1,
+   "items_enumeres": 1,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-se": "-se.tryKeyXpand",
     "-al": "-al.tryKeyXpand"
@@ -1616,18 +1891,21 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/tryKeyXpand.tokens.json",
-   "categorie": null
+   "capture": "captures/tryKeyXpand.tokens.json"
   },
   {
    "grammaire": "tryLIN",
    "source": "-gr.tryLIN",
+   "action": "produce-all",
    "modalite": "TEXTE",
    "produit": true,
    "raison": null,
    "jetons_midi": 0,
    "mots_texte": 25,
    "items": 25,
+   "items_enumeres": 25,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.tryLIN",
     "-al": "-al.abc"
@@ -1640,30 +1918,37 @@
   {
    "grammaire": "tryMIDIfile",
    "source": "-gr.tryMIDIfile",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
-   "jetons_midi": 160,
-   "mots_texte": 180,
-   "items": 20,
+   "jetons_midi": 8,
+   "mots_texte": 9,
+   "items": 1,
+   "items_enumeres": 2,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-se": "-se.asymmetric1"
    },
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/tryMIDIfile.tokens.json",
-   "categorie": null
+   "capture": "captures/tryMIDIfile.tokens.json"
   },
   {
    "grammaire": "tryObjects",
    "source": "-gr.tryObjects",
+   "action": "produce-all",
    "modalite": "TEXTE",
    "produit": true,
    "raison": null,
    "jetons_midi": 0,
-   "mots_texte": 360,
-   "items": 20,
+   "mots_texte": 18,
+   "items": 1,
+   "items_enumeres": 1,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.koto3",
     "-al": "-al.abc1"
@@ -1671,18 +1956,21 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/tryObjects.text.txt",
-   "categorie": null
+   "capture": "captures/tryObjects.text.txt"
   },
   {
    "grammaire": "tryPatternGrammar",
    "source": "-gr.tryPatternGrammar",
+   "action": "produce-all",
    "modalite": "TEXTE",
    "produit": true,
    "raison": null,
    "jetons_midi": 0,
    "mots_texte": 52,
    "items": 4,
+   "items_enumeres": 4,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.tryPatternGrammar",
     "-al": "-al.tryPatternGrammar"
@@ -1690,18 +1978,21 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/tryPatternGrammar.text.txt",
-   "categorie": null
+   "capture": "captures/tryPatternGrammar.text.txt"
   },
   {
    "grammaire": "tryRagas",
    "source": "-gr.tryRagas",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
    "jetons_midi": 42,
-   "mots_texte": 39907992,
+   "mots_texte": 1048572,
    "items": 1,
+   "items_enumeres": 1,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-se": "-se.tryRagas",
     "-to": "-to.raga",
@@ -1710,36 +2001,42 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/tryRagas.tokens.json",
-   "categorie": null
+   "capture": "captures/tryRagas.tokens.json"
   },
   {
    "grammaire": "tryRotate",
    "source": "-gr.tryRotate",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
-   "jetons_midi": 1300,
-   "mots_texte": 1344,
-   "items": 20,
+   "jetons_midi": 65,
+   "mots_texte": 67,
+   "items": 1,
+   "items_enumeres": 1,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-se": "-se.asymmetric1"
    },
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/tryRotate.tokens.json",
-   "categorie": null
+   "capture": "captures/tryRotate.tokens.json"
   },
   {
    "grammaire": "trySerial",
    "source": "-gr.trySerial",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
    "jetons_midi": 8,
    "mots_texte": 7,
    "items": 1,
+   "items_enumeres": 1,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-se": "-se.trySerial",
     "-al": "-al.abc"
@@ -1752,12 +2049,16 @@
   {
    "grammaire": "tryShruti",
    "source": "-gr.tryShruti",
+   "action": null,
    "modalite": null,
    "produit": false,
    "raison": "=> Error reading Csound instruments file:  /home/romi/dev/bp/bp3-engine/test-dat",
    "jetons_midi": 0,
    "mots_texte": 0,
    "items": 0,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.tryShruti",
     "-to": "-to.tryShruti",
@@ -1771,12 +2072,16 @@
   {
    "grammaire": "trySrand",
    "source": "-gr.trySrand",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
    "jetons_midi": 25,
    "mots_texte": 37,
    "items": 1,
+   "items_enumeres": 1,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-se": "-se.trySrand",
     "-al": "-al.tryKeyXpand"
@@ -1784,36 +2089,42 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/trySrand.tokens.json",
-   "categorie": null
+   "capture": "captures/trySrand.tokens.json"
   },
   {
    "grammaire": "tryTicks",
    "source": "-gr.tryTicks",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
    "jetons_midi": 16,
    "mots_texte": 16,
    "items": 1,
+   "items_enumeres": 1,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-se": "-se.tryTicks"
    },
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/tryTicks.tokens.json",
-   "categorie": null
+   "capture": "captures/tryTicks.tokens.json"
   },
   {
    "grammaire": "tryflags2",
    "source": "-gr.tryflags2",
+   "action": "produce-all",
    "modalite": "TEXTE",
    "produit": true,
    "raison": null,
    "jetons_midi": 0,
    "mots_texte": 25,
    "items": 25,
+   "items_enumeres": 25,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.tryflags2",
     "-al": "-al.abc"
@@ -1826,12 +2137,16 @@
   {
    "grammaire": "tryflags3",
    "source": "-gr.tryflags3",
+   "action": "produce-all",
    "modalite": "TEXTE",
    "produit": true,
    "raison": null,
    "jetons_midi": 0,
-   "mots_texte": 2,
-   "items": 2,
+   "mots_texte": 25,
+   "items": 25,
+   "items_enumeres": 25,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.tryflags3",
     "-al": "-al.abc"
@@ -1844,12 +2159,16 @@
   {
    "grammaire": "tryflags3.html",
    "source": "-gr.tryflags3.html",
+   "action": null,
    "modalite": null,
    "produit": false,
-   "raison": "19 erreur(s) de compilation : => Cannot create path to the expected '_stop' file because no Trace pa",
+   "raison": "19 erreur(s) de compilation : Error code 8: incorrect expression or bad derivation in gram#1 rule 1",
    "jetons_midi": 0,
    "mots_texte": 0,
    "items": 0,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {},
    "convention": "english",
    "config_source": "php_ref",
@@ -1859,12 +2178,16 @@
   {
    "grammaire": "tryhomomorphism",
    "source": "-gr.tryhomomorphism",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
    "jetons_midi": 6,
    "mots_texte": 12,
    "items": 1,
+   "items_enumeres": 1,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-se": "-se.tryhomomorphism",
     "-al": "-al.tryhomomorphism"
@@ -1872,18 +2195,21 @@
    "convention": "french",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/tryhomomorphism.tokens.json",
-   "categorie": null
+   "capture": "captures/tryhomomorphism.tokens.json"
   },
   {
    "grammaire": "trytemplates",
    "source": "-gr.trytemplates",
+   "action": "produce-all",
    "modalite": "TEXTE",
    "produit": true,
    "raison": null,
    "jetons_midi": 0,
-   "mots_texte": 442,
+   "mots_texte": 98,
    "items": 25,
+   "items_enumeres": 25,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.trytemplates",
     "-al": "-al.abc"
@@ -1896,12 +2222,16 @@
   {
    "grammaire": "trytemplates2",
    "source": "-gr.trytemplates2",
+   "action": "produce-all",
    "modalite": "TEXTE",
    "produit": true,
    "raison": null,
    "jetons_midi": 0,
-   "mots_texte": 660,
-   "items": 25,
+   "mots_texte": 20,
+   "items": 4,
+   "items_enumeres": 4,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.trytemplates2",
     "-al": "-al.abc"
@@ -1914,12 +2244,16 @@
   {
    "grammaire": "tunings",
    "source": "-gr.tryTunings",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
    "jetons_midi": 16,
    "mots_texte": 16,
    "items": 1,
+   "items_enumeres": 1,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-se": "-se.tryTunings",
     "-cs": "-cs.tryTunings"
@@ -1927,18 +2261,21 @@
    "convention": null,
    "config_source": "en-tete",
    "declare": "text",
-   "capture": "captures/tunings.tokens.json",
-   "categorie": null
+   "capture": "captures/tunings.tokens.json"
   },
   {
    "grammaire": "vina",
    "source": "-gr.vina",
+   "action": "single",
    "modalite": null,
    "produit": false,
    "raison": "blocage (> 90 s sans rendre la main)",
    "jetons_midi": 0,
    "mots_texte": 0,
    "items": 0,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.Vina",
     "-cs": "-cs.Vina"
@@ -1951,12 +2288,16 @@
   {
    "grammaire": "vina2",
    "source": "-gr.vina2",
+   "action": "single",
    "modalite": null,
    "produit": false,
    "raison": "blocage (> 90 s sans rendre la main)",
    "jetons_midi": 0,
    "mots_texte": 0,
    "items": 0,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.Vina",
     "-cs": "-cs.Vina"
@@ -1969,12 +2310,16 @@
   {
    "grammaire": "vina3",
    "source": "-gr.vina3",
+   "action": "single",
    "modalite": null,
    "produit": false,
    "raison": "blocage (> 90 s sans rendre la main)",
    "jetons_midi": 0,
    "mots_texte": 0,
    "items": 0,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": false,
    "config": {
     "-se": "-se.Vina3",
     "-to": "-to.Vina",
@@ -1988,97 +2333,109 @@
   {
    "grammaire": "visser-shapes",
    "source": "-gr.Visser.Shapes",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
    "jetons_midi": 2086,
    "mots_texte": 2553,
    "items": 1,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-se": "-se.Visser.Shapes"
    },
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/visser-shapes.tokens.json",
-   "categorie": null
+   "capture": "captures/visser-shapes.tokens.json"
   },
   {
    "grammaire": "visser-waves",
    "source": "-gr.Visser.Waves",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
    "jetons_midi": 365,
    "mots_texte": 433,
    "items": 1,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-se": "-se.Visser.Waves"
    },
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/visser-waves.tokens.json",
-   "categorie": null
+   "capture": "captures/visser-waves.tokens.json"
   },
   {
    "grammaire": "visser3",
    "source": "-gr.Visser3",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
    "jetons_midi": 401,
    "mots_texte": 770,
    "items": 1,
+   "items_enumeres": 33,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-se": "-se.Visser3"
    },
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/visser3.tokens.json",
-   "categorie": null
+   "capture": "captures/visser3.tokens.json"
   },
   {
    "grammaire": "visser5",
    "source": "-gr.Visser5",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
    "jetons_midi": 1152,
    "mots_texte": 1822,
    "items": 1,
+   "items_enumeres": 19,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-se": "-se.Visser5"
    },
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/visser5.tokens.json",
-   "categorie": null
+   "capture": "captures/visser5.tokens.json"
   },
   {
    "grammaire": "watch",
    "source": "-gr.Watch_What_Happens",
+   "action": "single",
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
    "jetons_midi": 2105,
    "mots_texte": 5122,
    "items": 1,
+   "items_enumeres": 7,
+   "enumeration_refusee_par_le_moteur": false,
+   "joue": true,
    "config": {
     "-se": "-se.Watch_What_Happens"
    },
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/watch.tokens.json",
-   "categorie": null
+   "capture": "captures/watch.tokens.json"
   }
  ],
- "commit_v2": "7a970ac",
- "ajoutees_depuis_v2": [
-  "trySerial",
-  "doeslittle"
- ]
+ "degenerees": 1,
+ "productibles_utilisables": 88
 }

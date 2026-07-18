@@ -1,7 +1,7 @@
-# Baseline native « original » — tableau des 113 grammaires
+# Baseline native « original » v3 — tableau des 113 grammaires
 
-Capturé le 2026-07-18 avec `bp3 v3.4.4 (graphics-for-BP3)`, graine `1`.
-MAJ : 2026-07-18 — 34 fichiers de reglages convertis (23 BP3-128 + 11 requis), 12 grammaires recuperees
+Figée le 2026-07-18 · `bp3 v3.4.4 (graphics-for-BP3)` · graine `1`
+88 productibles (MIDI 54 + TEXTE 34), 25 muettes.
 
 | grammaire | source | modalité | produit | jetons | mots | capture / raison |
 |---|---|---|---|---|---|---|
@@ -22,6 +22,7 @@ MAJ : 2026-07-18 — 34 fichiers de reglages convertis (23 BP3-128 + 11 requis),
 | `checkSUB.new` | `-gr.checkSUB.new` | MIDI | oui | 10 | 13 | captures/checkSUB.new.tokens.json |
 | `checkVolMasterSlave` | `-gr.checkVolMasterSlave` | MIDI | oui | 6 | 12 | captures/checkVolMasterSlave.tokens.json |
 | `dhati` | `-gr.dhati` | MIDI | oui | 23 | 144 | captures/dhati.tokens.json |
+| `doeslittle` | `-gr.doeslittle` | MIDI | oui | 7 | 11 | captures/doeslittle.tokens.json |
 | `drum` | `-gr.drum` | MIDI | oui | 12 | 23 | captures/drum.tokens.json |
 | `graphics` | `-gr.tryGraphics` | MIDI | oui | 6 | 7 | captures/graphics.tokens.json |
 | `harmony` | `-gr.tryHarmony` | MIDI | oui | 20 | 20 | captures/harmony.tokens.json |
@@ -48,6 +49,7 @@ MAJ : 2026-07-18 — 34 fichiers de reglages convertis (23 BP3-128 + 11 requis),
 | `tryMIDIfile` | `-gr.tryMIDIfile` | MIDI | oui | 160 | 180 | captures/tryMIDIfile.tokens.json |
 | `tryRagas` | `-gr.tryRagas` | MIDI | oui | 42 | 39907992 | captures/tryRagas.tokens.json |
 | `tryRotate` | `-gr.tryRotate` | MIDI | oui | 1300 | 1344 | captures/tryRotate.tokens.json |
+| `trySerial` | `-gr.trySerial` | MIDI | oui | 8 | 7 | captures/trySerial.tokens.json |
 | `trySrand` | `-gr.trySrand` | MIDI | oui | 25 | 37 | captures/trySrand.tokens.json |
 | `tryTicks` | `-gr.tryTicks` | MIDI | oui | 16 | 16 | captures/tryTicks.tokens.json |
 | `tryhomomorphism` | `-gr.tryhomomorphism` | MIDI | oui | 6 | 12 | captures/tryhomomorphism.tokens.json |
@@ -105,14 +107,12 @@ MAJ : 2026-07-18 — 34 fichiers de reglages convertis (23 BP3-128 + 11 requis),
 | `cloches1` | `-gr.cloches1` | — | non |  |  | blocage (> 90 s sans rendre la main) |
 | `csound` | `-gr.tryCsound` | — | non |  |  | blocage (> 90 s sans rendre la main) |
 | `dhin` | `-gr.dhin--` | — | non |  |  | 22 erreur(s) de compilation : => Cannot create path to the expected '_ |
-| `doeslittle` | `-gr.doeslittle` | — | non |  |  | 1 erreur(s) de compilation : => Cannot create path to the expected '_s |
 | `keys` | `-gr.keys` | — | non |  |  | aucune sortie, aucun message |
 | `look-and-say` | `-gr.look-and-say` | — | non |  |  | => Cannot create path to the expected '_stop' file because no Trace pa |
 | `scales` | `-gr.tryScales` | — | non |  |  | => Error reading Csound instruments file:  /home/romi/dev/bp/bp3-engin |
 | `testTie7` | `-gr.testTie7` | — | non |  |  | 1 erreur(s) de compilation : => Cannot create path to the expected '_s |
 | `transposition` | `-gr.tryTranspose` | — | non |  |  | 2 erreur(s) de compilation : => Cannot create path to the expected '_s |
 | `tryConsoleMaxTime` | `-gr.tryConsoleMaxTime` | — | non |  |  | => Cannot create path to the expected '_stop' file because no Trace pa |
-| `trySerial` | `-gr.trySerial` | — | non |  |  | => Cannot create path to the expected '_stop' file because no Trace pa |
 | `tryShruti` | `-gr.tryShruti` | — | non |  |  | => Error reading Csound instruments file:  /home/romi/dev/bp/bp3-engin |
 | `tryflags3.html` | `-gr.tryflags3.html` | — | non |  |  | 19 erreur(s) de compilation : => Cannot create path to the expected '_ |
 | `vina` | `-gr.vina` | — | non |  |  | blocage (> 90 s sans rendre la main) |

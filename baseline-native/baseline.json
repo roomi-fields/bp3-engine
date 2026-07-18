@@ -1,11 +1,11 @@
 {
- "version": "v2",
+ "version": "v3",
  "figee_le": "2026-07-18",
  "commit_v1": "579ca59",
- "productibles": 86,
- "midi": 52,
+ "productibles": 88,
+ "midi": 54,
  "texte": 34,
- "muettes": 27,
+ "muettes": 25,
  "total": 113,
  "ajoutees_depuis_v1": [
   "dhati2",
@@ -22,7 +22,7 @@
   "trytemplates2"
  ],
  "perdues_depuis_v1": [],
- "lot": "piste BP2 — 34 fichiers de reglages convertis (23 BP3-128 + 11 requis)",
+ "lot": "corpus — mojibake Æ->t (motifs temporels, BP3_help.txt:620) et ¥->. (delimiteur de temps)",
  "date": "2026-07-18",
  "binaire": "bp3 v3.4.4 (graphics-for-BP3)",
  "seed": "1",
@@ -819,19 +819,19 @@
   {
    "grammaire": "doeslittle",
    "source": "-gr.doeslittle",
-   "modalite": null,
-   "produit": false,
-   "raison": "1 erreur(s) de compilation : => Cannot create path to the expected '_stop' file because no Trace pa",
-   "jetons_midi": 0,
-   "mots_texte": 0,
-   "items": 0,
+   "modalite": "MIDI",
+   "produit": true,
+   "raison": null,
+   "jetons_midi": 7,
+   "mots_texte": 11,
+   "items": 1,
    "config": {
     "-se": "-se.doeslittle"
    },
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": null
+   "capture": "captures/doeslittle.tokens.json"
   },
   {
    "grammaire": "drum",
@@ -1734,12 +1734,12 @@
   {
    "grammaire": "trySerial",
    "source": "-gr.trySerial",
-   "modalite": null,
-   "produit": false,
-   "raison": "=> Cannot create path to the expected '_stop' file because no Trace path has bee",
-   "jetons_midi": 0,
-   "mots_texte": 0,
-   "items": 0,
+   "modalite": "MIDI",
+   "produit": true,
+   "raison": null,
+   "jetons_midi": 8,
+   "mots_texte": 7,
+   "items": 1,
    "config": {
     "-se": "-se.trySerial",
     "-al": "-al.abc"
@@ -1747,7 +1747,7 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": null
+   "capture": "captures/trySerial.tokens.json"
   },
   {
    "grammaire": "tryShruti",
@@ -2075,5 +2075,10 @@
    "capture": "captures/watch.tokens.json",
    "categorie": null
   }
+ ],
+ "commit_v2": "7a970ac",
+ "ajoutees_depuis_v2": [
+  "trySerial",
+  "doeslittle"
  ]
 }

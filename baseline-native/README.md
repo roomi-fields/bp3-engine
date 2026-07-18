@@ -1,11 +1,12 @@
 # Baseline native « original » — jeu unique, daté, vérifié
 
-## 🔖 **baseline v2 — figée le 2026-07-18 — 86 productibles** (MIDI 52 + TEXTE 34), 27 muettes, 113 au total
+## 🔖 **baseline v3 — figée le 2026-07-18 — 88 productibles** (MIDI 54 + TEXTE 34), 25 muettes, 113 au total
 
 | version | figée le | productibles | commit |
 |---|---|---|---|
 | v1 | 2026-07-18 | 74 (MIDI 51 + TEXTE 23) | `579ca59` |
-| **v2** | **2026-07-18** | **86 (MIDI 52 + TEXTE 34)** | ce commit |
+| v2 | 2026-07-18 | 86 (MIDI 52 + TEXTE 34) | `7a970ac` |
+| **v3** | **2026-07-18** | **88 (MIDI 54 + TEXTE 34)** | ce commit |
 
 **+12 depuis v1, 0 perdue.** Lot : piste BP2, 34 fichiers de réglages convertis.
 Ajoutées : `dhati2`, `dhati3`, `gramgene1`, `gramgene2`, `polyphony1`, `simpletemplates`,
@@ -127,3 +128,27 @@ cartes par version (`if(iv > N)`), cf. `docs-developer/format-se-bp2/`.
 
 Le décalage de 2 lignes dû à l'en-tête `V.x`/`Date:` a été testé et **écarté** : il ne rend pas
 les valeurs plausibles sur ces fichiers. Le problème est bien le layout, pas un offset.
+
+## MAJ v3 — mojibake du corpus : +2 grammaires
+
+Deux corruptions d'encodage corrigées dans les grammaires, cibles **documentées**, pas devinées :
+
+- `Æ` → `t` — noms de motifs temporels. `BP3_help.txt:620` : « Time patterns always start with
+  't' followed with digits », et `BP3_help.txt:1581` donne l'exemple **identique** à la ligne
+  corrompue : `a b _retro {t1 t2 t3,f g}`. (`-gr.trySerial`)
+- `¥` → `.` — délimiteur de temps. C'est la substitution que le harnais S0 applique déjà
+  (`replace(/¥/g,'.')` dans `s0_snapshot.cjs`), et le point est documenté comme délimiteur de
+  battement. (`-gr.trySerial`, `-gr.doeslittle`)
+
+Revenues : **`trySerial`** (MIDI, 8 jetons), **`doeslittle`** (MIDI, 7 jetons).
+Plus aucun `Æ` ni `¥` dans le corpus.
+
+### Correction d'une catégorisation erronée de v2
+
+v2 annonçait « 2 fichiers Csound introuvables — récupérables ». **C'est faux, et je le corrige :**
+`-cs.tryShruti` et `-cs.tryScales` existent bien (ils viennent de l'arbre amont de Bernard), mais
+sont dans un format textuel que le moteur ne lit pas. Surtout, ce n'était pas la vraie cause :
+sans le Csound, `tryShruti` et `scales` échouent quand même sur des terminaux microtonaux
+inconnus (`sa_4`, `fap3`) que le fichier de tonalité ne résout pas non plus.
+**Ces deux-là relèvent de M1** (backlog : « nom de terminal vide sur gamme invalide »), déjà
+ouvert et en attente d'arbitrage. Ce ne sont **pas** des gains rapides.

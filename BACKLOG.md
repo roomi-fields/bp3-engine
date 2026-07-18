@@ -60,15 +60,38 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   -gr.tryTranspose (`¬`). RESULTAT : Mozartexpression RECUPEREE (0 erreur, 1255 o). Les 4 autres
   progressent sans passer (a: 4 err, tryflags3: 5, tryTranspose: 4, Rajeev: 27) — causes restantes
   distinctes, a trier.
-- **BPE-6** `ouvert` [P1] — REGLAGES-ANCIEN-FORMAT-NON-LUS : le moteur ne lit QUE des reglages JSON.
+- **BPE-6/BPE-7** `fait` [P1] — REGLAGES-ANCIEN-FORMAT-NON-LUS : le moteur ne lit QUE des reglages JSON.
   Sur un `-se.*` au format BP2 positionnel il affiche « Could not parse JSON settings »
   (`csrc/bp3/SaveLoads1.c:607`) puis s'arrete SILENCIEUSEMENT (exit 0, aucune phase « Compiling
   grammar », 0 octet) — d'ou des faux « natif ne produit rien ». AUCUN convertisseur cote C
   (grep : rien dans csrc/bp3). Seul le harnais JS convertit (`convertOldSettings`,
   BPscript/test/s0_snapshot.cjs:44-110). AMPLEUR : **84 fichiers -se.* en ancien format contre
   59 en JSON** (143 au total). C'est le blocage DOMINANT du bucket, devant -ho et -or.
-  Options : (a) porter convertOldSettings en C, (b) convertir le corpus une fois pour toutes,
-  (c) laisser au harnais. Arbitrage requis.
+  DECISION ROMAIN 2026-07-18 = option (b), convertir le corpus une fois pour toutes
+  (`hub/decisions/2026-07-18-convertir-corpus-reglages-vieux-format-json.md`).
+  APPLIQUE : les **84** fichiers reecrits en JSON avec le convertOldSettings EXISTANT
+  (BPscript/test/s0_snapshot.cjs:44-110, extrait et execute tel quel via scratchpad/conv.cjs —
+  aucune reecriture ad-hoc). 84 convertis, 0 echec. Corpus : 143 JSON, 0 ancien.
+  Les 59 deja-JSON sont INTACTS (perimetre respecte). Originaux conserves dans l'historique git.
+  MESURE AVANT/APRES sur les 38 grammaires concernees : **0 produisaient -> 8 produisent**
+  (Djinns 3671 o, Mozartexpression 1255 o, tryKeyXpand 581 o, transposition1 629 o, tryRotate 229 o,
+  MyMelody 180 o, check& 41 o, tryMIDIfile 37 o). Les 3 premieres marchaient deja via config
+  manuelle ; elles marchent desormais DEPUIS LE CORPUS, sans traitement special.
+  IDEMPOTENCE VERIFIEE : `loadSettings` (s0_snapshot.cjs:115) teste `seContent.startsWith('{')`
+  et n'appelle le convertisseur que sur l'ancien format -> S0 continue de fonctionner sans
+  modification, l'appel n'est pas devenu incorrect (juste inerte). Rien a retirer.
+  ⚠ EFFET DE BORD ASSUME ET TRACE : le format JSON n'a AUCUN champ de chaine de depart. La
+  section `STARTSTRING:` disparait donc a la conversion. Verifie sur les 84 originaux : 81
+  portaient `S` (valeur par defaut du moteur, aucune perte) et 3 portaient la forme non tranchee
+  de BPE-2b (`<HTML>S<BR>Part1<BR>Part2</HTML>` : -se.checkArticulation, -se.checkControls,
+  -se.lahras). Ces 3 valeurs ne sont plus dans les fichiers de travail mais restent dans git.
+  ⚠ A SIGNALER A BPSCRIPT : 8 fichiers ont une convention de note propre qui DIFFERE du
+  `php_ref.note_convention` que S0 leur forcait (-se.Djinns 1 vs 0, -se.Mozartexpression 1 vs 0,
+  -se.Rajeev 2 vs 0, -se.cloches 1 vs 0, -se.dhadhatite 1 vs 0, -se.simpletemplates 1 vs 0,
+  -se.tryGOTO 1 vs 0, -se.trytemplates2 1 vs 0). SANS EFFET AUJOURD'HUI : les 10 grammaires qui
+  les utilisent sont toutes `php_ref.blocked` -> ecartees par s0_snapshot.cjs:174. Mais a leur
+  deblocage il faudra aligner php_ref sur la valeur du fichier (pour Djinns et Mozartexpression
+  j'ai verifie que la valeur du FICHIER est la bonne : production en do/mi/la = french).
 - **BPE-3** `bloqué` [P1] — PORTAGE-HO-CLI — ⚠ **RECADRE 2026-07-18, l'intitule etait trompeur** :  _(bloqué: RECADRE (intitule trompeur) : -ho n est PAS de l homomorphisme — c est l ANCIEN NOM du fichier ALPHABET (FileOldPrefix[1]=-ho. == FilePrefix[1]=-al., meme wAlphabet=1, -BP3main.h:389-392). Le CLI refuse -ho car ConsoleMain.c:925 ne teste que FilePrefix. Fix (A) = 5-10 lignes accepter les vieux prefixes (risque FAIBLE, couvre aussi -mi->-so). MAIS rendement mesure FAIBLE seul (1/10 produit). Le blocage dominant est BPE-6 (reglages vieux format). Homomorphisme = NON-SUJET pour ces grammaires (Atlas avait confirme la syntaxe, c est MOOT ici).)_
   `-ho` n'est PAS une feature d'homomorphisme a porter, c'est **l'ancien nom du fichier
   d'ALPHABET**. Preuve : `csrc/bp3/-BP3main.h:392` `FileOldPrefix[1] = "-ho."` vs

@@ -83,3 +83,53 @@ traiter ces 23 fichiers.
   mêmes positions : `60` (C4key), `440.0000` (A4freq), `64` (DeftVelocity).
 
 Un convertisseur correct doit rendre des valeurs plausibles sur **les deux**.
+
+---
+
+## Les 23 fichiers à 128 lignes : anomalie ÉLUCIDÉE (2026-07-18)
+
+Je signalais plus haut une anomalie non expliquée : 17 fichiers déclarant `BP2.9.8` (iv=28,
+version tardive) ne faisaient que 128 lignes, là où `BP2.9.3` (iv=22, plus ancienne) en fait 357.
+
+**Ce ne sont pas des fichiers BP2. Ce sont des fichiers écrits par BP3 lui-même**, avant le
+passage au JSON. Leur première ligne le dit :
+
+```
+// Bol Processor BP3 compatible with version BP2.9.8
+```
+
+La mention `BP2.9.8` est une déclaration de **compatibilité**, pas la version d'écriture. Le
+lecteur `CheckVersion()` la prend pourtant pour la version du fichier et en tire `iv=28`, ce
+qui fait attendre au lecteur BP2-legacy tous les blocs `if(iv > N)` — alors que le fichier
+suit un layout BP3 compact et fixe, sans branchement de version.
+
+### Discriminant, vérifié sans exception
+
+Sur les 84 fichiers anciens du corpus, dans leur forme d'origine :
+
+| première ligne contient `Bol Processor BP3` | nb | longueurs observées |
+|---|---|---|
+| oui | **23** | **128, et uniquement 128** |
+| non | 61 | 112, 145, 167, 172, 180, 181, 188, 199, 201, 237, 238, 246, … |
+
+**Zéro exception dans les deux sens** : aucun fichier à en-tête BP3 qui ne fasse pas 128 lignes,
+aucun fichier de 128 lignes sans en-tête BP3. La règle est donc exacte et implémentable telle
+quelle.
+
+### Conséquence pour le convertisseur
+
+Ces 23 fichiers **ne doivent pas passer par `convertOldSettings`** : cette fonction implémente
+les layouts BP2-legacy à branchement `iv`, qui ne s'appliquent pas ici. Il leur faut leur propre
+carte, celle de `SaveSettings()` — l'écrivain BP3 de la même époque, présent dans le même
+fichier extrait (`LoadSettings.reference.c` provient de `source/BP3/SaveLoads1.c` au commit
+`e9249594` ; `SaveSettings` y commence à la ligne 690 du fichier d'origine).
+
+En attendant, ces 23 fichiers sont **laissés en l'état** dans le corpus : les convertir avec la
+mauvaise carte reproduirait exactement le défaut de BPE-7.
+
+Les 23 : `-se.Bach_1st_prelude`, `-se.Bohlen-Pierce`, `-se.Goldberg_5`,
+`-se.ShapesInRhythm.QTM.old`, `-se.Visser.Shapes.old`, `-se.Visser.Waves.old`,
+`-se.Visser5.old`, `-se.checkPoly`, `-se.checkQuantization`, `-se.dhati.old`, `-se.kss.old`,
+`-se.musicXML`, `-se.startup`, `-se.symbols`, `-se.tryMPE`, `-se.tryMusicXML`, `-se.tryPart`,
+`-se.tryRagas.old`, `-se.tryReceive`, `-se.tryScales.old`, `-se.trySend`, `-se.tryShruti.old`,
+`-se.tryWait`.

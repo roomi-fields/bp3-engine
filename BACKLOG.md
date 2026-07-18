@@ -17,7 +17,13 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
 
 ## Limites / dette interne
 
-- **M1** `ouvert` — `one-scale`/`tryShruti` : nom de terminal VIDE sur gamme invalide (natif) vs `<60>` WASM. À trancher : gamme réellement invalide (acter natif + retirer) ou bug de résolution de gamme. Avis Romain demandé (verrou §3.2 résorption).
+- **M1** `ouvert` — `one-scale`/`tryShruti` : nom de terminal VIDE sur gamme invalide (natif) vs `<60>` WASM.
+  **Motif corrigé 2026-07-18** — ce n'est PAS « la gamme est incomplète » : les 23 degrés de grama sont bien
+  présents. Cause établie en partie : `-to.tryShruti` et `-cs.tryShruti` sont des ébauches écrites à la main,
+  sans en-tête BP3 ni ligne de numéros de touches → défaut de CORPUS, réparable en données. Mais même réparés,
+  la compilation refuse encore les degrés : cause NON isolée (suspect principal = 23 degrés par octave contre
+  12 touches). Détail et preuves : `docs-developer/tryShruti-gammes-microtonales.md`. Rien à remonter à
+  Bernard Bel tant que ce reste n'est pas isolé. Avis Romain toujours demandé (verrou §3.2 résorption).
 - **M2** `ouvert` — Couches de correction WASM NON portées en natif : `#33` dédup keep-longest, `#35` offset Kpress, `#32` drift MIDI. Le natif émet le TimeSet brut (fait foi) ; documenter l'écart par cas.
 - **M3** `fait` — `PrintArg→FILE*` ne sort pas les NOMS de jetons (Bernard a commenté le `fprintf` de `Display()`, « Fixed by BB 2022-02-20 »). Conséquence : pas de flag `--textout` dédié possible proprement. Contourné : ordre des jetons texte = `produce -o` (sortie brute lossless). Voir memory `oracle-texte-option-o`.
 

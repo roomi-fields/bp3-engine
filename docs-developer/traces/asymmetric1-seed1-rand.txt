@@ -1,0 +1,383 @@
+# Trace native bp3_rand — -gr.asymmetric1, seed 1 (demande bpx [69])
+# Binaire : bp3 v3.4.4, build local avec trace_compute=1 trace_weights=1
+#          (Compute.c:42-43, activation TEMPORAIRE, source restauree apres capture)
+# Config  : produce -e --seed 1 -se -se.asymmetric1 (MaxItemsProduce=1) -al -al.asymmetric1
+# Total   : 325 appels bp3_rand pour l'item 1 (meme compte que la trace BPx)
+# CIG(n) = ComputeInGram(sous-grammaire n), site Compute.c:441-446
+# Insert() = insertion, site Compute.c:1888-1921
+
+55:[Step #0] Selected: gram#1[1] S --> Head U V /Reverse = 0/ /beats = 24/ /K1 +1: 0/
+63:Insert() randomnumber = 41 pos1 = 0
+109:CIG(2). choice = 2 nb_candidates =  2 (*p_totwght)[nb_candidates-1] = 4, randomnumber = 18467 BP3_RAND_MAX = 32767
+112:[Step #1] Selected: gram#2[1] Head --> Head /B = 3/ /A = 3/ _goto(3,0)
+122:Insert() randomnumber = 6334 pos1 = 0
+157:CIG(3). choice = 206 nb_candidates =  2 (*p_totwght)[nb_candidates-1] = 254, randomnumber = 26500 BP3_RAND_MAX = 32767
+160:[Step #2] Selected: gram#3[2]  /K1: 1/  /B: 3/ Head --> Head b /Btrans +1: 0/ /B -1: 3/ /K4 +1: 0/
+170:Insert() randomnumber = 19169 pos1 = 2
+172:Insert() randomnumber = 15724 pos1 = 2
+174:Insert() randomnumber = 11478 pos1 = 0
+221:[Step #3] Selected: gram#5[2]  /K4: 1/  /Btrans: 1/  /Reverse: 0/ V --> 2V /Reverse = 1/
+277:CIG(6). choice = 228 nb_candidates =  2 (*p_totwght)[nb_candidates-1] = 254, randomnumber = 29358 BP3_RAND_MAX = 32767
+280:[Step #4] Selected: gram#6[2]  /B: 2/ Head --> Head /K1 +1: 0/ _goto(3,0)
+293:Insert() randomnumber = 26962 pos1 = 8
+295:Insert() randomnumber = 24464 pos1 = 8
+297:Insert() randomnumber = 5705 pos1 = 0
+338:CIG(3). choice = 219 nb_candidates =  2 (*p_totwght)[nb_candidates-1] = 254, randomnumber = 28145 BP3_RAND_MAX = 32767
+341:[Step #5] Selected: gram#3[2]  /K1: 1/  /B: 2/ Head --> Head b /Btrans +1: 0/ /B -1: 2/ /K4 +1: 0/
+354:Insert() randomnumber = 23281 pos1 = 6
+356:Insert() randomnumber = 16827 pos1 = 4
+358:Insert() randomnumber = 9961 pos1 = 2
+360:Insert() randomnumber = 491 pos1 = 0
+413:[Step #6] Selected: gram#5[1]  /K4: 1/  /Btrans: 1/  /Reverse: 1/ U --> 2U /Reverse = 0/
+478:CIG(6). choice = 23 nb_candidates =  2 (*p_totwght)[nb_candidates-1] = 254, randomnumber = 2995 BP3_RAND_MAX = 32767
+481:[Step #7] Selected: gram#6[1]  /A: 3/ Head --> Head /K1 +1: 0/ _goto(3,0)
+497:Insert() randomnumber = 11942 pos1 = 6
+499:Insert() randomnumber = 4827 pos1 = 2
+501:Insert() randomnumber = 5436 pos1 = 2
+503:Insert() randomnumber = 32391 pos1 = 16
+505:Insert() randomnumber = 14604 pos1 = 6
+507:Insert() randomnumber = 3902 pos1 = 2
+509:Insert() randomnumber = 153 pos1 = 0
+556:CIG(3). choice = 2 nb_candidates =  2 (*p_totwght)[nb_candidates-1] = 254, randomnumber = 292 BP3_RAND_MAX = 32767
+559:[Step #8] Selected: gram#3[1]  /K1: 1/  /A: 3/ Head --> Head a /Atrans +1: 0/ /A -1: 3/ /K2 +1: 0/ /K3 +1: 0/
+575:Insert() randomnumber = 12382 pos1 = 6
+577:Insert() randomnumber = 17421 pos1 = 8
+579:Insert() randomnumber = 18716 pos1 = 8
+581:Insert() randomnumber = 19718 pos1 = 10
+583:Insert() randomnumber = 19895 pos1 = 10
+585:Insert() randomnumber = 5447 pos1 = 2
+587:Insert() randomnumber = 21726 pos1 = 10
+589:Insert() randomnumber = 14771 pos1 = 6
+591:Insert() randomnumber = 11538 pos1 = 4
+593:Insert() randomnumber = 1869 pos1 = 0
+650:[Step #9] Selected: gram#4[1]  /K2: 1/  /Atrans: 1/ U --> 3U
+723:[Step #10] Selected: gram#4[2]  /K3: 1/  /Atrans: 1/ V --> 3V
+800:CIG(6). choice = 154 nb_candidates =  2 (*p_totwght)[nb_candidates-1] = 254, randomnumber = 19912 BP3_RAND_MAX = 32767
+803:[Step #11] Selected: gram#6[2]  /B: 1/ Head --> Head /K1 +1: 0/ _goto(3,0)
+824:Insert() randomnumber = 25667 pos1 = 20
+826:Insert() randomnumber = 26299 pos1 = 20
+828:Insert() randomnumber = 17035 pos1 = 14
+830:Insert() randomnumber = 9894 pos1 = 8
+832:Insert() randomnumber = 28703 pos1 = 22
+834:Insert() randomnumber = 23811 pos1 = 18
+836:Insert() randomnumber = 31322 pos1 = 24
+838:Insert() randomnumber = 30333 pos1 = 24
+840:Insert() randomnumber = 17673 pos1 = 14
+842:Insert() randomnumber = 4664 pos1 = 2
+844:Insert() randomnumber = 15141 pos1 = 12
+846:Insert() randomnumber = 7711 pos1 = 6
+848:Insert() randomnumber = 28253 pos1 = 22
+850:Insert() randomnumber = 6868 pos1 = 4
+852:Insert() randomnumber = 25547 pos1 = 20
+854:Insert() randomnumber = 27644 pos1 = 22
+856:Insert() randomnumber = 32662 pos1 = 26
+858:Insert() randomnumber = 32757 pos1 = 26
+860:Insert() randomnumber = 20037 pos1 = 16
+862:Insert() randomnumber = 12859 pos1 = 10
+864:Insert() randomnumber = 8723 pos1 = 6
+866:Insert() randomnumber = 9741 pos1 = 8
+868:Insert() randomnumber = 27529 pos1 = 22
+870:Insert() randomnumber = 778 pos1 = 0
+927:CIG(3). choice = 95 nb_candidates =  2 (*p_totwght)[nb_candidates-1] = 254, randomnumber = 12316 BP3_RAND_MAX = 32767
+930:[Step #12] Selected: gram#3[1]  /K1: 1/  /A: 2/ Head --> Head a /Atrans +1: 0/ /A -1: 2/ /K2 +1: 0/ /K3 +1: 0/
+951:Insert() randomnumber = 3035 pos1 = 2
+953:Insert() randomnumber = 22190 pos1 = 18
+955:Insert() randomnumber = 1842 pos1 = 0
+1025:[Step #13] Selected: gram#4[1]  /K2: 1/  /Atrans: 1/ U --> 3U
+1115:[Step #14] Selected: gram#4[2]  /K3: 1/  /Atrans: 1/ V --> 3V
+1202:CIG(6). choice = 2 nb_candidates =  2 (*p_totwght)[nb_candidates-1] = 254, randomnumber = 288 BP3_RAND_MAX = 32767
+1205:[Step #15] Selected: gram#6[1]  /A: 1/ Head --> Head /K1 +1: 0/ _goto(3,0)
+1231:Insert() randomnumber = 30106 pos1 = 32
+1233:Insert() randomnumber = 9040 pos1 = 10
+1235:Insert() randomnumber = 8942 pos1 = 10
+1237:Insert() randomnumber = 19264 pos1 = 20
+1239:Insert() randomnumber = 22648 pos1 = 24
+1241:Insert() randomnumber = 27446 pos1 = 30
+1243:Insert() randomnumber = 23805 pos1 = 26
+1245:Insert() randomnumber = 15890 pos1 = 16
+1247:Insert() randomnumber = 6729 pos1 = 6
+1249:Insert() randomnumber = 24370 pos1 = 26
+1251:Insert() randomnumber = 15350 pos1 = 16
+1253:Insert() randomnumber = 15006 pos1 = 16
+1255:Insert() randomnumber = 31101 pos1 = 34
+1257:Insert() randomnumber = 24393 pos1 = 26
+1259:Insert() randomnumber = 3548 pos1 = 4
+1261:Insert() randomnumber = 19629 pos1 = 22
+1263:Insert() randomnumber = 12623 pos1 = 14
+1265:Insert() randomnumber = 24084 pos1 = 26
+1267:Insert() randomnumber = 19954 pos1 = 22
+1269:Insert() randomnumber = 18756 pos1 = 20
+1271:Insert() randomnumber = 11840 pos1 = 12
+1273:Insert() randomnumber = 4966 pos1 = 4
+1275:Insert() randomnumber = 7376 pos1 = 8
+1277:Insert() randomnumber = 13931 pos1 = 14
+1279:Insert() randomnumber = 26308 pos1 = 28
+1281:Insert() randomnumber = 16944 pos1 = 18
+1283:Insert() randomnumber = 32439 pos1 = 36
+1285:Insert() randomnumber = 24626 pos1 = 26
+1287:Insert() randomnumber = 11323 pos1 = 12
+1289:Insert() randomnumber = 5537 pos1 = 6
+1291:Insert() randomnumber = 21538 pos1 = 24
+1293:Insert() randomnumber = 16118 pos1 = 18
+1295:Insert() randomnumber = 2082 pos1 = 2
+1297:Insert() randomnumber = 22929 pos1 = 24
+1299:Insert() randomnumber = 16541 pos1 = 18
+1301:Insert() randomnumber = 4833 pos1 = 4
+1303:Insert() randomnumber = 31115 pos1 = 34
+1305:Insert() randomnumber = 4639 pos1 = 4
+1307:Insert() randomnumber = 29658 pos1 = 32
+1309:Insert() randomnumber = 22704 pos1 = 24
+1311:Insert() randomnumber = 9930 pos1 = 10
+1313:Insert() randomnumber = 13977 pos1 = 14
+1315:Insert() randomnumber = 2306 pos1 = 2
+1317:Insert() randomnumber = 31673 pos1 = 34
+1319:Insert() randomnumber = 22386 pos1 = 24
+1321:Insert() randomnumber = 5021 pos1 = 4
+1323:Insert() randomnumber = 28745 pos1 = 32
+1325:Insert() randomnumber = 26924 pos1 = 30
+1327:Insert() randomnumber = 19072 pos1 = 20
+1329:Insert() randomnumber = 6270 pos1 = 6
+1331:Insert() randomnumber = 5829 pos1 = 6
+1333:Insert() randomnumber = 26777 pos1 = 30
+1335:Insert() randomnumber = 15573 pos1 = 16
+1337:Insert() randomnumber = 5097 pos1 = 4
+1339:Insert() randomnumber = 16512 pos1 = 18
+1341:Insert() randomnumber = 23986 pos1 = 26
+1343:Insert() randomnumber = 13290 pos1 = 14
+1345:Insert() randomnumber = 9161 pos1 = 10
+1347:Insert() randomnumber = 18636 pos1 = 20
+1349:Insert() randomnumber = 22355 pos1 = 24
+1351:Insert() randomnumber = 24767 pos1 = 26
+1353:Insert() randomnumber = 23655 pos1 = 26
+1355:Insert() randomnumber = 15574 pos1 = 16
+1357:Insert() randomnumber = 4031 pos1 = 4
+1359:Insert() randomnumber = 12052 pos1 = 12
+1361:Insert() randomnumber = 27350 pos1 = 30
+1363:Insert() randomnumber = 1150 pos1 = 0
+1430:CIG(3). choice = 131 nb_candidates =  2 (*p_totwght)[nb_candidates-1] = 254, randomnumber = 16941 BP3_RAND_MAX = 32767
+1433:[Step #16] Selected: gram#3[2]  /K1: 1/  /B: 1/ Head --> Head b /Btrans +1: 0/ /B -1: 1/ /K4 +1: 0/
+1459:Insert() randomnumber = 21724 pos1 = 24
+1461:Insert() randomnumber = 13966 pos1 = 14
+1463:Insert() randomnumber = 3430 pos1 = 2
+1465:Insert() randomnumber = 31107 pos1 = 34
+1467:Insert() randomnumber = 30191 pos1 = 34
+1469:Insert() randomnumber = 18007 pos1 = 20
+1471:Insert() randomnumber = 11337 pos1 = 12
+1473:Insert() randomnumber = 15457 pos1 = 16
+1475:Insert() randomnumber = 12287 pos1 = 12
+1477:Insert() randomnumber = 27753 pos1 = 30
+1479:Insert() randomnumber = 10383 pos1 = 10
+1481:Insert() randomnumber = 14945 pos1 = 16
+1483:Insert() randomnumber = 8909 pos1 = 10
+1485:Insert() randomnumber = 32209 pos1 = 36
+1487:Insert() randomnumber = 9758 pos1 = 10
+1489:Insert() randomnumber = 24221 pos1 = 26
+1491:Insert() randomnumber = 18588 pos1 = 20
+1493:Insert() randomnumber = 6422 pos1 = 6
+1495:Insert() randomnumber = 24946 pos1 = 28
+1497:Insert() randomnumber = 27506 pos1 = 30
+1499:Insert() randomnumber = 13030 pos1 = 14
+1501:Insert() randomnumber = 16413 pos1 = 18
+1503:Insert() randomnumber = 29168 pos1 = 32
+1505:Insert() randomnumber = 900 pos1 = 0
+1600:[Step #17] Selected: gram#5[2]  /K4: 1/  /Btrans: 1/  /Reverse: 0/ V --> 2V /Reverse = 1/
+1686:[Step #18] Selected: gram#6[1]  /A: 1/ Head --> Head /K1 +1: 0/ _goto(3,0)
+1715:Insert() randomnumber = 32591 pos1 = 42
+1717:Insert() randomnumber = 18762 pos1 = 24
+1719:Insert() randomnumber = 1655 pos1 = 2
+1721:Insert() randomnumber = 17410 pos1 = 22
+1723:Insert() randomnumber = 6359 pos1 = 8
+1725:Insert() randomnumber = 27624 pos1 = 36
+1727:Insert() randomnumber = 20537 pos1 = 26
+1729:Insert() randomnumber = 21548 pos1 = 28
+1731:Insert() randomnumber = 6483 pos1 = 8
+1733:Insert() randomnumber = 27595 pos1 = 36
+1735:Insert() randomnumber = 4041 pos1 = 4
+1737:Insert() randomnumber = 3602 pos1 = 4
+1739:Insert() randomnumber = 24350 pos1 = 30
+1741:Insert() randomnumber = 10291 pos1 = 12
+1743:Insert() randomnumber = 30836 pos1 = 40
+1745:Insert() randomnumber = 9374 pos1 = 12
+1747:Insert() randomnumber = 11020 pos1 = 14
+1749:Insert() randomnumber = 4596 pos1 = 6
+1751:Insert() randomnumber = 24021 pos1 = 30
+1753:Insert() randomnumber = 27348 pos1 = 34
+1755:Insert() randomnumber = 23199 pos1 = 30
+1757:Insert() randomnumber = 19668 pos1 = 24
+1759:Insert() randomnumber = 24484 pos1 = 32
+1761:Insert() randomnumber = 8281 pos1 = 10
+1763:Insert() randomnumber = 4734 pos1 = 6
+1765:Insert() randomnumber = 53 pos1 = 0
+1836:[Step #19] Selected: gram#3[1]  /K1: 1/  /A: 1/ Head --> Head a /Atrans +1: 0/ /A -1: 1/ /K2 +1: 0/ /K3 +1: 0/
+1865:Insert() randomnumber = 1999 pos1 = 2
+1867:Insert() randomnumber = 26418 pos1 = 34
+1869:Insert() randomnumber = 27938 pos1 = 36
+1871:Insert() randomnumber = 6900 pos1 = 8
+1873:Insert() randomnumber = 3788 pos1 = 4
+1875:Insert() randomnumber = 18127 pos1 = 22
+1877:Insert() randomnumber = 467 pos1 = 0
+1967:[Step #20] Selected: gram#4[1]  /K2: 1/  /Atrans: 1/ U --> 3U
+2085:[Step #21] Selected: gram#4[2]  /K3: 1/  /Atrans: 1/ V --> 3V
+2238:CIG(7). choice = 43 nb_candidates =  3 (*p_totwght)[nb_candidates-1] = 381, randomnumber = 3728 BP3_RAND_MAX = 32767
+2241:[Step #22] Selected: gram#7[1] U --> lambda
+2275:Insert() randomnumber = 14893 pos1 = 40
+2277:Insert() randomnumber = 24648 pos1 = 46
+2279:Insert() randomnumber = 22483 pos1 = 44
+2281:Insert() randomnumber = 17807 pos1 = 42
+2283:Insert() randomnumber = 2421 pos1 = 30
+2397:CIG(7). choice = 111 nb_candidates =  2 (*p_totwght)[nb_candidates-1] = 254, randomnumber = 14310 BP3_RAND_MAX = 32767
+2400:[Step #23] Selected: gram#7[2] V --> lambda
+2433:Insert() randomnumber = 6617 pos1 = 50
+2532:[Step #24] Selected: gram#7[3] Head --> lambda
+2564:Insert() randomnumber = 22813 pos1 = 34
+2566:Insert() randomnumber = 9514 pos1 = 14
+2568:Insert() randomnumber = 14309 pos1 = 20
+2570:Insert() randomnumber = 7616 pos1 = 10
+2572:Insert() randomnumber = 18935 pos1 = 28
+2574:Insert() randomnumber = 17451 pos1 = 26
+2576:Insert() randomnumber = 20600 pos1 = 30
+2578:Insert() randomnumber = 5249 pos1 = 6
+2580:Insert() randomnumber = 16519 pos1 = 24
+2582:Insert() randomnumber = 31556 pos1 = 46
+2584:Insert() randomnumber = 22798 pos1 = 34
+2586:Insert() randomnumber = 30303 pos1 = 44
+2588:Insert() randomnumber = 6224 pos1 = 8
+2590:Insert() randomnumber = 11008 pos1 = 16
+2592:Insert() randomnumber = 5844 pos1 = 8
+2594:Insert() randomnumber = 32609 pos1 = 48
+2596:Insert() randomnumber = 14989 pos1 = 22
+2598:Insert() randomnumber = 32702 pos1 = 48
+2600:Insert() randomnumber = 3195 pos1 = 4
+2602:Insert() randomnumber = 20485 pos1 = 30
+2604:Insert() randomnumber = 3093 pos1 = 4
+2606:Insert() randomnumber = 14343 pos1 = 20
+2608:Insert() randomnumber = 30523 pos1 = 44
+2610:Insert() randomnumber = 1587 pos1 = 2
+2612:Insert() randomnumber = 29314 pos1 = 42
+2614:Insert() randomnumber = 9503 pos1 = 14
+2616:Insert() randomnumber = 7448 pos1 = 10
+2618:Insert() randomnumber = 25200 pos1 = 36
+2620:Insert() randomnumber = 13458 pos1 = 20
+2622:Insert() randomnumber = 6618 pos1 = 8
+2624:Insert() randomnumber = 20580 pos1 = 30
+2626:Insert() randomnumber = 19796 pos1 = 28
+2628:Insert() randomnumber = 14798 pos1 = 22
+2630:Insert() randomnumber = 15281 pos1 = 22
+2632:Insert() randomnumber = 19589 pos1 = 28
+2634:Insert() randomnumber = 20798 pos1 = 30
+2636:Insert() randomnumber = 28009 pos1 = 40
+2638:Insert() randomnumber = 27157 pos1 = 40
+2640:Insert() randomnumber = 20472 pos1 = 30
+2642:Insert() randomnumber = 23622 pos1 = 34
+2644:Insert() randomnumber = 18538 pos1 = 26
+2646:Insert() randomnumber = 12292 pos1 = 18
+2648:Insert() randomnumber = 6038 pos1 = 8
+2650:Insert() randomnumber = 24179 pos1 = 36
+2652:Insert() randomnumber = 18190 pos1 = 26
+2654:Insert() randomnumber = 29657 pos1 = 44
+2656:Insert() randomnumber = 7958 pos1 = 10
+2658:Insert() randomnumber = 6191 pos1 = 8
+2660:Insert() randomnumber = 19815 pos1 = 28
+2662:Insert() randomnumber = 22888 pos1 = 34
+2664:Insert() randomnumber = 19156 pos1 = 28
+2666:Insert() randomnumber = 11511 pos1 = 16
+2668:Insert() randomnumber = 16202 pos1 = 24
+2670:Insert() randomnumber = 2634 pos1 = 2
+2672:Insert() randomnumber = 24272 pos1 = 36
+2674:Insert() randomnumber = 20055 pos1 = 28
+2676:Insert() randomnumber = 20328 pos1 = 30
+2678:Insert() randomnumber = 22646 pos1 = 32
+2680:Insert() randomnumber = 26362 pos1 = 38
+2682:Insert() randomnumber = 4886 pos1 = 6
+2684:Insert() randomnumber = 18875 pos1 = 28
+2686:Insert() randomnumber = 28433 pos1 = 42
+2688:Insert() randomnumber = 29869 pos1 = 44
+2690:Insert() randomnumber = 20142 pos1 = 30
+2692:Insert() randomnumber = 23844 pos1 = 34
+2694:Insert() randomnumber = 1416 pos1 = 2
+2696:Insert() randomnumber = 21881 pos1 = 32
+2698:Insert() randomnumber = 31998 pos1 = 46
+2700:Insert() randomnumber = 10322 pos1 = 14
+2702:Insert() randomnumber = 18651 pos1 = 26
+2704:Insert() randomnumber = 10021 pos1 = 14
+2706:Insert() randomnumber = 5699 pos1 = 8
+2708:Insert() randomnumber = 3557 pos1 = 4
+2710:Insert() randomnumber = 28476 pos1 = 42
+2712:Insert() randomnumber = 27892 pos1 = 40
+2714:Insert() randomnumber = 24389 pos1 = 36
+2716:Insert() randomnumber = 5075 pos1 = 6
+2718:Insert() randomnumber = 10712 pos1 = 16
+2720:Insert() randomnumber = 2600 pos1 = 2
+2722:Insert() randomnumber = 2510 pos1 = 2
+2724:Insert() randomnumber = 21003 pos1 = 30
+2726:Insert() randomnumber = 26869 pos1 = 40
+2728:Insert() randomnumber = 17861 pos1 = 26
+2730:Insert() randomnumber = 14688 pos1 = 20
+2732:Insert() randomnumber = 13401 pos1 = 20
+2734:Insert() randomnumber = 9789 pos1 = 14
+2736:Insert() randomnumber = 15255 pos1 = 22
+2738:Insert() randomnumber = 16423 pos1 = 24
+2740:Insert() randomnumber = 5002 pos1 = 6
+2742:Insert() randomnumber = 10585 pos1 = 14
+2744:Insert() randomnumber = 24182 pos1 = 36
+2746:Insert() randomnumber = 10285 pos1 = 14
+2748:Insert() randomnumber = 27088 pos1 = 40
+2750:Insert() randomnumber = 31426 pos1 = 46
+2752:Insert() randomnumber = 28617 pos1 = 42
+2754:Insert() randomnumber = 23757 pos1 = 34
+2756:Insert() randomnumber = 9832 pos1 = 14
+2758:Insert() randomnumber = 30932 pos1 = 46
+2760:Insert() randomnumber = 4169 pos1 = 6
+2762:Insert() randomnumber = 2154 pos1 = 2
+2764:Insert() randomnumber = 25721 pos1 = 38
+2766:Insert() randomnumber = 17189 pos1 = 24
+2768:Insert() randomnumber = 19976 pos1 = 28
+2770:Insert() randomnumber = 31329 pos1 = 46
+2772:Insert() randomnumber = 2368 pos1 = 2
+2774:Insert() randomnumber = 28692 pos1 = 42
+2776:Insert() randomnumber = 21425 pos1 = 32
+2778:Insert() randomnumber = 10555 pos1 = 14
+2780:Insert() randomnumber = 3434 pos1 = 4
+2782:Insert() randomnumber = 16549 pos1 = 24
+2784:Insert() randomnumber = 7441 pos1 = 10
+2786:Insert() randomnumber = 9512 pos1 = 14
+2788:Insert() randomnumber = 30145 pos1 = 44
+2790:Insert() randomnumber = 18060 pos1 = 26
+2792:Insert() randomnumber = 21718 pos1 = 32
+2794:Insert() randomnumber = 3753 pos1 = 4
+2796:Insert() randomnumber = 16139 pos1 = 24
+2798:Insert() randomnumber = 12423 pos1 = 18
+2800:Insert() randomnumber = 16279 pos1 = 24
+2802:Insert() randomnumber = 25996 pos1 = 38
+2804:Insert() randomnumber = 16687 pos1 = 24
+2806:Insert() randomnumber = 12529 pos1 = 18
+2808:Insert() randomnumber = 22549 pos1 = 32
+2810:Insert() randomnumber = 17437 pos1 = 26
+2812:Insert() randomnumber = 19866 pos1 = 28
+2814:Insert() randomnumber = 12949 pos1 = 18
+2816:Insert() randomnumber = 193 pos1 = 0
+2963:[Step #0] Selected: gram#1[1] S --> Head U V /Reverse = 0/ /beats = 24/ /K1 +1: 0/
+2977:[Step #1] Selected: gram#2[1] Head --> Head /B = 3/ /A = 3/ _goto(3,0)
+2987:[Step #2] Selected: gram#3[2]  /K1: 1/  /B: 3/ Head --> Head b /Btrans +1: 0/ /B -1: 3/ /K4 +1: 0/
+3002:[Step #3] Selected: gram#5[2]  /K4: 1/  /Btrans: 1/  /Reverse: 0/ V --> 2V /Reverse = 1/
+3016:[Step #4] Selected: gram#6[2]  /B: 2/ Head --> Head /K1 +1: 0/ _goto(3,0)
+3026:[Step #5] Selected: gram#3[1]  /K1: 1/  /A: 3/ Head --> Head a /Atrans +1: 0/ /A -1: 3/ /K2 +1: 0/ /K3 +1: 0/
+3038:[Step #6] Selected: gram#4[1]  /K2: 1/  /Atrans: 1/ U --> 3U
+3047:[Step #7] Selected: gram#4[2]  /K3: 1/  /Atrans: 1/ V --> 3V
+3064:[Step #8] Selected: gram#6[2]  /B: 2/ Head --> Head /K1 +1: 0/ _goto(3,0)
+3074:[Step #9] Selected: gram#3[1]  /K1: 1/  /A: 2/ Head --> Head a /Atrans +1: 0/ /A -1: 2/ /K2 +1: 0/ /K3 +1: 0/
+3086:[Step #10] Selected: gram#4[1]  /K2: 1/  /Atrans: 1/ U --> 3U
+3095:[Step #11] Selected: gram#4[2]  /K3: 1/  /Atrans: 1/ V --> 3V
+3112:[Step #12] Selected: gram#6[2]  /B: 2/ Head --> Head /K1 +1: 0/ _goto(3,0)
+3122:[Step #13] Selected: gram#3[1]  /K1: 1/  /A: 1/ Head --> Head a /Atrans +1: 0/ /A -1: 1/ /K2 +1: 0/ /K3 +1: 0/
+3134:[Step #14] Selected: gram#4[1]  /K2: 1/  /Atrans: 1/ U --> 3U
+3143:[Step #15] Selected: gram#4[2]  /K3: 1/  /Atrans: 1/ V --> 3V
+3159:[Step #16] Selected: gram#6[2]  /B: 2/ Head --> Head /K1 +1: 0/ _goto(3,0)
+3168:[Step #17] Selected: gram#3[2]  /K1: 1/  /B: 2/ Head --> Head b /Btrans +1: 0/ /B -1: 2/ /K4 +1: 0/
+3183:[Step #18] Selected: gram#5[1]  /K4: 1/  /Btrans: 1/  /Reverse: 1/ U --> 2U /Reverse = 0/
+3196:[Step #19] Selected: gram#6[2]  /B: 1/ Head --> Head /K1 +1: 0/ _goto(3,0)
+3205:[Step #20] Selected: gram#3[2]  /K1: 1/  /B: 1/ Head --> Head b /Btrans +1: 0/ /B -1: 1/ /K4 +1: 0/
+3220:[Step #21] Selected: gram#5[2]  /K4: 1/  /Btrans: 1/  /Reverse: 0/ V --> 2V /Reverse = 1/
+3238:[Step #22] Selected: gram#7[2] V --> lambda
+3249:[Step #23] Selected: gram#7[3] Head --> lambda
+3259:[Step #24] Selected: gram#7[1] U --> lambda

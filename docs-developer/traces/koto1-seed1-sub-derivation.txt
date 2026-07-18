@@ -1,0 +1,309 @@
+# Trace de derivation SUB — koto1, seed 1 (demande bpx, regle '#? ? --> #? ?')
+# Binaire bp3 v3.4.4, build local trace_compute=1 trace_weights=1 (Compute.c:42-43),
+# source RESTAUREE apres capture. Config php_ref : -se.koto3 (proxy) + -al.abc1, --seed 1.
+# Production complete : 72 jetons sur 20 items ; item 1 = 'a a a a a a a' (7 jetons).
+# ATTENTION : l'oracle 72 est un TOTAL sur 20 items, pas un compte d'item 1.
+#
+# Passes SUB de l'item 1, buffer et indices a chaque Insert.
+
+Found() right irul = 11, length = 6 grtype = 3 SUBtype = 3
+(*p_candidate)[3] = 11
+1) sumwght = 259 w = 10
+Found() left neg irul = 12, istart = 0 lenc = 0 jstart = 0 pos = 0 offset = 0
+Found() right irul = 12, length = 4 grtype = 3 SUBtype = 3
+(*p_candidate)[4] = 12
+1) sumwght = 269 w = 10
+End FindCandidateRules i = 5
+nb_candidates = 5 (*p_repeat) = 0
+nb_candidates (2) = 5
+ComputeInGram(2). choice = 1 nb_candidates =  5 (*p_totwght)[nb_candidates-1] = 279, randomnumber = 153 BP3_RAND_MAX = 32767
+irul = 1
+
+[Step #9] Selected: gram#2[1] #? ? --> #? ?
+(*p_pos)[j] = 0 (*p_repeat) = 0 mode = 1 PROD = 1
+Derive() igram = 2 irul = 1
+Insert() pos1 = 0
+
+Work string:
+i = 0 m = 3 p = 3
+i = 2 m = 3 p = 3
+i = 4 m = 3 p = 3
+i = 6 m = 3 p = 5
+i = 8 m = 3 p = 3
+i = 10 m = 3 p = 3
+i = 12 m = 3 p = 3
+i = 14 m = 3 p = 3
+
+Found() right irul = -1, length = 2 grtype = 3 SUBtype = 3
+jstart = 0 jmax = 2 pos1 = 0 length = 2 lenc1 = 0 dif = 0
+
+Right argument of rule:
+i = 0 m = 0 p = 2
+i = 2 m = 0 p = 1
+i = 4 m = 0 p = 1
+
+istart = 4 jstart = 0
+wild cards? i = 4 j = 0 jmax = 2 xi = 0
+p_arg2[0] m = 3 p = 3
+
+Buffer after:
+i = 0 m = 3 p = 3
+
+FindCandidateRules() leftpos = 2
+Found() left neg irul = 1, istart = 0 lenc = 1 jstart = 0 pos = 2 offset = 0
+Remaining rules startfrom = 1
+Found() left neg irul = 1, istart = 0 lenc = 1 jstart = 0 pos = 2 offset = 0
+Found() left neg irul = 2, istart = 0 lenc = 0 jstart = 2 pos = 2 offset = 0
+Found() left neg irul = 3, istart = 0 lenc = 0 jstart = 2 pos = 2 offset = 0
+Found() right irul = 3, length = 2 grtype = 3 SUBtype = 3
+(*p_candidate)[0] = 3
+1) sumwght = 0 w = 5
+Found() left neg irul = 4, istart = 0 lenc = 0 jstart = 0 pos = 2 offset = 2
+Found() left neg irul = 5, istart = 0 lenc = 0 jstart = 2 pos = 2 offset = 0
+Found() left neg irul = 6, istart = 0 lenc = 0 jstart = 0 pos = 2 offset = 2
+Found() left neg irul = 7, istart = 0 lenc = 1 jstart = 0 pos = 2 offset = 0
+Found() left neg irul = 8, istart = 0 lenc = 0 jstart = 0 pos = 2 offset = 2
+Found() left neg irul = 9, istart = 0 lenc = 0 jstart = 2 pos = 2 offset = 0
+Found() left neg irul = 10, istart = 0 lenc = 0 jstart = 2 pos = 2 offset = 0
+Found() right irul = 10, length = 12 grtype = 3 SUBtype = 3
+(*p_candidate)[1] = 10
+1) sumwght = 5 w = 127
+Found() left neg irul = 11, istart = 0 lenc = 0 jstart = 2 pos = 2 offset = 0
+Found() left neg irul = 12, istart = 0 lenc = 0 jstart = 2 pos = 2 offset = 0
+Found() right irul = 12, length = 4 grtype = 3 SUBtype = 3
+(*p_candidate)[2] = 12
+1) sumwght = 132 w = 10
+End FindCandidateRules i = 3
+nb_candidates = 3 (*p_repeat) = 0
+nb_candidates (2) = 3
+ComputeInGram(2). choice = 1 nb_candidates =  3 (*p_totwght)[nb_candidates-1] = 142, randomnumber = 292 BP3_RAND_MAX = 32767
+irul = 3
+
+[Step #10] Selected: gram#2[3] a --> a
+(*p_pos)[j] = 2 (*p_repeat) = 0 mode = 1 PROD = 1
+Derive() igram = 2 irul = 3
+Insert() pos1 = 2
+
+Work string:
+i = 0 m = 3 p = 3
+i = 2 m = 3 p = 3
+i = 4 m = 3 p = 3
+i = 6 m = 3 p = 5
+i = 8 m = 3 p = 3
+i = 10 m = 3 p = 3
+i = 12 m = 3 p = 3
+i = 14 m = 3 p = 3
+
+Found() left neg irul = -1, istart = 0 lenc = 0 jstart = 2 pos = 2 offset = 0
+Found() right irul = -1, length = 2 grtype = 3 SUBtype = 3
+jstart = 2 jmax = 4 pos1 = 2 length = 2 lenc1 = 0 dif = 0
+
+Right argument of rule:
+i = 0 m = 3 p = 3
+
+istart = 0 jstart = 2
+wild cards? i = 0 j = 2 jmax = 4 xi = 0
+p_arg2[2] m = 3 p = 3
+
+Buffer after:
+i = 0 m = 3 p = 3
+i = 2 m = 3 p = 3
+
+FindCandidateRules() leftpos = 4
+Found() left neg irul = 1, istart = 0 lenc = 1 jstart = 2 pos = 4 offset = 0
+Found() left neg irul = 3, istart = 0 lenc = 0 jstart = 4 pos = 4 offset = 0
+Found() right irul = 3, length = 2 grtype = 3 SUBtype = 3
+
+Rule already selected: gram#2[3] <5:5> RND a --> a
+nb_candidates = 1 (*p_repeat) = 0
+nb_candidates (2) = 1
+irul = 3
+
+[Step #11] Selected: gram#2[3] a --> a
+(*p_pos)[j] = 4 (*p_repeat) = 0 mode = 1 PROD = 1
+Derive() igram = 2 irul = 3
+Insert() pos1 = 4
+
+Work string:
+i = 0 m = 3 p = 3
+i = 2 m = 3 p = 3
+i = 4 m = 3 p = 3
+i = 6 m = 3 p = 5
+i = 8 m = 3 p = 3
+i = 10 m = 3 p = 3
+i = 12 m = 3 p = 3
+i = 14 m = 3 p = 3
+
+Found() left neg irul = -1, istart = 0 lenc = 0 jstart = 4 pos = 4 offset = 0
+Found() right irul = -1, length = 2 grtype = 3 SUBtype = 3
+jstart = 4 jmax = 6 pos1 = 4 length = 2 lenc1 = 0 dif = 0
+
+Right argument of rule:
+i = 0 m = 3 p = 3
+
+istart = 0 jstart = 4
+wild cards? i = 0 j = 4 jmax = 6 xi = 0
+p_arg2[4] m = 3 p = 3
+
+Buffer after:
+i = 0 m = 3 p = 3
+i = 2 m = 3 p = 3
+i = 4 m = 3 p = 3
+
+FindCandidateRules() leftpos = 6
+Found() left neg irul = 1, istart = 0 lenc = 1 jstart = 4 pos = 6 offset = 0
+Found() left neg irul = 3, istart = 0 lenc = 0 jstart = 6 pos = 6 offset = 0
+Remaining rules startfrom = 1
+Found() left neg irul = 1, istart = 0 lenc = 1 jstart = 4 pos = 6 offset = 0
+Found() left neg irul = 2, istart = 0 lenc = 0 jstart = 6 pos = 6 offset = 0
+Found() left neg irul = 3, istart = 0 lenc = 0 jstart = 6 pos = 6 offset = 0
+Found() left neg irul = 4, istart = 0 lenc = 0 jstart = 4 pos = 6 offset = 2
+Found() right irul = 4, length = 6 grtype = 3 SUBtype = 3
+(*p_candidate)[0] = 4
+1) sumwght = 0 w = 30
+Found() left neg irul = 5, istart = 0 lenc = 0 jstart = 6 pos = 6 offset = 0
+Found() right irul = 5, length = 2 grtype = 3 SUBtype = 3
+(*p_candidate)[1] = 5
+1) sumwght = 30 w = 5
+Found() left neg irul = 6, istart = 0 lenc = 0 jstart = 4 pos = 6 offset = 2
+Found() left neg irul = 7, istart = 0 lenc = 1 jstart = 4 pos = 6 offset = 0
+Found() right irul = 7, length = 2 grtype = 3 SUBtype = 3
+Found() left neg irul = 8, istart = 0 lenc = 0 jstart = 4 pos = 6 offset = 2
+Found() left neg irul = 9, istart = 0 lenc = 0 jstart = 6 pos = 6 offset = 0
+Found() left neg irul = 10, istart = 0 lenc = 0 jstart = 6 pos = 6 offset = 0
+Found() left neg irul = 11, istart = 0 lenc = 0 jstart = 6 pos = 6 offset = 0
+Found() left neg irul = 12, istart = 0 lenc = 0 jstart = 6 pos = 6 offset = 0
+End FindCandidateRules i = 2
+nb_candidates = 2 (*p_repeat) = 0
+nb_candidates (2) = 2
+ComputeInGram(2). choice = 13 nb_candidates =  2 (*p_totwght)[nb_candidates-1] = 35, randomnumber = 12382 BP3_RAND_MAX = 32767
+irul = 4
+
+[Step #12] Selected: gram#2[4] a b a --> a a
+(*p_pos)[j] = 6 (*p_repeat) = 0 mode = 1 PROD = 1
+Derive() igram = 2 irul = 4
+Insert() pos1 = 6
+
+Work string:
+i = 0 m = 3 p = 3
+i = 2 m = 3 p = 3
+i = 4 m = 3 p = 3
+i = 6 m = 3 p = 5
+i = 8 m = 3 p = 3
+i = 10 m = 3 p = 3
+i = 12 m = 3 p = 3
+i = 14 m = 3 p = 3
+
+Found() left neg irul = -1, istart = 0 lenc = 0 jstart = 4 pos = 6 offset = 2
+Found() right irul = -1, length = 6 grtype = 3 SUBtype = 3
+jstart = 6 jmax = 6 pos1 = 6 length = 6 lenc1 = 0 dif = -2
+
+Right argument of rule:
+i = 0 m = 3 p = 3
+i = 2 m = 3 p = 3
+
+istart = 2 jstart = 6
+
+Buffer after:
+i = 0 m = 3 p = 3
+i = 2 m = 3 p = 3
+i = 4 m = 3 p = 3
+
+FindCandidateRules() leftpos = 8
+Found() left neg irul = 1, istart = 0 lenc = 1 jstart = 6 pos = 8 offset = 0
+Found() left neg irul = 3, istart = 0 lenc = 0 jstart = 8 pos = 8 offset = 0
+Found() right irul = 3, length = 2 grtype = 3 SUBtype = 3
+
+Rule already selected: gram#2[3] <5:5> RND a --> a
+nb_candidates = 1 (*p_repeat) = 0
+nb_candidates (2) = 1
+irul = 3
+
+[Step #13] Selected: gram#2[3] a --> a
+(*p_pos)[j] = 8 (*p_repeat) = 0 mode = 1 PROD = 1
+Derive() igram = 2 irul = 3
+Insert() pos1 = 8
+
+Work string:
+i = 0 m = 3 p = 3
+i = 2 m = 3 p = 3
+i = 4 m = 3 p = 3
+i = 6 m = 3 p = 5
+i = 8 m = 3 p = 3
+i = 10 m = 3 p = 3
+i = 12 m = 3 p = 3
+i = 14 m = 3 p = 3
+
+Found() left neg irul = -1, istart = 0 lenc = 0 jstart = 8 pos = 8 offset = 0
+Found() right irul = -1, length = 2 grtype = 3 SUBtype = 3
+jstart = 6 jmax = 8 pos1 = 8 length = 2 lenc1 = 0 dif = 0
+
+Right argument of rule:
+i = 0 m = 3 p = 3
+
+istart = 0 jstart = 6
+wild cards? i = 0 j = 6 jmax = 8 xi = 0
+p_arg2[6] m = 3 p = 3
+
+Buffer after:
+i = 0 m = 3 p = 3
+i = 2 m = 3 p = 3
+i = 4 m = 3 p = 3
+i = 6 m = 3 p = 3
+
+FindCandidateRules() leftpos = 10
+Found() left neg irul = 1, istart = 0 lenc = 1 jstart = 8 pos = 10 offset = 0
+Found() left neg irul = 3, istart = 0 lenc = 0 jstart = 10 pos = 10 offset = 0
+Found() right irul = 3, length = 2 grtype = 3 SUBtype = 3
+
+Rule already selected: gram#2[3] <5:5> RND a --> a
+nb_candidates = 1 (*p_repeat) = 0
+nb_candidates (2) = 1
+irul = 3
+
+[Step #14] Selected: gram#2[3] a --> a
+(*p_pos)[j] = 10 (*p_repeat) = 0 mode = 1 PROD = 1
+Derive() igram = 2 irul = 3
+Insert() pos1 = 10
+
+Work string:
+i = 0 m = 3 p = 3
+i = 2 m = 3 p = 3
+i = 4 m = 3 p = 3
+i = 6 m = 3 p = 5
+i = 8 m = 3 p = 3
+i = 10 m = 3 p = 3
+i = 12 m = 3 p = 3
+i = 14 m = 3 p = 3
+
+Found() left neg irul = -1, istart = 0 lenc = 0 jstart = 10 pos = 10 offset = 0
+Found() right irul = -1, length = 2 grtype = 3 SUBtype = 3
+jstart = 8 jmax = 10 pos1 = 10 length = 2 lenc1 = 0 dif = 0
+
+Right argument of rule:
+i = 0 m = 3 p = 3
+
+istart = 0 jstart = 8
+wild cards? i = 0 j = 8 jmax = 10 xi = 0
+p_arg2[8] m = 3 p = 3
+
+Buffer after:
+i = 0 m = 3 p = 3
+i = 2 m = 3 p = 3
+i = 4 m = 3 p = 3
+i = 6 m = 3 p = 3
+i = 8 m = 3 p = 3
+
+FindCandidateRules() leftpos = 12
+Found() left neg irul = 1, istart = 0 lenc = 1 jstart = 10 pos = 12 offset = 0
+Found() left neg irul = 3, istart = 0 lenc = 0 jstart = 12 pos = 12 offset = 0
+Found() right irul = 3, length = 2 grtype = 3 SUBtype = 3
+
+Rule already selected: gram#2[3] <5:5> RND a --> a
+nb_candidates = 1 (*p_repeat) = 0
+nb_candidates (2) = 1
+irul = 3
+
+[Step #15] Selected: gram#2[3] a --> a
+(*p_pos)[j] = 12 (*p_repeat) = 0 mode = 1 PROD = 1
+Derive() igram = 2 irul = 3

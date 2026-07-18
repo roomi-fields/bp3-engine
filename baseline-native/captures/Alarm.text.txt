@@ -1,0 +1,1 @@
+do3 1000{2,{{2,fa3,la3}{sol3,re4},re5 fa5 re5 fa5 si4 re5}{do3 sol2 do2,do5 _ -}}300 {2,{{3,fa3 mi3 re3 mi3 fa3 sol3},fa5 mi5 re5 mi5 fa5 sol5}{do3 sol2 do2,do5 _ -}}

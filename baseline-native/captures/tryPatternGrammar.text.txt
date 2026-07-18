@@ -1,0 +1,4 @@
+a b a b a g a b a b a g a b a b a
+a a a g a a a g a a a
+a b a b a a b a b a a b a b a
+a a a a a a a a a

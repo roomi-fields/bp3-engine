@@ -1,0 +1,4 @@
+Capture TRONQUEE a 2000000 octets pour rester versionnable.
+Taille reelle de la production : 854817980 octets (815.2 Mo)
+Empreinte sha256 (16 car.) du fichier COMPLET : 2b073db11e0b75c3
+Production pathologique — cf. alerte volume, a instruire avant tout usage comme reference.

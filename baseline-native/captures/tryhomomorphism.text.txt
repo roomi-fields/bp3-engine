@@ -1,0 +1,1 @@
+a b c(= do4 c mi4 fa4) *(: re4 fa4 mi4 d)

@@ -1,13 +1,13 @@
 # Baseline native — tableau par grammaire
 
-**v6** — figée le 2026-07-19 · binaire bp3 v3.4.4 (graphics-for-BP3) · graine 1
+**v7** — figée le 2026-07-19 · binaire bp3 v3.4.4 (graphics-for-BP3) · graine 1
 
 `action` = ce que fait le moteur nativement. Les deux voies doivent répliquer **la même action**.
 
 - **single** = la grammaire *joue* un morceau : une réalisation, un item, graine fixe.
 - **produce-all** = production purement symbolique, le moteur énumère l'ensemble.
 
-## Les 90 qui produisent
+## Les 95 qui produisent
 
 | grammaire | action | mode natif | jetons | mots | items | énumération |
 |---|---|---|---|---|---|---|
@@ -55,11 +55,13 @@
 | `asymmetric` | single | TEXTE | 0 | 15 | 1 | **vide** |
 | `beatrix-dice` | single | MIDI | 270 | 179 | 1 | — (elle joue) |
 | `bells` | single | MIDI | 16 | 17 | 1 | — (elle joue) |
+| `blurb` | single | MIDI | 8 | 14 | 1 | — (elle joue) |
 | `check&` | single | MIDI | 4 | 6 | 1 | — (elle joue) |
 | `checkSUB` | single | MIDI | 10 | 13 | 1 | — (elle joue) |
 | `checkSUB.new` | single | MIDI | 10 | 13 | 1 | — (elle joue) |
 | `checkSUB1` | single | TEXTE | 0 | 2 | 1 | **refusée** (SUB) |
 | `checkVolMasterSlave` | single | MIDI | 6 | 12 | 1 | — (elle joue) |
+| `csound` | single | MIDI | 8 | 11 | 1 | — (elle joue) |
 | `dhati` | single | MIDI | 23 | 144 | 1 | — (elle joue) |
 | `doeslittle` | single | MIDI | 7 | 11 | 1 | — (elle joue) |
 | `drum` | single | MIDI | 12 | 23 | 1 | — (elle joue) |
@@ -96,6 +98,9 @@
 | `tryTicks` | single | MIDI | 16 | 16 | 1 | — (elle joue) |
 | `tryhomomorphism` | single | MIDI | 6 | 12 | 1 | — (elle joue) |
 | `tunings` | single | MIDI | 16 | 16 | 1 | — (elle joue) |
+| `vina` | single | MIDI | 5 | 73 | 1 | — (elle joue) |
+| `vina2` | single | MIDI | 1 | 7 | 1 | — (elle joue) |
+| `vina3` | single | MIDI | 57 | 216 | 1 | — (elle joue) |
 | `visser-shapes` | single | MIDI | 2086 | 2553 | 1 | — (elle joue) |
 | `visser-waves` | single | MIDI | 365 | 433 | 1 | — (elle joue) |
 | `visser3` | single | MIDI | 401 | 770 | 1 | — (elle joue) |
@@ -111,28 +116,23 @@
 | `a.html` | `checkSUB1` | règles identiques une fois le balisage HTML retiré |
 | `tryflags3.html` | `tryflags3` | règles identiques une fois le balisage HTML retiré |
 
-## Les 21 qui ne produisent pas
+## Les 16 qui ne produisent pas
 
 | grammaire | cause |
 |---|---|
 | `Nadaka1` | => Cannot produce items because all weights are nil in gram#1 |
-| `Rajeev` | 27 erreur(s) de compilation : Variable must start with uppercase character or '| |
-| `a` | 4 erreur(s) de compilation : Error code 52: Missing slash after /flag/ in gram#2 |
-| `blurb` | blocage (> 90 s sans rendre la main) |
-| `checkAllCsound` | 30 erreur(s) de compilation : => You probably forgot to create or load a '-cs' i |
+| `Rajeev` | 27 erreur(s) de compilation : Variable must start with uppercase character or '|'. Can't make sense  |
+| `a` | 4 erreur(s) de compilation : Error code 52: Missing slash after /flag/ in gram#2 rule 3 |
+| `checkAllCsound` | 30 erreur(s) de compilation : => You probably forgot to create or load a '-cs' instrument file |
 | `checkHomo` | => Can't compile alphabet |
 | `checkVolChan` | 6 erreur(s) de compilation : => Incorrect note. (May be wrong note convention) |
 | `checkcontext` | => Calculation overflow (10000 derivations): task abandoned. Loop? |
 | `checkhomo2` | => Can't compile alphabet |
-| `checkrests` | 12 erreur(s) de compilation : Variable must start with uppercase character or '| |
-| `cloches1` | blocage (> 90 s sans rendre la main) |
-| `csound` | blocage (> 90 s sans rendre la main) |
-| `dhin` | 22 erreur(s) de compilation : Variable must start with uppercase character or '| |
+| `checkrests` | 12 erreur(s) de compilation : Variable must start with uppercase character or '|'. Can't make sense  |
+| `cloches1` | production galoppante, pas un blocage : le tampon croit geometriquement (6876 -> 10300 -> 15452 -> 23180 jeton |
+| `dhin` | 22 erreur(s) de compilation : Variable must start with uppercase character or '|'. Can't make sense  |
 | `keys` | aucune sortie, aucun message |
 | `scales` | => Error reading Csound instruments file:  /home/romi/dev/bp/bp3-engine/test-dat |
-| `transposition` | 2 erreur(s) de compilation : Variable must start with uppercase character or '|' |
+| `transposition` | 2 erreur(s) de compilation : Variable must start with uppercase character or '|'. Can't make sense  |
 | `tryConsoleMaxTime` | => Calculation overflow (10000 derivations): task abandoned. Loop? |
 | `tryShruti` | => Error reading Csound instruments file:  /home/romi/dev/bp/bp3-engine/test-dat |
-| `vina` | blocage (> 90 s sans rendre la main) |
-| `vina2` | blocage (> 90 s sans rendre la main) |
-| `vina3` | blocage (> 90 s sans rendre la main) |

@@ -139,5 +139,5 @@
 7
 1
 _begin tables
-<html>f1 0 256 1 &quot;vina-wave-table.aiff&quot; 0 4 0<br>
- </html>
+f1 0 256 1 "vina-wave-table.aiff" 0 4 0
+_end tables

@@ -1,10 +1,38 @@
 # Baseline native « original » — jeu unique, daté, vérifié
 
-## 🔖 **baseline v6 — figée le 2026-07-19 — tri des muettes, lot 1**
+## 🔖 **baseline v7 — figée le 2026-07-19 — blocages élucidés**
 
-**90 productibles** (dont 1 sous réserve → **89 utilisables**), **2 doublons**, **21 muettes
+**95 productibles** (dont 1 sous réserve → **94 utilisables**), **2 doublons**, **16 muettes
 réelles**, **113 entrées au total**.
-Modes natifs : **MIDI 55** · **TEXTE 35**. Actions : **single 60** · **produce-all 30**.
+Modes natifs : **MIDI 60** · **TEXTE 35**. Actions : **single 65** · **produce-all 30**.
+
+### v6 → v7 : le lot des blocages — 5 récupérées sur 6, cause trouvée
+
+Les 6 grammaires qui « bloquaient > 90 s » n'étaient **pas** une seule famille. La trace, sortie
+non tamponnée, montre deux signatures nettes :
+
+**Cinq s'arrêtaient au même point exact** — juste après `N Csound instrument(s) found`, sans un
+message de plus : `blurb`, `csound`, `vina`, `vina2`, `vina3`. Cause trouvée : le lecteur de
+ressources Csound boucle sans fin quand la section `_begin tables` n'est pas fermée
+(`csrc/bp3/SaveLoads1.c:434-448` — les seules sorties sont `_end tables` ou une ligne vide ; à la
+vraie fin de fichier, rien). Or `-cs.Vina` et `-cs.tryCsound` avaient **perdu leur `_end tables`**
+dans un habillage HTML de l'époque BP2 (dernière ligne ` </html>`).
+
+> **Contre-exemple qui confirme le mécanisme** : `-cs.tryCsoundObjects` n'a pas non plus de
+> `_end tables` et pourtant ne bloquait pas — parce qu'il finit par une **ligne vide**, qui
+> déclenche la sortie de secours. La terminaison ne tenait qu'à un hasard de mise en forme.
+
+Corpus corrigé (dés-habillage HTML + marqueur rétabli sur les 3 fichiers) : les 5 grammaires
+passent de **plus de 90 s de blocage à une production en 1 seconde**. Le défaut **moteur**
+subsiste et est remonté à Bernard Bel — bug **#55** : une entrée malformée doit échouer fort,
+pas faire tourner le processus sans fin ni message. Résout **BPE-11** et **BPE-13**.
+
+**La sixième n'était pas bloquée du tout.** `cloches1` *produit* — son tampon croît
+géométriquement (6876 → 10300 → 15452 → 23180 jetons). C'est une dérivation qui explose. Deux
+choses distinctes, à ne pas confondre : son réglage `MaxConsoleTime` converti vaut **59944 s**
+(16 h 39), valeur jamais plausible — défaut de corpus ; mais même ramené à 30 s avec un seul
+item, le moteur **ne s'arrête pas** — la limite de temps de calcul ne coupe rien pendant
+l'expansion du tampon. Bug **#56**, nouvel item **BPE-14**. Elle reste muette.
 
 ### v5 → v6 : le lot annoncé « tri des 11 erreurs de compilation »
 
@@ -31,7 +59,8 @@ ni `dhin` (22), ni `checkVolChan` (6), ni `checkAllCsound` (30). Leur cause est 
 | v2 | 2026-07-18 | 86 | 52 | répétition (N items) | `7a970ac` |
 | v3 | 2026-07-18 | 88 | 54 | répétition (N items) | `b59091c` |
 | v5 | 2026-07-18 | 89 | 54 | par action | `8dd3ec5` |
-| **v6** | **2026-07-19** | **90** | **55** | par action | ce commit |
+| v6 | 2026-07-19 | 90 | 55 | par action | `5dd8c41` |
+| **v7** | **2026-07-19** | **95** | **60** | par action | ce commit |
 
 | version | figée le | productibles | MIDI | capture | commit |
 |---|---|---|---|---|---|

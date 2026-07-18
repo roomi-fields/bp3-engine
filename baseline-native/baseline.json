@@ -1,14 +1,14 @@
 {
- "version": "v6",
+ "version": "v7",
  "figee_le": "2026-07-19",
  "date": "2026-07-18",
  "binaire": "bp3 v3.4.4 (graphics-for-BP3)",
  "seed": "1",
  "n": 113,
  "capture": "par ACTION : single (le jeu, 1 item, graine fixe) des que la grammaire joue ; produce-all (l ensemble) pour les grammaires purement symboliques quand le moteur accepte d enumerer",
- "productibles": 90,
+ "productibles": 95,
  "produce_all": 30,
- "single": 60,
+ "single": 65,
  "grammaires": [
   {
    "grammaire": "765432",
@@ -455,15 +455,15 @@
    "grammaire": "blurb",
    "source": "-gr.blurb",
    "action": "single",
-   "modalite": null,
-   "produit": false,
-   "raison": "blocage (> 90 s sans rendre la main)",
-   "jetons_midi": 0,
-   "mots_texte": 0,
-   "items": 0,
-   "items_enumeres": null,
+   "modalite": "MIDI",
+   "produit": true,
+   "raison": null,
+   "jetons_midi": 8,
+   "mots_texte": 14,
+   "items": 1,
+   "items_enumeres": 1,
    "enumeration_refusee_par_le_moteur": false,
-   "joue": false,
+   "joue": true,
    "config": {
     "-se": "-se.blurb",
     "-cs": "-cs.tryCsound"
@@ -471,7 +471,9 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": null
+   "capture": "captures/blurb.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu",
+   "texte_structure": false
   },
   {
    "grammaire": "check&",
@@ -738,7 +740,7 @@
    "action": "single",
    "modalite": null,
    "produit": false,
-   "raison": "blocage (> 90 s sans rendre la main)",
+   "raison": "production galoppante, pas un blocage : le tampon croit geometriquement (6876 -> 10300 -> 15452 -> 23180 jetons). Reglage MaxConsoleTime converti a 59944 s (16 h 39) ; meme ramene a 30 s le moteur ne coupe pas. Bug #56 / BPE-14.",
    "jetons_midi": 0,
    "mots_texte": 0,
    "items": 0,
@@ -758,15 +760,15 @@
    "grammaire": "csound",
    "source": "-gr.tryCsound",
    "action": "single",
-   "modalite": null,
-   "produit": false,
-   "raison": "blocage (> 90 s sans rendre la main)",
-   "jetons_midi": 0,
-   "mots_texte": 0,
-   "items": 0,
-   "items_enumeres": null,
+   "modalite": "MIDI",
+   "produit": true,
+   "raison": null,
+   "jetons_midi": 8,
+   "mots_texte": 11,
+   "items": 1,
+   "items_enumeres": 2,
    "enumeration_refusee_par_le_moteur": false,
-   "joue": false,
+   "joue": true,
    "config": {
     "-se": "-se.tryCsound",
     "-cs": "-cs.tryCsound"
@@ -774,7 +776,9 @@
    "convention": null,
    "config_source": "en-tete",
    "declare": "midi",
-   "capture": null
+   "capture": "captures/csound.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu",
+   "texte_structure": false
   },
   {
    "grammaire": "destru",
@@ -2390,15 +2394,15 @@
    "grammaire": "vina",
    "source": "-gr.vina",
    "action": "single",
-   "modalite": null,
-   "produit": false,
-   "raison": "blocage (> 90 s sans rendre la main)",
-   "jetons_midi": 0,
-   "mots_texte": 0,
-   "items": 0,
+   "modalite": "MIDI",
+   "produit": true,
+   "raison": null,
+   "jetons_midi": 5,
+   "mots_texte": 73,
+   "items": 1,
    "items_enumeres": null,
-   "enumeration_refusee_par_le_moteur": false,
-   "joue": false,
+   "enumeration_refusee_par_le_moteur": true,
+   "joue": true,
    "config": {
     "-se": "-se.Vina",
     "-cs": "-cs.Vina"
@@ -2406,21 +2410,23 @@
    "convention": "indian",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": null
+   "capture": "captures/vina.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu",
+   "texte_structure": true
   },
   {
    "grammaire": "vina2",
    "source": "-gr.vina2",
    "action": "single",
-   "modalite": null,
-   "produit": false,
-   "raison": "blocage (> 90 s sans rendre la main)",
-   "jetons_midi": 0,
-   "mots_texte": 0,
-   "items": 0,
-   "items_enumeres": null,
+   "modalite": "MIDI",
+   "produit": true,
+   "raison": null,
+   "jetons_midi": 1,
+   "mots_texte": 7,
+   "items": 1,
+   "items_enumeres": 1,
    "enumeration_refusee_par_le_moteur": false,
-   "joue": false,
+   "joue": true,
    "config": {
     "-se": "-se.Vina",
     "-cs": "-cs.Vina"
@@ -2428,21 +2434,23 @@
    "convention": "indian",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": null
+   "capture": "captures/vina2.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu",
+   "texte_structure": true
   },
   {
    "grammaire": "vina3",
    "source": "-gr.vina3",
    "action": "single",
-   "modalite": null,
-   "produit": false,
-   "raison": "blocage (> 90 s sans rendre la main)",
-   "jetons_midi": 0,
-   "mots_texte": 0,
-   "items": 0,
+   "modalite": "MIDI",
+   "produit": true,
+   "raison": null,
+   "jetons_midi": 57,
+   "mots_texte": 216,
+   "items": 1,
    "items_enumeres": null,
-   "enumeration_refusee_par_le_moteur": false,
-   "joue": false,
+   "enumeration_refusee_par_le_moteur": true,
+   "joue": true,
    "config": {
     "-se": "-se.Vina3",
     "-to": "-to.Vina",
@@ -2451,7 +2459,9 @@
    "convention": null,
    "config_source": "en-tete",
    "declare": "midi",
-   "capture": null
+   "capture": "captures/vina3.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu",
+   "texte_structure": true
   },
   {
    "grammaire": "visser-shapes",
@@ -2565,8 +2575,8 @@
   }
  ],
  "degenerees": 1,
- "productibles_utilisables": 89,
+ "productibles_utilisables": 94,
  "captures_texte_structurees": 5,
  "doublons": 2,
- "muettes_reelles": 21
+ "muettes_reelles": 16
 }

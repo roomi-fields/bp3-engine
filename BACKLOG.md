@@ -27,7 +27,14 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
 - **M2** `ouvert` — Couches de correction WASM NON portées en natif : `#33` dédup keep-longest, `#35` offset Kpress, `#32` drift MIDI. Le natif émet le TimeSet brut (fait foi) ; documenter l'écart par cas.
 - **M3** `fait` — `PrintArg→FILE*` ne sort pas les NOMS de jetons (Bernard a commenté le `fprintf` de `Display()`, « Fixed by BB 2022-02-20 »). Conséquence : pas de flag `--textout` dédié possible proprement. Contourné : ordre des jetons texte = `produce -o` (sortie brute lossless). Voir memory `oracle-texte-option-o`.
 
-- **BPE-11** `ouvert` [P2] — CHARGEMENT `-cs` : BLOCAGE > 240 s. Sur `tryCsound` et `vina3`,
+- **BPE-11** `RESOLU 2026-07-19` [P2] — **Root-cause trouve.** Le lecteur de ressources Csound
+  boucle sans fin quand la section `_begin tables` n'est pas fermee (`SaveLoads1.c:434-448` :
+  les seules sorties sont `_end tables` ou une ligne VIDE ; a la vraie fin de fichier, rien).
+  Cause de corpus : l'habillage HTML de l'epoque BP2 avait mange le `_end tables` de
+  `-cs.Vina`, `-cs.tryCsound` et `-cs.tryCsoundObjects`. **Corriges** (des-habillage + marqueur) :
+  `blurb`, `csound`, `vina`, `vina2`, `vina3` passent de > 90 s de blocage a une production en 1 s.
+  Le defaut MOTEUR subsiste et est remonte a Bernard Bel : **bug #55**. Constat d'origine :
+  CHARGEMENT `-cs` : BLOCAGE > 240 s. Sur `tryCsound` et `vina3`,
   passer le fichier Csound declare en tete fait BOUCLER le moteur : aucune sortie, aucun message,
   code 124 apres 240 s (mesure `/usr/bin/time` : 241,2 s). SANS `-cs`, les memes grammaires
   echouent VITE et proprement : « Error code 15: argument syntax » sur `_ins(3)` / `_ins(Vina)`
@@ -184,4 +191,13 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
 - **BPE-9** `ouvert` [P3] — BPE-5 (mojibake) : 3 fichiers -gr cassent la compilation car un mojibake (³ pour >=, Ê, Â) tombe DANS une regle (a, Mozartexpression, Rajeev ; + tryflags3). 20 -gr portent la signature mais seuls ceux ou elle est dans une regle cassent. Nettoyer l encodage.
 - **BPE-10** (ANNULE avec BPE-7) `ouvert` [P2] — BPE-7-RESIDU-NOTECONV : 3 fichiers -se.* (dhati2, koto1, tryWait) ont une convention de note HORS plage 0/1/2 (=5,5,3) apres conversion (position 47 lue ne contenait pas la convention). Post-JSON, la valeur du FICHIER gagne sur php_ref -> le fix doit etre DANS le fichier. FIX = determiner la BONNE convention par RECOUPEMENT de production (comme Djinns/Mozartexpression) et l ecrire dans le fichier ; si la grammaire est sans note (symboles seuls), retirer la cle (defaut). Affecte dhati2/dhati3/koto1/koto2 (produisent mais spelling possiblement faux).
 - **BPE-12** `ouvert` [P3] — PORTAGE-FEATURES-BP2 : 5 grammaires du lot 48 bloquees par des FEATURES non portees (pas un trou de harnais) : _cont/_value/_ins/_step/_fixed, liaison '&' (testTie7), terminaux de gamme (tryScales fap3), blurb. Vrai portage moteur BP2->BP3, a instruire quand priorise. Distinct des trous de mesure (deja resolus).
-- **BPE-13** `ouvert` [P3] — BPE-11-CS-LOOP : tryCsound + vina3 BOUCLENT avec -cs (config correcte) : 0 sortie, code 124, ~241s puis tue ; SANS -cs elles echouent vite (Error 15 _ins). Possible meme famille que bug #50 (watch ~257s). Pas root-cause (boucle infinie vs lenteur patho indistingues). A instruire, non bloquant.
+- **BPE-13** `RESOLU 2026-07-19` [P3] — meme cause que BPE-11 (bug moteur #55, section de tables
+  non fermee dans le `-cs`). Corpus corrige, les deux grammaires produisent. Constat d'origine :
+  BPE-11-CS-LOOP : tryCsound + vina3 BOUCLENT avec -cs (config correcte) : 0 sortie, code 124, ~241s puis tue ; SANS -cs elles echouent vite (Error 15 _ins). Possible meme famille que bug #50 (watch ~257s). Pas root-cause (boucle infinie vs lenteur patho indistingues). A instruire, non bloquant.
+
+- **BPE-14** `ouvert` [P2] — `cloches1` : production GALOPANTE, pas un blocage. Le tampon croit
+  geometriquement (6876 -> 10300 -> 15452 -> 23180 jetons...). Deux causes distinctes a ne pas
+  confondre : (a) CORPUS — son `MaxConsoleTime` converti vaut 59944 s (16 h 39), valeur jamais
+  plausible, la garde de plausibilite de la conversion l'a laissee passer ; (b) MOTEUR — meme
+  ramene a 30 s avec un seul item, le moteur ne s'arrete pas dans les 60 s : la limite de temps
+  de calcul ne coupe pas pendant l'expansion du tampon. Remonte a Bernard Bel : **bug #56**.

@@ -1,19 +1,21 @@
 # Baseline native — tableau par grammaire
 
-**v8** — figée le 2026-07-19 · binaire bp3 v3.4.4 (graphics-for-BP3) · graine 1
+**v9** — figée le 2026-07-19 · binaire bp3 v3.4.4 (graphics-for-BP3) · graine 1
 
 `action` = ce que fait le moteur nativement. Les deux voies doivent répliquer **la même action**.
 
 - **single** = la grammaire *joue* un morceau : une réalisation, un item, graine fixe.
 - **produce-all** = production purement symbolique, le moteur énumère l'ensemble.
 
-## Les 94 qui produisent
+## Les 96 qui produisent
 
 | grammaire | action | mode natif | jetons | mots | items | énumération |
 |---|---|---|---|---|---|---|
 | `all-items` | produce-all | TEXTE | 0 | 36 | 12 | acceptée (12 items) |
 | `all-items1` | produce-all | TEXTE | 0 | 36 | 12 | acceptée (12 items) |
 | `checkBT` | produce-all | TEXTE | 0 | 4 | 1 | acceptée (1 items) |
+| `checkHomo` | produce-all | TEXTE | 0 | 8 | 1 | acceptée (1 items) |
+| `checkhomo2` | produce-all | TEXTE | 0 | 23 | 6 | acceptée (6 items) |
 | `destru` | produce-all | TEXTE | 0 | 48 | 2 | acceptée (2 items) |
 | `dhadhatite` | produce-all | TEXTE | 0 | 2 | 1 | acceptée (1 items) |
 | `dhadhatite1` | produce-all | TEXTE | 0 | 2 | 1 | acceptée (1 items) |
@@ -108,12 +110,12 @@
 
 ## Doublons — 2 entrées qui ne sont pas des grammaires à mesurer
 
-| entrée | doublon de | preuve |
-|---|---|---|
-| `a.html` | `checkSUB1` | règles identiques une fois le balisage HTML retiré |
-| `tryflags3.html` | `tryflags3` | règles identiques une fois le balisage HTML retiré |
+| entrée | doublon de |
+|---|---|
+| `a.html` | `checkSUB1` |
+| `tryflags3.html` | `tryflags3` |
 
-## Les 17 qui ne produisent pas
+## Les 15 qui ne produisent pas
 
 | grammaire | cause |
 |---|---|
@@ -121,10 +123,8 @@
 | `Rajeev` | 27 erreur(s) de compilation : Variable must start with uppercase character or '|'. Can't make sense  |
 | `a` | 4 erreur(s) de compilation : Error code 52: Missing slash after /flag/ in gram#2 rule 3 |
 | `checkAllCsound` | 30 erreur(s) de compilation : => You probably forgot to create or load a '-cs' instrument file |
-| `checkHomo` | => Can't compile alphabet |
 | `checkVolChan` | 6 erreur(s) de compilation : => Incorrect note. (May be wrong note convention) |
 | `checkcontext` | => Calculation overflow (10000 derivations): task abandoned. Loop? |
-| `checkhomo2` | => Can't compile alphabet |
 | `checkrests` | 12 erreur(s) de compilation : Variable must start with uppercase character or '|'. Can't make sense  |
 | `cloches1` | production galoppante, pas un blocage : le tampon croit geometriquement (6876 -> 10300 -> 15452 -> 23180 jetons). Reglag |
 | `dhin` | 22 erreur(s) de compilation : Variable must start with uppercase character or '|'. Can't make sense  |

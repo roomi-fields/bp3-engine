@@ -1,9 +1,37 @@
 # Baseline native « original » — jeu unique, daté, vérifié
 
-## 🔖 **baseline v8 — figée le 2026-07-19 — détection du refus corrigée**
+## 🔖 **baseline v9 — figée le 2026-07-19 — alphabets BP2 : deux lignes d'en-tête bloquaient tout**
 
-**94 productibles**, **2 doublons**, **17 muettes réelles**, **113 entrées au total**.
-Modes natifs : **MIDI 60** · **TEXTE 34**. Actions : **single 67** · **produce-all 27**.
+**96 productibles**, **2 doublons**, **15 muettes réelles**, **113 entrées au total**.
+Modes natifs : **MIDI 60** · **TEXTE 36**. Actions : **single 67** · **produce-all 29**.
+
+### v8 → v9 : `checkHomo` et `checkhomo2` récupérées — la cause tient en un caractère
+
+Les deux échouaient sur `=> Can't compile alphabet`, sans plus de détail. Le message précis,
+une fois isolé, est sans ambiguïté :
+
+```
+Can't accept character ":" in alphabet
+```
+
+Or leur alphabet `-ho.checkhomo` ne contient **qu'un seul** `:` — dans sa ligne d'en-tête BP2
+`Date: Lun 17 Avr 1995 -- 22:18`. Le compilateur d'alphabet ne saute pas cet en-tête et refuse
+le caractère. Deux lignes bloquaient les deux grammaires.
+
+Correction en **données, sans rien détruire** : un alphabet dérivé `-al.checkhomo` est ajouté,
+identique au corps près des deux lignes d'en-tête. L'original `-ho.checkhomo` est conservé tel
+quel. C'est le même procédé que les 5 alphabets dérivés créés précédemment.
+Résultat : **0 erreur de compilation**, `checkHomo` (8 mots) et `checkhomo2` (23 mots, 6 items)
+produisent.
+
+**Balayage complet plutôt que le seul cas signalé** : les 11 alphabets `-ho.` à en-tête BP2 ont
+tous ce `:` en ligne 2. Six avaient déjà un dérivé ; j'ai créé les **cinq manquants**
+(`MyAlphabet`, `Rajeev`, `abc2`, `checkhomo`, `kathak`). Seul `checkhomo` était référencé par
+des grammaires — les quatre autres sont orphelins, mais le piège est désormais désamorcé pour
+eux aussi.
+
+⚠ **Ce n'est pas la cause de `Rajeev`** : testée avec et sans son alphabet dérivé, elle donne
+**27 erreurs dans les deux cas**. Sa cause est ailleurs.
 
 ### v7 → v8 : mon détecteur de refus ne connaissait qu'un message sur trois
 
@@ -96,7 +124,8 @@ ni `dhin` (22), ni `checkVolChan` (6), ni `checkAllCsound` (30). Leur cause est 
 | v5 | 2026-07-18 | 89 | 54 | par action | `8dd3ec5` |
 | v6 | 2026-07-19 | 90 | 55 | par action | `5dd8c41` |
 | v7 | 2026-07-19 | 95 | 60 | par action | `cc7912f` |
-| **v8** | **2026-07-19** | **94** | **60** | par action | ce commit |
+| v8 | 2026-07-19 | 94 | 60 | par action | `2740868` |
+| **v9** | **2026-07-19** | **96** | **60** | par action | ce commit |
 
 | version | figée le | productibles | MIDI | capture | commit |
 |---|---|---|---|---|---|

@@ -1,13 +1,13 @@
 {
- "version": "v8",
+ "version": "v9",
  "figee_le": "2026-07-19",
  "date": "2026-07-18",
  "binaire": "bp3 v3.4.4 (graphics-for-BP3)",
  "seed": "1",
  "n": 113,
  "capture": "par ACTION : single (le jeu, 1 item, graine fixe) des que la grammaire joue ; produce-all (l ensemble) pour les grammaires purement symboliques quand le moteur accepte d enumerer",
- "productibles": 94,
- "produce_all": 27,
+ "productibles": 96,
+ "produce_all": 29,
  "single": 67,
  "grammaires": [
   {
@@ -545,23 +545,25 @@
   {
    "grammaire": "checkHomo",
    "source": "-gr.checkHomo",
-   "action": null,
-   "modalite": null,
-   "produit": false,
-   "raison": "=> Can't compile alphabet",
+   "action": "produce-all",
+   "modalite": "TEXTE",
+   "produit": true,
+   "raison": null,
    "jetons_midi": 0,
-   "mots_texte": 0,
-   "items": 0,
-   "items_enumeres": null,
+   "mots_texte": 8,
+   "items": 1,
+   "items_enumeres": 1,
    "enumeration_refusee_par_le_moteur": false,
    "joue": false,
    "config": {
-    "-al": "-ho.checkhomo"
+    "-al": "-al.checkhomo"
    },
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": null
+   "capture": "captures/checkHomo.text.txt",
+   "enumeration_statut": "acceptee par le moteur",
+   "texte_structure": false
   },
   {
    "grammaire": "checkSUB",
@@ -697,23 +699,25 @@
   {
    "grammaire": "checkhomo2",
    "source": "-gr.checkhomo2",
-   "action": null,
-   "modalite": null,
-   "produit": false,
-   "raison": "=> Can't compile alphabet",
+   "action": "produce-all",
+   "modalite": "TEXTE",
+   "produit": true,
+   "raison": null,
    "jetons_midi": 0,
-   "mots_texte": 0,
-   "items": 0,
-   "items_enumeres": null,
+   "mots_texte": 23,
+   "items": 6,
+   "items_enumeres": 6,
    "enumeration_refusee_par_le_moteur": false,
    "joue": false,
    "config": {
-    "-al": "-ho.checkhomo"
+    "-al": "-al.checkhomo"
    },
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": null
+   "capture": "captures/checkhomo2.text.txt",
+   "enumeration_statut": "acceptee par le moteur",
+   "texte_structure": false
   },
   {
    "grammaire": "checkrests",
@@ -2573,8 +2577,8 @@
   }
  ],
  "degenerees": 0,
- "productibles_utilisables": 94,
+ "productibles_utilisables": 96,
  "captures_texte_structurees": 5,
  "doublons": 2,
- "muettes_reelles": 17
+ "muettes_reelles": 15
 }

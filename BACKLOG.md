@@ -201,3 +201,11 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   plausible, la garde de plausibilite de la conversion l'a laissee passer ; (b) MOTEUR — meme
   ramene a 30 s avec un seul item, le moteur ne s'arrete pas dans les 60 s : la limite de temps
   de calcul ne coupe pas pendant l'expansion du tampon. Remonte a Bernard Bel : **bug #56**.
+
+- **BPE-15** `ouvert` [P2] — REGLES DE DRAPEAUX SEULS refusees (« Error code 8: incorrect
+  expression or bad derivation »). Signature partagee par plusieurs muettes : une regle qui ne
+  contient QUE des drapeaux, sans membre gauche ni fleche — ex. `-gr.tryTranspose` rule 2
+  (`/Atimes = 20/ /Btimes = 19/ /Ctimes = 5/ /Dtimes = 5/`), et 20 occurrences dans `-gr.Rajeev`.
+  `-gr.a` presente une variante proche (« Error code 52: Missing slash after /flag/ » sur
+  `Dummy --> /K2 = 11/`). A instruire : notation BP2 d'initialisation de drapeaux abandonnee,
+  ou defaut du compilateur ? Non tranche, aucun correctif applique.

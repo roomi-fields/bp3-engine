@@ -1,13 +1,13 @@
 # Baseline native — tableau par grammaire
 
-**v7** — figée le 2026-07-19 · binaire bp3 v3.4.4 (graphics-for-BP3) · graine 1
+**v8** — figée le 2026-07-19 · binaire bp3 v3.4.4 (graphics-for-BP3) · graine 1
 
 `action` = ce que fait le moteur nativement. Les deux voies doivent répliquer **la même action**.
 
 - **single** = la grammaire *joue* un morceau : une réalisation, un item, graine fixe.
 - **produce-all** = production purement symbolique, le moteur énumère l'ensemble.
 
-## Les 95 qui produisent
+## Les 94 qui produisent
 
 | grammaire | action | mode natif | jetons | mots | items | énumération |
 |---|---|---|---|---|---|---|
@@ -24,9 +24,6 @@
 | `ek-do-tin` | produce-all | TEXTE | 0 | 99 | 1 | acceptée (1 items) |
 | `flags` | produce-all | TEXTE | 0 | 400 | 20 | acceptée (20 items) |
 | `gramgene1` | produce-all | TEXTE | 0 | 142 | 25 | acceptée (25 items) |
-| `koto1` | produce-all | TEXTE | 0 | 8 | 1 | acceptée (1 items) |
-| `koto2` | produce-all | TEXTE | 0 | 8 | 1 | acceptée (1 items) |
-| `look-and-say` ⚠ | produce-all | TEXTE | 0 | 1 | 1 | acceptée (1 items) |
 | `polyphony1` | produce-all | TEXTE | 0 | 76 | 25 | acceptée (25 items) |
 | `repeat` | produce-all | TEXTE | 0 | 40 | 5 | acceptée (5 items) |
 | `templates` | produce-all | TEXTE | 0 | 25 | 5 | acceptée (5 items) |
@@ -68,6 +65,8 @@
 | `gramgene2` | single | TEXTE | 0 | 78 | 1 | **bloquée** > 90 s |
 | `graphics` | single | MIDI | 6 | 7 | 1 | — (elle joue) |
 | `harmony` | single | MIDI | 20 | 20 | 1 | — (elle joue) |
+| `koto1` | single | TEXTE | 0 | 7 | 1 | **refusée** (SUB) |
+| `koto2` | single | TEXTE | 0 | 7 | 1 | **refusée** (SUB) |
 | `koto3` | single | MIDI | 2 | 15 | 1 | — (elle joue) |
 | `kss2` | single | MIDI | 97 | 138 | 1 | — (elle joue) |
 | `livecode1` | single | MIDI | 27 | 23 | 1 | — (elle joue) |
@@ -107,8 +106,6 @@
 | `visser5` | single | MIDI | 1152 | 1822 | 1 | — (elle joue) |
 | `watch` | single | MIDI | 2105 | 5122 | 1 | — (elle joue) |
 
-⚠ `look-and-say` — production degeneree : la sortie est le seul terminal de depart ("'1'"), aucune regle n'a ete appliquee. Le bug moteur #51 (all weights are nil) reste actif ; ne pas s'en servir comme reference.
-
 ## Doublons — 2 entrées qui ne sont pas des grammaires à mesurer
 
 | entrée | doublon de | preuve |
@@ -116,7 +113,7 @@
 | `a.html` | `checkSUB1` | règles identiques une fois le balisage HTML retiré |
 | `tryflags3.html` | `tryflags3` | règles identiques une fois le balisage HTML retiré |
 
-## Les 16 qui ne produisent pas
+## Les 17 qui ne produisent pas
 
 | grammaire | cause |
 |---|---|
@@ -129,9 +126,10 @@
 | `checkcontext` | => Calculation overflow (10000 derivations): task abandoned. Loop? |
 | `checkhomo2` | => Can't compile alphabet |
 | `checkrests` | 12 erreur(s) de compilation : Variable must start with uppercase character or '|'. Can't make sense  |
-| `cloches1` | production galoppante, pas un blocage : le tampon croit geometriquement (6876 -> 10300 -> 15452 -> 23180 jeton |
+| `cloches1` | production galoppante, pas un blocage : le tampon croit geometriquement (6876 -> 10300 -> 15452 -> 23180 jetons). Reglag |
 | `dhin` | 22 erreur(s) de compilation : Variable must start with uppercase character or '|'. Can't make sense  |
 | `keys` | aucune sortie, aucun message |
+| `look-and-say` | bug moteur #51 (« all weights are nil in gram#1 »). Le « 1 item » compte en v5-v7 etait un ARTEFACT : le residu de tampo |
 | `scales` | => Error reading Csound instruments file:  /home/romi/dev/bp/bp3-engine/test-dat |
 | `transposition` | 2 erreur(s) de compilation : Variable must start with uppercase character or '|'. Can't make sense  |
 | `tryConsoleMaxTime` | => Calculation overflow (10000 derivations): task abandoned. Loop? |

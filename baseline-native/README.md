@@ -1,10 +1,45 @@
 # Baseline native « original » — jeu unique, daté, vérifié
 
-## 🔖 **baseline v7 — figée le 2026-07-19 — blocages élucidés**
+## 🔖 **baseline v8 — figée le 2026-07-19 — détection du refus corrigée**
 
-**95 productibles** (dont 1 sous réserve → **94 utilisables**), **2 doublons**, **16 muettes
-réelles**, **113 entrées au total**.
-Modes natifs : **MIDI 60** · **TEXTE 35**. Actions : **single 65** · **produce-all 30**.
+**94 productibles**, **2 doublons**, **17 muettes réelles**, **113 entrées au total**.
+Modes natifs : **MIDI 60** · **TEXTE 34**. Actions : **single 67** · **produce-all 27**.
+
+### v7 → v8 : mon détecteur de refus ne connaissait qu'un message sur trois
+
+Signalé par bpx via bp3-frontend sur `koto2`, et **arbitré contre ma baseline** : c'est elle qui
+avait tort. En vérifiant, le défaut est plus large que le cas signalé.
+
+Le moteur refuse l'énumération par **trois messages distincts**, et le détecteur n'en connaissait
+qu'un :
+
+| message | fichier | connu de v5-v7 ? |
+|---|---|---|
+| `Can't produce all items in 'SUB' or 'SUB1' or 'POSLONG' subgrammar gram#N` | `ProduceItems.c:770` | oui |
+| `You cannot produce all items in a 'SUB' subgrammar` | `Compute.c:1156` | **non** |
+| `Cannot produce all items because this grammar contains a '…' instruction` | `CompileProcs.c:568` | **non** |
+
+Les 30 grammaires classées `produce-all` ont été **toutes** re-vérifiées avec les trois messages.
+**Trois étaient mal classées**, pas une : `koto1`, `koto2`, `look-and-say`. Elles passent en
+`single` avec `enumeration_statut = refusée (SUB, Compute.c:1156)`.
+
+**`checkBT` a été vérifiée explicitement** (elle aussi affichait `produce-all` / 1 item) : aucun
+message de refus, son énumération de taille 1 est **réelle**. Elle ne bouge pas.
+
+### L'artefact du « 1 item » — et ce qu'il coûtait
+
+Quand le moteur refuse l'énumération, `-o` écrit quand même un **résidu de tampon** sur le
+disque. Compter les lignes du fichier donne alors « 1 item » là où le moteur en a produit **zéro**.
+C'est ce résidu qui masquait les trois refus.
+
+Conséquence directe : **`look-and-say` n'a jamais produit.** Son « gain » annoncé en v5 était
+entièrement cet artefact — en action `single` elle ne produit rien du tout. Elle redevient muette,
+sur le bug moteur **#51**. La réserve que je lui avais mise était donc justifiée, mais trop douce :
+ce n'était pas une production dégénérée, c'était une non-production.
+
+> **La règle qui en découle, et qui vaut pour les deux voies** : ne pas faire émettre le
+> résidu-au-refus pour « faire coïncider » le compte. Reproduire un artefact d'interface, c'est
+> masquer le refus. BPx a raison de renvoyer un refus franc.
 
 ### v6 → v7 : le lot des blocages — 5 récupérées sur 6, cause trouvée
 
@@ -60,7 +95,8 @@ ni `dhin` (22), ni `checkVolChan` (6), ni `checkAllCsound` (30). Leur cause est 
 | v3 | 2026-07-18 | 88 | 54 | répétition (N items) | `b59091c` |
 | v5 | 2026-07-18 | 89 | 54 | par action | `8dd3ec5` |
 | v6 | 2026-07-19 | 90 | 55 | par action | `5dd8c41` |
-| **v7** | **2026-07-19** | **95** | **60** | par action | ce commit |
+| v7 | 2026-07-19 | 95 | 60 | par action | `cc7912f` |
+| **v8** | **2026-07-19** | **94** | **60** | par action | ce commit |
 
 | version | figée le | productibles | MIDI | capture | commit |
 |---|---|---|---|---|---|
@@ -239,12 +275,6 @@ une modalité déclarée fausse** (inchangé depuis v1) : `Alarm` (midi → TEXT
 
 ⚠ Nuance : **MIDI pur = 0**. Les 54 grammaires « MIDI » émettent **aussi** du texte. Le
 discriminant réel est : *émet-elle des jetons minutés en plus du texte ?*
-
-## Réserve sur `look-and-say`
-
-Seule grammaire gagnée depuis v3, et **inutilisable comme référence** : sa sortie est le
-seul terminal de départ (`'1'`), aucune règle n'a été appliquée. Le bug moteur **#51**
-(« all weights are nil ») reste actif. Elle est marquée `reserve` dans `baseline.json`.
 
 ## Ce que cette baseline est, et ce qu'elle n'est pas
 

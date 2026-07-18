@@ -1,14 +1,14 @@
 {
- "version": "v7",
+ "version": "v8",
  "figee_le": "2026-07-19",
  "date": "2026-07-18",
  "binaire": "bp3 v3.4.4 (graphics-for-BP3)",
  "seed": "1",
  "n": 113,
  "capture": "par ACTION : single (le jeu, 1 item, graine fixe) des que la grammaire joue ; produce-all (l ensemble) pour les grammaires purement symboliques quand le moteur accepte d enumerer",
- "productibles": 95,
- "produce_all": 30,
- "single": 65,
+ "productibles": 94,
+ "produce_all": 27,
+ "single": 67,
  "grammaires": [
   {
    "grammaire": "765432",
@@ -1201,15 +1201,15 @@
   {
    "grammaire": "koto1",
    "source": "-gr.koto1",
-   "action": "produce-all",
+   "action": "single",
    "modalite": "TEXTE",
    "produit": true,
    "raison": null,
    "jetons_midi": 0,
-   "mots_texte": 8,
+   "mots_texte": 7,
    "items": 1,
-   "items_enumeres": 1,
-   "enumeration_refusee_par_le_moteur": false,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": true,
    "joue": false,
    "config": {
     "-se": "-se.koto3",
@@ -1219,21 +1219,21 @@
    "config_source": "php_ref",
    "declare": "text",
    "capture": "captures/koto1.text.txt",
-   "enumeration_statut": "acceptee par le moteur",
+   "enumeration_statut": "refusee par le moteur (SUB, Compute.c:1156)",
    "texte_structure": false
   },
   {
    "grammaire": "koto2",
    "source": "-gr.koto2",
-   "action": "produce-all",
+   "action": "single",
    "modalite": "TEXTE",
    "produit": true,
    "raison": null,
    "jetons_midi": 0,
-   "mots_texte": 8,
+   "mots_texte": 7,
    "items": 1,
-   "items_enumeres": 1,
-   "enumeration_refusee_par_le_moteur": false,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": true,
    "joue": false,
    "config": {
     "-se": "-se.koto3",
@@ -1243,7 +1243,7 @@
    "config_source": "php_ref",
    "declare": "text",
    "capture": "captures/koto2.text.txt",
-   "enumeration_statut": "acceptee par le moteur",
+   "enumeration_statut": "refusee par le moteur (SUB, Compute.c:1156)",
    "texte_structure": false
   },
   {
@@ -1338,15 +1338,15 @@
   {
    "grammaire": "look-and-say",
    "source": "-gr.look-and-say",
-   "action": "produce-all",
-   "modalite": "TEXTE",
-   "produit": true,
-   "raison": null,
+   "action": null,
+   "modalite": null,
+   "produit": false,
+   "raison": "bug moteur #51 (« all weights are nil in gram#1 »). Le « 1 item » compte en v5-v7 etait un ARTEFACT : le residu de tampon ecrit par -o lors du REFUS d'enumeration, pas une production. En action single elle ne produit rien du tout.",
    "jetons_midi": 0,
-   "mots_texte": 1,
-   "items": 1,
-   "items_enumeres": 1,
-   "enumeration_refusee_par_le_moteur": false,
+   "mots_texte": 0,
+   "items": 0,
+   "items_enumeres": null,
+   "enumeration_refusee_par_le_moteur": true,
    "joue": false,
    "config": {
     "-se": "-se.look-and-say"
@@ -1354,10 +1354,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/look-and-say.text.txt",
-   "reserve": "production degeneree : la sortie est le seul terminal de depart (\"'1'\"), aucune regle n'a ete appliquee. Le bug moteur #51 (all weights are nil) reste actif ; ne pas s'en servir comme reference.",
-   "enumeration_statut": "acceptee par le moteur",
-   "texte_structure": false
+   "capture": null,
+   "enumeration_statut": "refusee par le moteur (SUB, Compute.c:1156)"
   },
   {
    "grammaire": "major-minor",
@@ -2574,9 +2572,9 @@
    "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   }
  ],
- "degenerees": 1,
+ "degenerees": 0,
  "productibles_utilisables": 94,
  "captures_texte_structurees": 5,
  "doublons": 2,
- "muettes_reelles": 16
+ "muettes_reelles": 17
 }

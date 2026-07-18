@@ -1,0 +1,19 @@
+{
+ "source": "bp3 natif v3.4.4",
+ "stage": "derivation",
+ "mode": "single",
+ "grammar": "checkSUB1",
+ "gr_file": "-gr.checkSUB1",
+ "config": {
+  "settings": "-se.koto3",
+  "alphabet": "-al.abc",
+  "sound_objects": null,
+  "seed": 1
+ },
+ "n_items": 1,
+ "items": [
+  "i j"
+ ],
+ "tokens": [],
+ "n_tokens": 0
+}

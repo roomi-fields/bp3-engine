@@ -1,0 +1,18 @@
+{
+ "source": "bp3 natif v3.4.4",
+ "stage": "derivation",
+ "mode": "produce-all",
+ "grammar": "checkSUB1",
+ "gr_file": "-gr.checkSUB1",
+ "config": {
+  "settings": "-se.koto3",
+  "alphabet": "-al.abc",
+  "sound_objects": null,
+  "seed": 1
+ },
+ "n_items": 0,
+ "items": [],
+ "tokens": [],
+ "n_tokens": 0,
+ "note": "VIDE PAR CONCEPTION : le moteur refuse produce-all sur une sous-grammaire SUB/SUB1/POSLONG (csrc/bp3/ProduceItems.c:770). Pas un bug, pas un oracle manquant : il N'EXISTE PAS d'oracle produce-all pour cette grammaire. Comparer en mode single."
+}

@@ -1,0 +1,20 @@
+{
+ "source": "bp3 natif v3.4.4",
+ "stage": "derivation",
+ "mode": "produce-all",
+ "grammar": "destru",
+ "gr_file": "-gr.tryDESTRU",
+ "config": {
+  "settings": "-se.tryDESTRU",
+  "alphabet": "-al.abc",
+  "sound_objects": "-so.abc",
+  "seed": 1
+ },
+ "n_items": 2,
+ "items": [
+  "c b a c b a c b a c b a c b a c b a c b a c b a c b a c b a c b a c b a",
+  "c b a c b a c b a c b a"
+ ],
+ "tokens": [],
+ "n_tokens": 0
+}

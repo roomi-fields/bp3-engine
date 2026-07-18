@@ -1,6 +1,6 @@
 // Bol Processor version BP2.8.0
 // Grammar file saved as '-gr.Djinns'. Date: Lun 16 Mars 1998 -- 21:35
--or.Djinns
+// -or.Djinns  (BPE-4 : type MIDI-orchestra desactive, wMIDIorchestra commente dans -BP3.h)
 -se.Djinns
 
 // Designed for Roland D-50, patch C54 (percussion set 1)

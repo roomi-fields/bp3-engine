@@ -30,7 +30,7 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
 - **BPE-1** `en-cours` [P1] — S0-HARNAIS-DEPS : s0_snapshot.cjs (BPscript/test) doit passer les DEPENDANCES declarees en tete de grammaire (-al alphabet, -gl, -cs csound, -to tonality) — actuellement il lance -gr seul -> echec spurieux (62/63 erreurs dhati = alphabet non charge). Fix = lire les deps par grammaire (logique dans scratchpad/reharness.py) et les passer. Recupere dhati + 5 grammaires (12345678, 765432, Nadaka, trial.mohanam, tryRagas) SANS toucher le moteur.  _(bloqué: CORRIGE : pas un fix code s0_snapshot.cjs — s0 passe DEJA -al si php_ref.alphabet present (l.202-210). Le vrai fix = entrees grammars.json manquantes (config), TERRITOIRE bpscript. bp3-engine fournit les specs, bpscript applique. Reassigne -> BPScript.)_  _(en-cours: DEBLOQUE+RESOLU cote specs : bp3-engine a livre les 6 specs grammars.json (message #56), corpus BPE-2 nettoye (fc2b364). bpscript applique (BPS-16).)_
 - **BPE-2** `fait` [P2] — CORPUS-HTML-STARTSTRING : 28 fichiers -se.* portaient une chaine de depart corrompue `<HTML>S</HTML>` au lieu de `S` (artefact export web) -> moteur ne derivait rien. **25 nettoyes** (forme simple, identique a la forme saine de reference `-se.Alarm`/`-se.blurb` : `STARTSTRING:` puis le symbole nu). Verifie : le moteur lit desormais `STARTSTRING: S`. Aucune des 7 grammaires recuperees n'utilise un fichier touche (non-regression). NB : sur -se.a, corriger la chaine seule ne suffit pas (format ancien non-JSON, impasse distincte).
   - **BPE-2b** `bloqué` [P3] — 3 fichiers NON touches car forme multi-lignes `<HTML>S<BR>Part1<BR>Part2</HTML>` : `-se.checkArticulation`, `-se.checkControls`, `-se.lahras`. AUCUN fichier sain du corpus n'a de chaine de depart multi-lignes -> pas de reference pour trancher entre « 3 lignes S/Part1/Part2 » et « S seul ». Test empirique non concluant (le moteur ne lit que la 1re ligne ; -gr.checkControls ne se charge meme pas). Refus de deviner la semantique : demande d'arbitrage envoyee a l'architecte.
-- **BPE-4** `ouvert` [P1] — PREFIXE-OR-ORPHELIN : 7 grammaires declarent `-or.<nom>` en tete
+- **BPE-4** `fait` [P1] — PREFIXE-OR-ORPHELIN : 7 grammaires declarent `-or.<nom>` en tete
   (Djinns, checkVolMasterSlave, cloches1, Mozartexpression, Nadaka1, tryKeyMap, tryKeyXpand) et
   les fichiers `-or.*` EXISTENT dans test-data. Mais `-or.` n'a AUCUNE entree dans la table des
   prefixes connus : `csrc/bp3/-BP3.h:631` porte `// #define wMIDIorchestra 38` **commente**, et
@@ -39,15 +39,27 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   lit comme une REGLE -> « Error code 8 ... ??? -or.Djinns » -> 0 sortie.
   PREUVE : en retirant la seule ligne `-or.`, 3 grammaires produisent immediatement —
   Djinns 3671 o, tryKeyXpand 581 o, checkVolMasterSlave 91 o (les 4 autres ont un blocage en plus).
-  DECISION REQUISE (je n'improvise pas) : (a) re-activer le type MIDI-orchestra (port de feature),
-  ou (b) faire sauter au moteur toute ligne d'en-tete `-xx.` inconnue au lieu de la parser comme
-  regle (change la semantique de parsing). Arbitrage architecte/Bernard avant tout correctif.
-- **BPE-5** `ouvert` [P3] — CORPUS-MOJIBAKE : caracteres corrompus (MacRoman mal decode) dans les
+  APPLIQUE 2026-07-18 (arbitrage architecte [61] : correctif DONNEES, pas moteur) : les 7 lignes
+  `-or.` sont COMMENTEES (`// -or.<nom>  (BPE-4 : ...)`), PAS supprimees — l'information de
+  dependance est preservee pour le jour ou `wMIDIorchestra` sera reactive. Verifie : Djinns
+  produit 3671 o a l'identique avec la ligne commentee. 7 fichiers, 1 ligne chacun.
+  RESTE OUVERT COTE MOTEUR (hors ce correctif) : (a) re-activer le type MIDI-orchestra, ou
+  (b) faire sauter au moteur toute ligne d'en-tete `-xx.` inconnue. Non tranche, non urgent.
+- **BPE-5** `fait` [P3] — CORPUS-MOJIBAKE : caracteres corrompus (MacRoman mal decode) dans les
   grammaires, meme famille que BPE-2. `³` la ou il faut `≥` : `-gr.a`, `-gr.tryflags3` (2 fichiers ;
   un seul fichier du corpus a le `≥` correct) -> « Error code 52: Missing slash after /flag/ » sur
   `/K1³200/`. `Ê` (espace insecable corrompu) : `-gr.Mozartexpression` -> « Can't make sense of
   "Êt13Ê=Ê104/100" », Error code 46. NB : S0 patche deja 2 mojibakes (`¥`->`.`, `ž`->`u`,
-  s0_snapshot.cjs) mais pas ceux-ci — a corriger dans le corpus, pas dans le harnais.
+  s0_snapshot.cjs) mais pas ceux-ci.
+  APPLIQUE 2026-07-18 — cibles etablies par ANALYSE D'OCTETS (table MacRoman), pas par supposition :
+  `C2 B3` -> `≥` (MacRoman B3 = superieur-ou-egal ; usage `/K1≥100//K1<200/` s'apparie avec `<`) ;
+  `C3 8A` -> espace (MacRoman CA = espace insecable ; le voisinage utilise des espaces ordinaires) ;
+  `C3 82` -> `¬` (MacRoman C2 = signe NOT ; caractere DOCUMENTE `BP3_help.txt:541` : « periods
+  indicate beat delimitations and line breaks '¬' sections »).
+  5 fichiers corriges : -gr.a, -gr.tryflags3 (`≥`), -gr.Mozartexpression (espace), -gr.Rajeev,
+  -gr.tryTranspose (`¬`). RESULTAT : Mozartexpression RECUPEREE (0 erreur, 1255 o). Les 4 autres
+  progressent sans passer (a: 4 err, tryflags3: 5, tryTranspose: 4, Rajeev: 27) — causes restantes
+  distinctes, a trier.
 - **BPE-6** `ouvert` [P1] — REGLAGES-ANCIEN-FORMAT-NON-LUS : le moteur ne lit QUE des reglages JSON.
   Sur un `-se.*` au format BP2 positionnel il affiche « Could not parse JSON settings »
   (`csrc/bp3/SaveLoads1.c:607`) puis s'arrete SILENCIEUSEMENT (exit 0, aucune phase « Compiling
@@ -57,7 +69,7 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   59 en JSON** (143 au total). C'est le blocage DOMINANT du bucket, devant -ho et -or.
   Options : (a) porter convertOldSettings en C, (b) convertir le corpus une fois pour toutes,
   (c) laisser au harnais. Arbitrage requis.
-- **BPE-3** `ouvert` [P1] — PORTAGE-HO-CLI — ⚠ **RECADRE 2026-07-18, l'intitule etait trompeur** :
+- **BPE-3** `bloqué` [P1] — PORTAGE-HO-CLI — ⚠ **RECADRE 2026-07-18, l'intitule etait trompeur** :  _(bloqué: RECADRE (intitule trompeur) : -ho n est PAS de l homomorphisme — c est l ANCIEN NOM du fichier ALPHABET (FileOldPrefix[1]=-ho. == FilePrefix[1]=-al., meme wAlphabet=1, -BP3main.h:389-392). Le CLI refuse -ho car ConsoleMain.c:925 ne teste que FilePrefix. Fix (A) = 5-10 lignes accepter les vieux prefixes (risque FAIBLE, couvre aussi -mi->-so). MAIS rendement mesure FAIBLE seul (1/10 produit). Le blocage dominant est BPE-6 (reglages vieux format). Homomorphisme = NON-SUJET pour ces grammaires (Atlas avait confirme la syntaxe, c est MOOT ici).)_
   `-ho` n'est PAS une feature d'homomorphisme a porter, c'est **l'ancien nom du fichier
   d'ALPHABET**. Preuve : `csrc/bp3/-BP3main.h:392` `FileOldPrefix[1] = "-ho."` vs
   `csrc/bp3/-BP3main.h:389` `FilePrefix[1] = "-al."`, meme index `wAlphabet` (`csrc/bp3/-BP3.h:591`) ;
@@ -72,3 +84,6 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   alphabet -ho, **1 seule** produit (tryhomomorphism, 42 o) ; les 9 autres echouent AVANT la
   compilation, bloquees par BPE-6 (reglages ancien format). Donc porter -ho NE debloquera PAS
   les 26 oracles. SEQUENCE RECOMMANDEE : BPE-6, puis BPE-4, puis BPE-3. : le CLI bp3 repond 'Unknown option -ho' -> 27 grammaires native-broken sont en fait BLOQUEES par l homomorphisme non porte au CLI (-ho.abc/abc1/checkhomo/cloches1/dhadhatite/dhin--/Frenchnotes/gramgene/keys/notes/tryKeyMap/tryKeyXpand/tryhomomorphism). Statut reel INDETERMINE tant que -ho pas porte. LIE a la decision design homomorphisme cyclique (chaines cyclic:true + depth%period, en attente arbitrage Romain).
+- **BPE-7** `ouvert` [P1] — BPE-6 (BLOCAGE DOMINANT) : 84 fichiers -se.* en ANCIEN format BP2 positionnel (vs 59 JSON, 143 total). Le moteur ne lit QUE du JSON -> 'Could not parse JSON settings' (SaveLoads1.c:607) puis exit 0 SILENCIEUX, 0 octet = cargaison de faux 'natif produit rien'. Aucun convertisseur C ; seul le harnais JS convertit (convertOldSettings, s0_snapshot.cjs:44-110). OPTIONS : (a) porter convertOldSettings en C ; (b) convertir le corpus une fois ; (c) harnais convertit partout (mirror du PHP de Bernard). RECO archi = (c) : ni moteur ni corpus touches, on reflète les conditions standard Bernard. DECISION ROMAIN.
+- **BPE-8** `ouvert` [P2] — BPE-4 (-or. prefixe) : 7 grammaires bloquees par un prefixe -or. non reconnu ; retrait = 3 recuperees seches (Djinns 3671o, checkVolMasterSlave 91o, tryKeyXpand 581o). Une ligne. Faible risque.
+- **BPE-9** `ouvert` [P3] — BPE-5 (mojibake) : 3 fichiers -gr cassent la compilation car un mojibake (³ pour >=, Ê, Â) tombe DANS une regle (a, Mozartexpression, Rajeev ; + tryflags3). 20 -gr portent la signature mais seuls ceux ou elle est dans une regle cassent. Nettoyer l encodage.

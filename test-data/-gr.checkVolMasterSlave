@@ -1,6 +1,6 @@
 // Bol Processor version BP2.7.4
 // Grammar file saved as '-gr.checkVolMasterSlave'. Date: Mer 3 DŽc 1997 -- 7:42
--or.checkVolMasterSlave
+// -or.checkVolMasterSlave  (BPE-4 : type MIDI-orchestra desactive, wMIDIorchestra commente dans -BP3.h)
 
 RND
 gram#1[1] S -->  _volumecont (=  A ) (: A )

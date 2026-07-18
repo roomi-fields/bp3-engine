@@ -15,7 +15,7 @@
 // automatically by BP2, using standard names in the chosen convention.
 // (Bernard)
 
--or.Nadaka
+// -or.Nadaka  (BPE-4 : type MIDI-orchestra desactive, wMIDIorchestra commente dans -BP3.h)
 -se.hamsad
 
 // The layout of the different subgrammars is inspired by ÔqaidaÕ pieces

@@ -1,6 +1,6 @@
 // Bol Processor version BP2.8.0
 // Grammar file saved as '-gr.Mozartexpression'. Date: Dim 8 Mars 1998 -- 18:25
--or.Mozart
+// -or.Mozart  (BPE-4 : type MIDI-orchestra desactive, wMIDIorchestra commente dans -BP3.h)
 -se.Mozartexpression
 
 // This is a variant of Ò-gr.MozartÓ using time-patterns
@@ -9,7 +9,7 @@
 TIMEPATTERNS:
 t1 = 96/100  t2 = 100/100  t3 = 102/100  t4 = 100/100
 t5 = 100/100  t6 = 102/100  t7 = 104/100  t8 = 106/100 t9 = 107/100
-t10 = 108/100 t11 = 107/100 t12 = 106/100Êt13Ê=Ê104/100 t14 = 102/100
+t10 = 108/100 t11 = 107/100 t12 = 106/100 t13 = 104/100 t14 = 102/100
 t15 = 1/1
 -------------------
 RND [Select rules randomly]

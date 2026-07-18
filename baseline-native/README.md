@@ -1,9 +1,37 @@
 # Baseline native « original » — jeu unique, daté, vérifié
 
-## 🔖 **baseline v5 — figée le 2026-07-18 — capture PAR ACTION**
+## 🔖 **baseline v6 — figée le 2026-07-19 — tri des muettes, lot 1**
 
-**89 productibles** (dont 1 sous réserve → **88 utilisables**), **24 muettes**, **113 au total**.
-Modes natifs : **MIDI 54** · **TEXTE 35**. Actions : **single 59** · **produce-all 30**.
+**90 productibles** (dont 1 sous réserve → **89 utilisables**), **2 doublons**, **21 muettes
+réelles**, **113 entrées au total**.
+Modes natifs : **MIDI 55** · **TEXTE 35**. Actions : **single 60** · **produce-all 30**.
+
+### v5 → v6 : le lot annoncé « tri des 11 erreurs de compilation »
+
+**Deux entrées ne sont pas des grammaires à réparer : ce sont des doublons.**
+`-gr.a.html` et `-gr.tryflags3.html` sont des exports HTML de l'époque BP2. Une fois le
+balisage retiré, leurs règles sont **identiques** à celles de grammaires déjà présentes et
+productibles : `a.html` ≡ **`checkSUB1`** (10 règles sur 10), `tryflags3.html` ≡
+**`tryflags3`** (7 sur 7). Les réparer créerait une seconde référence pour la même grammaire.
+Elles sortent donc du dénominateur (champ `doublon_de`) — **les muettes réelles sont 21, pas 24**.
+
+**Une grammaire récupérée : `testTie7`** (MIDI, 2 jetons, 40 mots). Son `php_ref` ne déclare
+**aucune** convention de notes ; la baseline n'en passait donc aucune, et le moteur échouait
+sur `do4___&`. Avec la convention française : **1 erreur → 0**. La règle appliquée est
+explicite et enregistrée dans le champ `convention_source` : *quand `php_ref` est muet sur la
+convention, on retient celle qui compile* — `php_ref` reste autoritaire **quand il se prononce**.
+
+Les autres pistes ont été essayées et **écartées sur mesure**, sans être devinées : changer la
+convention ne corrige ni `Rajeev` (27 erreurs), ni `checkrests` (12, identiques en français),
+ni `dhin` (22), ni `checkVolChan` (6), ni `checkAllCsound` (30). Leur cause est ailleurs.
+
+| version | figée le | productibles | MIDI | capture | commit |
+|---|---|---|---|---|---|
+| v1 | 2026-07-18 | 74 | 51 | répétition (N items) | `579ca59` |
+| v2 | 2026-07-18 | 86 | 52 | répétition (N items) | `7a970ac` |
+| v3 | 2026-07-18 | 88 | 54 | répétition (N items) | `b59091c` |
+| v5 | 2026-07-18 | 89 | 54 | par action | `8dd3ec5` |
+| **v6** | **2026-07-19** | **90** | **55** | par action | ce commit |
 
 | version | figée le | productibles | MIDI | capture | commit |
 |---|---|---|---|---|---|

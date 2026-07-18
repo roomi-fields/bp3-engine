@@ -1,14 +1,14 @@
 {
- "version": "v5",
- "figee_le": "2026-07-18",
+ "version": "v6",
+ "figee_le": "2026-07-19",
  "date": "2026-07-18",
  "binaire": "bp3 v3.4.4 (graphics-for-BP3)",
  "seed": "1",
  "n": 113,
  "capture": "par ACTION : single (le jeu, 1 item, graine fixe) des que la grammaire joue ; produce-all (l ensemble) pour les grammaires purement symboliques quand le moteur accepte d enumerer",
- "productibles": 89,
+ "productibles": 90,
  "produce_all": 30,
- "single": 59,
+ "single": 60,
  "grammaires": [
   {
    "grammaire": "765432",
@@ -234,7 +234,7 @@
    "action": null,
    "modalite": null,
    "produit": false,
-   "raison": "6 erreur(s) de compilation : Error code 8: incorrect expression or bad derivation in gram#1 rule 1",
+   "raison": "export HTML redondant de la grammaire « checkSUB1 », deja presente et productible dans le corpus : regles identiques une fois le balisage HTML retire. Rien a reparer, rien a mesurer.",
    "jetons_midi": 0,
    "mots_texte": 0,
    "items": 0,
@@ -245,7 +245,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": null,
-   "capture": null
+   "capture": null,
+   "doublon_de": "checkSUB1"
   },
   {
    "grammaire": "acceleration",
@@ -1724,21 +1725,23 @@
   {
    "grammaire": "testTie7",
    "source": "-gr.testTie7",
-   "action": null,
-   "modalite": null,
-   "produit": false,
-   "raison": "1 erreur(s) de compilation : Variable must start with uppercase character or '|'. Can't make sense ",
-   "jetons_midi": 0,
-   "mots_texte": 0,
-   "items": 0,
-   "items_enumeres": null,
+   "action": "single",
+   "modalite": "MIDI",
+   "produit": true,
+   "raison": null,
+   "jetons_midi": 2,
+   "mots_texte": 40,
+   "items": 1,
+   "items_enumeres": 1,
    "enumeration_refusee_par_le_moteur": false,
-   "joue": false,
+   "joue": true,
    "config": {},
-   "convention": null,
+   "convention": "french",
    "config_source": "en-tete",
    "declare": "midi",
-   "capture": null
+   "capture": "captures/testTie7.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu",
+   "convention_source": "deduite : php_ref ne declare aucune convention de notes ; l'anglais donne 1 erreur de compilation, le francais 0"
   },
   {
    "grammaire": "time-patterns",
@@ -2275,7 +2278,7 @@
    "action": null,
    "modalite": null,
    "produit": false,
-   "raison": "19 erreur(s) de compilation : Error code 8: incorrect expression or bad derivation in gram#1 rule 1",
+   "raison": "export HTML redondant de la grammaire « tryflags3 », deja presente et productible dans le corpus : regles identiques une fois le balisage HTML retire. Rien a reparer, rien a mesurer.",
    "jetons_midi": 0,
    "mots_texte": 0,
    "items": 0,
@@ -2286,7 +2289,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": null,
-   "capture": null
+   "capture": null,
+   "doublon_de": "tryflags3"
   },
   {
    "grammaire": "tryhomomorphism",
@@ -2561,6 +2565,8 @@
   }
  ],
  "degenerees": 1,
- "productibles_utilisables": 88,
- "captures_texte_structurees": 5
+ "productibles_utilisables": 89,
+ "captures_texte_structurees": 5,
+ "doublons": 2,
+ "muettes_reelles": 21
 }

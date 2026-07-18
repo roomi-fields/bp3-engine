@@ -1,15 +1,13 @@
 # Baseline native — tableau par grammaire
 
-**v5** — figée le 2026-07-18 · binaire bp3 v3.4.4 (graphics-for-BP3) · graine 1
+**v6** — figée le 2026-07-19 · binaire bp3 v3.4.4 (graphics-for-BP3) · graine 1
 
 `action` = ce que fait le moteur nativement. Les deux voies doivent répliquer **la même action**.
 
 - **single** = la grammaire *joue* un morceau : une réalisation, un item, graine fixe.
 - **produce-all** = production purement symbolique, le moteur énumère l'ensemble.
 
-`énumération` = statut de la demande d'énumération (acceptée / refusée / bloquée / vide).
-
-## Les 89 qui produisent
+## Les 90 qui produisent
 
 | grammaire | action | mode natif | jetons | mots | items | énumération |
 |---|---|---|---|---|---|---|
@@ -83,6 +81,7 @@
 | `shapes-rhythm` | single | MIDI | 1952 | 4685 | 1 | — (elle joue) |
 | `simpletemplates` | single | MIDI | 7 | 11 | 1 | — (elle joue) |
 | `testNC1` | single | MIDI | 6 | 7 | 1 | — (elle joue) |
+| `testTie7` | single | MIDI | 2 | 40 | 1 | — (elle joue) |
 | `time-patterns` | single | MIDI | 8 | 13 | 1 | — (elle joue) |
 | `transposition1` | single | MIDI | 75 | 107 | 1 | — (elle joue) |
 | `transposition3` | single | MIDI | 66 | 30 | 1 | — (elle joue) |
@@ -103,17 +102,22 @@
 | `visser5` | single | MIDI | 1152 | 1822 | 1 | — (elle joue) |
 | `watch` | single | MIDI | 2105 | 5122 | 1 | — (elle joue) |
 
-⚠ **Réserve** :
-- `look-and-say` — production degeneree : la sortie est le seul terminal de depart ("'1'"), aucune regle n'a ete appliquee. Le bug moteur #51 (all weights are nil) reste actif ; ne pas s'en servir comme reference.
+⚠ `look-and-say` — production degeneree : la sortie est le seul terminal de depart ("'1'"), aucune regle n'a ete appliquee. Le bug moteur #51 (all weights are nil) reste actif ; ne pas s'en servir comme reference.
 
-## Les 24 qui ne produisent pas
+## Doublons — 2 entrées qui ne sont pas des grammaires à mesurer
+
+| entrée | doublon de | preuve |
+|---|---|---|
+| `a.html` | `checkSUB1` | règles identiques une fois le balisage HTML retiré |
+| `tryflags3.html` | `tryflags3` | règles identiques une fois le balisage HTML retiré |
+
+## Les 21 qui ne produisent pas
 
 | grammaire | cause |
 |---|---|
 | `Nadaka1` | => Cannot produce items because all weights are nil in gram#1 |
 | `Rajeev` | 27 erreur(s) de compilation : Variable must start with uppercase character or '| |
 | `a` | 4 erreur(s) de compilation : Error code 52: Missing slash after /flag/ in gram#2 |
-| `a.html` | 6 erreur(s) de compilation : Error code 8: incorrect expression or bad derivatio |
 | `blurb` | blocage (> 90 s sans rendre la main) |
 | `checkAllCsound` | 30 erreur(s) de compilation : => You probably forgot to create or load a '-cs' i |
 | `checkHomo` | => Can't compile alphabet |
@@ -126,11 +130,9 @@
 | `dhin` | 22 erreur(s) de compilation : Variable must start with uppercase character or '| |
 | `keys` | aucune sortie, aucun message |
 | `scales` | => Error reading Csound instruments file:  /home/romi/dev/bp/bp3-engine/test-dat |
-| `testTie7` | 1 erreur(s) de compilation : Variable must start with uppercase character or '|' |
 | `transposition` | 2 erreur(s) de compilation : Variable must start with uppercase character or '|' |
 | `tryConsoleMaxTime` | => Calculation overflow (10000 derivations): task abandoned. Loop? |
 | `tryShruti` | => Error reading Csound instruments file:  /home/romi/dev/bp/bp3-engine/test-dat |
-| `tryflags3.html` | 19 erreur(s) de compilation : Error code 8: incorrect expression or bad derivati |
 | `vina` | blocage (> 90 s sans rendre la main) |
 | `vina2` | blocage (> 90 s sans rendre la main) |
 | `vina3` | blocage (> 90 s sans rendre la main) |

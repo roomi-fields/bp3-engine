@@ -29,7 +29,8 @@
    "convention": "french",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/765432.tokens.json"
+   "capture": "captures/765432.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "Alarm",
@@ -50,7 +51,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/Alarm.text.txt"
+   "capture": "captures/Alarm.text.txt",
+   "enumeration_statut": "refusee par le moteur (SUB/SUB1/POSLONG, ProduceItems.c:770)"
   },
   {
    "grammaire": "Djinns",
@@ -71,7 +73,8 @@
    "convention": "french",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/Djinns.tokens.json"
+   "capture": "captures/Djinns.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "Mozartexpression",
@@ -92,7 +95,8 @@
    "convention": "french",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/Mozartexpression.tokens.json"
+   "capture": "captures/Mozartexpression.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "MyMelody",
@@ -114,7 +118,8 @@
    "convention": "french",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/MyMelody.tokens.json"
+   "capture": "captures/MyMelody.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "Nadaka-1er-essai",
@@ -135,7 +140,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/Nadaka-1er-essai.tokens.json"
+   "capture": "captures/Nadaka-1er-essai.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "Nadaka1",
@@ -178,7 +184,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/PP.tokens.json"
+   "capture": "captures/PP.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "Rajeev",
@@ -258,7 +265,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/acceleration.tokens.json"
+   "capture": "captures/acceleration.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "acceleration_v2",
@@ -279,7 +287,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/acceleration_v2.tokens.json"
+   "capture": "captures/acceleration_v2.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "alan-dice",
@@ -300,7 +309,8 @@
    "convention": "french",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/alan-dice.tokens.json"
+   "capture": "captures/alan-dice.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "all-items",
@@ -321,7 +331,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/all-items.text.txt"
+   "capture": "captures/all-items.text.txt",
+   "enumeration_statut": "acceptee par le moteur"
   },
   {
    "grammaire": "all-items1",
@@ -342,7 +353,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/all-items1.text.txt"
+   "capture": "captures/all-items1.text.txt",
+   "enumeration_statut": "acceptee par le moteur"
   },
   {
    "grammaire": "ames",
@@ -363,7 +375,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/ames.tokens.json"
+   "capture": "captures/ames.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "asymmetric",
@@ -385,7 +398,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/asymmetric.text.txt"
+   "capture": "captures/asymmetric.text.txt",
+   "enumeration_statut": "aucun item : l'enumeration rend la main immediatement en ne produisant rien (mesure du 2026-07-19)"
   },
   {
    "grammaire": "beatrix-dice",
@@ -406,7 +420,8 @@
    "convention": "french",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/beatrix-dice.tokens.json"
+   "capture": "captures/beatrix-dice.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "bells",
@@ -428,7 +443,8 @@
    "convention": null,
    "config_source": "en-tete",
    "declare": "midi",
-   "capture": "captures/bells.tokens.json"
+   "capture": "captures/bells.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "blurb",
@@ -471,7 +487,8 @@
    "convention": "french",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/check_.tokens.json"
+   "capture": "captures/check_.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "checkAllCsound",
@@ -514,7 +531,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/checkBT.text.txt"
+   "capture": "captures/checkBT.text.txt",
+   "enumeration_statut": "acceptee par le moteur"
   },
   {
    "grammaire": "checkHomo",
@@ -556,7 +574,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/checkSUB.tokens.json"
+   "capture": "captures/checkSUB.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "checkSUB.new",
@@ -577,7 +596,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/checkSUB.new.tokens.json"
+   "capture": "captures/checkSUB.new.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "checkSUB1",
@@ -599,7 +619,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/checkSUB1.text.txt"
+   "capture": "captures/checkSUB1.text.txt",
+   "enumeration_statut": "refusee par le moteur (SUB/SUB1/POSLONG, ProduceItems.c:770)"
   },
   {
    "grammaire": "checkVolChan",
@@ -639,7 +660,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/checkVolMasterSlave.tokens.json"
+   "capture": "captures/checkVolMasterSlave.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "checkcontext",
@@ -767,7 +789,8 @@
    "convention": "french",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/destru.text.txt"
+   "capture": "captures/destru.text.txt",
+   "enumeration_statut": "acceptee par le moteur"
   },
   {
    "grammaire": "dhadhatite",
@@ -789,7 +812,8 @@
    "convention": "french",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/dhadhatite.text.txt"
+   "capture": "captures/dhadhatite.text.txt",
+   "enumeration_statut": "acceptee par le moteur"
   },
   {
    "grammaire": "dhadhatite1",
@@ -811,7 +835,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/dhadhatite1.text.txt"
+   "capture": "captures/dhadhatite1.text.txt",
+   "enumeration_statut": "acceptee par le moteur"
   },
   {
    "grammaire": "dhadhatite_v2",
@@ -833,7 +858,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/dhadhatite_v2.text.txt"
+   "capture": "captures/dhadhatite_v2.text.txt",
+   "enumeration_statut": "acceptee par le moteur"
   },
   {
    "grammaire": "dhati",
@@ -855,7 +881,8 @@
    "convention": "french",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/dhati.tokens.json"
+   "capture": "captures/dhati.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "dhati2",
@@ -877,7 +904,8 @@
    "convention": null,
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/dhati2.text.txt"
+   "capture": "captures/dhati2.text.txt",
+   "enumeration_statut": "acceptee par le moteur"
   },
   {
    "grammaire": "dhati3",
@@ -899,7 +927,8 @@
    "convention": null,
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/dhati3.text.txt"
+   "capture": "captures/dhati3.text.txt",
+   "enumeration_statut": "acceptee par le moteur"
   },
   {
    "grammaire": "dhin",
@@ -943,7 +972,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/dhin1.text.txt"
+   "capture": "captures/dhin1.text.txt",
+   "enumeration_statut": "acceptee par le moteur"
   },
   {
    "grammaire": "doeslittle",
@@ -964,7 +994,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/doeslittle.tokens.json"
+   "capture": "captures/doeslittle.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "drum",
@@ -983,7 +1014,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/drum.tokens.json"
+   "capture": "captures/drum.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "ek-do-tin",
@@ -1005,7 +1037,8 @@
    "convention": "french",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/ek-do-tin.text.txt"
+   "capture": "captures/ek-do-tin.text.txt",
+   "enumeration_statut": "acceptee par le moteur"
   },
   {
    "grammaire": "flags",
@@ -1026,7 +1059,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/flags.text.txt"
+   "capture": "captures/flags.text.txt",
+   "enumeration_statut": "acceptee par le moteur"
   },
   {
    "grammaire": "gramgene1",
@@ -1048,7 +1082,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/gramgene1.text.txt"
+   "capture": "captures/gramgene1.text.txt",
+   "enumeration_statut": "acceptee par le moteur"
   },
   {
    "grammaire": "gramgene2",
@@ -1070,7 +1105,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/gramgene2.text.txt"
+   "capture": "captures/gramgene2.text.txt",
+   "enumeration_statut": "blocage : l'enumeration ne rend pas la main sous 90 s (mesure du 2026-07-19)"
   },
   {
    "grammaire": "graphics",
@@ -1091,7 +1127,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/graphics.tokens.json"
+   "capture": "captures/graphics.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "harmony",
@@ -1114,7 +1151,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/harmony.tokens.json"
+   "capture": "captures/harmony.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "keys",
@@ -1158,7 +1196,8 @@
    "convention": null,
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/koto1.text.txt"
+   "capture": "captures/koto1.text.txt",
+   "enumeration_statut": "acceptee par le moteur"
   },
   {
    "grammaire": "koto2",
@@ -1180,7 +1219,8 @@
    "convention": null,
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/koto2.text.txt"
+   "capture": "captures/koto2.text.txt",
+   "enumeration_statut": "acceptee par le moteur"
   },
   {
    "grammaire": "koto3",
@@ -1202,7 +1242,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/koto3.tokens.json"
+   "capture": "captures/koto3.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "kss2",
@@ -1223,7 +1264,8 @@
    "convention": "indian",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/kss2.tokens.json"
+   "capture": "captures/kss2.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "livecode1",
@@ -1244,7 +1286,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/livecode1.tokens.json"
+   "capture": "captures/livecode1.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "livecode2",
@@ -1265,7 +1308,8 @@
    "convention": null,
    "config_source": "en-tete",
    "declare": "midi",
-   "capture": "captures/livecode2.tokens.json"
+   "capture": "captures/livecode2.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "look-and-say",
@@ -1287,7 +1331,8 @@
    "config_source": "php_ref",
    "declare": "text",
    "capture": "captures/look-and-say.text.txt",
-   "reserve": "production degeneree : la sortie est le seul terminal de depart (\"'1'\"), aucune regle n'a ete appliquee. Le bug moteur #51 (all weights are nil) reste actif ; ne pas s'en servir comme reference."
+   "reserve": "production degeneree : la sortie est le seul terminal de depart (\"'1'\"), aucune regle n'a ete appliquee. Le bug moteur #51 (all weights are nil) reste actif ; ne pas s'en servir comme reference.",
+   "enumeration_statut": "acceptee par le moteur"
   },
   {
    "grammaire": "major-minor",
@@ -1309,7 +1354,8 @@
    "convention": null,
    "config_source": "en-tete",
    "declare": "text",
-   "capture": "captures/major-minor.tokens.json"
+   "capture": "captures/major-minor.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "mohanam",
@@ -1333,7 +1379,8 @@
    "convention": "indian",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/mohanam.tokens.json"
+   "capture": "captures/mohanam.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "mozart-dice",
@@ -1356,7 +1403,8 @@
    "convention": "french",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/mozart-dice.tokens.json"
+   "capture": "captures/mozart-dice.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "nadaka",
@@ -1379,7 +1427,8 @@
    "convention": "indian",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/nadaka.tokens.json"
+   "capture": "captures/nadaka.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "negative-context",
@@ -1400,7 +1449,8 @@
    "convention": "french",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/negative-context.tokens.json"
+   "capture": "captures/negative-context.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "not-reich",
@@ -1421,7 +1471,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/not-reich.tokens.json"
+   "capture": "captures/not-reich.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "one-scale",
@@ -1444,7 +1495,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/one-scale.tokens.json"
+   "capture": "captures/one-scale.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "polyphony1",
@@ -1466,7 +1518,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/polyphony1.text.txt"
+   "capture": "captures/polyphony1.text.txt",
+   "enumeration_statut": "acceptee par le moteur"
   },
   {
    "grammaire": "repeat",
@@ -1488,7 +1541,8 @@
    "convention": "french",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/repeat.text.txt"
+   "capture": "captures/repeat.text.txt",
+   "enumeration_statut": "acceptee par le moteur"
   },
   {
    "grammaire": "ruwet",
@@ -1510,7 +1564,8 @@
    "convention": "french",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/ruwet.tokens.json"
+   "capture": "captures/ruwet.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "scales",
@@ -1553,7 +1608,8 @@
    "convention": null,
    "config_source": "en-tete",
    "declare": null,
-   "capture": "captures/shapes-rhythm.tokens.json"
+   "capture": "captures/shapes-rhythm.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "simpletemplates",
@@ -1574,7 +1630,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/simpletemplates.tokens.json"
+   "capture": "captures/simpletemplates.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "templates",
@@ -1595,7 +1652,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/templates.text.txt"
+   "capture": "captures/templates.text.txt",
+   "enumeration_statut": "acceptee par le moteur"
   },
   {
    "grammaire": "testHO2",
@@ -1616,7 +1674,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/testHO2.text.txt"
+   "capture": "captures/testHO2.text.txt",
+   "enumeration_statut": "acceptee par le moteur"
   },
   {
    "grammaire": "testNC1",
@@ -1635,7 +1694,8 @@
    "convention": null,
    "config_source": "en-tete",
    "declare": "midi",
-   "capture": "captures/testNC1.tokens.json"
+   "capture": "captures/testNC1.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "testTie7",
@@ -1675,7 +1735,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/time-patterns.tokens.json"
+   "capture": "captures/time-patterns.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "transposition",
@@ -1719,7 +1780,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/transposition1.tokens.json"
+   "capture": "captures/transposition1.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "transposition3",
@@ -1740,7 +1802,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/transposition3.tokens.json"
+   "capture": "captures/transposition3.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "tryAllItems0",
@@ -1762,7 +1825,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/tryAllItems0.text.txt"
+   "capture": "captures/tryAllItems0.text.txt",
+   "enumeration_statut": "acceptee par le moteur"
   },
   {
    "grammaire": "tryAllItems1",
@@ -1783,7 +1847,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/tryAllItems1.text.txt"
+   "capture": "captures/tryAllItems1.text.txt",
+   "enumeration_statut": "acceptee par le moteur"
   },
   {
    "grammaire": "tryConsoleMaxTime",
@@ -1825,7 +1890,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/tryCsoundObjects.text.txt"
+   "capture": "captures/tryCsoundObjects.text.txt",
+   "enumeration_statut": "acceptee par le moteur"
   },
   {
    "grammaire": "tryGOTO",
@@ -1847,7 +1913,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/tryGOTO.text.txt"
+   "capture": "captures/tryGOTO.text.txt",
+   "enumeration_statut": "refusee par le moteur (SUB/SUB1/POSLONG, ProduceItems.c:770)"
   },
   {
    "grammaire": "tryKeyMap",
@@ -1869,7 +1936,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/tryKeyMap.tokens.json"
+   "capture": "captures/tryKeyMap.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "tryKeyXpand",
@@ -1891,7 +1959,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/tryKeyXpand.tokens.json"
+   "capture": "captures/tryKeyXpand.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "tryLIN",
@@ -1913,7 +1982,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/tryLIN.text.txt"
+   "capture": "captures/tryLIN.text.txt",
+   "enumeration_statut": "acceptee par le moteur"
   },
   {
    "grammaire": "tryMIDIfile",
@@ -1934,7 +2004,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/tryMIDIfile.tokens.json"
+   "capture": "captures/tryMIDIfile.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "tryObjects",
@@ -1956,7 +2027,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/tryObjects.text.txt"
+   "capture": "captures/tryObjects.text.txt",
+   "enumeration_statut": "acceptee par le moteur"
   },
   {
    "grammaire": "tryPatternGrammar",
@@ -1978,7 +2050,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/tryPatternGrammar.text.txt"
+   "capture": "captures/tryPatternGrammar.text.txt",
+   "enumeration_statut": "acceptee par le moteur"
   },
   {
    "grammaire": "tryRagas",
@@ -2001,7 +2074,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/tryRagas.tokens.json"
+   "capture": "captures/tryRagas.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "tryRotate",
@@ -2022,7 +2096,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/tryRotate.tokens.json"
+   "capture": "captures/tryRotate.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "trySerial",
@@ -2044,7 +2119,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/trySerial.tokens.json"
+   "capture": "captures/trySerial.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "tryShruti",
@@ -2089,7 +2165,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/trySrand.tokens.json"
+   "capture": "captures/trySrand.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "tryTicks",
@@ -2110,7 +2187,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/tryTicks.tokens.json"
+   "capture": "captures/tryTicks.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "tryflags2",
@@ -2132,7 +2210,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/tryflags2.text.txt"
+   "capture": "captures/tryflags2.text.txt",
+   "enumeration_statut": "acceptee par le moteur"
   },
   {
    "grammaire": "tryflags3",
@@ -2154,7 +2233,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/tryflags3.text.txt"
+   "capture": "captures/tryflags3.text.txt",
+   "enumeration_statut": "acceptee par le moteur"
   },
   {
    "grammaire": "tryflags3.html",
@@ -2195,7 +2275,8 @@
    "convention": "french",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/tryhomomorphism.tokens.json"
+   "capture": "captures/tryhomomorphism.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "trytemplates",
@@ -2217,7 +2298,8 @@
    "convention": "french",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/trytemplates.text.txt"
+   "capture": "captures/trytemplates.text.txt",
+   "enumeration_statut": "acceptee par le moteur"
   },
   {
    "grammaire": "trytemplates2",
@@ -2239,7 +2321,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": "captures/trytemplates2.text.txt"
+   "capture": "captures/trytemplates2.text.txt",
+   "enumeration_statut": "acceptee par le moteur"
   },
   {
    "grammaire": "tunings",
@@ -2261,7 +2344,8 @@
    "convention": null,
    "config_source": "en-tete",
    "declare": "text",
-   "capture": "captures/tunings.tokens.json"
+   "capture": "captures/tunings.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "vina",
@@ -2349,7 +2433,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/visser-shapes.tokens.json"
+   "capture": "captures/visser-shapes.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "visser-waves",
@@ -2370,7 +2455,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/visser-waves.tokens.json"
+   "capture": "captures/visser-waves.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "visser3",
@@ -2391,7 +2477,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/visser3.tokens.json"
+   "capture": "captures/visser3.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "visser5",
@@ -2412,7 +2499,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/visser5.tokens.json"
+   "capture": "captures/visser5.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "watch",
@@ -2433,7 +2521,8 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": "captures/watch.tokens.json"
+   "capture": "captures/watch.tokens.json",
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   }
  ],
  "degenerees": 1,

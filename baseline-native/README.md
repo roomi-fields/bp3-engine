@@ -48,6 +48,22 @@ Champs d'accompagnement, pour que le consommateur voie *pourquoi* :
 
 Aucune décision de notre part à aucune de ces trois étapes.
 
+**Le refus n'est pas le seul échec possible.** Une demande d'énumération peut aussi *bloquer*
+ou *ne rien rendre*, sans message. Le champ **`enumeration_statut`** dit lequel des cas
+s'applique, pour chaque grammaire qui produit :
+
+| `enumeration_statut` | n |
+|---|---|
+| sans objet : la grammaire joue, on capture le jeu | 54 |
+| acceptée par le moteur | 30 |
+| refusée par le moteur (`SUB`/`SUB1`/`POSLONG`) | 3 |
+| blocage > 90 s — `gramgene2` | 1 |
+| aucun item produit, sans message — `asymmetric` | 1 |
+
+Le booléen `enumeration_refusee_par_le_moteur` reste vrai **uniquement** pour le refus
+explicite ; il vaut `false` pour un blocage ou une énumération vide. Lire
+`enumeration_statut` pour lever l'ambiguïté — merci à bp3-frontend de l'avoir relevée.
+
 ### Fin de l'artefact de répétition
 
 Les versions v1–v3 capturaient N items (20, 25, 40 selon les réglages). Ce N ne venait
@@ -61,9 +77,14 @@ répétition (`checkBT` : 20 items, 1 seul distinct ; `livecode1`, `livecode2`, 
 morceau tiré N fois au hasard.
 
 En `single`, on force **un** item via une **copie** des réglages (`MaxItemsProduce=1`) —
-les fichiers d'origine ne sont jamais modifiés. **Vérifié** sur `koto2`, `gramgene1` et
-`mozart-dice` : l'item unique est **exactement le premier** de l'ancienne série de 20/25/40.
-Préfixe strict, aucun nouveau tirage.
+les fichiers d'origine ne sont jamais modifiés. **Vérifié** sur `mohanam` (série de 20),
+`ruwet` (20) et `mozart-dice` (40), toutes trois en `single` : l'item unique est **exactement
+le premier** de la série. Préfixe strict, aucun nouveau tirage.
+
+> Correction : un signal antérieur citait `koto2` et `gramgene1` comme exemples ici. La
+> vérification était réelle, mais l'exemple était mal choisi — ces deux-là sont en
+> `produce-all`, pas en `single`. Relevé par bp3-frontend ; **les champs font foi, pas la
+> prose des messages.**
 
 ### `mozart-dice` : énumère 40, capturée en `single` — c'est voulu
 

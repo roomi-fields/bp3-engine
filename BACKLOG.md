@@ -74,7 +74,7 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   -gr.tryTranspose (`¬`). RESULTAT : Mozartexpression RECUPEREE (0 erreur, 1255 o). Les 4 autres
   progressent sans passer (a: 4 err, tryflags3: 5, tryTranspose: 4, Rajeev: 27) — causes restantes
   distinctes, a trier.
-- **BPE-6/BPE-7** `fait` [P1] — REGLAGES-ANCIEN-FORMAT-NON-LUS : le moteur ne lit QUE des reglages JSON.
+- **BPE-6/BPE-7** `bloqué` [P1] — REGLAGES-ANCIEN-FORMAT-NON-LUS : le moteur ne lit QUE des reglages JSON.
   Sur un `-se.*` au format BP2 positionnel il affiche « Could not parse JSON settings »
   (`csrc/bp3/SaveLoads1.c:607`) puis s'arrete SILENCIEUSEMENT (exit 0, aucune phase « Compiling
   grammar », 0 octet) — d'ou des faux « natif ne produit rien ». AUCUN convertisseur cote C
@@ -99,6 +99,23 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   portaient `S` (valeur par defaut du moteur, aucune perte) et 3 portaient la forme non tranchee
   de BPE-2b (`<HTML>S<BR>Part1<BR>Part2</HTML>` : -se.checkArticulation, -se.checkControls,
   -se.lahras). Ces 3 valeurs ne sont plus dans les fichiers de travail mais restent dans git.
+  ⛔⛔ REVERTE 2026-07-18 — LA CONVERSION ETAIT DEFECTUEUSE, alerte bpscript [67] CONFIRMEE.
+  `convertOldSettings` suppose UN SEUL layout positionnel, or le corpus en contient PLUSIEURS
+  (fichiers de 112, 128, 145, 167-199, 238-306, ~357 lignes). Sur les layouts non prevus, les
+  positions fixes tombent a cote et produisent des valeurs DEGENEREES.
+  AUDIT DE PLAUSIBILITE que j'ai fait apres coup : **34 des 84 fichiers convertis etaient
+  suspects** (A4freq hors [200,900], VolumeController != 7/11, C4key hors [36,84],
+  SamplingRate < 20, MaxConsoleTime < 10). Signature typique : une serie de champs qui
+  s'effondrent tous sur la meme petite valeur (10, 10, 10) ou MaxConsoleTime=1 (qui COUPE la
+  production). Exemple verifie : `-se.Alarm` = 112 lignes de valeurs contre 357 pour un fichier
+  sain ; ses positions 62/63/65/67 valent toutes '10'.
+  DECISION : j'ai RESTAURE les 84 fichiers a leur etat d'avant BPE-7 (`git checkout 0446f54^`).
+  Je n'ai pas garde les 50 « plausibles » : ma verification est une HEURISTIQUE, pas une preuve,
+  et je refuse de laisser un corpus partage a 40 % corrompu en attendant. BPE-2 (chaine de
+  depart) est preserve, il est anterieur. BPE-10 (conventions hors-plage) est annule avec, il
+  ne corrigeait qu'un symptome de cette meme conversion.
+  A REFAIRE quand bpscript aura livre le converter corrige (P1, leur territoire) : reconvertir
+  les 84, puis re-mesurer le gain (le « 0 -> 8 » annonce est CADUC tant que la conversion est fausse).
   ⚠ A SIGNALER A BPSCRIPT : 8 fichiers ont une convention de note propre qui DIFFERE du
   `php_ref.note_convention` que S0 leur forcait (-se.Djinns 1 vs 0, -se.Mozartexpression 1 vs 0,
   -se.Rajeev 2 vs 0, -se.cloches 1 vs 0, -se.dhadhatite 1 vs 0, -se.simpletemplates 1 vs 0,
@@ -151,4 +168,6 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
 - **BPE-7** `ouvert` [P1] — BPE-6 (BLOCAGE DOMINANT) : 84 fichiers -se.* en ANCIEN format BP2 positionnel (vs 59 JSON, 143 total). Le moteur ne lit QUE du JSON -> 'Could not parse JSON settings' (SaveLoads1.c:607) puis exit 0 SILENCIEUX, 0 octet = cargaison de faux 'natif produit rien'. Aucun convertisseur C ; seul le harnais JS convertit (convertOldSettings, s0_snapshot.cjs:44-110). OPTIONS : (a) porter convertOldSettings en C ; (b) convertir le corpus une fois ; (c) harnais convertit partout (mirror du PHP de Bernard). RECO archi = (c) : ni moteur ni corpus touches, on reflète les conditions standard Bernard. DECISION ROMAIN.
 - **BPE-8** `ouvert` [P2] — BPE-4 (-or. prefixe) : 7 grammaires bloquees par un prefixe -or. non reconnu ; retrait = 3 recuperees seches (Djinns 3671o, checkVolMasterSlave 91o, tryKeyXpand 581o). Une ligne. Faible risque.
 - **BPE-9** `ouvert` [P3] — BPE-5 (mojibake) : 3 fichiers -gr cassent la compilation car un mojibake (³ pour >=, Ê, Â) tombe DANS une regle (a, Mozartexpression, Rajeev ; + tryflags3). 20 -gr portent la signature mais seuls ceux ou elle est dans une regle cassent. Nettoyer l encodage.
-- **BPE-10** `ouvert` [P2] — BPE-7-RESIDU-NOTECONV : 3 fichiers -se.* (dhati2, koto1, tryWait) ont une convention de note HORS plage 0/1/2 (=5,5,3) apres conversion (position 47 lue ne contenait pas la convention). Post-JSON, la valeur du FICHIER gagne sur php_ref -> le fix doit etre DANS le fichier. FIX = determiner la BONNE convention par RECOUPEMENT de production (comme Djinns/Mozartexpression) et l ecrire dans le fichier ; si la grammaire est sans note (symboles seuls), retirer la cle (defaut). Affecte dhati2/dhati3/koto1/koto2 (produisent mais spelling possiblement faux).
+- **BPE-10** (ANNULE avec BPE-7) `ouvert` [P2] — BPE-7-RESIDU-NOTECONV : 3 fichiers -se.* (dhati2, koto1, tryWait) ont une convention de note HORS plage 0/1/2 (=5,5,3) apres conversion (position 47 lue ne contenait pas la convention). Post-JSON, la valeur du FICHIER gagne sur php_ref -> le fix doit etre DANS le fichier. FIX = determiner la BONNE convention par RECOUPEMENT de production (comme Djinns/Mozartexpression) et l ecrire dans le fichier ; si la grammaire est sans note (symboles seuls), retirer la cle (defaut). Affecte dhati2/dhati3/koto1/koto2 (produisent mais spelling possiblement faux).
+- **BPE-12** `ouvert` [P3] — PORTAGE-FEATURES-BP2 : 5 grammaires du lot 48 bloquees par des FEATURES non portees (pas un trou de harnais) : _cont/_value/_ins/_step/_fixed, liaison '&' (testTie7), terminaux de gamme (tryScales fap3), blurb. Vrai portage moteur BP2->BP3, a instruire quand priorise. Distinct des trous de mesure (deja resolus).
+- **BPE-13** `ouvert` [P3] — BPE-11-CS-LOOP : tryCsound + vina3 BOUCLENT avec -cs (config correcte) : 0 sortie, code 124, ~241s puis tue ; SANS -cs elles echouent vite (Error 15 _ins). Possible meme famille que bug #50 (watch ~257s). Pas root-cause (boucle infinie vs lenteur patho indistingues). A instruire, non bloquant.

@@ -52,7 +52,8 @@
    "config_source": "php_ref",
    "declare": "midi",
    "capture": "captures/Alarm.text.txt",
-   "enumeration_statut": "refusee par le moteur (SUB/SUB1/POSLONG, ProduceItems.c:770)"
+   "enumeration_statut": "refusee par le moteur (SUB/SUB1/POSLONG, ProduceItems.c:770)",
+   "texte_structure": true
   },
   {
    "grammaire": "Djinns",
@@ -332,7 +333,8 @@
    "config_source": "php_ref",
    "declare": "text",
    "capture": "captures/all-items.text.txt",
-   "enumeration_statut": "acceptee par le moteur"
+   "enumeration_statut": "acceptee par le moteur",
+   "texte_structure": false
   },
   {
    "grammaire": "all-items1",
@@ -354,7 +356,8 @@
    "config_source": "php_ref",
    "declare": "text",
    "capture": "captures/all-items1.text.txt",
-   "enumeration_statut": "acceptee par le moteur"
+   "enumeration_statut": "acceptee par le moteur",
+   "texte_structure": false
   },
   {
    "grammaire": "ames",
@@ -399,7 +402,8 @@
    "config_source": "php_ref",
    "declare": "text",
    "capture": "captures/asymmetric.text.txt",
-   "enumeration_statut": "aucun item : l'enumeration rend la main immediatement en ne produisant rien (mesure du 2026-07-19)"
+   "enumeration_statut": "aucun item : l'enumeration rend la main immediatement en ne produisant rien (mesure du 2026-07-19)",
+   "texte_structure": false
   },
   {
    "grammaire": "beatrix-dice",
@@ -532,7 +536,8 @@
    "config_source": "php_ref",
    "declare": "text",
    "capture": "captures/checkBT.text.txt",
-   "enumeration_statut": "acceptee par le moteur"
+   "enumeration_statut": "acceptee par le moteur",
+   "texte_structure": false
   },
   {
    "grammaire": "checkHomo",
@@ -620,7 +625,8 @@
    "config_source": "php_ref",
    "declare": "text",
    "capture": "captures/checkSUB1.text.txt",
-   "enumeration_statut": "refusee par le moteur (SUB/SUB1/POSLONG, ProduceItems.c:770)"
+   "enumeration_statut": "refusee par le moteur (SUB/SUB1/POSLONG, ProduceItems.c:770)",
+   "texte_structure": false
   },
   {
    "grammaire": "checkVolChan",
@@ -790,7 +796,8 @@
    "config_source": "php_ref",
    "declare": "text",
    "capture": "captures/destru.text.txt",
-   "enumeration_statut": "acceptee par le moteur"
+   "enumeration_statut": "acceptee par le moteur",
+   "texte_structure": false
   },
   {
    "grammaire": "dhadhatite",
@@ -813,7 +820,8 @@
    "config_source": "php_ref",
    "declare": "text",
    "capture": "captures/dhadhatite.text.txt",
-   "enumeration_statut": "acceptee par le moteur"
+   "enumeration_statut": "acceptee par le moteur",
+   "texte_structure": false
   },
   {
    "grammaire": "dhadhatite1",
@@ -836,7 +844,8 @@
    "config_source": "php_ref",
    "declare": "text",
    "capture": "captures/dhadhatite1.text.txt",
-   "enumeration_statut": "acceptee par le moteur"
+   "enumeration_statut": "acceptee par le moteur",
+   "texte_structure": false
   },
   {
    "grammaire": "dhadhatite_v2",
@@ -859,7 +868,8 @@
    "config_source": "php_ref",
    "declare": "text",
    "capture": "captures/dhadhatite_v2.text.txt",
-   "enumeration_statut": "acceptee par le moteur"
+   "enumeration_statut": "acceptee par le moteur",
+   "texte_structure": false
   },
   {
    "grammaire": "dhati",
@@ -905,7 +915,8 @@
    "config_source": "php_ref",
    "declare": "text",
    "capture": "captures/dhati2.text.txt",
-   "enumeration_statut": "acceptee par le moteur"
+   "enumeration_statut": "acceptee par le moteur",
+   "texte_structure": false
   },
   {
    "grammaire": "dhati3",
@@ -928,7 +939,8 @@
    "config_source": "php_ref",
    "declare": "text",
    "capture": "captures/dhati3.text.txt",
-   "enumeration_statut": "acceptee par le moteur"
+   "enumeration_statut": "acceptee par le moteur",
+   "texte_structure": false
   },
   {
    "grammaire": "dhin",
@@ -973,7 +985,8 @@
    "config_source": "php_ref",
    "declare": "text",
    "capture": "captures/dhin1.text.txt",
-   "enumeration_statut": "acceptee par le moteur"
+   "enumeration_statut": "acceptee par le moteur",
+   "texte_structure": false
   },
   {
    "grammaire": "doeslittle",
@@ -1038,7 +1051,8 @@
    "config_source": "php_ref",
    "declare": "text",
    "capture": "captures/ek-do-tin.text.txt",
-   "enumeration_statut": "acceptee par le moteur"
+   "enumeration_statut": "acceptee par le moteur",
+   "texte_structure": true
   },
   {
    "grammaire": "flags",
@@ -1060,7 +1074,8 @@
    "config_source": "php_ref",
    "declare": "text",
    "capture": "captures/flags.text.txt",
-   "enumeration_statut": "acceptee par le moteur"
+   "enumeration_statut": "acceptee par le moteur",
+   "texte_structure": false
   },
   {
    "grammaire": "gramgene1",
@@ -1083,7 +1098,8 @@
    "config_source": "php_ref",
    "declare": "text",
    "capture": "captures/gramgene1.text.txt",
-   "enumeration_statut": "acceptee par le moteur"
+   "enumeration_statut": "acceptee par le moteur",
+   "texte_structure": false
   },
   {
    "grammaire": "gramgene2",
@@ -1106,7 +1122,8 @@
    "config_source": "php_ref",
    "declare": "text",
    "capture": "captures/gramgene2.text.txt",
-   "enumeration_statut": "blocage : l'enumeration ne rend pas la main sous 90 s (mesure du 2026-07-19)"
+   "enumeration_statut": "blocage : l'enumeration ne rend pas la main sous 90 s (mesure du 2026-07-19)",
+   "texte_structure": false
   },
   {
    "grammaire": "graphics",
@@ -1197,7 +1214,8 @@
    "config_source": "php_ref",
    "declare": "text",
    "capture": "captures/koto1.text.txt",
-   "enumeration_statut": "acceptee par le moteur"
+   "enumeration_statut": "acceptee par le moteur",
+   "texte_structure": false
   },
   {
    "grammaire": "koto2",
@@ -1220,7 +1238,8 @@
    "config_source": "php_ref",
    "declare": "text",
    "capture": "captures/koto2.text.txt",
-   "enumeration_statut": "acceptee par le moteur"
+   "enumeration_statut": "acceptee par le moteur",
+   "texte_structure": false
   },
   {
    "grammaire": "koto3",
@@ -1332,7 +1351,8 @@
    "declare": "text",
    "capture": "captures/look-and-say.text.txt",
    "reserve": "production degeneree : la sortie est le seul terminal de depart (\"'1'\"), aucune regle n'a ete appliquee. Le bug moteur #51 (all weights are nil) reste actif ; ne pas s'en servir comme reference.",
-   "enumeration_statut": "acceptee par le moteur"
+   "enumeration_statut": "acceptee par le moteur",
+   "texte_structure": false
   },
   {
    "grammaire": "major-minor",
@@ -1519,7 +1539,8 @@
    "config_source": "php_ref",
    "declare": "midi",
    "capture": "captures/polyphony1.text.txt",
-   "enumeration_statut": "acceptee par le moteur"
+   "enumeration_statut": "acceptee par le moteur",
+   "texte_structure": true
   },
   {
    "grammaire": "repeat",
@@ -1542,7 +1563,8 @@
    "config_source": "php_ref",
    "declare": "text",
    "capture": "captures/repeat.text.txt",
-   "enumeration_statut": "acceptee par le moteur"
+   "enumeration_statut": "acceptee par le moteur",
+   "texte_structure": false
   },
   {
    "grammaire": "ruwet",
@@ -1653,7 +1675,8 @@
    "config_source": "php_ref",
    "declare": "text",
    "capture": "captures/templates.text.txt",
-   "enumeration_statut": "acceptee par le moteur"
+   "enumeration_statut": "acceptee par le moteur",
+   "texte_structure": false
   },
   {
    "grammaire": "testHO2",
@@ -1675,7 +1698,8 @@
    "config_source": "php_ref",
    "declare": "text",
    "capture": "captures/testHO2.text.txt",
-   "enumeration_statut": "acceptee par le moteur"
+   "enumeration_statut": "acceptee par le moteur",
+   "texte_structure": false
   },
   {
    "grammaire": "testNC1",
@@ -1826,7 +1850,8 @@
    "config_source": "php_ref",
    "declare": "text",
    "capture": "captures/tryAllItems0.text.txt",
-   "enumeration_statut": "acceptee par le moteur"
+   "enumeration_statut": "acceptee par le moteur",
+   "texte_structure": false
   },
   {
    "grammaire": "tryAllItems1",
@@ -1848,7 +1873,8 @@
    "config_source": "php_ref",
    "declare": "text",
    "capture": "captures/tryAllItems1.text.txt",
-   "enumeration_statut": "acceptee par le moteur"
+   "enumeration_statut": "acceptee par le moteur",
+   "texte_structure": false
   },
   {
    "grammaire": "tryConsoleMaxTime",
@@ -1891,7 +1917,8 @@
    "config_source": "php_ref",
    "declare": "text",
    "capture": "captures/tryCsoundObjects.text.txt",
-   "enumeration_statut": "acceptee par le moteur"
+   "enumeration_statut": "acceptee par le moteur",
+   "texte_structure": true
   },
   {
    "grammaire": "tryGOTO",
@@ -1914,7 +1941,8 @@
    "config_source": "php_ref",
    "declare": "text",
    "capture": "captures/tryGOTO.text.txt",
-   "enumeration_statut": "refusee par le moteur (SUB/SUB1/POSLONG, ProduceItems.c:770)"
+   "enumeration_statut": "refusee par le moteur (SUB/SUB1/POSLONG, ProduceItems.c:770)",
+   "texte_structure": false
   },
   {
    "grammaire": "tryKeyMap",
@@ -1983,7 +2011,8 @@
    "config_source": "php_ref",
    "declare": "text",
    "capture": "captures/tryLIN.text.txt",
-   "enumeration_statut": "acceptee par le moteur"
+   "enumeration_statut": "acceptee par le moteur",
+   "texte_structure": false
   },
   {
    "grammaire": "tryMIDIfile",
@@ -2028,7 +2057,8 @@
    "config_source": "php_ref",
    "declare": "text",
    "capture": "captures/tryObjects.text.txt",
-   "enumeration_statut": "acceptee par le moteur"
+   "enumeration_statut": "acceptee par le moteur",
+   "texte_structure": true
   },
   {
    "grammaire": "tryPatternGrammar",
@@ -2051,7 +2081,8 @@
    "config_source": "php_ref",
    "declare": "text",
    "capture": "captures/tryPatternGrammar.text.txt",
-   "enumeration_statut": "acceptee par le moteur"
+   "enumeration_statut": "acceptee par le moteur",
+   "texte_structure": false
   },
   {
    "grammaire": "tryRagas",
@@ -2211,7 +2242,8 @@
    "config_source": "php_ref",
    "declare": "text",
    "capture": "captures/tryflags2.text.txt",
-   "enumeration_statut": "acceptee par le moteur"
+   "enumeration_statut": "acceptee par le moteur",
+   "texte_structure": false
   },
   {
    "grammaire": "tryflags3",
@@ -2234,7 +2266,8 @@
    "config_source": "php_ref",
    "declare": "text",
    "capture": "captures/tryflags3.text.txt",
-   "enumeration_statut": "acceptee par le moteur"
+   "enumeration_statut": "acceptee par le moteur",
+   "texte_structure": false
   },
   {
    "grammaire": "tryflags3.html",
@@ -2299,7 +2332,8 @@
    "config_source": "php_ref",
    "declare": "text",
    "capture": "captures/trytemplates.text.txt",
-   "enumeration_statut": "acceptee par le moteur"
+   "enumeration_statut": "acceptee par le moteur",
+   "texte_structure": false
   },
   {
    "grammaire": "trytemplates2",
@@ -2322,7 +2356,8 @@
    "config_source": "php_ref",
    "declare": "text",
    "capture": "captures/trytemplates2.text.txt",
-   "enumeration_statut": "acceptee par le moteur"
+   "enumeration_statut": "acceptee par le moteur",
+   "texte_structure": false
   },
   {
    "grammaire": "tunings",
@@ -2526,5 +2561,6 @@
   }
  ],
  "degenerees": 1,
- "productibles_utilisables": 88
+ "productibles_utilisables": 88,
+ "captures_texte_structurees": 5
 }

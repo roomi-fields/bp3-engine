@@ -141,6 +141,38 @@ le moteur ne les énumère pas. Ne pas les traiter comme des ensembles.
 
 ---
 
+## Forme canonique de la capture TEXTE : **brute, structure comprise**
+
+Question posée par bp3-frontend sur `Alarm`, tranchée ici puisque la baseline est la référence.
+
+La capture TEXTE est la **sortie brute** de `produce -o`, sans retouche. Sur une grammaire
+polymétrique elle porte donc la structure, et c'est **voulu** :
+
+```
+do3 1000{2,{{2,fa3,la3}{sol3,re4},re5 fa5 re5 fa5 si4 re5}{do3 sol2 do2,do5 _ -}}300 …
+```
+
+Ce n'est pas de la décoration. En Bol Processor, un item **est** une expression polymétrique :
+`{a,b}` dit la simultanéité, `1000{…}300` l'échelle de tempo, `_` la prolongation, `-` le
+silence. **Aplatir en liste de jetons détruit la simultanéité et les durées, et n'est pas
+réversible.** Une référence qui aplatit ne peut plus arbitrer quoi que ce soit sur la structure
+— elle cesse d'être une référence. La capture reste donc lossless.
+
+**5 captures TEXTE sur 35** sont concernées (champ `texte_structure`) : `Alarm`, `ek-do-tin`,
+`polyphony1`, `tryCsoundObjects`, `tryObjects`.
+
+### Comment comparer avec une voie qui aplatit
+
+Pas en changeant la référence. Si une voie rend des jetons plats, c'est la **couche de
+comparaison** qui doit appliquer un aplatissement **déclaré et déterministe** aux **deux**
+côtés — jamais un côté brut contre un côté aplati. Cet aplatissement appartient au harnais,
+pas à la capture.
+
+⚠ **`mots_texte` n'est pas un compte de jetons.** C'est un découpage sur les espaces, et sur
+un texte polymétrique il ne veut rien dire : `Alarm` donne 26 « mots » là où un aplatissement
+correct donne un autre nombre. Ne jamais opposer `mots_texte` au compte de jetons d'une voie —
+c'est comparer deux grandeurs différentes.
+
 ## La modalité est établie sur pièces, pas sur le champ déclaré
 
 La modalité retenue est celle qui produit réellement quelque chose. **9 grammaires avaient

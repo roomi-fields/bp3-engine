@@ -1,7 +1,7 @@
 # Baseline native « original » — tableau des 113 grammaires
 
-Capturé le 2026-07-18 avec `bp3 v3.4.4 (graphics-for-BP3)`, graine `1`, configuration déterministe
-(`php_ref` prioritaire, sinon dépendances déclarées en tête). Captures dans `captures/`.
+Capturé le 2026-07-18 avec `bp3 v3.4.4 (graphics-for-BP3)`, graine `1`.
+MAJ : 2026-07-18 — 34 fichiers de reglages convertis (23 BP3-128 + 11 requis), 12 grammaires recuperees
 
 | grammaire | source | modalité | produit | jetons | mots | capture / raison |
 |---|---|---|---|---|---|---|
@@ -38,6 +38,7 @@ Capturé le 2026-07-18 avec `bp3 v3.4.4 (graphics-for-BP3)`, graine `1`, configu
 | `one-scale` | `-gr.tryOneScale` | MIDI | oui | 6 | 6 | captures/one-scale.tokens.json |
 | `ruwet` | `-gr.Ruwet` | MIDI | oui | 2528 | 3156 | captures/ruwet.tokens.json |
 | `shapes-rhythm` | `-gr.ShapesInRhythm` | MIDI | oui | 1952 | 4685 | captures/shapes-rhythm.tokens.json |
+| `simpletemplates` | `-gr.simpletemplates` | MIDI | oui | 16 | 33 | captures/simpletemplates.tokens.json |
 | `testNC1` | `-gr.testNC1` | MIDI | oui | 6 | 7 | captures/testNC1.tokens.json |
 | `time-patterns` | `-gr.tryTimePatterns` | MIDI | oui | 8 | 13 | captures/time-patterns.tokens.json |
 | `transposition1` | `-gr.transposition1` | MIDI | oui | 75 | 107 | captures/transposition1.tokens.json |
@@ -66,55 +67,54 @@ Capturé le 2026-07-18 avec `bp3 v3.4.4 (graphics-for-BP3)`, graine `1`, configu
 | `dhadhatite` | `-gr.dhadhatite` | TEXTE | oui |  | 32 | captures/dhadhatite.text.txt |
 | `dhadhatite1` | `-gr.dhadhatite1` | TEXTE | oui |  | 40 | captures/dhadhatite1.text.txt |
 | `dhadhatite_v2` | `-gr.dhadhatite` | TEXTE | oui |  | 32 | captures/dhadhatite_v2.text.txt |
+| `dhati2` | `-gr.dhati2` | TEXTE | oui |  | 80 | captures/dhati2.text.txt |
+| `dhati3` | `-gr.dhati3` | TEXTE | oui |  | 80 | captures/dhati3.text.txt |
 | `dhin1` | `-gr.dhin1` | TEXTE | oui |  | 112 | captures/dhin1.text.txt |
 | `ek-do-tin` | `-gr.12345678` | TEXTE | oui |  | 99 | captures/ek-do-tin.text.txt |
 | `flags` | `-gr.tryFlags` | TEXTE | oui |  | 20 | captures/flags.text.txt |
+| `gramgene1` | `-gr.gramgene1` | TEXTE | oui |  | 884 | captures/gramgene1.text.txt |
+| `gramgene2` | `-gr.gramgene2` | TEXTE | oui |  | 372 | captures/gramgene2.text.txt |
 | `koto1` | `-gr.koto1` | TEXTE | oui |  | 72 | captures/koto1.text.txt |
 | `koto2` | `-gr.koto2` | TEXTE | oui |  | 109 | captures/koto2.text.txt |
+| `polyphony1` | `-gr.polyphony1` | TEXTE | oui |  | 73 | captures/polyphony1.text.txt |
 | `repeat` | `-gr.tryrepeat` | TEXTE | oui |  | 9 | captures/repeat.text.txt |
 | `templates` | `-gr.checktemplates` | TEXTE | oui |  | 25 | captures/templates.text.txt |
 | `testHO2` | `-gr.testHO2` | TEXTE | oui |  | 4 | captures/testHO2.text.txt |
 | `tryAllItems0` | `-gr.tryAllItems0` | TEXTE | oui |  | 20 | captures/tryAllItems0.text.txt |
 | `tryAllItems1` | `-gr.tryAllItems1` | TEXTE | oui |  | 36 | captures/tryAllItems1.text.txt |
 | `tryCsoundObjects` | `-gr.tryCsoundObjects` | TEXTE | oui |  | 2 | captures/tryCsoundObjects.text.txt |
+| `tryGOTO` | `-gr.tryGOTO` | TEXTE | oui |  | 25 | captures/tryGOTO.text.txt |
+| `tryLIN` | `-gr.tryLIN` | TEXTE | oui |  | 25 | captures/tryLIN.text.txt |
 | `tryObjects` | `-gr.tryObjects` | TEXTE | oui |  | 360 | captures/tryObjects.text.txt |
 | `tryPatternGrammar` | `-gr.tryPatternGrammar` | TEXTE | oui |  | 52 | captures/tryPatternGrammar.text.txt |
-| `Nadaka1` | `-gr.Nadaka1` | — | non |  |  | bug moteur #51/#52 — « all weights are nil in gram#1 » |
+| `tryflags2` | `-gr.tryflags2` | TEXTE | oui |  | 25 | captures/tryflags2.text.txt |
+| `tryflags3` | `-gr.tryflags3` | TEXTE | oui |  | 2 | captures/tryflags3.text.txt |
+| `trytemplates` | `-gr.trytemplates` | TEXTE | oui |  | 442 | captures/trytemplates.text.txt |
+| `trytemplates2` | `-gr.trytemplates2` | TEXTE | oui |  | 660 | captures/trytemplates2.text.txt |
+| `Nadaka1` | `-gr.Nadaka1` | — | non |  |  | => Cannot create path to the expected '_stop' file because no Trace pa |
 | `Rajeev` | `-gr.Rajeev` | — | non |  |  | 27 erreur(s) de compilation : => Cannot create path to the expected '_ |
 | `a` | `-gr.a` | — | non |  |  | 4 erreur(s) de compilation : => Cannot create path to the expected '_s |
 | `a.html` | `-gr.a.html` | — | non |  |  | 6 erreur(s) de compilation : => Cannot create path to the expected '_s |
-| `blurb` | `-gr.blurb` | — | non |  |  | reglages en ancien format, non convertis (lot en HOLD de BPE-7) |
+| `blurb` | `-gr.blurb` | — | non |  |  | blocage (> 90 s sans rendre la main) |
 | `checkAllCsound` | `-gr.checkAllCsound` | — | non |  |  | 30 erreur(s) de compilation : => Cannot create path to the expected '_ |
-| `checkHomo` | `-gr.checkHomo` | — | non |  |  | aucune sortie, aucun message discriminant |
+| `checkHomo` | `-gr.checkHomo` | — | non |  |  | => Cannot create path to the expected '_stop' file because no Trace pa |
 | `checkVolChan` | `-gr.checkVolChan` | — | non |  |  | 6 erreur(s) de compilation : => Cannot create path to the expected '_s |
-| `checkcontext` | `-gr.checkcontext` | — | non |  |  | boucle — « Calculation overflow (10000 derivations) » |
-| `checkhomo2` | `-gr.checkhomo2` | — | non |  |  | aucune sortie, aucun message discriminant |
+| `checkcontext` | `-gr.checkcontext` | — | non |  |  | => Cannot create path to the expected '_stop' file because no Trace pa |
+| `checkhomo2` | `-gr.checkhomo2` | — | non |  |  | => Cannot create path to the expected '_stop' file because no Trace pa |
 | `checkrests` | `-gr.checkrests` | — | non |  |  | 12 erreur(s) de compilation : => Cannot create path to the expected '_ |
 | `cloches1` | `-gr.cloches1` | — | non |  |  | blocage (> 90 s sans rendre la main) |
 | `csound` | `-gr.tryCsound` | — | non |  |  | blocage (> 90 s sans rendre la main) |
-| `dhati2` | `-gr.dhati2` | — | non |  |  | reglages en ancien format, non convertis (lot en HOLD de BPE-7) |
-| `dhati3` | `-gr.dhati3` | — | non |  |  | reglages en ancien format, non convertis (lot en HOLD de BPE-7) |
 | `dhin` | `-gr.dhin--` | — | non |  |  | 22 erreur(s) de compilation : => Cannot create path to the expected '_ |
 | `doeslittle` | `-gr.doeslittle` | — | non |  |  | 1 erreur(s) de compilation : => Cannot create path to the expected '_s |
-| `gramgene1` | `-gr.gramgene1` | — | non |  |  | reglages en ancien format, non convertis (lot en HOLD de BPE-7) |
-| `gramgene2` | `-gr.gramgene2` | — | non |  |  | reglages en ancien format, non convertis (lot en HOLD de BPE-7) |
 | `keys` | `-gr.keys` | — | non |  |  | aucune sortie, aucun message |
-| `look-and-say` | `-gr.look-and-say` | — | non |  |  | bug moteur #51/#52 — « all weights are nil in gram#1 » |
-| `polyphony1` | `-gr.polyphony1` | — | non |  |  | reglages en ancien format, non convertis (lot en HOLD de BPE-7) |
-| `scales` | `-gr.tryScales` | — | non |  |  | fichier Csound declare introuvable |
-| `simpletemplates` | `-gr.simpletemplates` | — | non |  |  | reglages en ancien format, non convertis (lot en HOLD de BPE-7) |
+| `look-and-say` | `-gr.look-and-say` | — | non |  |  | => Cannot create path to the expected '_stop' file because no Trace pa |
+| `scales` | `-gr.tryScales` | — | non |  |  | => Error reading Csound instruments file:  /home/romi/dev/bp/bp3-engin |
 | `testTie7` | `-gr.testTie7` | — | non |  |  | 1 erreur(s) de compilation : => Cannot create path to the expected '_s |
 | `transposition` | `-gr.tryTranspose` | — | non |  |  | 2 erreur(s) de compilation : => Cannot create path to the expected '_s |
-| `tryConsoleMaxTime` | `-gr.tryConsoleMaxTime` | — | non |  |  | boucle — « Calculation overflow (10000 derivations) » |
-| `tryGOTO` | `-gr.tryGOTO` | — | non |  |  | reglages en ancien format, non convertis (lot en HOLD de BPE-7) |
-| `tryLIN` | `-gr.tryLIN` | — | non |  |  | reglages en ancien format, non convertis (lot en HOLD de BPE-7) |
-| `trySerial` | `-gr.trySerial` | — | non |  |  | mojibake corpus — terminal « Æ1 » non reconnu |
-| `tryShruti` | `-gr.tryShruti` | — | non |  |  | fichier Csound declare introuvable |
-| `tryflags2` | `-gr.tryflags2` | — | non |  |  | reglages en ancien format, non convertis (lot en HOLD de BPE-7) |
-| `tryflags3` | `-gr.tryflags3` | — | non |  |  | reglages en ancien format, non convertis (lot en HOLD de BPE-7) |
+| `tryConsoleMaxTime` | `-gr.tryConsoleMaxTime` | — | non |  |  | => Cannot create path to the expected '_stop' file because no Trace pa |
+| `trySerial` | `-gr.trySerial` | — | non |  |  | => Cannot create path to the expected '_stop' file because no Trace pa |
+| `tryShruti` | `-gr.tryShruti` | — | non |  |  | => Error reading Csound instruments file:  /home/romi/dev/bp/bp3-engin |
 | `tryflags3.html` | `-gr.tryflags3.html` | — | non |  |  | 19 erreur(s) de compilation : => Cannot create path to the expected '_ |
-| `trytemplates` | `-gr.trytemplates` | — | non |  |  | reglages en ancien format, non convertis (lot en HOLD de BPE-7) |
-| `trytemplates2` | `-gr.trytemplates2` | — | non |  |  | reglages en ancien format, non convertis (lot en HOLD de BPE-7) |
 | `vina` | `-gr.vina` | — | non |  |  | blocage (> 90 s sans rendre la main) |
 | `vina2` | `-gr.vina2` | — | non |  |  | blocage (> 90 s sans rendre la main) |
 | `vina3` | `-gr.vina3` | — | non |  |  | blocage (> 90 s sans rendre la main) |

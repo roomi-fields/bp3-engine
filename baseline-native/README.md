@@ -17,9 +17,9 @@ ici, sous `baseline-native/`.
 
 | | n |
 |---|---|
-| **MIDI** (émet des jetons minutés) | **51** |
-| **TEXTE** (production symbolique seule) | **23** |
-| ne produit pas | **39** |
+| **MIDI** (émet des jetons minutés) | **52** |
+| **TEXTE** (production symbolique seule) | **34** |
+| ne produit pas | **27** |
 | **total** | **113** |
 
 ## La modalité est établie sur pièces, pas sur le champ déclaré
@@ -89,3 +89,26 @@ avec `-o` et `--tokensout` simultanés.
 en alerte volume. Leur capture est **tronquée à 2 Mo** pour rester versionnable ; un fichier
 `.TRONQUEE.txt` à côté donne la taille réelle et l'empreinte sha256 du fichier complet.
 Ces deux-là ne doivent pas servir de référence en l'état : le volume est à instruire d'abord.
+
+## MAJ 2026-07-18 — piste BP2 : 12 grammaires récupérées
+
+34 fichiers de réglages convertis : les **23 au format BP3-128** puis les **11** dont dépendaient
+les grammaires muettes. Résultat : **51/23/39 → 52/34/27**, soit **+12 productrices, 0 régression**.
+
+Revenues : `dhati2`, `dhati3` (80 mots), `gramgene1` (884), `gramgene2` (372), `polyphony1` (73),
+`simpletemplates` (**MIDI**, 16 jetons), `tryGOTO`, `tryLIN`, `tryflags2` (25 chacune),
+`tryflags3` (2), `trytemplates` (442), `trytemplates2` (660).
+
+**Plus aucune grammaire n'est bloquée par le format des réglages.** Le 13ᵉ attendu, `blurb`,
+a bien vu ses réglages convertis mais bascule sur une autre cause : blocage > 90 s.
+
+⚠ **Réserve à connaître sur ces 11 fichiers** : leurs layouts sont anciens (`V.2.5`, `BP2.6.1`)
+et ne correspondent pas à la carte du convertisseur. La garde de plausibilité de bpscript a donc
+**écarté 5 à 6 champs par fichier** (`MaxConsoleTime`, `C4key`, `A4freq`, `VolumeController`,
+`SamplingRate`, parfois `DefaultBlockKey`), qui retombent sur les défauts du moteur — lesquels
+sont les valeurs standard (C4key 60, A4freq 440). Les grammaires produisent, mais ces réglages
+sont **partiels**, pas intégralement fidèles à l'original. Une conversion complète exigerait les
+cartes par version (`if(iv > N)`), cf. `docs-developer/format-se-bp2/`.
+
+Le décalage de 2 lignes dû à l'en-tête `V.x`/`Date:` a été testé et **écarté** : il ne rend pas
+les valeurs plausibles sur ces fichiers. Le problème est bien le layout, pas un offset.

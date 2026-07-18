@@ -118,7 +118,7 @@
    "source": "-gr.Nadaka1",
    "modalite": null,
    "produit": false,
-   "raison": "bug moteur #51/#52 — « all weights are nil in gram#1 »",
+   "raison": "=> Cannot create path to the expected '_stop' file because no Trace path has bee",
    "jetons_midi": 0,
    "mots_texte": 0,
    "items": 0,
@@ -128,8 +128,7 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": null,
-   "categorie": "bug moteur #51/#52"
+   "capture": null
   },
   {
    "grammaire": "PP",
@@ -165,8 +164,7 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": null,
-   "categorie": "erreurs de compilation"
+   "capture": null
   },
   {
    "grammaire": "a",
@@ -181,8 +179,7 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": null,
-   "categorie": "erreurs de compilation"
+   "capture": null
   },
   {
    "grammaire": "a.html",
@@ -197,8 +194,7 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": null,
-   "capture": null,
-   "categorie": "erreurs de compilation"
+   "capture": null
   },
   {
    "grammaire": "acceleration",
@@ -369,7 +365,7 @@
    "source": "-gr.blurb",
    "modalite": null,
    "produit": false,
-   "raison": "reglages en ancien format, non convertis (lot en HOLD de BPE-7)",
+   "raison": "blocage (> 90 s sans rendre la main)",
    "jetons_midi": 0,
    "mots_texte": 0,
    "items": 0,
@@ -380,8 +376,7 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": null,
-   "categorie": "reglages en HOLD (recuperable)"
+   "capture": null
   },
   {
    "grammaire": "check&",
@@ -416,8 +411,7 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": null,
-   "categorie": "erreurs de compilation"
+   "capture": null
   },
   {
    "grammaire": "checkBT",
@@ -443,7 +437,7 @@
    "source": "-gr.checkHomo",
    "modalite": null,
    "produit": false,
-   "raison": "aucune sortie, aucun message discriminant",
+   "raison": "=> Cannot create path to the expected '_stop' file because no Trace path has bee",
    "jetons_midi": 0,
    "mots_texte": 0,
    "items": 0,
@@ -453,8 +447,7 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": null,
-   "categorie": "autre"
+   "capture": null
   },
   {
    "grammaire": "checkSUB",
@@ -526,8 +519,7 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": null,
-   "categorie": "erreurs de compilation"
+   "capture": null
   },
   {
    "grammaire": "checkVolMasterSlave",
@@ -550,7 +542,7 @@
    "source": "-gr.checkcontext",
    "modalite": null,
    "produit": false,
-   "raison": "boucle — « Calculation overflow (10000 derivations) »",
+   "raison": "=> Cannot create path to the expected '_stop' file because no Trace path has bee",
    "jetons_midi": 0,
    "mots_texte": 0,
    "items": 0,
@@ -561,15 +553,14 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": null,
-   "categorie": "boucle de derivation"
+   "capture": null
   },
   {
    "grammaire": "checkhomo2",
    "source": "-gr.checkhomo2",
    "modalite": null,
    "produit": false,
-   "raison": "aucune sortie, aucun message discriminant",
+   "raison": "=> Cannot create path to the expected '_stop' file because no Trace path has bee",
    "jetons_midi": 0,
    "mots_texte": 0,
    "items": 0,
@@ -579,8 +570,7 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": null,
-   "categorie": "autre"
+   "capture": null
   },
   {
    "grammaire": "checkrests",
@@ -595,8 +585,7 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": null,
-   "categorie": "erreurs de compilation"
+   "capture": null
   },
   {
    "grammaire": "cloches1",
@@ -614,8 +603,7 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": null,
-   "categorie": "blocage > 90 s"
+   "capture": null
   },
   {
    "grammaire": "csound",
@@ -633,8 +621,7 @@
    "convention": null,
    "config_source": "en-tete",
    "declare": "midi",
-   "capture": null,
-   "categorie": "blocage > 90 s"
+   "capture": null
   },
   {
    "grammaire": "destru",
@@ -734,12 +721,12 @@
   {
    "grammaire": "dhati2",
    "source": "-gr.dhati2",
-   "modalite": null,
-   "produit": false,
-   "raison": "reglages en ancien format, non convertis (lot en HOLD de BPE-7)",
+   "modalite": "TEXTE",
+   "produit": true,
+   "raison": null,
    "jetons_midi": 0,
-   "mots_texte": 0,
-   "items": 0,
+   "mots_texte": 80,
+   "items": 4,
    "config": {
     "-se": "-se.dhati2",
     "-al": "-al.dhati"
@@ -747,18 +734,17 @@
    "convention": null,
    "config_source": "php_ref",
    "declare": "text",
-   "capture": null,
-   "categorie": "reglages en HOLD (recuperable)"
+   "capture": "captures/dhati2.text.txt"
   },
   {
    "grammaire": "dhati3",
    "source": "-gr.dhati3",
-   "modalite": null,
-   "produit": false,
-   "raison": "reglages en ancien format, non convertis (lot en HOLD de BPE-7)",
+   "modalite": "TEXTE",
+   "produit": true,
+   "raison": null,
    "jetons_midi": 0,
-   "mots_texte": 0,
-   "items": 0,
+   "mots_texte": 80,
+   "items": 4,
    "config": {
     "-se": "-se.dhati2",
     "-al": "-al.dhati"
@@ -766,8 +752,7 @@
    "convention": null,
    "config_source": "php_ref",
    "declare": "text",
-   "capture": null,
-   "categorie": "reglages en HOLD (recuperable)"
+   "capture": "captures/dhati3.text.txt"
   },
   {
    "grammaire": "dhin",
@@ -785,8 +770,7 @@
    "convention": null,
    "config_source": "en-tete",
    "declare": "text",
-   "capture": null,
-   "categorie": "erreurs de compilation"
+   "capture": null
   },
   {
    "grammaire": "dhin1",
@@ -822,8 +806,7 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": null,
-   "categorie": "erreurs de compilation"
+   "capture": null
   },
   {
    "grammaire": "drum",
@@ -881,12 +864,12 @@
   {
    "grammaire": "gramgene1",
    "source": "-gr.gramgene1",
-   "modalite": null,
-   "produit": false,
-   "raison": "reglages en ancien format, non convertis (lot en HOLD de BPE-7)",
+   "modalite": "TEXTE",
+   "produit": true,
+   "raison": null,
    "jetons_midi": 0,
-   "mots_texte": 0,
-   "items": 0,
+   "mots_texte": 884,
+   "items": 25,
    "config": {
     "-se": "-se.gramgene",
     "-al": "-al.gramgene"
@@ -894,18 +877,17 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": null,
-   "categorie": "reglages en HOLD (recuperable)"
+   "capture": "captures/gramgene1.text.txt"
   },
   {
    "grammaire": "gramgene2",
    "source": "-gr.gramgene2",
-   "modalite": null,
-   "produit": false,
-   "raison": "reglages en ancien format, non convertis (lot en HOLD de BPE-7)",
+   "modalite": "TEXTE",
+   "produit": true,
+   "raison": null,
    "jetons_midi": 0,
-   "mots_texte": 0,
-   "items": 0,
+   "mots_texte": 372,
+   "items": 25,
    "config": {
     "-se": "-se.gramgene",
     "-al": "-al.gramgene"
@@ -913,8 +895,7 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": null,
-   "categorie": "reglages en HOLD (recuperable)"
+   "capture": "captures/gramgene2.text.txt"
   },
   {
    "grammaire": "graphics",
@@ -970,8 +951,7 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": null,
-   "categorie": "autre"
+   "capture": null
   },
   {
    "grammaire": "koto1",
@@ -1089,7 +1069,7 @@
    "source": "-gr.look-and-say",
    "modalite": null,
    "produit": false,
-   "raison": "bug moteur #51/#52 — « all weights are nil in gram#1 »",
+   "raison": "=> Cannot create path to the expected '_stop' file because no Trace path has bee",
    "jetons_midi": 0,
    "mots_texte": 0,
    "items": 0,
@@ -1099,8 +1079,7 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": null,
-   "categorie": "bug moteur #51/#52"
+   "capture": null
   },
   {
    "grammaire": "major-minor",
@@ -1241,12 +1220,12 @@
   {
    "grammaire": "polyphony1",
    "source": "-gr.polyphony1",
-   "modalite": null,
-   "produit": false,
-   "raison": "reglages en ancien format, non convertis (lot en HOLD de BPE-7)",
+   "modalite": "TEXTE",
+   "produit": true,
+   "raison": null,
    "jetons_midi": 0,
-   "mots_texte": 0,
-   "items": 0,
+   "mots_texte": 73,
+   "items": 25,
    "config": {
     "-se": "-se.polyphony1",
     "-al": "-al.abc"
@@ -1254,8 +1233,7 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": null,
-   "categorie": "reglages en HOLD (recuperable)"
+   "capture": "captures/polyphony1.text.txt"
   },
   {
    "grammaire": "repeat",
@@ -1300,7 +1278,7 @@
    "source": "-gr.tryScales",
    "modalite": null,
    "produit": false,
-   "raison": "fichier Csound declare introuvable",
+   "raison": "=> Error reading Csound instruments file:  /home/romi/dev/bp/bp3-engine/test-dat",
    "jetons_midi": 0,
    "mots_texte": 0,
    "items": 0,
@@ -1311,8 +1289,7 @@
    "convention": null,
    "config_source": "en-tete",
    "declare": "midi",
-   "capture": null,
-   "categorie": "dependance Csound absente"
+   "capture": null
   },
   {
    "grammaire": "shapes-rhythm",
@@ -1335,20 +1312,19 @@
   {
    "grammaire": "simpletemplates",
    "source": "-gr.simpletemplates",
-   "modalite": null,
-   "produit": false,
-   "raison": "reglages en ancien format, non convertis (lot en HOLD de BPE-7)",
-   "jetons_midi": 0,
-   "mots_texte": 0,
-   "items": 0,
+   "modalite": "MIDI",
+   "produit": true,
+   "raison": null,
+   "jetons_midi": 16,
+   "mots_texte": 33,
+   "items": 3,
    "config": {
     "-se": "-se.simpletemplates"
    },
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": null,
-   "categorie": "reglages en HOLD (recuperable)"
+   "capture": "captures/simpletemplates.tokens.json"
   },
   {
    "grammaire": "templates",
@@ -1415,8 +1391,7 @@
    "convention": null,
    "config_source": "en-tete",
    "declare": "midi",
-   "capture": null,
-   "categorie": "erreurs de compilation"
+   "capture": null
   },
   {
    "grammaire": "time-patterns",
@@ -1452,8 +1427,7 @@
    "convention": null,
    "config_source": "en-tete",
    "declare": "midi",
-   "capture": null,
-   "categorie": "erreurs de compilation"
+   "capture": null
   },
   {
    "grammaire": "transposition1",
@@ -1534,7 +1508,7 @@
    "source": "-gr.tryConsoleMaxTime",
    "modalite": null,
    "produit": false,
-   "raison": "boucle — « Calculation overflow (10000 derivations) »",
+   "raison": "=> Cannot create path to the expected '_stop' file because no Trace path has bee",
    "jetons_midi": 0,
    "mots_texte": 0,
    "items": 0,
@@ -1542,8 +1516,7 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": null,
-   "categorie": "boucle de derivation"
+   "capture": null
   },
   {
    "grammaire": "tryCsoundObjects",
@@ -1568,12 +1541,12 @@
   {
    "grammaire": "tryGOTO",
    "source": "-gr.tryGOTO",
-   "modalite": null,
-   "produit": false,
-   "raison": "reglages en ancien format, non convertis (lot en HOLD de BPE-7)",
+   "modalite": "TEXTE",
+   "produit": true,
+   "raison": null,
    "jetons_midi": 0,
-   "mots_texte": 0,
-   "items": 0,
+   "mots_texte": 25,
+   "items": 25,
    "config": {
     "-se": "-se.tryGOTO",
     "-al": "-al.abc"
@@ -1581,8 +1554,7 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": null,
-   "categorie": "reglages en HOLD (recuperable)"
+   "capture": "captures/tryGOTO.text.txt"
   },
   {
    "grammaire": "tryKeyMap",
@@ -1625,12 +1597,12 @@
   {
    "grammaire": "tryLIN",
    "source": "-gr.tryLIN",
-   "modalite": null,
-   "produit": false,
-   "raison": "reglages en ancien format, non convertis (lot en HOLD de BPE-7)",
+   "modalite": "TEXTE",
+   "produit": true,
+   "raison": null,
    "jetons_midi": 0,
-   "mots_texte": 0,
-   "items": 0,
+   "mots_texte": 25,
+   "items": 25,
    "config": {
     "-se": "-se.tryLIN",
     "-al": "-al.abc"
@@ -1638,8 +1610,7 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": null,
-   "categorie": "reglages en HOLD (recuperable)"
+   "capture": "captures/tryLIN.text.txt"
   },
   {
    "grammaire": "tryMIDIfile",
@@ -1740,7 +1711,7 @@
    "source": "-gr.trySerial",
    "modalite": null,
    "produit": false,
-   "raison": "mojibake corpus — terminal « Æ1 » non reconnu",
+   "raison": "=> Cannot create path to the expected '_stop' file because no Trace path has bee",
    "jetons_midi": 0,
    "mots_texte": 0,
    "items": 0,
@@ -1751,15 +1722,14 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": null,
-   "categorie": "mojibake corpus"
+   "capture": null
   },
   {
    "grammaire": "tryShruti",
    "source": "-gr.tryShruti",
    "modalite": null,
    "produit": false,
-   "raison": "fichier Csound declare introuvable",
+   "raison": "=> Error reading Csound instruments file:  /home/romi/dev/bp/bp3-engine/test-dat",
    "jetons_midi": 0,
    "mots_texte": 0,
    "items": 0,
@@ -1771,8 +1741,7 @@
    "convention": "indian",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": null,
-   "categorie": "dependance Csound absente"
+   "capture": null
   },
   {
    "grammaire": "trySrand",
@@ -1814,12 +1783,12 @@
   {
    "grammaire": "tryflags2",
    "source": "-gr.tryflags2",
-   "modalite": null,
-   "produit": false,
-   "raison": "reglages en ancien format, non convertis (lot en HOLD de BPE-7)",
+   "modalite": "TEXTE",
+   "produit": true,
+   "raison": null,
    "jetons_midi": 0,
-   "mots_texte": 0,
-   "items": 0,
+   "mots_texte": 25,
+   "items": 25,
    "config": {
     "-se": "-se.tryflags2",
     "-al": "-al.abc"
@@ -1827,18 +1796,17 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": null,
-   "categorie": "reglages en HOLD (recuperable)"
+   "capture": "captures/tryflags2.text.txt"
   },
   {
    "grammaire": "tryflags3",
    "source": "-gr.tryflags3",
-   "modalite": null,
-   "produit": false,
-   "raison": "reglages en ancien format, non convertis (lot en HOLD de BPE-7)",
+   "modalite": "TEXTE",
+   "produit": true,
+   "raison": null,
    "jetons_midi": 0,
-   "mots_texte": 0,
-   "items": 0,
+   "mots_texte": 2,
+   "items": 2,
    "config": {
     "-se": "-se.tryflags3",
     "-al": "-al.abc"
@@ -1846,8 +1814,7 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": null,
-   "categorie": "reglages en HOLD (recuperable)"
+   "capture": "captures/tryflags3.text.txt"
   },
   {
    "grammaire": "tryflags3.html",
@@ -1862,8 +1829,7 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": null,
-   "capture": null,
-   "categorie": "erreurs de compilation"
+   "capture": null
   },
   {
    "grammaire": "tryhomomorphism",
@@ -1887,12 +1853,12 @@
   {
    "grammaire": "trytemplates",
    "source": "-gr.trytemplates",
-   "modalite": null,
-   "produit": false,
-   "raison": "reglages en ancien format, non convertis (lot en HOLD de BPE-7)",
+   "modalite": "TEXTE",
+   "produit": true,
+   "raison": null,
    "jetons_midi": 0,
-   "mots_texte": 0,
-   "items": 0,
+   "mots_texte": 442,
+   "items": 25,
    "config": {
     "-se": "-se.trytemplates",
     "-al": "-al.abc"
@@ -1900,18 +1866,17 @@
    "convention": "french",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": null,
-   "categorie": "reglages en HOLD (recuperable)"
+   "capture": "captures/trytemplates.text.txt"
   },
   {
    "grammaire": "trytemplates2",
    "source": "-gr.trytemplates2",
-   "modalite": null,
-   "produit": false,
-   "raison": "reglages en ancien format, non convertis (lot en HOLD de BPE-7)",
+   "modalite": "TEXTE",
+   "produit": true,
+   "raison": null,
    "jetons_midi": 0,
-   "mots_texte": 0,
-   "items": 0,
+   "mots_texte": 660,
+   "items": 25,
    "config": {
     "-se": "-se.trytemplates2",
     "-al": "-al.abc"
@@ -1919,8 +1884,7 @@
    "convention": "english",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": null,
-   "categorie": "reglages en HOLD (recuperable)"
+   "capture": "captures/trytemplates2.text.txt"
   },
   {
    "grammaire": "tunings",
@@ -1957,8 +1921,7 @@
    "convention": "indian",
    "config_source": "php_ref",
    "declare": "midi",
-   "capture": null,
-   "categorie": "blocage > 90 s"
+   "capture": null
   },
   {
    "grammaire": "vina2",
@@ -1976,8 +1939,7 @@
    "convention": "indian",
    "config_source": "php_ref",
    "declare": "text",
-   "capture": null,
-   "categorie": "blocage > 90 s"
+   "capture": null
   },
   {
    "grammaire": "vina3",
@@ -1996,8 +1958,7 @@
    "convention": null,
    "config_source": "en-tete",
    "declare": "midi",
-   "capture": null,
-   "categorie": "blocage > 90 s"
+   "capture": null
   },
   {
    "grammaire": "visser-shapes",
@@ -2089,5 +2050,6 @@
    "capture": "captures/watch.tokens.json",
    "categorie": null
   }
- ]
+ ],
+ "maj": "2026-07-18 — 34 fichiers de reglages convertis (23 BP3-128 + 11 requis), 12 grammaires recuperees"
 }

@@ -1,0 +1,120 @@
+#!/usr/bin/env python3
+"""Garde ANTI-RÉTROCOMPATIBILITÉ — ordre Romain du 2026-07-19.
+
+Interdiction : on ne garde jamais une voie « legacy / vouée au retrait / le temps de
+migrer » en parallèle de la nouvelle. Remplacer X par Y, c'est SUPPRIMER X dans le même
+mouvement. Un code marqué `legacy`/`deprecated` qui a encore des appelants vivants n'est
+pas en train d'être retiré : il est réutilisé.
+
+Ce que le garde vérifie, et pourquoi ces deux points-là :
+
+1. AUCUN SYMBOLE MARQUÉ legacy/deprecated N'A D'APPELANT VIVANT, dans le code que ce dépôt
+   possède. Le mal réel : `compileBPS` a été gardé « au cas où », réutilisé, puis fait
+   évoluer — et la mesure de conformité tournait dessus.
+
+2. LES DEUX ARBRES DE SOURCES DU MOTEUR RESTENT IDENTIQUES. C'est la bifurcation
+   silencieuse propre à CE dépôt : la source canonique est `csrc/bp3/`, mais `build.sh:81`
+   et `Makefile:20` compilent depuis la COPIE `source/BP3/`, alimentée par une cible
+   `sync` qui exige un double passage. Si `sync` n'est pas relancé, on construit la copie
+   PÉRIMÉE en croyant construire la source. C'est exactement le mode d'échec `compileBPS`,
+   transposé : deux vérités en parallèle, et rien qui garantisse laquelle on mesure.
+
+Périmètre : `csrc/wasm/`, `scripts/`, `baseline-native/` — le code que ce dépôt écrit.
+`csrc/bp3/` est le moteur amont de Bernard Bel : ses marqueurs ne sont pas les nôtres, et
+les policer ici reviendrait à forker le moteur. Exclu délibérément, pas oublié.
+"""
+import os, re, subprocess, sys
+
+# normpath OBLIGATOIRE : sans lui R contient « /.. », et le test « ignorer les
+# dossiers caches » ci-dessous y voit un « /. » et saute TOUT le depot. C'est la
+# faute qui rendait ce garde muet — trouvee par l'injection, pas par relecture.
+R = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+POSSEDE = ["csrc/wasm", "scripts", "baseline-native"]
+# Exclu NOMMEMENT : ce script porte le leurre en clair pour prouver la morsure du garde.
+# Le scanner sans l'exclure, c'est se mordre soi-meme et rendre la preuve impossible.
+EXCLUS = {"scripts/gate-legacy-injection.sh", "scripts/gate-legacy.py"}
+MARQUE = re.compile(r"\b(deprecated|legacy|obsolete|voué au retrait|voue au retrait)\b", re.I)
+# un symbole déclaré sur la même ligne ou la suivante qu'un marqueur
+DECL = re.compile(r"\b(?:int|void|char|long|double|float|def|function|const)\s+\**(\w+)\s*\(")
+ecarts = []
+
+# ── 1. symboles marqués legacy portant un appelant vivant ────────────────────
+suspects = {}
+for d in POSSEDE:
+    for base, _, fics in os.walk(os.path.join(R, d)):
+        if any(p.startswith(".") for p in base.split(os.sep) if p):
+            continue
+        for f in fics:
+            if not f.endswith((".c", ".h", ".py", ".sh", ".js")):
+                continue
+            p = os.path.join(base, f)
+            if os.path.relpath(p, R) in EXCLUS:
+                continue
+            lignes = open(p, encoding="utf-8", errors="replace").read().split("\n")
+            for i, l in enumerate(lignes):
+                if not MARQUE.search(l):
+                    continue
+                for j in (i, i + 1, i + 2):
+                    if j < len(lignes):
+                        m = DECL.search(lignes[j])
+                        if m:
+                            # on memorise la ligne EXACTE de la declaration (j+1), pas celle
+                            # du marqueur : sinon la tolerance necessaire pour les relier
+                            # avale un appelant voisin. C'est la 3e faute revelee par
+                            # l'injection — un appelant a 2 lignes du marqueur passait.
+                            suspects[m.group(1)] = (f"{os.path.relpath(p, R)}:{i+1}", j + 1)
+                            break
+
+for sym, (ou, ligne_decl) in suspects.items():
+    # grep -E : sans -E, « \s » et « ( » ne sont pas interpretes et le motif ne matche JAMAIS.
+    # C'est la premiere faute qu'a revelee l'injection : le garde etait un figurant.
+    r = subprocess.run(["grep", "-rnE", "--include=*.c", "--include=*.h", "--include=*.py",
+                        "--include=*.sh", "--include=*.js", rf"\b{re.escape(sym)}[[:space:]]*\(",
+                        *[os.path.join(R, d) for d in POSSEDE]],
+                       capture_output=True, text=True)
+    # On exclut LA LIGNE de declaration, pas le FICHIER entier : un appelant vivant loge
+    # tres souvent dans le meme fichier que le symbole au retrait. Exclure le fichier,
+    # c'etait la seconde faute revelee par l'injection.
+    fic_decl = ou.rsplit(":", 1)[0]
+    appels = []
+    for l in r.stdout.split("\n"):
+        if not l.strip():
+            continue
+        try:
+            chemin, num, _ = l.split(":", 2)
+        except ValueError:
+            continue
+        rel = os.path.relpath(chemin, R)
+        if rel in EXCLUS:
+            continue
+        # la declaration elle-meme : meme fichier, a une ligne ou deux du marqueur
+        if rel == fic_decl and int(num) == ligne_decl:
+            continue
+        appels.append(l)
+    if appels:
+        ecarts.append(f"« {sym} » est marqué au retrait ({ou}) mais garde "
+                      f"{len(appels)} appelant(s) vivant(s) :")
+        for a in appels[:4]:
+            ecarts.append("      " + a.strip()[:110])
+
+# ── 2. les deux arbres de sources du moteur doivent rester identiques ────────
+CANON, COPIE = os.path.join(R, "csrc", "bp3"), os.path.join(R, "source", "BP3")
+if os.path.isdir(CANON) and os.path.isdir(COPIE):
+    for f in sorted(os.listdir(CANON)):
+        if not f.endswith((".c", ".h")):
+            continue
+        a, b = os.path.join(CANON, f), os.path.join(COPIE, f)
+        if not os.path.isfile(b):
+            ecarts.append(f"« {f} » existe dans csrc/bp3/ mais PAS dans source/BP3/ — "
+                          f"la construction ne le verrait pas")
+        elif open(a, "rb").read() != open(b, "rb").read():
+            ecarts.append(f"« {f} » DIVERGE entre csrc/bp3/ (canonique) et source/BP3/ "
+                          f"(ce que build.sh compile) — relancez `./build.sh` deux fois")
+
+if ecarts:
+    print(f"ANTI-RÉTROCOMPAT : {len(ecarts)} probleme(s) :")
+    for e in ecarts:
+        print("   -", e)
+    sys.exit(1)
+print(f"anti-retrocompat : aucun symbole au retrait avec appelant vivant ; "
+      f"les deux arbres de sources du moteur sont identiques.")

@@ -47,6 +47,8 @@ if [ "$VOIE" = rapide ] || [ "$VOIE" = tout ]; then
   lancer "baseline-integrite" 60 python3 scripts/gate-baseline.py
   lancer "anti-bypass"        60 python3 scripts/gate-meta.py
   lancer "anti-bypass-morsure" 90 ./scripts/gate-meta-injection.sh
+  lancer "anti-retrocompat"   60 python3 scripts/gate-legacy.py
+  lancer "anti-retro-morsure" 90 ./scripts/gate-legacy-injection.sh
 fi
 
 # La voie ROUGE est VIDE : son unique occupant, test-settings-params, n'était pas rouge

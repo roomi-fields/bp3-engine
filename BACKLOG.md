@@ -195,7 +195,7 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   non fermee dans le `-cs`). Corpus corrige, les deux grammaires produisent. Constat d'origine :
   BPE-11-CS-LOOP : tryCsound + vina3 BOUCLENT avec -cs (config correcte) : 0 sortie, code 124, ~241s puis tue ; SANS -cs elles echouent vite (Error 15 _ins). Possible meme famille que bug #50 (watch ~257s). Pas root-cause (boucle infinie vs lenteur patho indistingues). A instruire, non bloquant.
 
-- **BPE-14** `ouvert` [P2] — `cloches1` : production GALOPANTE, pas un blocage. Le tampon croit
+- **BPE-14** `CAUSE ETABLIE 2026-07-19 — DEFAUT DE GRAMMAIRE, PAS DE MOTEUR` [P2] — `cloches1` : Le tampon croit
   geometriquement (6876 -> 10300 -> 15452 -> 23180 jetons...). Deux causes distinctes a ne pas
   confondre : (a) CORPUS — son `MaxConsoleTime` converti vaut 59944 s (16 h 39), valeur jamais
   plausible, la garde de plausibilite de la conversion l'a laissee passer ; (b) MOTEUR — meme
@@ -304,3 +304,20 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   COUVERTURE REELLE, chiffree : **25 grammaires sur 110, soit 23 %**. Tant que BPE-14 n'est pas
   corrige, `test-all` ne couvre pas ce qu'il pretend couvrir, et il ne faut PAS s'appuyer dessus.
   Il reste en voie lente, avec ce chiffre ecrit noir sur blanc plutot qu'une couverture supposee.
+
+
+- **BPE-23** `ouvert` [P1] — PASSAGE-MOTEUR-v3.4.7 : l'amont a publie v3.4.5, v3.4.6 et v3.4.7
+  (etiquette `v3.4.7`, commit amont `39512c9`, 2026-07-19). Nous sommes en **v3.4.4** (`b094e18`).
+  ECART MESURE sur les sources partagees `csrc/bp3/` : **19 fichiers**, dont `ProduceItems.c`
+  (614 lignes), `Zouleb.c` (559), `Arithmetic.c` (139), `Compute.c` (123), `ConsoleMain.c` (117).
+  ⚠ **CE N'EST PAS UNE COPIE, C'EST UNE FUSION.** Ces memes fichiers portent nos ajouts locaux —
+  le serialiseur `--tokensout`, le portage de deduplication de BPx dans `ProduceItems.c`, et
+  `bp3_timed_events.h` qui n'existe pas en amont. Ecraser detruirait ce travail.
+  A FAIRE, dans cet ordre : (1) inventorier nos modifications locales fichier par fichier ;
+  (2) fusionner en conservant les deux apports ; (3) reconstruire ; (4) verifier #55 sur pieces
+  (le correctif annonce n'est PAS visible dans le diff de `SaveLoads1.c`) ; (5) re-mesurer
+  `cloches1` avec la limite de temps corrigee ; (6) re-capturer la baseline SI un comportement
+  change, et comparer champ par champ ET empreinte par empreinte comme pour la v12.
+  Je ne l'ai pas entrepris dans le meme tour : c'est un chantier a part entiere, et le faire
+  a la hate sur 19 fichiers dont 2 gros est exactement la facon de casser en silence ce qui
+  marche aujourd'hui.

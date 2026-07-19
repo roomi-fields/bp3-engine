@@ -9,8 +9,11 @@
 # boucle de lecture des tables (lignes 437-439). Ce script est donc le seul juge : après
 # le passage en v3.4.7, il dit sur pièces si le comportement a changé.
 #
-# Il vit dans la voie « rouge » du portillon : c'est un défaut moteur connu, non corrigé
-# chez nous. On ne le maquille pas, on le mesure.
+# STATUT AU 2026-07-19 : le bug est RÉSOLU depuis le passage en v3.4.7. Ce script a donc
+# changé de rôle — il n'atteste plus un défaut, il garde sa NON-RÉAPPARITION. Il est passé
+# de la voie « rouge » (défauts moteur connus) à la voie rapide, où il doit rester vert.
+# Une reproduction de bug corrigé ne se jette pas : c'est le seul test qui saura dire, à la
+# prochaine montée de version amont, si le correctif de Bernard a survécu.
 set -u
 cd "$(dirname "$0")/.."
 T=$(mktemp -d); trap 'rm -rf "$T"' EXIT
@@ -28,7 +31,9 @@ code=$?
 duree=$(( $(date +%s) - debut ))
 
 if [ $code -eq 124 ]; then
-  echo "  ROUGE — le moteur BOUCLE : aucun retour après ${duree} s. Bug #55 toujours présent."
+  echo "  ROUGE — le moteur BOUCLE : aucun retour après ${duree} s."
+  echo "  Le bug #55 est REVENU : il était corrigé en v3.4.7 (mesuré le 2026-07-19)."
+  echo "  Vérifiez ce qu'une montée de version amont a pu défaire."
   exit 1
 fi
 echo "  VERT — le moteur rend la main en ${duree} s (sortie $code) :"

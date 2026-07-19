@@ -52,6 +52,7 @@ if [ "$VOIE" = rapide ] || [ "$VOIE" = tout ]; then
   lancer "ancrages-locaux"    60 python3 scripts/gate-ancrages.py
   lancer "ancrages-morsure"   90 ./scripts/gate-ancrages-injection.sh
   lancer "effondrement-morsure" 90 ./scripts/gate-effondrement-injection.sh
+  lancer "non-retour-bug55"   60 ./scripts/verif-bug55.sh
 fi
 
 # La voie ROUGE porte les défauts MOTEUR connus et non corrigés. On ne les maquille jamais :
@@ -63,7 +64,8 @@ fi
 # La voie reste déclarée : le jour où un vrai défaut moteur apparaît, il a sa place.
 if [ "$VOIE" = rouge ] || [ "$VOIE" = tout ]; then
   echo "── voie ROUGE (défauts moteur connus, NE PAS faire verdir) ──"
-  lancer "verif-bug55" 60 ./scripts/verif-bug55.sh
+  echo "  (aucun garde dans cette voie — #55, son dernier occupant, est corrige"
+  echo "   depuis la v3.4.7 et garde desormais sa non-reapparition en voie rapide)"
 fi
 
 if [ "$VOIE" = lente ] || [ "$VOIE" = tout ]; then

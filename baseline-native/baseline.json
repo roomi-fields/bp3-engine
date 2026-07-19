@@ -1974,7 +1974,9 @@
    "config_source": "php_ref",
    "declare": "midi",
    "capture": "captures/tryKeyMap.tokens.json",
-   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu",
+   "reserve": "CONFIGURATION INCOMPLETE — ne pas utiliser ce compte comme reference. La capture vaut 392 jetons parce que le fichier d'objets sonores -so.tryKeyMap n'est PAS charge : ni php_ref ni l'en-tete de la grammaire ne le declarent. Charge avec sa ressource Csound resolue, le moteur en derive 410 — exactement ce que derive BPx. Le blocage n'est pas une ressource manquante (-cs.tryCsoundObjects existe bien dans test-data) mais le chemin stocke dans le -so (« csound_resources/... »), que le moteur prefixe systematiquement de « ../ » (SaveLoads1.c:855, en dur). Choix de convention de chemin a trancher avant de figer la reference.",
+   "reference_attendue": 410
   },
   {
    "grammaire": "tryKeyXpand",

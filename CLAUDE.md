@@ -118,3 +118,21 @@ Avant de déclarer un blocage humain sur une **dépendance de construction** :
 La distinction : demander l'accord pour une action **irréversible ou hors périmètre** reste
 juste. Demander l'accord pour une chose que je peux faire, vérifier et défaire, c'est de la
 passivité déguisée en prudence — et ça coûte le temps de tout le monde.
+
+## Déclarer SUR QUEL AXE on mesure (bpscript, 2026-07-19)
+
+Quand je publie une mesure ou une conclusion, **nommer explicitement l'axe sur lequel elle
+porte** : jetons MIDI, sortie texte, compteurs, minutage, ordre. Une phrase suffit.
+
+Pourquoi, et c'est contre-intuitif : ça ne me protège pas *moi*, ça rend mon erreur
+**trouvable par quelqu'un d'autre**. Le 2026-07-19 j'ai annoncé une régression de `_rotate`
+depuis la seule sortie texte, alors que les jetons MIDI — dans ma propre capture — prouvaient
+le contraire. Ce qui m'a fait vérifier, c'est que bpscript avait écrit noir sur blanc que *leur*
+mesure portait sur le MIDI. Ils ne soupçonnaient rien ; ils décrivaient leur périmètre. Une fois
+les deux axes nommés côte à côte, l'écart devenait visible.
+
+Ça ne demande aucune vigilance supplémentaire — juste de nommer le périmètre. Et ça transforme
+un lecteur passif en vérificateur sans qu'il ait à se méfier.
+
+Corollaire : **vérifier un piège ne protège pas des autres.** J'avais éliminé « c'est une
+variance aléatoire » et je m'en étais félicité, sans tester « je regarde le mauvais axe ».

@@ -64,9 +64,11 @@ GRAM#1[1] S --> C4 ; D4     →  sortie : C4 ; D4
 GRAM#1[1] S --> C4 D4       →  sortie : C4 D4
 ```
 
-Il est **transporté tel quel jusqu'à la sortie** et imprimé littéralement. Il est en
-revanche **musicalement inerte** : jetons et minutage strictement identiques avec et sans
-(`C4` 0→1000, `D4` 1000→2000 dans les deux cas).
+Il est **transporté tel quel jusqu'à la sortie** et imprimé littéralement. Il ne produit
+par lui-même **aucun son** : ici, jetons et minutage strictement identiques avec et sans
+(`C4` 0→1000, `D4` 1000→2000 dans les deux cas). Attention toutefois — cela ne veut pas
+dire qu'il est sans effet musical : dès qu'une règle peut s'appliquer par-dessus lui, sa
+présence change la séquence produite (voir la dernière section).
 
 Son effet réel est d'être une **barrière dans la dérivation** — il empêche une règle de
 s'appliquer à cheval sur lui :
@@ -82,7 +84,6 @@ GRAM#2[3] B --> E4           GRAM#2[3] B --> E4
 ```
 
 Sans le marqueur, `A B` s'apparie et donne `C4`. Avec lui, l'appariement est bloqué. Les
-<!-- suite : voir la section « le ';' sert-il hors métaprogrammation ? » plus bas -->
 trois autres marqueurs se comportent **exactement pareil** sur ce test (`D4 +E4`,
 `D4 = E4`, `D4 : E4`) : en tant que barrières de dérivation, les quatre sont bien
 équivalents. C'est dans leurs **contextes dédiés** — parenthèses pour `=`/`:`, en-tête de
@@ -134,7 +135,7 @@ Les deux niveaux coexistent.
 |---|---|---|
 | `=` | ouvre un bloc **maître** (motif de référence) | `Encode.c:1355`, `:1421` |
 | `:` | ouvre un bloc **esclave**, relié à son maître | `Encode.c:1362`, `:1490` |
-| `;` | **barrière de dérivation**, imprimée littéralement, musicalement inerte | mesuré ; le saut de ligne de `DisplayArg.c:1093` est du code mort (constat #58) |
+| `;` | **barrière de dérivation** et marqueur de position : il sélectionne quelle règle s'applique où | mesuré (dernière section) ; le saut de ligne de `DisplayArg.c:1093` est du code mort (constat #58) |
 | `+` | séparateur de **mesure additive** en en-tête de section | `Polymetric.c:181`, `DisplayArg.c:408` |
 
 Nuance, après le test empirique du 2026-07-19 : dans le rôle **commun** de barrière de

@@ -14,6 +14,7 @@ concatene les N passes.
 
 N'ECRIT QUE dans baseline-native/.
 """
+import sys
 import hashlib, json, os, re, subprocess, datetime, collections, shutil
 
 ROOT = "/home/romi/dev/bp/bp3-engine"
@@ -133,8 +134,25 @@ def mesure(toks, text):
     return ntok, len(prod.split()), items
 
 
+# ── MODE UNITAIRE ────────────────────────────────────────────────────────────
+# `capture.py <grammaire>` capture UNE grammaire a la demande, dans un dossier a
+# part, et NE TOUCHE PAS a la baseline publiee. C'est volontaire : un oracle frais
+# sert a comparer, pas a redefinir la reference en douce. Republier reste un acte
+# explicite — `capture.py` sans argument, suivi de la double comparaison.
+# Demande par bpscript le 2026-07-19, apres la suppression de son pipeline S0-S5 :
+# ses consommateurs ont besoin d'un oracle frais sans attendre notre version suivante.
+UNE = None
+if len(sys.argv) > 1:
+    UNE = sys.argv[1]
+    if UNE not in G:
+        print(f"grammaire inconnue : {UNE}")
+        print("noms disponibles : " + ", ".join(sorted(G)[:12]) + " …")
+        sys.exit(2)
+    CAP = os.path.join(OUT, "captures-a-la-demande")
+    os.makedirs(CAP, exist_ok=True)
+
 rows = []
-names = sorted(G)
+names = [UNE] if UNE else sorted(G)
 for idx, name in enumerate(names, 1):
     gd = G[name]
     bern = gd.get("bernard", name)
@@ -278,6 +296,20 @@ meta = dict(version="v5", figee_le=datetime.date.today().isoformat(),
             produce_all=len([r for r in n_ok if r["action"] == "produce-all"]),
             single=len([r for r in n_ok if r["action"] == "single"]),
             grammaires=rows)
+if UNE:
+    # On n'ecrit PAS baseline.json : la reference publiee ne bouge que sur republication.
+    x = rows[0]
+    print(f"\noracle frais pour « {UNE} » — baseline PUBLIEE INCHANGEE")
+    print(f"  action={x.get('action')}  mode={x.get('modalite')}  "
+          f"jetons={x.get('jetons_midi')}  mots={x.get('mots_texte')}  items={x.get('items')}")
+    print(f"  convention={x.get('convention')} ({x.get('convention_source')})")
+    print(f"  capture ecrite dans {CAP}/")
+    if x.get('capture_comparable') is False or UNE in ("trySrand", "trySerial"):
+        print("  ⚠ CETTE GRAMMAIRE N'EST PAS REPRODUCTIBLE a graine fixe : le nombre de jetons "
+              "est stable mais leur ORDRE change d'une execution a l'autre. Comparez les "
+              "compteurs, JAMAIS la sequence.")
+    sys.exit(0)
+
 json.dump(meta, open(os.path.join(OUT, "baseline.json"), "w"), indent=1, ensure_ascii=False)
 c = collections.Counter((r["modalite"] or "NE PRODUIT PAS") for r in rows)
 a = collections.Counter((r["action"] or "-") for r in rows)

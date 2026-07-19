@@ -82,6 +82,7 @@ GRAM#2[3] B --> E4           GRAM#2[3] B --> E4
 ```
 
 Sans le marqueur, `A B` s'apparie et donne `C4`. Avec lui, l'appariement est bloqué. Les
+<!-- suite : voir la section « le ';' sert-il hors métaprogrammation ? » plus bas -->
 trois autres marqueurs se comportent **exactement pareil** sur ce test (`D4 +E4`,
 `D4 = E4`, `D4 : E4`) : en tant que barrières de dérivation, les quatre sont bien
 équivalents. C'est dans leurs **contextes dédiés** — parenthèses pour `=`/`:`, en-tête de
@@ -140,3 +141,73 @@ Nuance, après le test empirique du 2026-07-19 : dans le rôle **commun** de bar
 dérivation, les quatre sont équivalents et interchangeables. C'est dans leurs **contextes
 dédiés** qu'ils se distinguent — et pour `;` ce contexte dédié n'existe plus dans le
 binaire actuel, la fonction étant désactivée par une ligne commentée (constat #58).
+
+## Le `;` sert-il hors métaprogrammation ? — OUI, et il porte la musique
+
+Établi le 2026-07-19 en réponse à la demande [113] : la métaprogrammation (émission de
+texte de grammaire) étant **hors périmètre** par décision datée, il fallait savoir si `;`
+n'a de sens **que** là — auquel cas il n'y aurait rien à porter.
+
+**Réponse : non. `;` est porteur dans une grammaire purement musicale.**
+
+### Une grammaire du corpus, purement musicale, l'emploie
+
+`test-data/-gr.dhati` est une qā'ida de tabla : notes françaises, sortie MIDI (66 jetons),
+aucune émission de texte. Elle emploie `;` dans **neuf** règles, et — c'est le point — en
+**stricte parallèle avec `+`**, comme deux marqueurs de **position dans le cycle rythmique** :
+
+```
+gram#6 [12] LEFT A8 + <-> dhatidhagedheenagena+       ← position marquée '+'
+gram#6 [13] LEFT A8 ; <-> dhatidhagedheenagena;       ← position marquée ';'
+```
+
+Les deux règles sont identiques **au marqueur près**. Même chose côté `gram#3`, où le
+marqueur décide vers quel symbole on réécrit :
+
+```
+gram#3 [26] <100> LEFT N16 + <-> V8 A8 +
+gram#3 [36] <100> LEFT O16 ; <-> V8 A8 ;
+```
+
+Membre droit identique, marqueur différent, **membre gauche différent** (`N16` contre
+`O16`). Le marqueur est donc ce qui discrimine.
+
+### Le retirer symétriquement ne prouve rien — le test qui tranche est asymétrique
+
+Retirer `;` **des deux côtés** de toutes les règles ne change rien : sur dix graines, jetons
+et minutage strictement identiques. C'est logique — les règles restent cohérentes entre
+elles, donc elles s'apparient pareil. Ce test-là ne dit rien.
+
+Le test qui tranche est de changer le marqueur dans **une seule** règle, en gardant tout le
+reste. Dans `gram#6 [13]`, on remplace `;` par `+` :
+
+```
+gram#6 [13] LEFT A8 ; <-> dhatidhagedheenagena;      →      gram#6 [13] LEFT A8 + <-> dhatidhagedheenagena+
+```
+
+Résultat sur cinq graines : **la musique produite diffère sur deux d'entre elles**. Sur la
+graine 1, le détail est sans appel :
+
+| | jetons | fin de la sortie |
+|---|---|---|
+| avec `;` (original) | **66** | `… dha ge dhee na ge dha ge dha ti dha ge dhee na ge na` |
+| avec `+` (marqueur changé) | **61** | `… dha ge A8}` |
+
+Avec le mauvais marqueur, la règle **ne s'applique plus** : le symbole `A8` reste non
+réécrit dans la sortie, et cinq jetons musicaux disparaissent. Le marqueur est donc
+**porteur** : il sélectionne quelle règle de réécriture s'applique à quelle position du
+cycle.
+
+### Conclusion pour l'arbitrage
+
+`;` a **deux emplois distincts**, et un seul est hors périmètre :
+
+1. **Marqueur de position structurelle dans une grammaire musicale** — porteur, prouvé
+   ci-dessus sur une grammaire réelle du corpus. **Rien à voir avec la métaprogrammation.**
+   C'est cet emploi-là qu'il faut porter.
+2. **Saut de ligne pour engendrer du texte de grammaire** — relèverait bien de la
+   métaprogrammation exclue, mais la question ne se pose même pas : cette fonction est
+   **éteinte** dans le binaire (constat #58).
+
+Donc : **porter**, et porter le sens n° 1, qui est le seul qui existe réellement dans le
+moteur d'aujourd'hui.

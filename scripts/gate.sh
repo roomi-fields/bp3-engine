@@ -51,14 +51,16 @@ if [ "$VOIE" = rapide ] || [ "$VOIE" = tout ]; then
   lancer "anti-retro-morsure" 90 ./scripts/gate-legacy-injection.sh
 fi
 
-# La voie ROUGE est VIDE : son unique occupant, test-settings-params, n'était pas rouge
+# La voie ROUGE porte les défauts MOTEUR connus et non corrigés. On ne les maquille jamais :
+# ils restent branchés et rouges jusqu'à ce que le moteur bouge.
+# Note historique : son premier occupant, test-settings-params, n'était pas rouge
 # à cause du moteur mais à cause de LUI-MÊME — il passait la convention 1 (= FRANÇAIS) à
 # une grammaire en notes anglaises. Aligné sur la vérité du moteur et RENFORCÉ (il exige
 # désormais la symétrie des conventions), il est vert et vit en voie rapide. Voir BPE-21.
 # La voie reste déclarée : le jour où un vrai défaut moteur apparaît, il a sa place.
 if [ "$VOIE" = rouge ] || [ "$VOIE" = tout ]; then
   echo "── voie ROUGE (défauts moteur connus, NE PAS faire verdir) ──"
-  echo "  (aucun garde dans cette voie)"
+  lancer "verif-bug55" 60 ./scripts/verif-bug55.sh
 fi
 
 if [ "$VOIE" = lente ] || [ "$VOIE" = tout ]; then

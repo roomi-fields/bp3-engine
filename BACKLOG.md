@@ -362,5 +362,14 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   « linux built in 0s » et a **deploye l'ancien binaire** ; c'est le SECOND passage, apres que
   `sync` ait copie les nouvelles sources, qui a revele l'echec de compilation. Sans le double
   passage documente, j'aurais cru avoir construit la 3.4.7 en livrant la 3.4.4.
-  RESTE : accord pour installer `libcurl4-openssl-dev`, puis reappliquer le patch, reconstruire,
-  verifier #55 empiriquement, re-mesurer `cloches1`, recapturer seulement si un comportement change.
+  **PREPARATION FAITE PENDANT LE BLOCAGE — la verification de #55 est ecrite et mesuree.**
+  `scripts/verif-bug55.sh` reproduit le bug de facon DETERMINISTE : un fichier `-cs` authentique
+  (`-cs.tryCsound`) prive de sa SEULE ligne `_end tables` fait boucler le moteur — aucun retour
+  apres 45 s, mesure sur v3.4.4. C'est l'etat AVANT, etabli noir sur blanc.
+  Ce script est le SEUL juge de #55 : la comparaison des sources ne confirme pas le correctif
+  annonce par Bernard (`SaveLoads1.c` est identique dans toute la boucle de lecture, lignes
+  437-439). Apres le passage en v3.4.7, une seule commande tranchera. Il est branche dans la voie
+  `rouge` du portillon (`./scripts/gate.sh rouge`), qui retrouve ainsi un occupant legitime.
+  RESTE : accord pour installer `libcurl4-openssl-dev`, puis reappliquer le patch, reconstruire
+  en DOUBLE passage, lancer `./scripts/gate.sh rouge` pour trancher #55, re-mesurer `cloches1`,
+  recapturer seulement si un comportement change.

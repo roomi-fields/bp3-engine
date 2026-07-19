@@ -1,11 +1,57 @@
 # Baseline native « original » — jeu unique, daté, vérifié
 
-## 🔖 **baseline v10 — figée le 2026-07-19 — objets sonores chargés**
+## 🔖 **baseline v11 — figée le 2026-07-19 — un alphabet illisible réparé**
 
-**96 productibles**, **2 doublons**, **15 muettes réelles**, **113 entrées au total**.
-Modes natifs : **MIDI 60** · **TEXTE 36**. Actions : **single 67** · **produce-all 29**.
+**97 productibles**, **2 doublons**, **14 muettes réelles**, **113 entrées au total**.
+Modes natifs : **MIDI 60** · **TEXTE 37**. Actions : **single 68** · **produce-all 30**.
 
-### v9 → v10 : ma configuration de capture ignorait les objets sonores
+### v10 → v11 : `dhin` sortait 22 erreurs à cause de ses fins de ligne
+
+Une seule entrée change, et c'est un gain sec.
+
+| grammaire | avant | après |
+|---|---|---|
+| `dhin` | muette, 22 erreurs de compilation | **productible** — TEXTE, 20 items, 3860 mots |
+
+Son alphabet `-al.dhin--` n'avait que des **retours chariot Mac** (`0x0D`) et aucun saut de
+ligne : le moteur y lisait une seule ligne géante et ne compilait rien. La réparation est une
+**conversion, pas une réécriture** — `-al.dhin--` s'est révélé identique **à l'octet près** à son
+jumeau `-ho.dhin--` une fois les fins de ligne converties. 13 autres fichiers du corpus étaient
+dans le même cas (commit `b4fdf8d`).
+
+⚠ **Piège symétrique, à ne pas « réparer »** : 62 fichiers `-se.*` n'ont eux non plus aucun saut
+de ligne, mais les grammaires qui les emploient **produisent**. C'est leur format normal.
+
+### ⚠ `trySrand` n'est pas une référence de contenu
+
+La comparaison des captures **une par une** (empreinte de chaque fichier) a montré une seule
+dérive : `trySrand` sort 25 jetons dans les deux versions, mais **dans un ordre différent**.
+
+Ce n'est pas un défaut — c'est l'objet même de la grammaire. Elle appelle `_randomize`, qui
+« ré-ensemence la suite aléatoire avec un nombre arbitraire » (`-gr.trySrand:7`), et son propre
+commentaire l'annonce : « The random sequences derived from A are always different because of the
+`_randomize` procedure placed on top of the grammar » (`:17-18`). `_randomize` prime sur `--seed`.
+
+**Conséquence pour les consommateurs** : sur cette grammaire, comparez les **compteurs**, jamais
+la séquence. Le champ `capture_comparable` vaut `false` pour elle, `true` pour les 112 autres.
+
+### Ce que cette republication a révélé sur la v10
+
+Je n'ai publié qu'après avoir comparé **champ par champ** les 113 entrées contre la v10. Deux
+choses en sont sorties, et je les signale plutôt que de les lisser :
+
+1. **`testTie7` n'était pas reproductible.** Sa première recapture ne produisait plus rien. Cause :
+   la grammaire n'a **aucune configuration déclarée** à la source, et ma capture ne tirait la
+   convention de notes que de là. Sans elle le moteur refuse `do4___&`. Correctif dans la capture,
+   avec une garde stricte : on ne retient une convention **que si une seule des quatre compile**.
+   Si plusieurs compilent, c'est ambigu et le champ `convention_source` le dit. Une seule entrée
+   est dans ce cas (`testTie7`, ⚖ dans le tableau) ; 13 restent ambiguës et non tranchées.
+   Le correctif durable appartient au registre de configuration, pas à moi.
+2. **L'en-tête de la v10 annonçait 5 captures texte structurées alors que ses propres entrées en
+   portaient 8.** L'en-tête était périmé. La v11 publie le compte réel, calculé depuis les entrées.
+   Rappel de la règle : **les champs font foi, pas le résumé.**
+
+### Historique — v9 → v10 : ma configuration de capture ignorait les objets sonores
 
 Signalé par bp3-frontend sur `tryKeyMap` (diagnostic bpx) : ma capture donnait 392 jetons là où
 BPx en dérive 410. **Ce n'était pas un écart entre implémentations, mais entre configurations** —

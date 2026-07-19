@@ -241,13 +241,28 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   (verifie : avec `_volumecont` on tombe a 3) ; et 2 `_script(…)` emploient la syntaxe BP2.
   Arbitrage porte a Romain par l'architecte. Commit `2df5fa1`.
 
-- **BPE-19** `en-attente-arbitrage` [P3] — CHECKALLCSOUND-RESSOURCE-ABSENTE : `-gr.checkAllCsound`
+- **BPE-19** `RESOLU 2026-07-19` [P3] — CHECKALLCSOUND-RESSOURCE-ABSENTE : `-gr.checkAllCsound`
   declare `-cs.checkAllCsound`, ABSENT du depot ; les 30 erreurs sont toutes des recherches
   d'instruments dans un fichier inexistant. Avec `-cs.tryCsound` a la place : 3 erreurs. Tous
   les instruments demandes (Flute, Harpsichord, Splashmachine) y sont, sauf `The_default`,
   introuvable dans les 14 fichiers `-cs.*` du corpus. DECISION CORPUS : soit un fichier a ete
   perdu, soit l'en-tete pointe un nom qui n'a jamais existe et il faut le rediriger.
-  Aucun correctif applique. Arbitrage porte a Romain par l'architecte.
+  ARBITRAGE RENDU (critere Romain via architecte [118]) : SUBSTITUER, le sens est preserve.
+  (1) C'est bien une grammaire de TEST — son propre en-tete le dit : « This grammar is used to
+  play items in -da.checkAllCsound until "Play selection" has been implemented », un banc pour
+  auditionner le fichier de donnees regle par regle en basculant un poids.
+  (2) Le sens survit a la substitution : `-cs.tryCsound` couvre 28 des 31 references
+  d'instruments (Harpsichord 12, numerique 1 -> 9, Splashmachine 3, Flute 2, numerique 3 -> 2).
+  `The_default` (3 references) ne teste AUCUN mecanisme distinct : c'est un nom de plus par le
+  meme chemin `_ins(<nom>)` que les trois autres noms exercent deja. Verifie qu'il n'est pas un
+  mot reserve : absent du moteur et de `BP3_help.txt`, present nulle part ailleurs que dans cette
+  paire de fichiers.
+  CORRECTIF APPLIQUE : en-tete redirige vers `-cs.tryCsound` ; les 3 regles appelant
+  `The_default` COMMENTEES et non supprimees (meme motif que BPE-4, l'information est preservee)
+  car elles empechent la compilation quel que soit le poids actif ; poids actif deplace de la
+  regle 16 sur la regle 14, qui exerce les memes controles continus (`_pitchrange`,
+  `_pitchcont`, `_pitchbend`) — deplacement legitime, l'en-tete du fichier invite explicitement
+  a regler le poids soi-meme. MESURE : 30 erreurs -> 0, et la grammaire PRODUIT 8 jetons.
 
 - **BPE-20** `RESOLU 2026-07-19` [P3] — DHIN-TROU-DE-CONFIG : les 22 erreurs de `-gr.dhin--`
   n'etaient pas un defaut du corpus mais de MA capture : l'alphabet n'etait pas charge.

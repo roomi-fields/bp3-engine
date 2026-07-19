@@ -1,6 +1,15 @@
+// En-tete redirige par bp3-engine, 2026-07-19 (BPE-19).
+// La grammaire declarait « -cs.checkAllCsound », fichier ABSENT du depot : les 30 erreurs
+// etaient toutes des recherches d'instruments dans un fichier inexistant. « -cs.tryCsound »
+// fournit 28 des 31 instruments cites (Harpsichord, Flute, Splashmachine, 1, 3) — seul
+// « The_default » manque, et il ne teste aucun mecanisme distinct : c'est un nom de plus
+// par le meme chemin _ins(<nom>) que les trois autres exercent deja. Le sens de la
+// grammaire est donc preserve. Les 3 regles qui l'appellent sont COMMENTEES, pas
+// supprimees, et le poids actif a ete deplace sur la regle 14, qui exerce les memes
+// controles continus (_pitchrange, _pitchcont, _pitchbend) que l'ancienne regle 16.
 // Bol Processor BP3 compatible with version BP2.9.8
 // Grammar file saved as "-gr.checkAllCsound". Date: 2020-11-06 07:09:17
--cs.checkAllCsound
+-cs.tryCsound
 -se.checkAllCsound
 
 // This grammar is used to play items in -da.checkAllCsound until "Play selection" has been implemented.
@@ -20,7 +29,10 @@ gram#1[5] <0> S --> _ins(3) _modcont _mod(0) C4 D4_ _ E4 _mod(12431)
 
 gram#1[6] <0> S --> _ins(1) _chan(2) _modcont _mod(0) C4 D4_ _ E4 _mod(12431)
 
-gram#1[7] <0> S --> _ins(The_default) {_volume(30) C5 D5 E5 F5,_volume(20) G5 D5 C6}
+// BPE-19 : regle DESACTIVEE, pas supprimee. Elle appelle _ins(The_default),
+// instrument qui n'existe dans aucun des 14 fichiers -cs. du corpus. Tant qu'elle
+// est presente, la grammaire ne compile pas, quel que soit le poids actif.
+// gram#1[7] <0> S --> _ins(The_default) {_volume(30) C5 D5 E5 F5,_volume(20) G5 D5 C6}
 
 gram#1[8] <0> S --> _ins(Harpsichord) _volume(0) A4 _volume(32) A4 _volume(64) A4 _volume(80) A4_volume(127) A4
 
@@ -34,11 +46,18 @@ gram#1[12] <0> S --> _ins(Harpsichord) _volumecont _volume(127) A4 G4 _volume(10
 
 gram#1[13] <0> S --> _ins(Harpsichord) _pitchcont _pitchbend(16383) A4 G4 C5 A5 A4 G4 C5 A5 _pitchbend(0)
 
-gram#1[14] <0> S --> _ins(Harpsichord) _volumecont _volume(0) _pitchcont _pitchrange(200) _pitchbend(200) A4 G4 C5 A5 A4 G4 C5 A5 _pitchbend(-200) _volume(127)
+// BPE-19 : poids actif deplace ici depuis la regle 16 (memes controles continus).
+gram#1[14] <1> S --> _ins(Harpsichord) _volumecont _volume(0) _pitchcont _pitchrange(200) _pitchbend(200) A4 G4 C5 A5 A4 G4 C5 A5 _pitchbend(-200) _volume(127)
 
-gram#1[15] <0> S --> _ins(The_default) _pitchcont _pitchbend(0) D4__ _pitchbend(16383) E4_ _pitchbend(0)___
+// BPE-19 : regle DESACTIVEE, pas supprimee. Elle appelle _ins(The_default),
+// instrument qui n'existe dans aucun des 14 fichiers -cs. du corpus. Tant qu'elle
+// est presente, la grammaire ne compile pas, quel que soit le poids actif.
+// gram#1[15] <0> S --> _ins(The_default) _pitchcont _pitchbend(0) D4__ _pitchbend(16383) E4_ _pitchbend(0)___
 
-gram#1[16] <1> S --> _ins(The_default) _pitchrange(200) _pitchcont _pitchbend(-200) D4__ _pitchbend(+200) E4_ _pitchbend(-200)___
+// BPE-19 : regle DESACTIVEE, pas supprimee. Elle appelle _ins(The_default),
+// instrument qui n'existe dans aucun des 14 fichiers -cs. du corpus. Tant qu'elle
+// est presente, la grammaire ne compile pas, quel que soit le poids actif.
+// gram#1[16] <1> S --> _ins(The_default) _pitchrange(200) _pitchcont _pitchbend(-200) D4__ _pitchbend(+200) E4_ _pitchbend(-200)___
 
 gram#1[17] <0> S --> _ins(1) _pitchrange(200) _pitchbend(0) _pitchcont C4 _ _pitchbend(20)_ _ _pitchbend(165) _ _ D4 _ _ _ _pitchbend(150)
 

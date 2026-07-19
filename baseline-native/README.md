@@ -77,6 +77,46 @@ d'alphabet refuse (elles contiennent un `:`). Sur `tryhomomorphism`, les deux fi
 identiques **à l'octet près** hors ces deux lignes, et l'homomorphisme est bel et bien
 appliqué : `-al` rend 6 jetons sans erreur, `-ho` en rend **zéro**.
 
+### Pourquoi cette baseline diverge des anciens instantanés `s3_native` — cause établie
+
+bpscript a comparé ses 55 instantanés aux captures d'ici, une par une : **16 divergences sur
+39 comparables**. Ni ses instantanés ni ces captures ne sont faux — **ce sont deux mesures
+prises sous des conditions différentes**. Mesuré, pas supposé :
+
+**Cause dominante — le nombre d'items.** Cette baseline force `MaxItemsProduce=1` : elle
+capture **le jeu**, une réalisation, graine fixe. Les instantanés `s3_native` laissaient le
+réglage du fichier, souvent 20. En retirant le forçage :
+
+| grammaire | ici (1 item) | ici (N items) | leur instantané |
+|---|---:|---:|---:|
+| `ruwet` | 126 | **2528** | 2655 |
+| `PP` | 2 | 26 | 73 |
+| `koto3` | 2 | 22 | 312 |
+| `simpletemplates` | 7 | 16 | 198 |
+
+L'ordre de grandeur bascule d'un coup. Le résidu s'explique par un compte d'items ou un
+fichier de réglages encore différent.
+
+**Cause distincte — `dhati` (23 contre 66) : leur instantané précède le correctif `-so`.**
+Prouvé en une mesure :
+
+| | jetons |
+|---|---:|
+| avec `-so.dhati` (ici, depuis la v10) | **66** |
+| sans `-so.dhati` (avant la v10) | **23** |
+| leur instantané | 23 |
+
+Exactement 23. Leur capture date d'avant le chargement des objets sonores — ce n'est pas une
+divergence, c'est une photo plus ancienne.
+
+**Troisième cause — l'orthographe enharmonique** (`harmony` : `Db4` contre `C#4`) : la zone
+des cinq conventions de notes ambiguës, décrite plus haut. Même son, notation différente.
+
+**Ce que ça veut dire pour un consommateur** : ne comparez à cette baseline qu'une mesure
+prise dans **les mêmes conditions** — un item, graine 1, la configuration `php_ref`, objets
+sonores compris. Un écart de conditions produit un écart de mesure qui n'a rien à voir avec
+le moteur.
+
 ### Historique — v9 → v10 : ma configuration de capture ignorait les objets sonores
 
 Signalé par bp3-frontend sur `tryKeyMap` (diagnostic bpx) : ma capture donnait 392 jetons là où

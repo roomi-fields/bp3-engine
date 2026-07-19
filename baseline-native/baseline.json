@@ -1,5 +1,5 @@
 {
- "version": "v9",
+ "version": "v10",
  "figee_le": "2026-07-19",
  "date": "2026-07-18",
  "binaire": "bp3 v3.4.4 (graphics-for-BP3)",
@@ -887,7 +887,7 @@
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
-   "jetons_midi": 23,
+   "jetons_midi": 66,
    "mots_texte": 144,
    "items": 1,
    "items_enumeres": 20,
@@ -895,7 +895,8 @@
    "joue": true,
    "config": {
     "-se": "-se.dhati",
-    "-al": "-al.dhati"
+    "-al": "-al.dhati",
+    "-so": "-so.dhati"
    },
    "convention": "french",
    "config_source": "php_ref",
@@ -1920,7 +1921,8 @@
    "config": {
     "-se": "-se.tryCsoundObjects",
     "-al": "-al.tryCsoundObjects",
-    "-cs": "-cs.tryCsoundObjects"
+    "-cs": "-cs.tryCsoundObjects",
+    "-so": "-so.tryCsoundObjects"
    },
    "convention": "english",
    "config_source": "php_ref",
@@ -1960,7 +1962,7 @@
    "modalite": "MIDI",
    "produit": true,
    "raison": null,
-   "jetons_midi": 392,
+   "jetons_midi": 410,
    "mots_texte": 450,
    "items": 1,
    "items_enumeres": 1,
@@ -1968,15 +1970,14 @@
    "joue": true,
    "config": {
     "-se": "-se.tryKeyMap",
-    "-al": "-al.tryKeyMap"
+    "-al": "-al.tryKeyMap",
+    "-so": "-so.tryKeyMap"
    },
    "convention": "english",
    "config_source": "php_ref",
    "declare": "midi",
    "capture": "captures/tryKeyMap.tokens.json",
-   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu",
-   "reserve": "CONFIGURATION INCOMPLETE — ne pas utiliser ce compte comme reference. La capture vaut 392 jetons parce que le fichier d'objets sonores -so.tryKeyMap n'est PAS charge : ni php_ref ni l'en-tete de la grammaire ne le declarent. Charge avec sa ressource Csound resolue, le moteur en derive 410 — exactement ce que derive BPx. Le blocage n'est pas une ressource manquante (-cs.tryCsoundObjects existe bien dans test-data) mais le chemin stocke dans le -so (« csound_resources/... »), que le moteur prefixe systematiquement de « ../ » (SaveLoads1.c:855, en dur). Choix de convention de chemin a trancher avant de figer la reference.",
-   "reference_attendue": 410
+   "enumeration_statut": "sans objet : la grammaire joue, on capture le jeu"
   },
   {
    "grammaire": "tryKeyXpand",

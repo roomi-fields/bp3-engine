@@ -1,9 +1,47 @@
 # Baseline native « original » — jeu unique, daté, vérifié
 
-## 🔖 **baseline v9 — figée le 2026-07-19 — alphabets BP2 : deux lignes d'en-tête bloquaient tout**
+## 🔖 **baseline v10 — figée le 2026-07-19 — objets sonores chargés**
 
 **96 productibles**, **2 doublons**, **15 muettes réelles**, **113 entrées au total**.
 Modes natifs : **MIDI 60** · **TEXTE 36**. Actions : **single 67** · **produce-all 29**.
+
+### v9 → v10 : ma configuration de capture ignorait les objets sonores
+
+Signalé par bp3-frontend sur `tryKeyMap` (diagnostic bpx) : ma capture donnait 392 jetons là où
+BPx en dérive 410. **Ce n'était pas un écart entre implémentations, mais entre configurations** —
+et c'est la mienne qui était incomplète : elle ne chargeait pas le fichier d'objets sonores.
+
+⚠ **Deux références changent. Ne mesurez plus contre les anciennes :**
+
+| grammaire | avant | après |
+|---|---|---|
+| `tryKeyMap` | 392 jetons | **410** — exactement ce que dérive BPx |
+| `dhati` | 23 jetons | **66** |
+
+`tryCsoundObjects` est inchangée (son fichier d'objets sonores n'ajoute pas de jetons minutés).
+Ce sont les **3 seules** grammaires du corpus disposant d'un `-so`.
+
+**Aucune grammaire ne déclare son `-so`** — ni la référence `php_ref`, ni l'en-tête de la
+grammaire. Ils suivent la convention de nom `-so.<grammaire>`, exactement comme `-ho.<X>` pour
+l'alphabet. La capture applique désormais la même règle de nommage, et le tableau marque d'un
+🔊 les grammaires concernées.
+
+### Le chemin Csound : pourquoi `capture-run/` existe
+
+Le moteur préfixe **en dur** `../` au chemin Csound stocké dans un `-so`
+(`csrc/bp3/SaveLoads1.c:855`) — pas de chemin de recherche, et le drapeau `-cs` ne l'écrase pas.
+Les `-so` du corpus stockent `csound_resources/-cs.tryCsoundObjects`, chemin correct pour la
+disposition de l'installation amont mais pas pour notre arborescence plate.
+
+Décision architecte, **portée à la seule capture** : on reproduit la disposition attendue au lieu
+de réécrire le corpus. Le binaire est lancé depuis `capture-run/`, donc `../csound_resources/`
+résout sur `csound_resources/` à la racine du dépôt. **Les fichiers `-so` restent intouchés** —
+réécrire leur chemin figerait dans le corpus partagé une valeur dépendante du répertoire de
+travail, qui marcherait ici et casserait ailleurs.
+
+Le changement de répertoire de travail a été **vérifié sans effet** sur les grammaires sans
+objets sonores : `mohanam`, `ruwet`, `all-items`, `tunings` et `koto3` rendent des comptes
+strictement identiques.
 
 ### v8 → v9 : `checkHomo` et `checkhomo2` récupérées — la cause tient en un caractère
 
@@ -125,7 +163,8 @@ ni `dhin` (22), ni `checkVolChan` (6), ni `checkAllCsound` (30). Leur cause est 
 | v6 | 2026-07-19 | 90 | 55 | par action | `5dd8c41` |
 | v7 | 2026-07-19 | 95 | 60 | par action | `cc7912f` |
 | v8 | 2026-07-19 | 94 | 60 | par action | `2740868` |
-| **v9** | **2026-07-19** | **96** | **60** | par action | ce commit |
+| v9 | 2026-07-19 | 96 | 60 | par action | `b06ec47` |
+| **v10** | **2026-07-19** | **96** | **60** | par action + objets sonores | ce commit |
 
 | version | figée le | productibles | MIDI | capture | commit |
 |---|---|---|---|---|---|

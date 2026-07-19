@@ -1,6 +1,6 @@
 # Baseline native — tableau par grammaire
 
-**v9** — figée le 2026-07-19 · binaire bp3 v3.4.4 (graphics-for-BP3) · graine 1
+**v10** — figée le 2026-07-19 · binaire bp3 v3.4.4 (graphics-for-BP3) · graine 1
 
 `action` = ce que fait le moteur nativement. Les deux voies doivent répliquer **la même action**.
 
@@ -32,7 +32,7 @@
 | `testHO2` | produce-all | TEXTE | 0 | 4 | 1 | acceptée (1 items) |
 | `tryAllItems0` | produce-all | TEXTE | 0 | 20 | 8 | acceptée (8 items) |
 | `tryAllItems1` | produce-all | TEXTE | 0 | 36 | 12 | acceptée (12 items) |
-| `tryCsoundObjects` | produce-all | TEXTE | 0 | 2 | 1 | acceptée (1 items) |
+| `tryCsoundObjects` 🔊 | produce-all | TEXTE | 0 | 2 | 1 | acceptée (1 items) |
 | `tryLIN` | produce-all | TEXTE | 0 | 25 | 25 | acceptée (25 items) |
 | `tryObjects` | produce-all | TEXTE | 0 | 18 | 1 | acceptée (1 items) |
 | `tryPatternGrammar` | produce-all | TEXTE | 0 | 52 | 4 | acceptée (4 items) |
@@ -61,7 +61,7 @@
 | `checkSUB1` | single | TEXTE | 0 | 2 | 1 | **refusée** (SUB) |
 | `checkVolMasterSlave` | single | MIDI | 6 | 12 | 1 | — (elle joue) |
 | `csound` | single | MIDI | 8 | 11 | 1 | — (elle joue) |
-| `dhati` | single | MIDI | 23 | 144 | 1 | — (elle joue) |
+| `dhati` 🔊 | single | MIDI | 66 | 144 | 1 | — (elle joue) |
 | `doeslittle` | single | MIDI | 7 | 11 | 1 | — (elle joue) |
 | `drum` | single | MIDI | 12 | 23 | 1 | — (elle joue) |
 | `gramgene2` | single | TEXTE | 0 | 78 | 1 | **bloquée** > 90 s |
@@ -89,7 +89,7 @@
 | `transposition1` | single | MIDI | 75 | 107 | 1 | — (elle joue) |
 | `transposition3` | single | MIDI | 66 | 30 | 1 | — (elle joue) |
 | `tryGOTO` | single | TEXTE | 0 | 1 | 1 | **refusée** (SUB) |
-| `tryKeyMap` | single | MIDI | 392 | 450 | 1 | — (elle joue) |
+| `tryKeyMap` 🔊 | single | MIDI | 410 | 450 | 1 | — (elle joue) |
 | `tryKeyXpand` | single | MIDI | 91 | 120 | 1 | — (elle joue) |
 | `tryMIDIfile` | single | MIDI | 8 | 9 | 1 | — (elle joue) |
 | `tryRagas` | single | MIDI | 42 | 1048572 | 1 | — (elle joue) |
@@ -108,6 +108,8 @@
 | `visser5` | single | MIDI | 1152 | 1822 | 1 | — (elle joue) |
 | `watch` | single | MIDI | 2105 | 5122 | 1 | — (elle joue) |
 
+🔊 = objets sonores chargés (`-so`).
+
 ## Doublons — 2 entrées qui ne sont pas des grammaires à mesurer
 
 | entrée | doublon de |
@@ -120,7 +122,7 @@
 | grammaire | cause |
 |---|---|
 | `Nadaka1` | => Cannot produce items because all weights are nil in gram#1 |
-| `Rajeev` | 27 erreur(s) de compilation : Variable must start with uppercase character or '|'. Can't make sense  |
+| `Rajeev` | le moteur refuse le saut de section « ¬ » (BP3_help.txt:541 le documente pourtant) : 7 erreurs sur 27. Les 20 autres son |
 | `a` | 4 erreur(s) de compilation : Error code 52: Missing slash after /flag/ in gram#2 rule 3 |
 | `checkAllCsound` | 30 erreur(s) de compilation : => You probably forgot to create or load a '-cs' instrument file |
 | `checkVolChan` | 6 erreur(s) de compilation : => Incorrect note. (May be wrong note convention) |
@@ -131,6 +133,6 @@
 | `keys` | aucune sortie, aucun message |
 | `look-and-say` | bug moteur #51 (« all weights are nil in gram#1 »). Le « 1 item » compte en v5-v7 etait un ARTEFACT : le residu de tampo |
 | `scales` | => Error reading Csound instruments file:  /home/romi/dev/bp/bp3-engine/test-dat |
-| `transposition` | 2 erreur(s) de compilation : Variable must start with uppercase character or '|'. Can't make sense  |
+| `transposition` | le moteur refuse le saut de section « ¬ » (BP3_help.txt:541 le documente pourtant) : 1 erreur sur 2. La 2e est un « Erro |
 | `tryConsoleMaxTime` | => Calculation overflow (10000 derivations): task abandoned. Loop? |
 | `tryShruti` | => Error reading Csound instruments file:  /home/romi/dev/bp/bp3-engine/test-dat |

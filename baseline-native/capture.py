@@ -163,6 +163,44 @@ if len(sys.argv) > 1:
     CAP = os.path.join(OUT, "captures-a-la-demande")
     os.makedirs(CAP, exist_ok=True)
 
+# ── SONDE D ENTREE ───────────────────────────────────────────────────────────
+# Avant d'engager une demi-heure de mesure, on verifie en trente secondes que la
+# chaine emet encore des jetons minutes. Le garde anti-effondrement en fin de course
+# empeche de PUBLIER du vide ; celui-ci empeche de le MESURER pour rien.
+# Le 2026-07-19 une recapture entiere a tourne trente minutes pour rendre 0 jeton MIDI
+# sur 113 grammaires — l appel au serialiseur avait ete perdu. Trente secondes de sonde
+# l auraient dit d emblee.
+if not UNE:
+    _ref = os.path.join(OUT, "baseline.json")
+    if os.path.isfile(_ref):
+        _b = {x["grammaire"]: x for x in json.load(open(_ref, encoding="utf-8"))["grammaires"]}
+        _sondes = [n for n in ("vina", "dhati", "mohanam", "ruwet", "tunings")
+                   if n in _b and _b[n].get("jetons_midi", 0) > 0]
+        _muettes = []
+        for _n in _sondes:
+            _x = _b[_n]
+            _g = os.path.join(TMP, f"sonde.{_n}")
+            clean(os.path.join(TD, _x["source"]), _g)
+            _tk = os.path.join(TMP, f"sonde.{_n}.json")
+            if os.path.isfile(_tk):
+                os.remove(_tk)
+            _se = se_un_item(_x["config"]["-se"], _n) if "-se" in _x.get("config", {}) else None
+            run("produce", _g, _x["config"], _x.get("convention"), _se, _tk,
+                os.path.join(TMP, f"sonde.{_n}.txt"))
+            _nt = len(json.load(open(_tk))) if os.path.isfile(_tk) else 0
+            print(f"  sonde {_n:10s} {_nt:5d} jetons (reference {_x['jetons_midi']})")
+            if _nt == 0:
+                _muettes.append(_n)
+        if _muettes and len(_muettes) == len(_sondes):
+            print(f"\nCAPTURE ABANDONNEE — la chaine de mesure n'emet plus aucun jeton minute.")
+            print(f"  {len(_muettes)} grammaire(s) sondee(s), toutes muettes, alors que la")
+            print(f"  baseline publiee leur attribue des jetons.")
+            print("\nUn binaire peut construire, tourner et sortir Errors: 0 sans rien emettre :")
+            print("verifiez que l'appel au serialiseur est toujours en place")
+            print("  python3 scripts/gate-ancrages.py")
+            print("\nRien n'a ete mesure, rien n'a ete publie. La baseline est INTACTE.")
+            sys.exit(4)
+
 rows = []
 names = [UNE] if UNE else sorted(G)
 for idx, name in enumerate(names, 1):

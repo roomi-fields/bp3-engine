@@ -21,11 +21,22 @@ ROOT = "/home/romi/dev/bp/bp3-engine"
 TD = os.path.join(ROOT, "test-data")
 BP3 = os.path.join(ROOT, "bp3")
 OUT = os.path.join(ROOT, "baseline-native")
-CAP = os.path.join(OUT, "captures")
+CAP_PUBLIE = os.path.join(OUT, "captures")
+# Une recapture complete dure une demi-heure. Si elle ecrivait DANS le repertoire publie,
+# l'oracle resterait incoherent pendant tout ce temps — a moitie efface, a moitie reecrit —
+# et tout consommateur qui le lit pendant ce laps rendrait des faux resultats. C'est
+# exactement ce qui est arrive a bpscript le 2026-07-19 : leur comparateur a lu 27 captures
+# manquantes et les a comptees comme des divergences, alors que la recapture etait en cours.
+# On ecrit donc dans une zone de travail, et on BASCULE d'un coup a la fin. Meme propriete
+# que baseline.json, qui n'est ecrit qu'une fois tout mesure : en cas d'arret, le publie est
+# intact.
+CAP = os.path.join(OUT, "captures.en-cours")
 RUN = os.path.join(ROOT, "capture-run")  # cwd du binaire : ../csound_resources/ y resout
 GRJ = "/home/romi/dev/bp/BPscript/test/grammars/grammars.json"
 TMP = "/tmp/claude-1000/-home-romi-dev-bp-bp3-engine/2886bb74-5c18-4f37-8f64-8d3075d1375c/scratchpad/v4"
 os.makedirs(TMP, exist_ok=True)
+if os.path.isdir(CAP):
+    shutil.rmtree(CAP)
 os.makedirs(CAP, exist_ok=True)
 MODE = ("RND", "ORD", "LIN", "SUB", "TEMPLATES", "gram#", "GRAM#")
 CONV = {"english": None, "french": "--french", "indian": "--indian"}
@@ -148,6 +159,7 @@ if len(sys.argv) > 1:
         print(f"grammaire inconnue : {UNE}")
         print("noms disponibles : " + ", ".join(sorted(G)[:12]) + " …")
         sys.exit(2)
+    # mode unitaire : zone a part, on n'efface rien et on ne bascule rien
     CAP = os.path.join(OUT, "captures-a-la-demande")
     os.makedirs(CAP, exist_ok=True)
 
@@ -309,6 +321,16 @@ if UNE:
               "est stable mais leur ORDRE change d'une execution a l'autre. Comparez les "
               "compteurs, JAMAIS la sequence.")
     sys.exit(0)
+
+# BASCULE ATOMIQUE : jusqu'ici le repertoire publie n'a pas ete touche.
+if os.path.isdir(CAP_PUBLIE):
+    _vieux = CAP_PUBLIE + ".remplace"
+    if os.path.isdir(_vieux):
+        shutil.rmtree(_vieux)
+    os.rename(CAP_PUBLIE, _vieux)
+os.rename(CAP, CAP_PUBLIE)
+if os.path.isdir(CAP_PUBLIE + ".remplace"):
+    shutil.rmtree(CAP_PUBLIE + ".remplace")
 
 json.dump(meta, open(os.path.join(OUT, "baseline.json"), "w"), indent=1, ensure_ascii=False)
 c = collections.Counter((r["modalite"] or "NE PRODUIT PAS") for r in rows)

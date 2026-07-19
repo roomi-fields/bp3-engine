@@ -1,8 +1,8 @@
 {
- "version": "v12",
+ "version": "v13",
  "figee_le": "2026-07-19",
  "date": "2026-07-19",
- "binaire": "bp3 v3.4.4 (graphics-for-BP3)",
+ "binaire": "bp3 v3.4.7 (graphics-for-BP3)",
  "seed": "1",
  "n": 113,
  "capture": "par ACTION : single (le jeu, 1 item, graine fixe) des que la grammaire joue ; produce-all (l ensemble) pour les grammaires purement symboliques quand le moteur accepte d enumerer",
@@ -16,10 +16,10 @@
  "captures_non_comparables": 2,
  "conventions_declarees": 97,
  "conventions_derivees": 1,
- "conventions_sans_objet": 8,
- "conventions_ambigues": 5,
+ "conventions_sans_objet": 9,
+ "conventions_ambigues": 4,
  "muettes_reelles": 13,
- "nouveaute_v12": "checkAllCsound devient productible (BPE-19, commit d139365). Et le classement des conventions de notes est refait sur le bon critere : la convention CHANGE-T-ELLE la sortie, au lieu de compter combien de conventions compilent. Les 13 dites ambigues en v11 se resolvent en 8 sans objet et 5 reellement ambigues.",
+ "nouveaute_v13": "Moteur passe en v3.4.7. UNE SEULE entree change de comportement : tryRotate, dont l'operateur _rotate n'est plus applique — il ressort litteralement dans la sortie et les notes ne sont plus tournees. REGRESSION MOTEUR, remontee a Bernard Bel.",
  "grammaires": [
   {
    "grammaire": "765432",
@@ -1242,7 +1242,7 @@
    "action": null,
    "modalite": null,
    "produit": false,
-   "raison": "aucune sortie, aucun message",
+   "raison": "Can't make sense of \"*\"",
    "jetons_midi": 0,
    "mots_texte": 0,
    "items": 0,
@@ -1394,9 +1394,9 @@
    "config": {
     "-se": "-se.livecode2"
    },
-   "convention": null,
+   "convention": "english",
    "config_source": "en-tete",
-   "convention_source": "ambigue : 3 sorties differentes selon la convention (english | french | keys)",
+   "convention_source": "sans objet : les 3 conventions qui compilent rendent la meme sortie",
    "declare": "midi",
    "capture": "captures/livecode2.tokens.json",
    "capture_comparable": true
@@ -2217,7 +2217,7 @@
    "produit": true,
    "raison": null,
    "jetons_midi": 65,
-   "mots_texte": 67,
+   "mots_texte": 78,
    "items": 1,
    "items_enumeres": 1,
    "enumeration_refusee_par_le_moteur": false,
@@ -2240,7 +2240,7 @@
    "produit": true,
    "raison": null,
    "jetons_midi": 8,
-   "mots_texte": 7,
+   "mots_texte": 11,
    "items": 1,
    "items_enumeres": 1,
    "enumeration_refusee_par_le_moteur": false,
@@ -2254,7 +2254,7 @@
    "convention_source": "php_ref",
    "declare": "text",
    "capture": "captures/trySerial.tokens.json",
-   "non_deterministe": "ses operateurs seriels re-ensemencent independamment de --seed : MESURE, 4 sequences distinctes sur 6 executions consecutives. Nombre de jetons stable (8), ORDRE variable.",
+   "non_deterministe": "ses operateurs seriels re-ensemencent independamment de --seed : mesure, 4 sequences distinctes sur 6 executions. Nombre de jetons stable, ORDRE variable.",
    "capture_comparable": false
   },
   {
@@ -2304,7 +2304,7 @@
    "convention_source": "php_ref",
    "declare": "midi",
    "capture": "captures/trySrand.tokens.json",
-   "non_deterministe": "appelle _randomize, qui re-ensemence le tirage avec un nombre arbitraire et prime sur --seed. C'est l'objet meme de la grammaire (-gr.trySrand:7, commentaire :17-18). Nombre de jetons stable, ORDRE variable.",
+   "non_deterministe": "appelle _randomize, qui re-ensemence le tirage et prime sur --seed (-gr.trySrand:7, commentaire :17-18). Nombre de jetons stable, ORDRE variable.",
    "capture_comparable": false
   },
   {
@@ -2582,7 +2582,7 @@
    "jetons_midi": 2086,
    "mots_texte": 2553,
    "items": 1,
-   "items_enumeres": null,
+   "items_enumeres": 25,
    "enumeration_refusee_par_le_moteur": false,
    "joue": true,
    "config": {
@@ -2605,7 +2605,7 @@
    "jetons_midi": 365,
    "mots_texte": 433,
    "items": 1,
-   "items_enumeres": null,
+   "items_enumeres": 1,
    "enumeration_refusee_par_le_moteur": false,
    "joue": true,
    "config": {

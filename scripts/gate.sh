@@ -53,6 +53,7 @@ if [ "$VOIE" = rapide ] || [ "$VOIE" = tout ]; then
   lancer "ancrages-morsure"   90 ./scripts/gate-ancrages-injection.sh
   lancer "effondrement-morsure" 90 ./scripts/gate-effondrement-injection.sh
   lancer "non-retour-bug55"   60 ./scripts/verif-bug55.sh
+  lancer "sonde-morsure"     120 ./scripts/gate-sonde-injection.sh
 fi
 
 # La voie ROUGE porte les défauts MOTEUR connus et non corrigés. On ne les maquille jamais :

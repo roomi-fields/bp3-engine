@@ -8,8 +8,11 @@ cd "$(dirname "$0")/.."
 echec=0
 BIN="bp3"; SAUVE=$(mktemp)
 cp "$BIN" "$SAUVE"
-nettoie() { cp "$SAUVE" "$BIN"; chmod +x "$BIN"; rm -f "$SAUVE"; }
+nettoie() { [ -f "$SAUVE" ] && { cp "$SAUVE" "$BIN"; chmod +x "$BIN"; rm -f "$SAUVE"; }; }
 trap nettoie EXIT
+
+EMPREINTE_JSON=$(sha256sum baseline-native/baseline.json)
+NB_CAPTURES=$(ls baseline-native/captures | wc -l)
 
 echo "1. état de départ — la sonde doit PASSER (le moteur émet)"
 sortie=$(timeout 300 python3 baseline-native/capture.py vina 2>&1)
@@ -38,9 +41,17 @@ else
   echo "   abandon en ${duree} s, code 4, message explicite ✔"
 fi
 
-echo "4. la baseline publiée doit être INTACTE"
-if python3 scripts/gate-baseline.py >/dev/null 2>&1; then echo "   intacte ✔"
-else echo "   ÉCHEC : la baseline a été touchée malgré l'abandon"; echec=1; fi
+# On vérifie que L'INJECTION n'a rien touché — par empreinte avant/après, PAS en lançant
+# le garde d'intégrité : celui-ci est légitimement rouge quand une baseline vient d'être
+# capturée et que ses en-têtes ne sont pas encore posés. Le garde répondrait à une autre
+# question que celle qu'on pose ici, et sa réponse passerait pour un échec de l'injection.
+echo "4. l'abandon ne doit avoir touché NI baseline.json NI les captures publiées"
+if [ "$(sha256sum baseline-native/baseline.json)" = "$EMPREINTE_JSON" ] \
+   && [ "$(ls baseline-native/captures | wc -l)" = "$NB_CAPTURES" ]; then
+  echo "   rien touché ✔"
+else
+  echo "   ÉCHEC : l'abandon a modifié la baseline ou ses captures"; echec=1
+fi
 
 nettoie
 echo "─────────────────────────────────────────────"

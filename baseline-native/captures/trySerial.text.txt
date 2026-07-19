@@ -1,1 +1,1 @@
-He Says : Useless Are{Boulezian Operators}{For BP2}
+He Says : _rndseq {_ordseq Boulezian Operators} Are Useless{_ordseq For BP2}

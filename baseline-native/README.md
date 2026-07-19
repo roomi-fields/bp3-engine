@@ -1,121 +1,48 @@
 # Baseline native « original » — jeu unique, daté, vérifié
 
-## 🔖 **baseline v12 — figée le 2026-07-19**
+## 🔖 **baseline v13 — figée le 2026-07-19 — moteur v3.4.7**
 
 **98 productibles**, **2 doublons**, **13 muettes réelles**, **113 entrées au total**.
 Modes natifs : **MIDI 61** · **TEXTE 37**. Actions : **single 69** · **produce-all 30**.
 
-### v11 → v12 : deux changements, dont un de méthode
+### v12 → v13 : le moteur passe en v3.4.7, et **une seule entrée change de comportement**
 
-**1. `checkAllCsound` devient productible** (8 jetons). Elle déclarait un fichier d'instruments
-Csound absent du dépôt ; redirigée vers `-cs.tryCsound`, qui couvre 28 de ses 31 références
-(BPE-19, commit `d139365`). C'est la **seule** entrée dont les mesures changent.
+Double comparaison contre la v12 — champ par champ sur les 113 entrées **et** empreinte par
+empreinte sur les 163 captures. Une seule divergence est réelle : **`tryRotate`**.
 
-**2. Le classement des conventions de notes est refait sur le bon critère.** La v11 comptait
-*combien de conventions compilent* — ce qui ne peut pas distinguer « la convention n'a aucun
-effet » de « la convention change le résultat ». Le bon critère est : **la sortie change-t-elle ?**
+**L'opérateur `_rotate` n'est plus appliqué.** En v3.4.4 il agissait — la sortie montrait les
+notes tournées. En v3.4.7 il ressort **littéralement dans le texte produit**, et les notes sont
+dans leur ordre d'origine :
 
-Les 13 entrées dites « ambiguës » en v11 se résolvent en :
+| version | début de la sortie |
+|---|---|
+| v3.4.4 | `/6 {E4 F4 G4 C4 D4} 1/2 …` — rotation appliquée |
+| v3.4.7 | `/6 {_rotate(K1=2) C4 D4 E4 F4 G4} 1/2 …` — opérateur imprimé, notes intactes |
 
-| | n | ce que ça veut dire |
-|---|---|---|
-| déclarées à la source | 97 | rien à faire |
-| sans objet | 8 | plusieurs conventions compilent et rendent **la même sortie** — grammaires à symboles, sans nom de note |
-| dérivée | 1 | une seule convention compile (`testTie7`) |
-| **vraiment ambiguës** | **5** | la convention **change la sortie** — voir `TABLEAU.md` |
-| absente | 2 | la grammaire ne produit pas |
+Ce n'est pas une variance : `tryRotate` est **déterministe**, vérifié sur quatre exécutions
+consécutives (78 mots à chaque fois). **C'est une régression du moteur amont**, remontée à
+Bernard Bel. La piste : la v3.4.7 conditionne l'application des outils sériels à
+`OutBPdata && NeedZouleb > 0` dans `ProduceItems.c`, condition qui n'est pas remplie ici.
 
-Les 5 réelles ne sont pas de même nature, et le tableau le précise pour chacune : `bells`
-s'effondre sous `indian` (4 jetons contre 16), `major-minor` et `tunings` changent d'**orthographe
-enharmonique** (`A#4` contre `Bb4`, même son), `testNC1` change une **durée** (2850 contre 3000),
-`livecode2` donne trois sorties distinctes.
+Les trois autres écarts ne sont pas des changements de comportement :
 
-### ⚠ Deux captures ne sont PAS des références de contenu
+- `trySrand` et `trySerial` — les deux captures **non comparables**, dont l'ordre varie à graine
+  fixe par construction (voir plus bas).
+- `visser-shapes` et `visser-waves` — leur énumération, qui dépassait la limite de temps lors de
+  la capture précédente, a abouti cette fois. Le **jeu mesuré est identique** ; seul le champ
+  `items_enumeres` se remplit.
 
-`trySrand` **et** `trySerial` produisent un nombre de jetons stable mais dans un **ordre variable
-à graine fixe**. Mesuré pour `trySerial` : **4 séquences distinctes sur 6 exécutions**. Ce ne sont
-pas des défauts — ces deux grammaires existent pour démontrer des opérateurs qui ré-ensemencent le
-tirage (`_randomize` pour l'une, les opérateurs sériels pour l'autre) et qui priment sur `--seed`.
+### Ce qui a failli être publié à la place
 
-Sur ces deux-là : **comparez les compteurs, jamais la séquence.** Le champ `capture_comparable`
-vaut `false` pour elles, `true` pour les 111 autres. Un harnais qui diffe leur contenu rend un
-faux échec.
+La première recapture sur v3.4.7 a rendu **98 TEXTE et zéro MIDI**. Cause : l'appel au
+sérialiseur de jetons vivait dans un fichier **natif-seul** (`source/BP3/PlayThings.c`) qui a été
+repris tel quel depuis l'amont pendant la montée de version. Le binaire construisait, tournait,
+sortait `Errors: 0` — et n'émettait plus rien.
 
-La v11 n'en signalait qu'une : `trySerial` était passée à travers parce que sa capture v10 et sa
-capture v11 coïncidaient par hasard. C'est le même angle mort que partout ailleurs dans ce
-journal — **une vérification qui ne pouvait pas discriminer**.
-
-### ⚠ L'en-tête d'une grammaire n'est PAS sa configuration — ne chargez pas les deux
-
-Question posée par bp3-frontend le 2026-07-19, mesurée ici parce qu'elle porte sur une
-divergence de méthode entre les voies.
-
-L'en-tête d'un `-gr.` nomme les fichiers avec lesquels il a été **sauvegardé**. La
-configuration de référence (`php_ref`) nomme ceux que le harnais de Bernard **charge
-réellement**. Les deux diffèrent sur 12 entrées, et ce ne sont **pas des trous** : ce sont des
-remplacements délibérés de la référence.
-
-Mesuré, en chargeant le fichier de réglages de l'en-tête au lieu de celui de la référence :
-
-| grammaire | référence | en-tête |
-|---|---:|---:|
-| `transposition1` | 75 jetons | **0** |
-| `tryMIDIfile` | 160 jetons | **0** |
-| `check&` | 4 jetons | **0** |
-| `tryRotate` | 1300 jetons | 65 |
-| `MyMelody` | 31 jetons | 31 (identique) |
-
-**Suivre l'en-tête casse trois entrées et en change une d'un facteur vingt.** Une voie qui
-charge « ce que l'en-tête référence » au lieu de la configuration de référence ne mesure donc
-pas la même chose que l'oracle, et divergera sans que le moteur y soit pour rien.
-
-**Cas particulier des homomorphismes `-ho`** : le moteur natif **n'a pas d'option `-ho`**
-(`Unknown option '-ho'`). Un fichier `-ho.<X>` se charge par `-al`. Quand la configuration
-porte `-al.<X>` là où l'en-tête dit `-ho.<X>`, ce n'est pas une omission — c'est le fichier
-**dérivé** de l'original, dont on a retiré les deux lignes d'en-tête BP2 que le compilateur
-d'alphabet refuse (elles contiennent un `:`). Sur `tryhomomorphism`, les deux fichiers sont
-identiques **à l'octet près** hors ces deux lignes, et l'homomorphisme est bel et bien
-appliqué : `-al` rend 6 jetons sans erreur, `-ho` en rend **zéro**.
-
-### Pourquoi cette baseline diverge des anciens instantanés `s3_native` — cause établie
-
-bpscript a comparé ses 55 instantanés aux captures d'ici, une par une : **16 divergences sur
-39 comparables**. Ni ses instantanés ni ces captures ne sont faux — **ce sont deux mesures
-prises sous des conditions différentes**. Mesuré, pas supposé :
-
-**Cause dominante — le nombre d'items.** Cette baseline force `MaxItemsProduce=1` : elle
-capture **le jeu**, une réalisation, graine fixe. Les instantanés `s3_native` laissaient le
-réglage du fichier, souvent 20. En retirant le forçage :
-
-| grammaire | ici (1 item) | ici (N items) | leur instantané |
-|---|---:|---:|---:|
-| `ruwet` | 126 | **2528** | 2655 |
-| `PP` | 2 | 26 | 73 |
-| `koto3` | 2 | 22 | 312 |
-| `simpletemplates` | 7 | 16 | 198 |
-
-L'ordre de grandeur bascule d'un coup. Le résidu s'explique par un compte d'items ou un
-fichier de réglages encore différent.
-
-**Cause distincte — `dhati` (23 contre 66) : leur instantané précède le correctif `-so`.**
-Prouvé en une mesure :
-
-| | jetons |
-|---|---:|
-| avec `-so.dhati` (ici, depuis la v10) | **66** |
-| sans `-so.dhati` (avant la v10) | **23** |
-| leur instantané | 23 |
-
-Exactement 23. Leur capture date d'avant le chargement des objets sonores — ce n'est pas une
-divergence, c'est une photo plus ancienne.
-
-**Troisième cause — l'orthographe enharmonique** (`harmony` : `Db4` contre `C#4`) : la zone
-des cinq conventions de notes ambiguës, décrite plus haut. Même son, notation différente.
-
-**Ce que ça veut dire pour un consommateur** : ne comparez à cette baseline qu'une mesure
-prise dans **les mêmes conditions** — un item, graine 1, la configuration `php_ref`, objets
-sonores compris. Un écart de conditions produit un écart de mesure qui n'a rien à voir avec
-le moteur.
+Trois mécanismes empêchent désormais que ça se reproduise, chacun prouvé par injection :
+une **sonde d'entrée** qui abandonne en quelques secondes si la chaîne est muette, un **garde
+d'ancrages** qui refuse qu'un ajout local disparaisse d'un fichier natif-seul, et un **garde
+anti-effondrement** qui bloque la publication si la modalité MIDI s'effondre.
 
 ### Historique — v9 → v10 : ma configuration de capture ignorait les objets sonores
 

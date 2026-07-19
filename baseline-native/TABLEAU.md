@@ -1,11 +1,11 @@
 # Baseline native — tableau par grammaire
 
-**v12** — figée le 2026-07-19 · binaire bp3 v3.4.4 (graphics-for-BP3) · graine 1
+**v13** — figée le 2026-07-19 · binaire bp3 v3.4.7 (graphics-for-BP3) · graine 1
 
-- **single** = la grammaire *joue* un morceau : une réalisation, un item, graine fixe.
-- **produce-all** = production purement symbolique, le moteur énumère l'ensemble.
+- **single** = la grammaire *joue* : une réalisation, un item, graine fixe.
+- **produce-all** = production symbolique, le moteur énumère.
 
-🔊 objets sonores · 🧩 texte à structure polymétrique, **non mesuré** · 🎲 **capture non comparable** (sortie variable à graine fixe) · ⚖ convention **ambiguë**, elle change la sortie
+🔊 objets sonores · 🧩 texte polymétrique **non mesuré** · 🎲 **capture non comparable** · ⚖ convention **ambiguë**
 
 ## Les 98 qui produisent
 
@@ -56,7 +56,7 @@
 | `koto3` | single | MIDI | 2 | 15 | 1 | — |
 | `kss2` | single | MIDI | 97 | 138 | 1 | — |
 | `livecode1` | single | MIDI | 27 | 23 | 1 | 1 |
-| `livecode2`⚖ | single | MIDI | 29 | 1048558 | 1 | 1 |
+| `livecode2` | single | MIDI | 29 | 1048558 | 1 | 1 |
 | `major-minor`⚖ | single | MIDI | 24 | 2 | 1 | 1 |
 | `mohanam` | single | MIDI | 27 | 41 | 1 | 16 |
 | `mozart-dice` | single | MIDI | 269 | 172 | 1 | — |
@@ -94,8 +94,8 @@
 | `tryObjects`🧩 | produce-all | TEXTE | 0 | 18 | 1 | 1 |
 | `tryPatternGrammar` | produce-all | TEXTE | 0 | 52 | 4 | 4 |
 | `tryRagas` | single | MIDI | 42 | 1048572 | 1 | 1 |
-| `tryRotate` | single | MIDI | 65 | 67 | 1 | 1 |
-| `trySerial`🎲 | single | MIDI | 8 | 7 | 1 | 1 |
+| `tryRotate` | single | MIDI | 65 | 78 | 1 | 1 |
+| `trySerial`🎲 | single | MIDI | 8 | 11 | 1 | 1 |
 | `trySrand`🎲 | single | MIDI | 25 | 37 | 1 | 1 |
 | `trytemplates` | produce-all | TEXTE | 0 | 98 | 25 | 25 |
 | `trytemplates2` | produce-all | TEXTE | 0 | 20 | 4 | 4 |
@@ -104,8 +104,8 @@
 | `vina`🧩 | single | MIDI | 5 | 73 | 1 | — |
 | `vina2`🧩 | single | MIDI | 1 | 7 | 1 | 1 |
 | `vina3`🧩 | single | MIDI | 57 | 216 | 1 | — |
-| `visser-shapes` | single | MIDI | 2086 | 2553 | 1 | — |
-| `visser-waves` | single | MIDI | 365 | 433 | 1 | — |
+| `visser-shapes` | single | MIDI | 2086 | 2553 | 1 | 25 |
+| `visser-waves` | single | MIDI | 365 | 433 | 1 | 1 |
 | `visser3` | single | MIDI | 401 | 770 | 1 | 33 |
 | `visser5` | single | MIDI | 1152 | 1822 | 1 | 19 |
 | `watch` | single | MIDI | 2105 | 5122 | 1 | 7 |
@@ -119,7 +119,7 @@
 | `checkrests` | 12 erreur(s) de compilation : Variable must start with uppercase character or '/'. Can't make sense  |
 | `checkVolChan` | 5 erreur(s) de compilation : => Incorrect note. (May be wrong note convention) |
 | `cloches1` | blocage (> 90 s sans rendre la main) |
-| `keys` | aucune sortie, aucun message |
+| `keys` | Can't make sense of "*" |
 | `look-and-say` | => Cannot produce items because all weights are nil in gram#1 |
 | `Nadaka1` | => Cannot produce items because all weights are nil in gram#1 |
 | `Rajeev` | 27 erreur(s) de compilation : Variable must start with uppercase character or '/'. Can't make sense  |
@@ -134,18 +134,6 @@
 |---|---|
 | `a.html` | `checkSUB1` |
 | `tryflags3.html` | `tryflags3` |
-
-## Les 5 conventions de notes ambiguës
-
-La convention **change la sortie** — elle ne peut donc pas être laissée indéterminée.
-
-| grammaire | ce qui change |
-|---|---|
-| `bells` | `indian` effondre la production à 4 jetons contre 16 : `re` y est avalé comme degré indien |
-| `livecode2` | trois sorties différentes selon `english` / `french` / `keys` |
-| `major-minor` | orthographe enharmonique : `D#3` sous `english`+`keys`, `Eb3` sous `french`+`indian` — même son |
-| `testNC1` | **durée** d'une note : `G3` dure 2850 sous `english`+`keys`, 3000 sous `french`+`indian` |
-| `tunings` | orthographe enharmonique : `A#4` contre `Bb4` — même son, notation différente |
 
 ---
 

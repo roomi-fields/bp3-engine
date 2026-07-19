@@ -1,0 +1,1 @@
+_volumecont _volume(0) _pitchcont _pitchrange(200) _pitchbend(200) A4 G4 C5 A5 A4 G4 C5 A5 _pitchbend(-200) _volume(127)

@@ -14,7 +14,7 @@ concatene les N passes.
 
 N'ECRIT QUE dans baseline-native/.
 """
-import json, os, re, subprocess, datetime, collections, shutil
+import hashlib, json, os, re, subprocess, datetime, collections, shutil
 
 ROOT = "/home/romi/dev/bp/bp3-engine"
 TD = os.path.join(ROOT, "test-data")
@@ -165,7 +165,29 @@ for idx, name in enumerate(names, 1):
         if len(ok_conv) == 1:
             conv, convsrc = ok_conv[0], "derivee : seule convention qui compile"
         elif len(ok_conv) > 1:
-            convsrc = f"ambigue : {len(ok_conv)} conventions compilent, non tranchee"
+            # Plusieurs conventions compilent : ce n'est ambigu QUE si elles donnent des
+            # sorties DIFFERENTES. Si elles rendent toutes le meme resultat, la convention
+            # ne mord sur rien (grammaire a symboles, sans nom de note) : elle est SANS OBJET.
+            # On compare les sorties reelles, pas le nombre de conventions qui compilent —
+            # compter les compilations ne peut pas discriminer les deux cas.
+            groupes = {}
+            for c in ok_conv:
+                tk = os.path.join(TMP, f"k.{slug}.tok"); tx = os.path.join(TMP, f"k.{slug}.txt")
+                for f in (tk, tx):
+                    if os.path.isfile(f):
+                        os.remove(f)
+                run("produce", g, cfg, c, None, tk, tx)
+                # une sortie VIDE n'est pas une sortie : deux vides ne prouvent pas l'egalite
+                blob = b"".join(open(f, "rb").read() for f in (tk, tx) if os.path.isfile(f))
+                cle = hashlib.sha256(blob).hexdigest()[:10] if blob.strip() else f"vide-{c}"
+                groupes.setdefault(cle, []).append(c)
+            if len(groupes) == 1:
+                conv = ok_conv[0]
+                convsrc = ("sans objet : les %d conventions qui compilent rendent la meme sortie"
+                           % len(ok_conv))
+            else:
+                convsrc = ("ambigue : %d sorties differentes selon la convention (%s)"
+                           % (len(groupes), " | ".join("+".join(v) for v in groupes.values())))
     toks = os.path.join(CAP, f"{slug}.tokens.json")
     text = os.path.join(CAP, f"{slug}.text.txt")
 

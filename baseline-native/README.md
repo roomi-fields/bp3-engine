@@ -1,55 +1,49 @@
 # Baseline native « original » — jeu unique, daté, vérifié
 
-## 🔖 **baseline v11 — figée le 2026-07-19 — un alphabet illisible réparé**
+## 🔖 **baseline v12 — figée le 2026-07-19**
 
-**97 productibles**, **2 doublons**, **14 muettes réelles**, **113 entrées au total**.
-Modes natifs : **MIDI 60** · **TEXTE 37**. Actions : **single 68** · **produce-all 30**.
+**98 productibles**, **2 doublons**, **13 muettes réelles**, **113 entrées au total**.
+Modes natifs : **MIDI 61** · **TEXTE 37**. Actions : **single 69** · **produce-all 30**.
 
-### v10 → v11 : `dhin` sortait 22 erreurs à cause de ses fins de ligne
+### v11 → v12 : deux changements, dont un de méthode
 
-Une seule entrée change, et c'est un gain sec.
+**1. `checkAllCsound` devient productible** (8 jetons). Elle déclarait un fichier d'instruments
+Csound absent du dépôt ; redirigée vers `-cs.tryCsound`, qui couvre 28 de ses 31 références
+(BPE-19, commit `d139365`). C'est la **seule** entrée dont les mesures changent.
 
-| grammaire | avant | après |
+**2. Le classement des conventions de notes est refait sur le bon critère.** La v11 comptait
+*combien de conventions compilent* — ce qui ne peut pas distinguer « la convention n'a aucun
+effet » de « la convention change le résultat ». Le bon critère est : **la sortie change-t-elle ?**
+
+Les 13 entrées dites « ambiguës » en v11 se résolvent en :
+
+| | n | ce que ça veut dire |
 |---|---|---|
-| `dhin` | muette, 22 erreurs de compilation | **productible** — TEXTE, 20 items, 3860 mots |
+| déclarées à la source | 97 | rien à faire |
+| sans objet | 8 | plusieurs conventions compilent et rendent **la même sortie** — grammaires à symboles, sans nom de note |
+| dérivée | 1 | une seule convention compile (`testTie7`) |
+| **vraiment ambiguës** | **5** | la convention **change la sortie** — voir `TABLEAU.md` |
+| absente | 2 | la grammaire ne produit pas |
 
-Son alphabet `-al.dhin--` n'avait que des **retours chariot Mac** (`0x0D`) et aucun saut de
-ligne : le moteur y lisait une seule ligne géante et ne compilait rien. La réparation est une
-**conversion, pas une réécriture** — `-al.dhin--` s'est révélé identique **à l'octet près** à son
-jumeau `-ho.dhin--` une fois les fins de ligne converties. 13 autres fichiers du corpus étaient
-dans le même cas (commit `b4fdf8d`).
+Les 5 réelles ne sont pas de même nature, et le tableau le précise pour chacune : `bells`
+s'effondre sous `indian` (4 jetons contre 16), `major-minor` et `tunings` changent d'**orthographe
+enharmonique** (`A#4` contre `Bb4`, même son), `testNC1` change une **durée** (2850 contre 3000),
+`livecode2` donne trois sorties distinctes.
 
-⚠ **Piège symétrique, à ne pas « réparer »** : 62 fichiers `-se.*` n'ont eux non plus aucun saut
-de ligne, mais les grammaires qui les emploient **produisent**. C'est leur format normal.
+### ⚠ Deux captures ne sont PAS des références de contenu
 
-### ⚠ `trySrand` n'est pas une référence de contenu
+`trySrand` **et** `trySerial` produisent un nombre de jetons stable mais dans un **ordre variable
+à graine fixe**. Mesuré pour `trySerial` : **4 séquences distinctes sur 6 exécutions**. Ce ne sont
+pas des défauts — ces deux grammaires existent pour démontrer des opérateurs qui ré-ensemencent le
+tirage (`_randomize` pour l'une, les opérateurs sériels pour l'autre) et qui priment sur `--seed`.
 
-La comparaison des captures **une par une** (empreinte de chaque fichier) a montré une seule
-dérive : `trySrand` sort 25 jetons dans les deux versions, mais **dans un ordre différent**.
+Sur ces deux-là : **comparez les compteurs, jamais la séquence.** Le champ `capture_comparable`
+vaut `false` pour elles, `true` pour les 111 autres. Un harnais qui diffe leur contenu rend un
+faux échec.
 
-Ce n'est pas un défaut — c'est l'objet même de la grammaire. Elle appelle `_randomize`, qui
-« ré-ensemence la suite aléatoire avec un nombre arbitraire » (`-gr.trySrand:7`), et son propre
-commentaire l'annonce : « The random sequences derived from A are always different because of the
-`_randomize` procedure placed on top of the grammar » (`:17-18`). `_randomize` prime sur `--seed`.
-
-**Conséquence pour les consommateurs** : sur cette grammaire, comparez les **compteurs**, jamais
-la séquence. Le champ `capture_comparable` vaut `false` pour elle, `true` pour les 112 autres.
-
-### Ce que cette republication a révélé sur la v10
-
-Je n'ai publié qu'après avoir comparé **champ par champ** les 113 entrées contre la v10. Deux
-choses en sont sorties, et je les signale plutôt que de les lisser :
-
-1. **`testTie7` n'était pas reproductible.** Sa première recapture ne produisait plus rien. Cause :
-   la grammaire n'a **aucune configuration déclarée** à la source, et ma capture ne tirait la
-   convention de notes que de là. Sans elle le moteur refuse `do4___&`. Correctif dans la capture,
-   avec une garde stricte : on ne retient une convention **que si une seule des quatre compile**.
-   Si plusieurs compilent, c'est ambigu et le champ `convention_source` le dit. Une seule entrée
-   est dans ce cas (`testTie7`, ⚖ dans le tableau) ; 13 restent ambiguës et non tranchées.
-   Le correctif durable appartient au registre de configuration, pas à moi.
-2. **L'en-tête de la v10 annonçait 5 captures texte structurées alors que ses propres entrées en
-   portaient 8.** L'en-tête était périmé. La v11 publie le compte réel, calculé depuis les entrées.
-   Rappel de la règle : **les champs font foi, pas le résumé.**
+La v11 n'en signalait qu'une : `trySerial` était passée à travers parce que sa capture v10 et sa
+capture v11 coïncidaient par hasard. C'est le même angle mort que partout ailleurs dans ce
+journal — **une vérification qui ne pouvait pas discriminer**.
 
 ### Historique — v9 → v10 : ma configuration de capture ignorait les objets sonores
 

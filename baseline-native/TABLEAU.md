@@ -1,32 +1,30 @@
 # Baseline native — tableau par grammaire
 
-**v11** — figée le 2026-07-19 · binaire bp3 v3.4.4 (graphics-for-BP3) · graine 1
-
-`action` = ce que fait le moteur nativement. Les deux voies doivent répliquer **la même action**.
+**v12** — figée le 2026-07-19 · binaire bp3 v3.4.4 (graphics-for-BP3) · graine 1
 
 - **single** = la grammaire *joue* un morceau : une réalisation, un item, graine fixe.
 - **produce-all** = production purement symbolique, le moteur énumère l'ensemble.
 
-🔊 = objets sonores chargés · 🧩 = capture texte à structure polymétrique, **non mesurée**
-· ⚖ = convention de notes **dérivée**, non déclarée à la source
+🔊 objets sonores · 🧩 texte à structure polymétrique, **non mesuré** · 🎲 **capture non comparable** (sortie variable à graine fixe) · ⚖ convention **ambiguë**, elle change la sortie
 
-## Les 97 qui produisent
+## Les 98 qui produisent
 
-| grammaire | action | mode natif | jetons | mots | items | énumération |
+| grammaire | action | mode | jetons | mots | items | énum. |
 |---|---|---|---:|---:|---:|---|
 | `765432` | single | MIDI | 823 | 1405 | 1 | — |
 | `acceleration` | single | MIDI | 78 | 100 | 1 | 1 |
 | `acceleration_v2` | single | MIDI | 78 | 100 | 1 | 1 |
 | `alan-dice` | single | MIDI | 270 | 181 | 1 | — |
-| `Alarm` 🧩 | single | TEXTE | 0 | 26 | 1 | — |
+| `Alarm`🧩 | single | TEXTE | 0 | 26 | 1 | — |
 | `all-items` | produce-all | TEXTE | 0 | 36 | 12 | 12 |
 | `all-items1` | produce-all | TEXTE | 0 | 36 | 12 | 12 |
 | `ames` | single | MIDI | 11 | 7 | 1 | 1 |
 | `asymmetric` | single | TEXTE | 0 | 15 | 1 | — |
 | `beatrix-dice` | single | MIDI | 270 | 179 | 1 | — |
-| `bells` | single | MIDI | 16 | 17 | 1 | 1 |
+| `bells`⚖ | single | MIDI | 16 | 17 | 1 | 1 |
 | `blurb` | single | MIDI | 8 | 14 | 1 | 1 |
 | `check&` | single | MIDI | 4 | 6 | 1 | 7 |
+| `checkAllCsound` | single | MIDI | 8 | 15 | 1 | 1 |
 | `checkBT` | produce-all | TEXTE | 0 | 4 | 1 | 1 |
 | `checkHomo` | produce-all | TEXTE | 0 | 8 | 1 | 1 |
 | `checkhomo2` | produce-all | TEXTE | 0 | 23 | 6 | 6 |
@@ -39,7 +37,7 @@
 | `dhadhatite` | produce-all | TEXTE | 0 | 2 | 1 | 1 |
 | `dhadhatite1` | produce-all | TEXTE | 0 | 2 | 1 | 1 |
 | `dhadhatite_v2` | produce-all | TEXTE | 0 | 2 | 1 | 1 |
-| `dhati` 🔊 | single | MIDI | 66 | 144 | 1 | 20 |
+| `dhati`🔊 | single | MIDI | 66 | 144 | 1 | 20 |
 | `dhati2` | produce-all | TEXTE | 0 | 65 | 1 | 1 |
 | `dhati3` | produce-all | TEXTE | 0 | 65 | 1 | 1 |
 | `dhin` | produce-all | TEXTE | 0 | 3860 | 20 | 20 |
@@ -47,7 +45,7 @@
 | `Djinns` | single | MIDI | 895 | 851 | 1 | — |
 | `doeslittle` | single | MIDI | 7 | 11 | 1 | 1 |
 | `drum` | single | MIDI | 12 | 23 | 1 | 1 |
-| `ek-do-tin` 🧩 | produce-all | TEXTE | 0 | 99 | 1 | 1 |
+| `ek-do-tin`🧩 | produce-all | TEXTE | 0 | 99 | 1 | 1 |
 | `flags` | produce-all | TEXTE | 0 | 400 | 20 | 20 |
 | `gramgene1` | produce-all | TEXTE | 0 | 142 | 25 | 25 |
 | `gramgene2` | single | TEXTE | 0 | 78 | 1 | — |
@@ -58,8 +56,8 @@
 | `koto3` | single | MIDI | 2 | 15 | 1 | — |
 | `kss2` | single | MIDI | 97 | 138 | 1 | — |
 | `livecode1` | single | MIDI | 27 | 23 | 1 | 1 |
-| `livecode2` | single | MIDI | 29 | 1048558 | 1 | 1 |
-| `major-minor` | single | MIDI | 24 | 2 | 1 | 1 |
+| `livecode2`⚖ | single | MIDI | 29 | 1048558 | 1 | 1 |
+| `major-minor`⚖ | single | MIDI | 24 | 2 | 1 | 1 |
 | `mohanam` | single | MIDI | 27 | 41 | 1 | 16 |
 | `mozart-dice` | single | MIDI | 269 | 172 | 1 | — |
 | `Mozartexpression` | single | MIDI | 251 | 27 | 1 | — |
@@ -69,7 +67,7 @@
 | `negative-context` | single | MIDI | 6 | 6 | 1 | — |
 | `not-reich` | single | MIDI | 580 | 565 | 1 | 1 |
 | `one-scale` | single | MIDI | 6 | 6 | 1 | 1 |
-| `polyphony1` 🧩 | produce-all | TEXTE | 0 | 76 | 25 | 25 |
+| `polyphony1`🧩 | produce-all | TEXTE | 0 | 76 | 25 | 25 |
 | `PP` | single | MIDI | 2 | 9 | 1 | — |
 | `repeat` | produce-all | TEXTE | 0 | 40 | 5 | 5 |
 | `ruwet` | single | MIDI | 126 | 157 | 1 | 8 |
@@ -77,47 +75,46 @@
 | `simpletemplates` | single | MIDI | 7 | 11 | 1 | 3 |
 | `templates` | produce-all | TEXTE | 0 | 25 | 5 | 5 |
 | `testHO2` | produce-all | TEXTE | 0 | 4 | 1 | 1 |
-| `testNC1` | single | MIDI | 6 | 7 | 1 | 1 |
-| `testTie7` ⚖ | single | MIDI | 2 | 40 | 1 | 1 |
+| `testNC1`⚖ | single | MIDI | 6 | 7 | 1 | 1 |
+| `testTie7` | single | MIDI | 2 | 40 | 1 | 1 |
 | `time-patterns` | single | MIDI | 8 | 13 | 1 | 1 |
 | `transposition1` | single | MIDI | 75 | 107 | 1 | 1 |
 | `transposition3` | single | MIDI | 66 | 30 | 1 | — |
 | `tryAllItems0` | produce-all | TEXTE | 0 | 20 | 8 | 8 |
 | `tryAllItems1` | produce-all | TEXTE | 0 | 36 | 12 | 12 |
-| `tryCsoundObjects` 🔊🧩 | produce-all | TEXTE | 0 | 2 | 1 | 1 |
+| `tryCsoundObjects`🔊🧩 | produce-all | TEXTE | 0 | 2 | 1 | 1 |
 | `tryflags2` | produce-all | TEXTE | 0 | 25 | 25 | 25 |
 | `tryflags3` | produce-all | TEXTE | 0 | 25 | 25 | 25 |
 | `tryGOTO` | single | TEXTE | 0 | 1 | 1 | — |
 | `tryhomomorphism` | single | MIDI | 6 | 12 | 1 | 1 |
-| `tryKeyMap` 🔊 | single | MIDI | 410 | 450 | 1 | 1 |
+| `tryKeyMap`🔊 | single | MIDI | 410 | 450 | 1 | 1 |
 | `tryKeyXpand` | single | MIDI | 91 | 120 | 1 | 1 |
 | `tryLIN` | produce-all | TEXTE | 0 | 25 | 25 | 25 |
 | `tryMIDIfile` | single | MIDI | 8 | 9 | 1 | 2 |
-| `tryObjects` 🧩 | produce-all | TEXTE | 0 | 18 | 1 | 1 |
+| `tryObjects`🧩 | produce-all | TEXTE | 0 | 18 | 1 | 1 |
 | `tryPatternGrammar` | produce-all | TEXTE | 0 | 52 | 4 | 4 |
 | `tryRagas` | single | MIDI | 42 | 1048572 | 1 | 1 |
 | `tryRotate` | single | MIDI | 65 | 67 | 1 | 1 |
-| `trySerial` | single | MIDI | 8 | 7 | 1 | 1 |
-| `trySrand` | single | MIDI | 25 | 37 | 1 | 1 |
+| `trySerial`🎲 | single | MIDI | 8 | 7 | 1 | 1 |
+| `trySrand`🎲 | single | MIDI | 25 | 37 | 1 | 1 |
 | `trytemplates` | produce-all | TEXTE | 0 | 98 | 25 | 25 |
 | `trytemplates2` | produce-all | TEXTE | 0 | 20 | 4 | 4 |
 | `tryTicks` | single | MIDI | 16 | 16 | 1 | 1 |
-| `tunings` | single | MIDI | 16 | 16 | 1 | 1 |
-| `vina` 🧩 | single | MIDI | 5 | 73 | 1 | — |
-| `vina2` 🧩 | single | MIDI | 1 | 7 | 1 | 1 |
-| `vina3` 🧩 | single | MIDI | 57 | 216 | 1 | — |
+| `tunings`⚖ | single | MIDI | 16 | 16 | 1 | 1 |
+| `vina`🧩 | single | MIDI | 5 | 73 | 1 | — |
+| `vina2`🧩 | single | MIDI | 1 | 7 | 1 | 1 |
+| `vina3`🧩 | single | MIDI | 57 | 216 | 1 | — |
 | `visser-shapes` | single | MIDI | 2086 | 2553 | 1 | — |
 | `visser-waves` | single | MIDI | 365 | 433 | 1 | — |
 | `visser3` | single | MIDI | 401 | 770 | 1 | 33 |
 | `visser5` | single | MIDI | 1152 | 1822 | 1 | 19 |
 | `watch` | single | MIDI | 2105 | 5122 | 1 | 7 |
 
-## Les 14 qui ne produisent pas
+## Les 13 qui ne produisent pas
 
 | grammaire | raison |
 |---|---|
 | `a` | 4 erreur(s) de compilation : Error code 52: Missing slash after /flag/ in gram#2 rule 3 |
-| `checkAllCsound` | 30 erreur(s) de compilation : => You probably forgot to create or load a '-cs' instrument file |
 | `checkcontext` | => Calculation overflow (10000 derivations): task abandoned. Loop? |
 | `checkrests` | 12 erreur(s) de compilation : Variable must start with uppercase character or '/'. Can't make sense  |
 | `checkVolChan` | 5 erreur(s) de compilation : => Incorrect note. (May be wrong note convention) |
@@ -138,6 +135,18 @@
 | `a.html` | `checkSUB1` |
 | `tryflags3.html` | `tryflags3` |
 
+## Les 5 conventions de notes ambiguës
+
+La convention **change la sortie** — elle ne peut donc pas être laissée indéterminée.
+
+| grammaire | ce qui change |
+|---|---|
+| `bells` | `indian` effondre la production à 4 jetons contre 16 : `re` y est avalé comme degré indien |
+| `livecode2` | trois sorties différentes selon `english` / `french` / `keys` |
+| `major-minor` | orthographe enharmonique : `D#3` sous `english`+`keys`, `Eb3` sous `french`+`indian` — même son |
+| `testNC1` | **durée** d'une note : `G3` dure 2850 sous `english`+`keys`, 3000 sous `french`+`indian` |
+| `tunings` | orthographe enharmonique : `A#4` contre `Bb4` — même son, notation différente |
+
 ---
 
-**97 productibles** · MIDI 60 · TEXTE 37 · single 68 · produce-all 30 · 2 doublons · 14 muettes · 113 entrées.
+**98 productibles** · MIDI 61 · TEXTE 37 · single 69 · produce-all 30 · 2 doublons · 13 muettes · 113 entrées.

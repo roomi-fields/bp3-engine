@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Portillon FORCÉ avant tout push — décision Romain du 2026-07-19, volet 2
+# (hub/decisions/2026-07-19-confronter-via-oracle-et-restaurer-tous-les-guards.md).
+#
+# Ce fichier est VERSIONNÉ dans scripts/githooks/ et installé par `./scripts/install-hooks.sh`.
+# Il n'est jamais posé à la main dans .git/hooks : un garde qui vit hors du dépôt disparaît
+# au premier clone, et c'est exactement comme ça qu'un portillon se vide sans que personne
+# le voie.
+#
+# Voie RAPIDE seulement. Les voies « rouge » (défauts moteur connus, BPE-21) et « lente »
+# (test-all, BPE-22) ne bloquent pas le push : les lancer à la main, ou depuis l'intégration
+# continue quand elle existera.
+#
+# Contournement : `git push --no-verify`. Il est volontairement possible — mais il devient
+# alors un acte explicite et traçable, au lieu du silence d'avant.
+racine="$(git rev-parse --show-toplevel)"
+echo "── portillon bp3-engine (voie rapide) ───────"
+if "$racine/scripts/gate.sh" rapide; then
+  exit 0
+fi
+echo
+echo "PUSH REFUSÉ : le portillon est rouge. Corrigez, ou expliquez-vous avec --no-verify."
+exit 1

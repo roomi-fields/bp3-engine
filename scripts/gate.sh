@@ -33,11 +33,19 @@ lancer() { # lancer <nom> <delai> <commande...>
 
 if [ "$VOIE" = rapide ] || [ "$VOIE" = tout ]; then
   echo "── voie RAPIDE ───────────────────────────────"
-  for t in midi-bug midi-reinit reinit repro-exact sequence \
-           visser3-only visser3-sequence visser3-setting; do
-    lancer "test-$t" 60 node "scripts/test-$t.js"
-  done
+  # Listés un par un, et non par une boucle : le méta-garde anti-bypass doit pouvoir
+  # lire ce fichier sans interpréter du shell. Un garde qui doit deviner ne garde rien.
+  lancer "test-midi-bug"          60 node scripts/test-midi-bug.js
+  lancer "test-midi-reinit"       60 node scripts/test-midi-reinit.js
+  lancer "test-reinit"            60 node scripts/test-reinit.js
+  lancer "test-repro-exact"       60 node scripts/test-repro-exact.js
+  lancer "test-sequence"          60 node scripts/test-sequence.js
+  lancer "test-visser3-only"      60 node scripts/test-visser3-only.js
+  lancer "test-visser3-sequence"  60 node scripts/test-visser3-sequence.js
+  lancer "test-visser3-setting"   60 node scripts/test-visser3-setting.js
   lancer "baseline-integrite" 60 python3 scripts/gate-baseline.py
+  lancer "anti-bypass"        60 python3 scripts/gate-meta.py
+  lancer "anti-bypass-morsure" 90 ./scripts/gate-meta-injection.sh
 fi
 
 if [ "$VOIE" = rouge ] || [ "$VOIE" = tout ]; then

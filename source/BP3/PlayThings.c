@@ -342,6 +342,19 @@ int PlayBuffer1(tokenbyte ***pp_buff,int onlypianoroll) {
 	if(result == AGAIN) again = TRUE;
 	result = OK;
 	SetTimeOn = FALSE;
+	/* Oracle natif : dump JSON des timed-tokens apres TimeSet (avant MakeSound),
+	   iso bp3_get_timed_tokens (WASM). Active par --tokensout. Voir TokensOut.c.
+	   ⚠ CET APPEL EST A NOUS, PAS A L AMONT. Il a ete perdu une fois, le 2026-07-19,
+	   en reprenant ce fichier tel quel lors du passage en v3.4.7 : PlayThings.c est
+	   natif-seul et n'etait pas dans l'inventaire des modifications locales, qui ne
+	   couvrait que csrc/bp3/. Resultat : le serialiseur restait compile mais n'etait
+	   plus jamais appele, et une recapture entiere a rendu 0 jeton MIDI sur 113
+	   grammaires. A REPORTER A CHAQUE MONTEE DE VERSION AMONT. */
+	{
+		extern char TokensOutFile[];
+		extern void EmitTimedTokensItem(tokenbyte ***pp_buff, long kmax);
+		if(TokensOutFile[0]) EmitTimedTokensItem(pp_buff, kmax);
+	}
 	if(trace_play) BPPrintMessage(1,odInfo,"\ntmin = %ld, tmax = %ld, rtMIDI = %d\n",(long)tmin,(long)tmax,rtMIDI);
 
 	// if(ShowGraphic) BPPrintMessage(0,odInfo, "Shall we draw graphics?\n");

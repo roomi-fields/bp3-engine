@@ -276,7 +276,9 @@ int PlayBuffer1(tokenbyte ***pp_buff,int onlypianoroll) {
 		MaxDeriv = MAXDERIV;
 		if((result=MakeComputeSpace(MaxDeriv)) != OK) goto SORTIR;
 		DisplayProduce = ShowMessages = UseBufferLimit = finish = repeat = FALSE;
-        time_end_compute = getClockTime() + (MaxConsoleTime * 1000000);
+        if(MaxConsoleTime > 0L)
+			time_end_compute = getClockTime() + (MaxConsoleTime * 1000000);
+		else time_end_compute = 0L;
 		
 		//////  Make derivation (unique substitution) with glossary ///////
 		result = ComputeInGram(pp_buff,&GlossGram,1,0,&length,&finish,&repeat,PROD,FALSE,
@@ -340,13 +342,6 @@ int PlayBuffer1(tokenbyte ***pp_buff,int onlypianoroll) {
 	if(result == AGAIN) again = TRUE;
 	result = OK;
 	SetTimeOn = FALSE;
-	/* Oracle natif : dump JSON des timed-tokens après TimeSet (avant MakeSound),
-	   iso bp3_get_timed_tokens (WASM). Activé par --tokensout. Voir TokensOut.c. */
-	{
-		extern char TokensOutFile[];
-		extern void EmitTimedTokensItem(tokenbyte ***pp_buff, long kmax);
-		if(TokensOutFile[0]) EmitTimedTokensItem(pp_buff, kmax);
-	}
 	if(trace_play) BPPrintMessage(1,odInfo,"\ntmin = %ld, tmax = %ld, rtMIDI = %d\n",(long)tmin,(long)tmax,rtMIDI);
 
 	// if(ShowGraphic) BPPrintMessage(0,odInfo, "Shall we draw graphics?\n");

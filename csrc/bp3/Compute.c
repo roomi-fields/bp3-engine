@@ -141,30 +141,7 @@ int Compute(tokenbyte ***pp_a,int fromigram,int toigram,long *p_length,int *p_re
 	CompleteDecisions = TRUE;
 
 	SORTIR:
-
-	if(r == OK) {
-		ix = ZERO;
-		level = 0;
-		if(NeedZouleb > 0) {
-			if(ShowMessages) BPPrintMessage(1,odInfo,"👉 Applying serial tools...\n");
-			do {
-				r = Zouleb(pp_a,&level,&ix,FALSE,FALSE,0,(*p_repeat),FALSE,NOSEED);
-				if(r != OK) break;
-				}
-			while(level >= 0);
-			}
-		}
-	if(DisplayProduce != displayproducemem) {
-		DisplayProduce = displayproducemem;
-		}
-	if(TraceProduce && !TraceDetail) {
-		Print(wTrace,"\nResult = ");
-		if((r=PrintWorkString(FALSE,wTrace,FALSE,FALSE,pp_a)) != OK) return(r);
-		}
-	if(NeedZouleb != 0) {
-		BPPrintMessage(0,odError,"=> NeedZouleb = %ld after Compute(). Should be 0\n",(long)NeedZouleb);
-		}
-//	if(ItemNumber == 0) ItemNumber = 1;
+	DisplayProduce = displayproducemem;
 	return(r);
 	}
 
@@ -177,11 +154,12 @@ int ComputeInGram(tokenbyte ***pp_a,t_gram *p_gram,int igram,int inrul,long *p_l
 	int rep,datamode,ifunc,ig,ir,j,jj,irul,irep,nrep,**p_candidate,foundone,
 		**p_prefrule,grtype,maxpref,nb_candidates,r,choice,shootagain,hastabs,
 		freedom,w,notsaid,changed,randomnumber,irul_c,found_one,
-		halt,startfrom,try,maxtry,equalweight;
+		halt,startfrom,try,maxtry,equalweight,total_weight_candidates;
 	t_rule rule;
 	long i,position,firstposition,**p_origin,**p_pos,leftpos,lastpos,pos1,incmark,
 		**p_totwght;
 	unsigned long datemem,time;
+	double p;
 	tokenbyte ***pp_b,**p_b,**p_c,***pp_c,instan[MAXLIN],meta[MAXMETA2];
 	t_subgram subgram;
 	TextOffset dummy, selend;
@@ -191,11 +169,11 @@ int ComputeInGram(tokenbyte ***pp_a,t_gram *p_gram,int igram,int inrul,long *p_l
 		BPPrintMessage(0,odError,"=> Err. in ComputeInGram(). p_gram == NULL");
 		return(ABORT);
 		}
-	/* if(!Improvize && !Interactive && time_end_compute > 0L && getClockTime() > time_end_compute) {
+	if(!Improvize && !Interactive && time_end_compute > 0L && getClockTime() > time_end_compute) {
 		EmergencyExit = TRUE;
 		BPPrintMessage(0,odInfo,"=> (4) Maximum allowed time (%ld seconds) has been spent in ComputeInGram(). Stopped computing...\n➡ This limit can be modified in the settings\n\n",MaxConsoleTime);
 		return(ABORT);
-		} */
+		}
 	if(p_gram->p_subgram == NULL) return(OK);
 	subgram = (*(p_gram->p_subgram))[igram];
 	grtype = subgram.type;
@@ -353,11 +331,11 @@ int ComputeInGram(tokenbyte ***pp_a,t_gram *p_gram,int igram,int inrul,long *p_l
 	while(((nb_candidates = FindCandidateRules(pp_a,p_gram,startfrom,igram,grtype,p_candidate,p_totwght,p_pos,p_prefrule,leftpos,&maxpref,&freedom,*p_repeat,
 		mode,&equalweight,learn,time_end_compute)) > 0) || (nb_candidates == AGAIN)) {
 
-	/*	if(!Improvize && !Interactive && time_end_compute > 0L  && getClockTime() > time_end_compute) {
+		if(!Improvize && !Interactive && time_end_compute > 0L  && getClockTime() > time_end_compute) {
 			EmergencyExit =TRUE;
 			BPPrintMessage(0,odInfo,"=> (5) Maximum allowed time (%d seconds) has been spent in ComputeInGram(). Stopped computing...\n➡ This limit can be modified in the settings\n\n",MaxConsoleTime);
 			return(ABORT);
-			} */
+			}
 		try = irep = 0;
 		if(TraceDetail) equalweight = FALSE; // 2026-05-03, so all candidate rules will be listed
 		if(trace_compute) 
@@ -509,11 +487,13 @@ TRY3:		(*p_length) = LengthOf(pp_a);	/* was changed by FindArg() */
 		if(TraceDetail) {
 			if(nb_candidates > 0) {
 			//	BPPrintMessage(1,odInfo,"step %d: candidates=[",Step);
+				total_weight_candidates = 0;
 				if(Step == 0 && !(p_gram->hasTEMP)) Print(wTrace,"\n");
 				Print(wTrace,"step %d: candidates=[",Step);
 				found_one = FALSE;
 				for(jj=0; jj < nb_candidates; jj++) {
 					irul_c = (*p_candidate)[jj];
+					total_weight_candidates += (*((*(Gram.p_subgram))[igram].p_rule))[irul_c].weight;
 					if(found_one) Print(wTrace,", ");
 					Print(wTrace,"SG%d.R%d",igram,irul_c);
 					found_one = TRUE;
@@ -525,7 +505,14 @@ TRY3:		(*p_length) = LengthOf(pp_a);	/* was changed by FindArg() */
 					Print(wTrace,"step %d: [Interruption]\n",Step);
 				else Print(wTrace,"step %d: [Error nb_candidates = %ld",Step,(long)nb_candidates);
 				}
-			if(nb_candidates > 0) Print(wTrace,"], chosen=SG%d.R%d\n",igram,irul);
+			if(nb_candidates > 0) {
+				Print(wTrace,"], chosen=SG%d.R%d",igram,irul);
+				if(mode == PROD && total_weight_candidates > 0) {
+					p = (double) (*((*(Gram.p_subgram))[igram].p_rule))[irul].weight / total_weight_candidates;
+					Print(wTrace," prob=%.3f",p);
+					}
+				Print(wTrace,"\n");
+				}
 	//		BPPrintMessage(1,odInfo,"], chosen=SG%d.R%d\n",igram,irul);
 			Step++;
 			} 
@@ -597,11 +584,11 @@ NOPROD:
 			rep = pos1; goto QUIT;
 			}
 		if(ChangedGrammar || ChangedSettings) return(OK);
-	/*	if(!Improvize && !Interactive && time_end_compute > 0L && getClockTime() > time_end_compute) {
-			EmergencyExit =TRUE; 
+		if(!Improvize && !Interactive && time_end_compute > 0L && getClockTime() > time_end_compute) {
+			EmergencyExit = TRUE; 
 			BPPrintMessage(0,odInfo,"=> (7) Maximum allowed time (%d seconds) has been spent in ComputeInGram(). Stopped computing...\n➡ This limit can be modified in the settings\n\n",MaxConsoleTime);
 			return(ABORT); 
-			} */
+			}
 	/*	if(pos1 == STOP) {
 			rep = MISSED;
 			if(igram < p_gram->number_gram) {
@@ -676,11 +663,11 @@ MORE:
 			if(w < 0) w = 0;
 			(*((*(p_gram->p_subgram))[igram].p_rule))[irul].w = w;
 			}
-	/*	if(!Improvize && !Interactive && time_end_compute > 0L && getClockTime() > time_end_compute) {
+		if(!Improvize && !Interactive && time_end_compute > 0L && getClockTime() > time_end_compute) {
 			EmergencyExit = TRUE; 
 			BPPrintMessage(0,odInfo,"=> (8) Maximum allowed time (%d seconds) has been spent in ComputeInGram(). Stopped computing...\n➡ This limit can be modified in the settings\n\n",MaxConsoleTime);
 			return(ABORT);
-			} */
+			}
 		if(Flagthere && (grtype != SUBtype) && !shootagain)
 			if((rep=ChangeFlagsInRule(p_gram,igram,irul)) != OK) goto QUIT;
 		shootagain = FALSE;
@@ -1142,11 +1129,11 @@ int FindCandidateRules(tokenbyte ***pp_a,t_gram *p_gram,int startfrom,int igram,
 	if(CheckEmergency() != OK) return(ABORT);
 	if(ChangedGrammar || ChangedSettings) return(0);
 
-/* if(!Improvize && !Interactive && time_end_compute > 0L && getClockTime() > time_end_compute) {
+	if(!Improvize && !Interactive && time_end_compute > 0L && getClockTime() > time_end_compute) {
 		EmergencyExit =TRUE;
 		BPPrintMessage(0,odInfo,"=> (1) Maximum allowed time (%d seconds) has been spent in FindCandidateRules(). Stopped computing...\n➡ This limit can be modified in the settings\n\n",MaxConsoleTime);
 		return(ABORT);
-		} */
+		}
 
 	if(trace_compute) BPPrintMessage(1,odInfo,"FindCandidateRules() leftpos = %ld\n",leftpos);
 
@@ -1571,11 +1558,11 @@ int Found(int irul,tokenbyte ***pp_a,int grtype,tokenbyte **p_arg,long offset,in
 
 	if(ChangedGrammar || ChangedSettings) return(FALSE);
 
-/*	if(!Improvize && !Interactive && time_end_compute > 0L && getClockTime() > time_end_compute) {
+	if(!Improvize && !Interactive && time_end_compute > 0L && getClockTime() > time_end_compute) {
 		EmergencyExit = TRUE;
 		BPPrintMessage(0,odInfo,"=> (2) Maximum allowed time (%d seconds) has been spent in Found(). Stopped computing...\n➡ This limit can be modified in the settings\n\n",MaxConsoleTime);
 		return(ABORT);
-		} */
+		}
 			
 	// offset = rule.leftoffset if grtype = SUBtype; offset = 0 otherwise.
 	if(offset > 0 && grtype != SUBtype) {
@@ -1907,11 +1894,11 @@ long Insert(int grtype,tokenbyte ***pp_origin,tokenbyte ***pp_dest,t_rule rule,l
 				posdif = ((*p_lengthorigin) - pos - 1);
 				pos1 = pos + 2 * (int)(posdif
 				* (randomnumber / ((double)BP3_RAND_MAX) / 2.));
-			/*	if(!Improvize && !Interactive && time_end_compute > 0L && getClockTime() > time_end_compute) {
+				if(!Improvize && !Interactive && time_end_compute > 0L && getClockTime() > time_end_compute) {
 					EmergencyExit = TRUE;
 					BPPrintMessage(0,odInfo,"=> (3) Maximum allowed time (%d seconds) has been spent in Insert(). Stopped computing...\n➡ This limit can be modified in the settings\n\n",MaxConsoleTime);
 					return(ABORT);
-					} */
+					}
 			if(trace_compute) BPPrintMessage(0,odInfo,"Insert() randomnumber = %ld pos1 = %ld\n",(long)randomnumber,(long)pos1);
 				}
 			while(!Found(-1,pp_origin,grtype,p_arg1,offset,rule.leftnegcontext,&lenc1,pos1,
@@ -2193,7 +2180,6 @@ int ShowItem(int justplay,tokenbyte ***pp_a,int repeat,int mode,int all) {
 			datamode = FALSE;
 			ifunc = FALSE; // 2026-04-12
 			}
-	//	BPActivateWindow(QUICK,wTrace);
 		if(p_ItemStart == NULL
 				|| DisplayStackIndex >= MyGetHandleSize((Handle)p_ItemStart) / sizeof(long)) {
 			BPPrintMessage(0,odError,"=> Err. ShowItem(). p_ItemStart = NULL");
@@ -2215,11 +2201,11 @@ int ShowItem(int justplay,tokenbyte ***pp_a,int repeat,int mode,int all) {
 		}
 	if(mode == PROD && PlanProduce && (DisplayStackIndex > 1)) UndoFlag = TRUE;
 
-	QUIT:
+QUIT:
 	return(r);
 	}
 
-int SaveWeights(void) {
+int SaveWeightsToFile(void) {
 	// Save current rule weigths to the "-wg" weights file
 	int igram,irul,w;
 	BPPrintMessage(0,odInfo,"Saving rule weights\n");
@@ -2227,9 +2213,52 @@ int SaveWeights(void) {
 	for(igram=1; igram <= Gram.number_gram; igram++) {
 		for(irul=1; irul <= (*(Gram.p_subgram))[igram].number_rule; irul++) {
 			w = (*((*(Gram.p_subgram))[igram].p_rule))[irul].weight;
-			my_sprintf(Message,
-"{\"igram\":%d,\"irul\":%d,\"weight\":\"%d\"}\n",igram,irul,w);
-			Print(wWeights,Message);
+			Print(wWeights,"{\"igram\":%d,\"irul\":%d,\"weight\":\"%d\"}\n",igram,irul,w);
+			}
+		}
+	return OK;
+	}
+
+int GetWeightsFromFile(void) {
+	// Read rule weights back from the "-wg" weights file
+	int igram, irul, weight;
+	char line[256];
+	BPPrintMessage(0, odInfo, "Loading rule weights\n");
+	while(fgets(line, sizeof(line), weightPtr) != NULL) {
+		// Skip comment lines
+		if(line[0] == '/' || line[0] == '\n') continue;
+	//	BPPrintMessage(0,odInfo,"%s\n",line);
+		if(sscanf(line,"{\"igram\":%d,\"irul\":%d,\"weight\":\"%d\"}",
+			&igram,&irul,&weight) == 3) {
+			if(igram >= 1 && igram <= Gram.number_gram) {
+				if(irul >= 1 && irul <= (*(Gram.p_subgram))[igram].number_rule) {
+					(*((*(Gram.p_subgram))[igram].p_rule))[irul].weight = weight;
+				//	BPPrintMessage(0,odInfo,"igram = %d, irul = %d, weight = %d\n",igram,irul,weight);
+					}
+				}
+			}
+		}
+	return OK;
+	}
+
+int NormaliseWeights(void) {
+	int igram, irul, weight, max;
+	double scale;
+	max = 0;
+	for(igram=1; igram <= Gram.number_gram; igram++) {
+		for(irul=1; irul <= (*(Gram.p_subgram))[igram].number_rule; irul++) {
+			weight = (*((*(Gram.p_subgram))[igram].p_rule))[irul].weight;
+			if(weight > max) max = weight;
+			}
+		}
+	if(max > MAXWEIGHT) {
+		scale = (double) MAXWEIGHT / max;
+		for(igram=1; igram <= Gram.number_gram; igram++) {
+			for(irul=1; irul <= (*(Gram.p_subgram))[igram].number_rule; irul++) {
+				weight = (*((*(Gram.p_subgram))[igram].p_rule))[irul].weight;
+				weight = (int) (weight * scale);
+				(*((*(Gram.p_subgram))[igram].p_rule))[irul].weight = weight;
+				}
 			}
 		}
 	return OK;

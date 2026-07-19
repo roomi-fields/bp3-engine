@@ -186,7 +186,7 @@ char ChangedVolume[MAXCHAN+1],ChangedPanoramic[MAXCHAN+1],ChangedModulation[MAXC
 	ChangedPressure[MAXCHAN+1],WhichCsoundInstrument[MAXCHAN+1];
 int Jbol,Jfunc,Jinstr,Jinscript,Joutscript,Maxinscript,Maxoutscript,iProto,Jcontrol,Jpatt,Jvar,Jflag,MaxVar,
 	Jhomo,**p_VarStatus,iCsoundInstrument;
-int FreezeWindows,StartFromOne,rtMIDI,OutCsound,OutBPdata,MustChangeInput,Capture0n,SmartCursor,NotSaidKpress,**p_MemGram,**p_MemRul,SaidChannel;
+int FreezeWindows,StartFromOne,rtMIDI,OutCsound,OutBPdata,MustChangeInput,SmartCursor,NotSaidKpress,**p_MemGram,**p_MemRul,SaidChannel;
 int CaptureSource;
 FILE* CapturePtr;
 Milliseconds TabfileStart;
@@ -239,9 +239,9 @@ Milliseconds OldMIDIfileTime;
 unsigned long LapWait,WhenItStarted;
 int ****p_Image,****p_NoteImage,MaxGram,MaxRul,SplitTimeObjects,SplitVariables,SplitLines,Token,Step,SpaceOn,
 	VariableOn,N_err,nstore,NumberTables,OkShowExpand,Improvize,Analyzing,ComputeWhilePlay,TransposeInput,
-	TransposeValue,Varweight,Flagthere,ResetDone,BolsInGrammar,NoAlphabet,PointCsound,PointMIDI,
+	TransposeValue,Varweight,MIDIcapture,Flagthere,ResetDone,BolsInGrammar,NoAlphabet,PointCsound,PointMIDI,
 	**p_Ifrom,**p_Resolution,**p_CsoundInstr,**p_CsoundAssignedInstr;
-int LiveGrammar,LiveSettings,TraceLive,SyncChange,ChangedGrammar,NewGrammarWaiting,ChangedSettings;
+int LiveGrammar,LiveSettings,TraceLive,LearnFromWeights,SyncChange,ChangedGrammar,NewGrammarWaiting,ChangedSettings;
 MIDIcode ****pp_MIDIcode;
 float **p_CsoundTempo;
 Milliseconds ****pp_CsoundTime;
@@ -287,6 +287,7 @@ long **p_Ppatt,**p_Qpatt;
 MIDIcode **p_Code; 
 char Midiportfilename[MAXNAME];
 char LiveFolder[MAXNAME];
+char UrlToPush[MAXLIN];
 double SpeedRange,Ke,CorrectionFactor;
 unsigned long NumEventsWritten;
 int DeriveFurther,DeriveFurtherKey,DeriveFurtherChan,ResetWeights,NeverResetWeights,
@@ -324,6 +325,7 @@ int Charstep,UndoFlag;
 long ClockInitCapture;
 long NumberCharsTrace, NumberCharsData, NumberInferences;
 char LineBuff[MAXLIN];
+char ParseMode[6];
 char MIDIinputname[MAXPORTS][MAXNAME],MIDIoutputname[MAXPORTS][MAXNAME],OutputMIDIportComment[MAXPORTS][MAXNAME],InputMIDIportComment[MAXPORTS][MAXNAME];
 int MIDIinput[MAXPORTS], MIDIoutput[MAXPORTS]; // In Linux, these are 'clients'. Otherwise, 'ports'.
 #if defined(__linux__)

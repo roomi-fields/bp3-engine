@@ -102,3 +102,19 @@ Ordre de Romain du 2026-07-19 (colère `compileBPS`), décision
   vérités en parallèle, et c'est la mauvaise qu'on mesurait.
 - **Le garde `scripts/gate-legacy.py` fait respecter ça**, et sa morsure est prouvée par
   injection (`scripts/gate-legacy-injection.sh`), comme le méta-garde anti-contournement.
+
+## ⚠️ ESSAYER AVANT D'ESCALADER — une dépendance installable n'est pas un blocage
+
+Recadrage de l'architecte, 2026-07-19. J'ai déclaré un « blocage Romain » sur l'installation
+de `libcurl4-openssl-dev` et calé le chantier BPE-23 pendant des heures. **`sudo` est sans mot
+de passe sur cette machine : je pouvais l'installer moi-même.**
+
+Avant de déclarer un blocage humain sur une **dépendance de construction** :
+1. `sudo -n true` — teste si le privilège est disponible sans mot de passe ;
+2. si oui, **installe et continue** ; le dire dans le rapport, pas le demander avant ;
+3. n'escalader que si `sudo` réclame vraiment un mot de passe, ou si l'action est
+   irréversible / hors du périmètre de construction (rien à voir avec un paquet de dev).
+
+La distinction : demander l'accord pour une action **irréversible ou hors périmètre** reste
+juste. Demander l'accord pour une chose que je peux faire, vérifier et défaire, c'est de la
+passivité déguisée en prudence — et ça coûte le temps de tout le monde.

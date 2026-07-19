@@ -45,7 +45,13 @@ WASM_CFLAGS = $(CFLAGS_COMMON) \
 	-MMD -MP
 
 # === Linker flags ===
-LINUX_LDFLAGS   = -lm -lasound
+# libcurl : dependance introduite par le moteur amont en v3.4.7 (-BP3.h:97), pour la
+# fonction « enter_notes » qui pousse une capture MIDI vers un projet web. On passe par
+# pkg-config plutot que d'ecrire -I/usr/include/curl en dur : sur cette machine l'en-tete
+# est au chemin multiarch /usr/include/x86_64-linux-gnu/curl/, qu'un chemin fige raterait.
+CURL_CFLAGS := $(shell pkg-config --cflags libcurl 2>/dev/null)
+CURL_LIBS   := $(shell pkg-config --libs libcurl 2>/dev/null || echo -lcurl)
+LINUX_LDFLAGS   = -lm -lasound $(CURL_LIBS)
 WINDOWS_LDFLAGS = -lm -lwinmm
 WASM_LDFLAGS = \
 	-s EXPORTED_FUNCTIONS='["_bp3_init","_bp3_load_grammar","_bp3_load_alphabet","_bp3_load_settings","_bp3_load_settings_params","_bp3_load_tonality","_bp3_load_csound_resources","_bp3_produce","_bp3_get_result","_bp3_get_messages","_bp3_get_midi_events","_bp3_get_midi_event_count","_bp3_get_timed_tokens","_bp3_get_timed_token_count","_bp3_load_object_prototypes","_bp3_set_seed","_bp3_set_write_midi","_bp3_set_timed_tokens_verbose","_bp3_provision_file","_bp3_set_trace","_bp3_get_flag_state","_bp3_set_flag","_bp3_get_flag_names","_malloc","_free","_emscripten_stack_get_base","_emscripten_stack_get_end"]' \
@@ -172,7 +178,7 @@ $(LINUX_OBJ)/%.o: $(NATIVE_SRC)/%.c | $(LINUX_OBJ)
 	$(GCC) $(NATIVE_CFLAGS) -MF $(LINUX_OBJ)/$*.d -c $< -o $@
 
 $(LINUX_BIN): $(LINUX_OBJS)
-	$(GCC) $(CFLAGS_COMMON) -o $@ $^ $(LINUX_LDFLAGS)
+	$(GCC) $(CFLAGS_COMMON) $(CURL_CFLAGS) -o $@ $^ $(LINUX_LDFLAGS)
 	@echo "==> Built $(LINUX_BIN)"
 
 # === Windows build (cross-compile with mingw-w64) ===

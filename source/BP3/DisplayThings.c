@@ -41,25 +41,6 @@
 int trace_display = 0;
 int check_context = 0;
 
-/*
-int Print(int w,char* t) {
-	long length;
-	char *ptr;
-	if(!FirstGrammar) return(OK);
-	if(w < 0 || w >= WMAX) {
-		BPPrintMessage(0,odError,"=> Err1. Print() w = %d\n",w);
-		return(OK);
-		}
-	if(!Editable[w]) {
-		BPPrintMessage(0,odError,"=> Err2. Print() Not editable %d\n",w);
-		return(MISSED);
-		}
-	length = strlen(t);
-	ptr = t;
-	TextInsert(ptr,length,TEH[w]);
-	return(OK);
-	} */
-
 int Print(int w, const char *format, ...) { // 2026-04-27
     va_list args;
     int length;
@@ -890,7 +871,7 @@ if(Pduration > 0.) {
 	else my_sprintf(Message,"Dur = %.0f ticks",Pduration);
 		
 	if(Ratio != Prod) {
-		if(Ratio < ULONG_MAX) my_sprintf(line,"  Ratio = %lu",(unsigned long)Ratio);
+		if(Ratio < (double) ULONG_MAX) my_sprintf(line,"  Ratio = %lu",(unsigned long)Ratio);
 		else my_sprintf(line,"   Ratio = %.0f",Ratio);
 		if((strlen(Message) + strlen(line)) < MAXLIN) strcat(Message,line);
 		}

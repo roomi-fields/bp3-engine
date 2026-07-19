@@ -117,7 +117,7 @@ extern char ChangedVolume[MAXCHAN+1],ChangedPanoramic[MAXCHAN+1],ChangedModulati
 	ChangedPressure[MAXCHAN+1],WhichCsoundInstrument[MAXCHAN+1];
 extern int Jbol,Jinstr,Jfunc,Jinscript,Joutscript,Maxinscript,Maxoutscript,iProto,Jcontrol,Jpatt,Jvar,Jflag,
 	MaxVar,Jhomo,**p_VarStatus,iCsoundInstrument;
-extern int FreezeWindows,StartFromOne,rtMIDI,OutCsound,OutBPdata,MustChangeInput,Capture0n,
+extern int FreezeWindows,StartFromOne,rtMIDI,OutCsound,OutBPdata,MustChangeInput,
 	SmartCursor,NotSaidKpress,**p_MemGram,**p_MemRul,SaidChannel;
 extern int CaptureSource;
 extern FILE* CapturePtr;
@@ -171,12 +171,12 @@ extern Milliseconds OldMIDIfileTime;
 extern unsigned long LapWait,WhenItStarted;
 extern int ****p_Image,****p_NoteImage,MaxGram,MaxRul,SplitTimeObjects,SplitVariables,SplitLines,Token,Step,
 	SpaceOn,
-	VariableOn,N_err,nstore,NumberTables,OkShowExpand,Improvize,Analyzing,ComputeWhilePlay,Varweight,
+	VariableOn,N_err,nstore,NumberTables,OkShowExpand,Improvize,Analyzing,ComputeWhilePlay,Varweight,MIDIcapture,
 	TransposeInput,TransposeValue,
 	Flagthere,ResetDone,BolsInGrammar,NoAlphabet,**p_Ifrom,PointCsound,PointMIDI,
 	**p_Resolution,
 	**p_CsoundInstr,**p_CsoundAssignedInstr;
-extern int LiveGrammar,LiveSettings,SyncChange,TraceLive,ChangedGrammar,NewGrammarWaiting,ChangedSettings;
+extern int LiveGrammar,LiveSettings,SyncChange,TraceLive,LearnFromWeights,ChangedGrammar,NewGrammarWaiting,ChangedSettings;
 extern MIDIcode ****pp_MIDIcode;
 extern float **p_CsoundTempo;
 extern Milliseconds ****pp_CsoundTime;
@@ -223,6 +223,7 @@ extern long **p_Ppatt,**p_Qpatt;
 extern MIDIcode **p_Code;
 extern char Midiportfilename[MAXNAME];
 extern char LiveFolder[MAXNAME];
+extern char UrlToPush[MAXLIN];
 
 extern double SpeedRange,Ke,CorrectionFactor;
 
@@ -261,6 +262,7 @@ extern int Charstep,UndoFlag;
 extern long ClockInitCapture;
 extern long NumberCharsTrace, NumberCharsData, NumberInferences;
 extern char LineBuff[MAXLIN];
+extern char ParseMode[6];
 extern char MIDIinputname[MAXPORTS][MAXNAME],MIDIoutputname[MAXPORTS][MAXNAME],OutputMIDIportComment[MAXPORTS][MAXNAME],InputMIDIportComment[MAXPORTS][MAXNAME];
 extern int MIDIinput[MAXPORTS], MIDIoutput[MAXPORTS];
 #if defined(__linux__)
@@ -373,6 +375,7 @@ extern int i_ptr, hist_mem_ptr[5000], size_mem_ptr[5000];
 
 extern FILE * imagePtr;
 extern FILE * outPtr;
+extern FILE * weightPtr;
 extern int N_image;
 extern long MaxConsoleTime;
 extern int NumberScales, MaxScales, DefaultScaleParam, ToldAboutScale;

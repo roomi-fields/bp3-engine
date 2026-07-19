@@ -267,3 +267,21 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
 - **BPE-20** `RESOLU 2026-07-19` [P3] — DHIN-TROU-DE-CONFIG : les 22 erreurs de `-gr.dhin--`
   n'etaient pas un defaut du corpus mais de MA capture : l'alphabet n'etait pas charge.
   Charge correctement, `Errors: 0` sans rien modifier. Cause reelle du fichier lui-meme = BPE-16.
+
+- **BPE-21** `ouvert` [P1] — WASM-REGLAGES-TUENT-LE-MIDI : `scripts/test-settings-params.js`
+  echoue sur 2 de ses 5 cas, et c'est un DEFAUT REEL, pas un garde perime. Quand on charge les
+  reglages par `bp3_load_settings_params`, la production rend **0 evenement MIDI** la ou elle en
+  rend 6 sans (cas 2 : « settings must not kill MIDI » ; cas 4 : idem). Les cas 1, 3 et 5 passent,
+  donc le moteur produit bien par ailleurs — c'est le passage des reglages qui tue le MIDI.
+  ⚠ NE PAS REECRIRE LE TEST POUR LE FAIRE VERDIR (regle explicite de la decision Romain du
+  2026-07-19) : l'echec vient du CODE, c'est le CODE qui doit bouger. Le garde reste BRANCHE au
+  portillon dans une voie `rouge` dediee, visible, tant que le defaut n'est pas corrige.
+  Voisinage a instruire : `scripts/test-midi-bug.js` couvre un symptome tres proche (« un en-tete
+  `-se.xxx` tue le MIDI a l'execution suivante ») et il PASSE — le correctif d'alors n'a donc pas
+  couvert le chemin `bp3_load_settings_params`. Lancer : `./scripts/gate.sh rouge`.
+
+- **BPE-22** `ouvert` [P3] — TEST-ALL-TROP-LONG : `scripts/test-all.js` (toutes les grammaires
+  confrontees au moteur WASM) depasse 90 s et ne peut pas vivre dans la voie rapide. Range en voie
+  `lente` avec un delai de 600 s (`./scripts/gate.sh lente`). A instruire : est-il lent par nature
+  (volume) ou bloque-t-il sur une grammaire precise ? Tant que ce n'est pas tranche, sa couverture
+  reelle est inconnue — ce n'est donc PAS un garde sur lequel s'appuyer.

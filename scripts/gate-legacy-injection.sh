@@ -7,7 +7,16 @@ cd "$(dirname "$0")/.."
 LEG="csrc/wasm/bp3_leurre_legacy.c"
 CANON="csrc/bp3/Misc.c"
 echec=0
-nettoie() { rm -f "$LEG"; git checkout -- "$CANON" 2>/dev/null || true; }
+# On memorise la date du fichier canonique AVANT de le toucher, et on la restaure apres :
+# `git checkout` restaure le CONTENU mais pas la DATE, et le controle de fraicheur des
+# artefacts (volet 3 du garde) verrait alors une source plus recente que les binaires.
+# Une preuve d injection ne doit rien laisser derriere elle, pas meme une date.
+DATE_CANON=$(stat -c %y "$CANON")
+nettoie() {
+  rm -f "$LEG"
+  git checkout -- "$CANON" 2>/dev/null || true
+  touch -d "$DATE_CANON" "$CANON" 2>/dev/null || true
+}
 trap nettoie EXIT
 
 vert() { python3 scripts/gate-legacy.py >/dev/null 2>&1; }
@@ -41,7 +50,7 @@ elif ! printf '%s' "$sortie" | grep -q "Misc.c"; then
 else
   echo "   rouge, et il nomme le fichier ✔"
 fi
-git checkout -- "$CANON"
+git checkout -- "$CANON"; touch -d "$DATE_CANON" "$CANON"
 
 echo "4. retrait des deux leurres — le garde doit redevenir VERT"
 vert && echo "   vert ✔" || { echo "   ÉCHEC : reste rouge après retrait"; echec=1; }

@@ -209,3 +209,46 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   `-gr.a` presente une variante proche (« Error code 52: Missing slash after /flag/ » sur
   `Dummy --> /K2 = 11/`). A instruire : notation BP2 d'initialisation de drapeaux abandonnee,
   ou defaut du compilateur ? Non tranche, aucun correctif applique.
+
+- **BPE-16** `RESOLU 2026-07-19` [P2] — CORPUS-FINS-DE-LIGNE-MAC : 14 fichiers du corpus
+  n'avaient que des retours chariot Mac (`0x0D`) et aucun saut de ligne — le moteur y lit une
+  seule ligne geante et ne compile rien. `-al.Mozartnotes`, `-al.dhin--`, `-al.engine`,
+  `-al.trial.mohanam`, `-da.checktemplates` + 9 fichiers `-tb.*` (ces derniers ignores par le
+  moteur, convertis par coherence). REPARATION SURE, non une reecriture : `-al.dhin--`,
+  `-al.Mozartnotes` et `-al.engine` sont IDENTIQUES A L'OCTET PRES a leurs jumeaux `-ho.*` une
+  fois les fins de ligne converties — ce sont les memes fichiers, abimes au transfert.
+  MESURE : `-gr.dhin--` charge avec `-al.dhin--` passe de 22 erreurs a 0.
+  NON-REGRESSION : `mohanam`, seule autre entree de la baseline concernee, rend des jetons
+  binairement identiques avant/apres (755 jetons). Commit `b4fdf8d`.
+  ⚠ PIEGE SYMETRIQUE A NE PAS « REPARER » : 62 fichiers `-se.*` n'ont eux non plus aucun saut
+  de ligne (`-se.dhadhatite`, `-se.tryKeyMap`, `-se.gramgene`…) mais les grammaires qui les
+  emploient PRODUISENT. C'est leur format normal, pas un degat. Ne pas y toucher.
+
+- **BPE-17** `RESOLU 2026-07-19` [P2] — CHECKRESTS-SILENCE-INDETERMINE : les 12 erreurs de
+  compilation de `-gr.checkrests` venaient d'UN SEUL caractere. Le silence indetermine, ecrit
+  `…` a l'origine, avait ete converti a tort en `É` (octet `0xC9` du jeu Mac lu comme du
+  latin-1 puis re-encode ; octets constates `C3 89`). Retabli en `_rest`, la notation que
+  `BP3_help.txt:127` recommande explicitement PARCE QUE l'ancienne souffre des conversions de
+  caracteres — la doc decrivait d'avance le bug. 12 erreurs -> 0. Commit `2df5fa1`.
+  Meme famille que BPE-5/BPE-9 (mojibake), mais cause et correctif distincts.
+
+- **BPE-18** `en-attente-arbitrage` [P3] — CHECKVOLCHAN-HERITAGE-BP2 : `-gr.checkVolChan` est un
+  fichier BP2 de 1994 (`V.2.4`, `Date: Mar 6 Sep 1994`). 12 erreurs -> 5, trois causes empilees
+  mesurees une par une : en-tete BP2 + ligne `INIT:` vide (6 erreurs, retires) ; `_vol(` renomme
+  `_volume(` en BP3 (`BP3_help.txt:800`, corrige). NON CORRIGE VOLONTAIREMENT : `_cresc` /
+  `_decresc` n'existent plus en BP3 (ni moteur ni doc) — leur equivalent plausible est
+  `_volumecont` (`BP3_help.txt:817`) mais c'est un choix de SENS, pas une transcription
+  (verifie : avec `_volumecont` on tombe a 3) ; et 2 `_script(…)` emploient la syntaxe BP2.
+  Arbitrage porte a Romain par l'architecte. Commit `2df5fa1`.
+
+- **BPE-19** `en-attente-arbitrage` [P3] — CHECKALLCSOUND-RESSOURCE-ABSENTE : `-gr.checkAllCsound`
+  declare `-cs.checkAllCsound`, ABSENT du depot ; les 30 erreurs sont toutes des recherches
+  d'instruments dans un fichier inexistant. Avec `-cs.tryCsound` a la place : 3 erreurs. Tous
+  les instruments demandes (Flute, Harpsichord, Splashmachine) y sont, sauf `The_default`,
+  introuvable dans les 14 fichiers `-cs.*` du corpus. DECISION CORPUS : soit un fichier a ete
+  perdu, soit l'en-tete pointe un nom qui n'a jamais existe et il faut le rediriger.
+  Aucun correctif applique. Arbitrage porte a Romain par l'architecte.
+
+- **BPE-20** `RESOLU 2026-07-19` [P3] — DHIN-TROU-DE-CONFIG : les 22 erreurs de `-gr.dhin--`
+  n'etaient pas un defaut du corpus mais de MA capture : l'alphabet n'etait pas charge.
+  Charge correctement, `Errors: 0` sans rien modifier. Cause reelle du fichier lui-meme = BPE-16.

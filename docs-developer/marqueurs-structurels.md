@@ -48,17 +48,44 @@ C'est exactement l'usage de la grammaire d'exemple : `(= V8 )` … plus loin `(:
 **Conséquence** : `=` et `:` ne sont pas substituables l'un à l'autre — les intervertir
 change le maître en esclave et casse la règle.
 
-## `;` — saut de ligne dans une grammaire d'interprétation
+## `;` — barrière de dérivation ; le saut de ligne est du code mort
 
-Dans une grammaire d'interprétation (`ifunc`), `;` est rendu comme un **retour à la
-ligne** dans la sortie : `csrc/bp3/DisplayArg.c:1093`.
+**Correction du 2026-07-19, après test empirique** (demande [112]). J'avais écrit ici que
+`;` devient un retour à la ligne. Le moteur contient bien cette règle
+(`csrc/bp3/DisplayArg.c:1093`, `/* interpreting grammar: ';' becomes '\r' */`) **mais elle
+ne s'exécute jamais** : elle est conditionnée au drapeau `ifunc`, levé uniquement quand
+`Jfunc` est non nul, et `Jfunc` n'est affecté qu'en `csrc/bp3/CompileGrammar.c:1354` — une
+ligne **commentée**. Voir le constat #58 du registre des bugs moteur.
 
-```c
-if(ifunc && m == T0 && p == 5) { /* interpreting grammar: ';' becomes '\r' */
+Ce que `;` fait réellement, mesuré sur le moteur natif v3.4.4 :
+
+```
+GRAM#1[1] S --> C4 ; D4     →  sortie : C4 ; D4
+GRAM#1[1] S --> C4 D4       →  sortie : C4 D4
 ```
 
-C'est un marqueur de **mise en forme du texte produit**, sans rapport avec le couple
-maître/esclave.
+Il est **transporté tel quel jusqu'à la sortie** et imprimé littéralement. Il est en
+revanche **musicalement inerte** : jetons et minutage strictement identiques avec et sans
+(`C4` 0→1000, `D4` 1000→2000 dans les deux cas).
+
+Son effet réel est d'être une **barrière dans la dérivation** — il empêche une règle de
+s'appliquer à cheval sur lui :
+
+```
+GRAM#1[1] S --> A ; B        GRAM#1[1] S --> A B
+---  ORD                     ---  ORD
+GRAM#2[1] A B --> C4         GRAM#2[1] A B --> C4
+GRAM#2[2] A --> D4           GRAM#2[2] A --> D4
+GRAM#2[3] B --> E4           GRAM#2[3] B --> E4
+
+→ sortie : D4 ; E4           → sortie : C4
+```
+
+Sans le marqueur, `A B` s'apparie et donne `C4`. Avec lui, l'appariement est bloqué. Les
+trois autres marqueurs se comportent **exactement pareil** sur ce test (`D4 +E4`,
+`D4 = E4`, `D4 : E4`) : en tant que barrières de dérivation, les quatre sont bien
+équivalents. C'est dans leurs **contextes dédiés** — parenthèses pour `=`/`:`, en-tête de
+section pour `+` — qu'ils se distinguent.
 
 ## `+` — séparateur de mesure additive
 
@@ -106,8 +133,10 @@ Les deux niveaux coexistent.
 |---|---|---|
 | `=` | ouvre un bloc **maître** (motif de référence) | `Encode.c:1355`, `:1421` |
 | `:` | ouvre un bloc **esclave**, relié à son maître | `Encode.c:1362`, `:1490` |
-| `;` | **saut de ligne** dans la sortie d'une grammaire d'interprétation | `DisplayArg.c:1093` |
+| `;` | **barrière de dérivation**, imprimée littéralement, musicalement inerte | mesuré ; le saut de ligne de `DisplayArg.c:1093` est du code mort (constat #58) |
 | `+` | séparateur de **mesure additive** en en-tête de section | `Polymetric.c:181`, `DisplayArg.c:408` |
 
-Ils ne sont **pas** interchangeables. L'implémentation les différencie bel et bien ; c'est
-la documentation qui est muette, pas le moteur.
+Nuance, après le test empirique du 2026-07-19 : dans le rôle **commun** de barrière de
+dérivation, les quatre sont équivalents et interchangeables. C'est dans leurs **contextes
+dédiés** qu'ils se distinguent — et pour `;` ce contexte dédié n'existe plus dans le
+binaire actuel, la fonction étant désactivée par une ligne commentée (constat #58).

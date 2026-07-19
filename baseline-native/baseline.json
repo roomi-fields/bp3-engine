@@ -19,7 +19,7 @@
  "conventions_sans_objet": 9,
  "conventions_ambigues": 4,
  "muettes_reelles": 13,
- "nouveaute_v13": "Moteur passe en v3.4.7. UNE SEULE entree change de comportement : tryRotate, dont l'operateur _rotate n'est plus applique — il ressort litteralement dans la sortie et les notes ne sont plus tournees. REGRESSION MOTEUR, remontee a Bernard Bel.",
+ "nouveaute_v13": "Moteur passe en v3.4.7. Une seule entree change : tryRotate, dont la sortie TEXTE montre desormais le marqueur _rotate et les notes avant rotation. Les jetons MIDI sont IDENTIQUES a la v12 : la rotation est bien appliquee, seule la serialisation texte change. Question d affichage posee a Bernard Bel (constat #59), rien de casse dans la production.",
  "grammaires": [
   {
    "grammaire": "765432",

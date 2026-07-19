@@ -10,19 +10,24 @@ Modes natifs : **MIDI 61** · **TEXTE 37**. Actions : **single 69** · **produce
 Double comparaison contre la v12 — champ par champ sur les 113 entrées **et** empreinte par
 empreinte sur les 163 captures. Une seule divergence est réelle : **`tryRotate`**.
 
-**L'opérateur `_rotate` n'est plus appliqué.** En v3.4.4 il agissait — la sortie montrait les
-notes tournées. En v3.4.7 il ressort **littéralement dans le texte produit**, et les notes sont
-dans leur ordre d'origine :
+**Ce qui change est la sérialisation TEXTE, pas le calcul.** J'avais d'abord écrit que
+l'opérateur n'était plus appliqué — **c'était faux**, et bpscript me l'a fait voir en signalant
+que leur mesure porte sur les jetons MIDI, l'axe que je n'avais pas regardé.
 
-| version | début de la sortie |
-|---|---|
-| v3.4.4 | `/6 {E4 F4 G4 C4 D4} 1/2 …` — rotation appliquée |
-| v3.4.7 | `/6 {_rotate(K1=2) C4 D4 E4 F4 G4} 1/2 …` — opérateur imprimé, notes intactes |
+| | v3.4.4 | v3.4.7 |
+|---|---|---|
+| jetons MIDI | `E4 F4 G4 C4 D4 …` | `E4 F4 G4 C4 D4 …` — **identiques à l'octet près** |
+| sortie texte | `/6 {E4 F4 G4 C4 D4} …` | `/6 {_rotate(K1=2) C4 D4 E4 F4 G4} …` |
 
-Ce n'est pas une variance : `tryRotate` est **déterministe**, vérifié sur quatre exécutions
-consécutives (78 mots à chaque fois). **C'est une régression du moteur amont**, remontée à
-Bernard Bel. La piste : la v3.4.7 conditionne l'application des outils sériels à
-`OutBPdata && NeedZouleb > 0` dans `ProduceItems.c`, condition qui n'est pas remplie ici.
+**La rotation est bien appliquée** : `E4 F4 G4 C4 D4` est la rotation de `C4 D4 E4 F4 G4`, et
+les 65 jetons MIDI sont identiques entre les deux versions. Ce qui change, c'est que le marqueur
+`_rotate(K1=2)` n'est plus effacé du texte affiché, lequel montre les notes **avant** rotation —
+alors que la musique produite, elle, est tournée. Le texte et le MIDI ne racontent plus la même
+chose.
+
+Question ouverte pour Bernard Bel (constat #59), beaucoup plus étroite que ce que j'avais
+d'abord écrit : la sortie texte doit-elle montrer l'expression avant ou après application des
+outils sériels ? **Rien n'est cassé dans la production musicale.**
 
 Les trois autres écarts ne sont pas des changements de comportement :
 

@@ -87,3 +87,18 @@ Corollaires que j'ai payés en propre (2026-07-18/19) :
   au lieu de comparer les sorties).
 - **Un outil de mesure réécrit à la main pour une question ponctuelle n'est PAS le même outil.**
   Utiliser celui du dépôt (`baseline-native/capture.py`), pas une variante de circonstance.
+
+## ⛔ INTERDIT : migration douce, voie de rétrocompatibilité, code « voué au retrait » gardé
+
+Ordre de Romain du 2026-07-19 (colère `compileBPS`), décision
+`hub/decisions/2026-07-19-confronter-via-oracle-et-restaurer-tous-les-guards.md` amendée.
+
+- **Remplacer X par Y = SUPPRIMER X dans le MÊME mouvement.** Pas de repli, pas de voie
+  parallèle, pas de « migration douce », pas de « on garde X le temps de migrer ».
+- **Un code marqué `legacy` / `deprecated` / « voué au retrait » qui a encore des appelants
+  vivants n'est PAS en train d'être retiré : il est réutilisé.** C'est interdit.
+- Le mal que ça fait : `compileBPS` a été gardé « au cas où », puis réutilisé, puis **fait
+  évoluer** — et la mesure de conformité tournait dessus. Une bifurcation silencieuse : deux
+  vérités en parallèle, et c'est la mauvaise qu'on mesurait.
+- **Le garde `scripts/gate-legacy.py` fait respecter ça**, et sa morsure est prouvée par
+  injection (`scripts/gate-legacy-injection.sh`), comme le méta-garde anti-contournement.

@@ -49,6 +49,9 @@ if [ "$VOIE" = rapide ] || [ "$VOIE" = tout ]; then
   lancer "anti-bypass-morsure" 90 ./scripts/gate-meta-injection.sh
   lancer "anti-retrocompat"   60 python3 scripts/gate-legacy.py
   lancer "anti-retro-morsure" 90 ./scripts/gate-legacy-injection.sh
+  lancer "ancrages-locaux"    60 python3 scripts/gate-ancrages.py
+  lancer "ancrages-morsure"   90 ./scripts/gate-ancrages-injection.sh
+  lancer "effondrement-morsure" 90 ./scripts/gate-effondrement-injection.sh
 fi
 
 # La voie ROUGE porte les défauts MOTEUR connus et non corrigés. On ne les maquille jamais :

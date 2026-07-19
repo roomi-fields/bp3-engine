@@ -322,6 +322,31 @@ if UNE:
               "compteurs, JAMAIS la sequence.")
     sys.exit(0)
 
+# ── GARDE ANTI-EFFONDREMENT ──────────────────────────────────────────────────
+# On REFUSE de publier une capture dont la modalite MIDI s'est effondree par rapport
+# a la baseline publiee. Le 2026-07-19, une recapture a rendu 98 TEXTE et ZERO MIDI
+# parce que l'appel au serialiseur avait ete perdu : le binaire construisait, tournait,
+# sortait Errors: 0, et n'emettait plus rien. Sans ce garde, cette capture serait
+# devenue la reference de trois consommateurs.
+# Le garde BLOQUE la bascule, il n'avertit pas : une etape manuelle de verification
+# s'oublie, un refus de publier ne s'oublie pas.
+_ancien = os.path.join(OUT, "baseline.json")
+if os.path.isfile(_ancien):
+    _av = json.load(open(_ancien, encoding="utf-8"))
+    _midi_av = sum(1 for x in _av["grammaires"] if x.get("modalite") == "MIDI")
+    _midi_ap = sum(1 for x in rows if x.get("modalite") == "MIDI")
+    if _midi_av > 0 and _midi_ap < _midi_av * 0.5:
+        print(f"\nPUBLICATION REFUSEE — EFFONDREMENT DE LA MODALITE MIDI")
+        print(f"  baseline publiee ({_av.get('version')}) : {_midi_av} grammaires en MIDI")
+        print(f"  cette capture                        : {_midi_ap}")
+        print(f"  soit {100 * _midi_ap // max(_midi_av, 1)} % — sous le seuil de 50 %.")
+        print("\nUne chute de cette ampleur ne vient pas des grammaires : elle vient du moteur")
+        print("ou de la chaine de mesure. Verifiez que --tokensout emet encore (un binaire")
+        print("peut construire, tourner et sortir Errors: 0 sans rien emettre), puis relancez.")
+        print(f"\nLa baseline publiee est INTACTE. Les mesures de cette tentative sont dans")
+        print(f"{CAP}/ si vous voulez les examiner.")
+        sys.exit(3)
+
 # BASCULE ATOMIQUE : jusqu'ici le repertoire publie n'a pas ete touche.
 if os.path.isdir(CAP_PUBLIE):
     _vieux = CAP_PUBLIE + ".remplace"

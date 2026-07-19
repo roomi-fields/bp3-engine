@@ -1,0 +1,15 @@
+{
+  "_comment": "ANCRAGES LOCAUX — marqueurs qui DOIVENT survivre a toute synchronisation amont. Chaque entree nomme un fichier et les fragments de texte qui prouvent que nos ajouts y sont encore. Un fichier repris tel quel depuis l'amont perd ces marqueurs : le garde le detecte AVANT que le defaut ne se manifeste. Ne retirer une entree que si l'ajout local a ete VOLONTAIREMENT supprime.",
+  "source/BP3/PlayThings.c": {
+    "marqueurs": ["TokensOutFile", "EmitTimedTokensItem"],
+    "pourquoi": "appel au serialiseur de jetons minutes (--tokensout). Perdu le 2026-07-19 en reprenant ce fichier natif-seul depuis l'amont v3.4.7 : le serialiseur restait compile mais n'etait plus appele, et une recapture entiere a rendu 0 jeton MIDI sur 113 grammaires, sans le moindre message d'erreur."
+  },
+  "source/BP3/TokensOut.c": {
+    "marqueurs": ["EmitTimedTokensItem"],
+    "pourquoi": "le serialiseur lui-meme. Fichier entierement a nous, absent de l'amont."
+  },
+  "csrc/bp3/ConsoleMain.c": {
+    "marqueurs": ["--tokensout", "TokensOutFile"],
+    "pourquoi": "declaration et analyse du drapeau de ligne de commande --tokensout."
+  }
+}

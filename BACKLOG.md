@@ -268,7 +268,7 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   n'etaient pas un defaut du corpus mais de MA capture : l'alphabet n'etait pas charge.
   Charge correctement, `Errors: 0` sans rien modifier. Cause reelle du fichier lui-meme = BPE-16.
 
-- **BPE-21** `ouvert` [P1] — WASM-REGLAGES-TUENT-LE-MIDI : `scripts/test-settings-params.js`
+- **BPE-21** `RESOLU 2026-07-19 — CE N'ETAIT PAS UN DEFAUT MOTEUR` [P1] — WASM-REGLAGES-TUENT-LE-MIDI : `scripts/test-settings-params.js`
   echoue sur 2 de ses 5 cas, et c'est un DEFAUT REEL, pas un garde perime. Quand on charge les
   reglages par `bp3_load_settings_params`, la production rend **0 evenement MIDI** la ou elle en
   rend 6 sans (cas 2 : « settings must not kill MIDI » ; cas 4 : idem). Les cas 1, 3 et 5 passent,
@@ -276,9 +276,21 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   ⚠ NE PAS REECRIRE LE TEST POUR LE FAIRE VERDIR (regle explicite de la decision Romain du
   2026-07-19) : l'echec vient du CODE, c'est le CODE qui doit bouger. Le garde reste BRANCHE au
   portillon dans une voie `rouge` dediee, visible, tant que le defaut n'est pas corrige.
-  Voisinage a instruire : `scripts/test-midi-bug.js` couvre un symptome tres proche (« un en-tete
-  `-se.xxx` tue le MIDI a l'execution suivante ») et il PASSE — le correctif d'alors n'a donc pas
-  couvert le chemin `bp3_load_settings_params`. Lancer : `./scripts/gate.sh rouge`.
+  ⚠ **JE ME SUIS TROMPE, ET J'AVAIS FAIT ENDOSSER MON ERREUR.** Ce n'etait PAS un defaut moteur.
+  BISSECTION parametre par parametre : sur les six arguments, un seul tue le MIDI — `noteConvention=1`.
+  Or **1 = FRANCAIS**, pas anglais : `ConventionString[] = {ENGLISH, FRENCH, INDIAN, KEYS}`
+  (`csrc/bp3/-BP3main.h:134`). Le test passait 1 en commentant « English convention=1 », avec une
+  grammaire en notes ANGLAISES (`C4 D4 E4`). Sous convention francaise, `C4` n'est pas une note :
+  zero evenement est la BONNE reponse.
+  PREUVE DE SYMETRIE, qui etablit que le moteur est juste : anglais+notes anglaises = 6 evenements ;
+  francais+notes francaises = 6 ; anglais+notes francaises = 0 ; francais+notes anglaises = 0.
+  Chaque convention lit les siennes et refuse les autres. Rien a corriger dans le moteur.
+  CORRECTIF : le test est aligne sur la verite du moteur (convention 0 pour des notes anglaises) —
+  c'est le cas « aligner un garde perime sur la verite ratifiee », PAS « reecrire pour verdir » :
+  l'echec ne venait pas du code. Et il est **RENFORCE** : deux cas ajoutes exigent desormais la
+  SYMETRIE (francais lit les notes francaises, ET refuse les anglaises). Sans eux, un vert ne
+  prouverait pas que la convention est prise en compte, seulement qu'elle ne gene pas.
+  7 cas sur 7 passent. Le garde vit en voie rapide ; la voie `rouge` est desormais vide.
 
 - **BPE-22** `TRANCHE 2026-07-19` [P3] — TEST-ALL-TROP-LONG : `scripts/test-all.js` (toutes les grammaires
   confrontees au moteur WASM) depasse 90 s et ne peut pas vivre dans la voie rapide. Range en voie

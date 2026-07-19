@@ -280,8 +280,15 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   `-se.xxx` tue le MIDI a l'execution suivante ») et il PASSE — le correctif d'alors n'a donc pas
   couvert le chemin `bp3_load_settings_params`. Lancer : `./scripts/gate.sh rouge`.
 
-- **BPE-22** `ouvert` [P3] — TEST-ALL-TROP-LONG : `scripts/test-all.js` (toutes les grammaires
+- **BPE-22** `TRANCHE 2026-07-19` [P3] — TEST-ALL-TROP-LONG : `scripts/test-all.js` (toutes les grammaires
   confrontees au moteur WASM) depasse 90 s et ne peut pas vivre dans la voie rapide. Range en voie
   `lente` avec un delai de 600 s (`./scripts/gate.sh lente`). A instruire : est-il lent par nature
-  (volume) ou bloque-t-il sur une grammaire precise ? Tant que ce n'est pas tranche, sa couverture
-  reelle est inconnue — ce n'est donc PAS un garde sur lequel s'appuyer.
+  TRANCHE (demande architecte [122]) : il est **BLOQUE sur une grammaire**, il n'est PAS lent par
+  volume. Mesure : **25 grammaires traitees a 60 s, toujours 25 a 200 s** — zero progression en
+  140 s de plus. La derniere traitee est `checktemplates` ; la bloquante est la suivante dans
+  l'ordre de tri : **`cloches1`**.
+  Ce n'est donc pas un defaut de `test-all` : c'est **BPE-14** (production galopante de `cloches1`)
+  qui le bloque. Les deux entrees se referment ensemble — corriger BPE-14 debloque BPE-22.
+  COUVERTURE REELLE, chiffree : **25 grammaires sur 110, soit 23 %**. Tant que BPE-14 n'est pas
+  corrige, `test-all` ne couvre pas ce qu'il pretend couvrir, et il ne faut PAS s'appuyer dessus.
+  Il reste en voie lente, avec ce chiffre ecrit noir sur blanc plutot qu'une couverture supposee.

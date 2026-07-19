@@ -55,6 +55,10 @@ fi
 
 if [ "$VOIE" = lente ] || [ "$VOIE" = tout ]; then
   echo "── voie LENTE ────────────────────────────────"
+  # ⚠ COUVERTURE REELLE MESUREE : 25 grammaires sur 110 (23 %). Il ne va PAS plus loin :
+  # il est bloque sur `cloches1` (production galopante, BPE-14), pas lent par volume —
+  # 25 traitees a 60 s, toujours 25 a 200 s. Ne pas lire son « vert » comme une couverture
+  # du corpus tant que BPE-14 n'est pas corrige.
   lancer "test-all" 600 node scripts/test-all.js
 fi
 

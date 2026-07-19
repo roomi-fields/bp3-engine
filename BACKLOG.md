@@ -337,5 +337,30 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   ET L'INVENTAIRE CONFIRME #56 : le correctif de la limite de temps est bien visible dans
   `ProduceItems.c` amont (`MaxConsoleTime` / `time_end_compute`). C'est le contraste exact avec
   #55, invisible lui dans `SaveLoads1.c` — deux annonces, une confirmee par la source, une non.
-  RESTE : fusionner (etape 2), reconstruire, verifier #55 empiriquement, re-mesurer `cloches1`,
-  recapturer seulement si un comportement change.
+  **ETAPE 2 FAITE — LA FUSION EST REUSSIE, MAIS LA CONSTRUCTION EST BLOQUEE PAR UNE NOUVELLE
+  DEPENDANCE SYSTEME.**
+  Fusion a TROIS versions (base de fork `b094e18` / notre arbre / amont `39512c9`), via
+  `git merge-file` et non a la main : **39 fichiers repris de l'amont tels quels, 1 fusionne,
+  ZERO conflit**. Le patch complet est garde dans `BPE-23-fusion-v3.4.7.patch` (5444 lignes).
+  DECOUVERTE QUI SIMPLIFIE TOUT : nos modifications locales aux sources partagees du moteur
+  totalisent **14 lignes dans UN SEUL fichier**, `ConsoleMain.c` (le drapeau `--tokensout`).
+  Plus deux fichiers qui nous sont propres et que l'amont n'a pas (`bp3_timed_events.c/.h`).
+  Tout le reste de `csrc/bp3/` etait du code amont intact. Le risque que j'avais decrit comme
+  diffus sur 19 fichiers etait en realite de 14 lignes.
+  BLOCAGE, precis : l'amont v3.4.7 introduit une dependance **libcurl** INCONDITIONNELLE
+  (`csrc/bp3/-BP3.h:97`, `#include <curl/curl.h>`), pour une seule fonction nouvelle qu'on
+  n'utilise pas — `enter_notes` (`csrc/bp3/ConsoleMain.c:307`, `curl_global_init`), qui pousse
+  une capture MIDI vers un projet web via `UrlToPush`. Les en-tetes de developpement ne sont pas
+  installes sur la machine. `apt-get install -s libcurl4-openssl-dev` confirme que le paquet est
+  disponible ; l'installer est une modification de la machine de Romain, je ne la fais pas seul.
+  ETAT RETABLI, volontairement : arbre revenu en 3.4.4, binaire reconstruit et coherent
+  (`./bp3 --short-version` = 3.4.4, les deux arbres identiques, portillon vert). Je REFUSE de
+  laisser des sources en 3.4.7 avec un binaire en 3.4.4 — c'est exactement la bifurcation
+  silencieuse que le garde anti-retrocompat existe pour empecher, et elle s'est presentee des
+  la premiere manoeuvre.
+  ⚠ PIEGE OBSERVE SUR PIECES, a retenir : au PREMIER passage `./build.sh` a annonce
+  « linux built in 0s » et a **deploye l'ancien binaire** ; c'est le SECOND passage, apres que
+  `sync` ait copie les nouvelles sources, qui a revele l'echec de compilation. Sans le double
+  passage documente, j'aurais cru avoir construit la 3.4.7 en livrant la 3.4.4.
+  RESTE : accord pour installer `libcurl4-openssl-dev`, puis reappliquer le patch, reconstruire,
+  verifier #55 empiriquement, re-mesurer `cloches1`, recapturer seulement si un comportement change.

@@ -7,6 +7,34 @@ Chaque section référence le point correspondant dans `FEEDBACK_BERNARD.md` (te
 
 ---
 
+
+## 2026-07-19 — passage du moteur amont v3.4.4 → v3.4.7
+
+Fusion à trois versions (base de fork `b094e18` / notre arbre / amont `39512c9`) via
+`git merge-file` : **39 fichiers repris de l'amont tels quels, 1 fusionné, zéro conflit**.
+
+**Nos modifications locales à `csrc/bp3/` se réduisent à 14 lignes dans un seul fichier** —
+`ConsoleMain.c`, la déclaration et l'analyse du drapeau `--tokensout`. Elles sont intactes.
+`bp3_timed_events.c/.h` nous sont propres et n'existent pas en amont.
+
+Deux obstacles hors des fichiers partagés, à connaître pour la prochaine montée de version :
+
+- **Les fichiers natif-seul de `source/BP3/` ne suivent pas automatiquement.** `IN` et `OUT`
+  étaient des `#define` en v3.4.4 (`-BP3.h:146-147`) et ont disparu en v3.4.7 : `MIDIstuff.c`
+  et `MIDIdriver.c` ne compilaient plus. Quatre fichiers amont mis à jour (`Graphic.c`,
+  `MIDIdriver.c`, `MIDIstuff.c`, `PlayThings.c`). `TokensOut.c` est le nôtre et reste.
+- **Nouvelle dépendance libcurl**, inconditionnelle (`-BP3.h:97`), pour la seule fonction
+  `enter_notes` (`ConsoleMain.c:307`). Côté natif : `libcurl4-openssl-dev` et un passage par
+  `pkg-config` dans le `Makefile` — pas de chemin d'inclusion figé, l'en-tête est au chemin
+  multiarch. Côté WASM : voir `CHANGELOG_WASM.md`.
+
+**Bug moteur #55 résolu par cette montée**, vérifié sur pièces avec `scripts/verif-bug55.sh` :
+un fichier `-cs` privé de sa seule ligne `_end tables` faisait boucler la v3.4.4 sans retour
+après 45 s ; la v3.4.7 rend la main en 0 s, `Errors: 0`.
+
+**Bug #56 : la limite de temps réactivée n'interrompt pas `-gr.cloches1`** — mesuré sur v3.4.7,
+graines 1 et 2, plus de 80 s. Retour transmis à Bernard Bel.
+
 ## 2026-06-14 — Sérialiseur timed-tokens NATIF `--tokensout` (oracle unique)
 
 Cap : `hub/decisions/2026-06-14-oracle-natif-trois-voies.md` (oracle = bp3 natif).

@@ -7,6 +7,28 @@ Pour l'architecture générale, voir `WASM_PORT.md`.
 
 ---
 
+
+## 2026-07-19 — doublure libcurl, rendue nécessaire par le moteur amont v3.4.7
+
+Le moteur amont inclut désormais libcurl **sans condition** (`csrc/bp3/-BP3.h:97`), pour la
+seule fonction `enter_notes` qui pousse une capture MIDI vers un projet web. Emscripten n'a pas
+libcurl, et cette fonctionnalité n'a de toute façon pas de sens dans un navigateur.
+
+`csrc/wasm/curl-doublure/` fournit l'en-tête et le symbole inerte (`curl_global_init`), branché
+par `-Icsrc/wasm/curl-doublure` dans `WASM_CFLAGS`.
+
+**Les sources amont ne sont pas modifiées, et c'est délibéré** : diverger de `csrc/bp3/`
+obligerait à re-fusionner à chaque version amont — la voie parallèle que l'interdiction de
+rétrocompatibilité proscrit. Si l'amont utilise un jour réellement libcurl ailleurs, la doublure
+échouera **bruyamment** à l'édition de liens. Elle ne masque rien en silence.
+
+**Non-régression vérifiée** : les 9 tests WASM du portillon passent contre le binaire reconstruit
+sur le moteur v3.4.7.
+
+⚠ **Le portillon tournait contre un `build/bp3.js` du 26 avril** — antérieur de trois mois à la
+montée de version, donc vert sans rien mesurer. `scripts/gate-legacy.py` refuse désormais qu'un
+binaire soit plus vieux que ses sources, morsure prouvée par injection.
+
 ## bp3_api.c — API JavaScript
 
 ### Nouvelles fonctions API

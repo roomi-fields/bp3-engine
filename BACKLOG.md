@@ -318,6 +318,24 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   (le correctif annonce n'est PAS visible dans le diff de `SaveLoads1.c`) ; (5) re-mesurer
   `cloches1` avec la limite de temps corrigee ; (6) re-capturer la baseline SI un comportement
   change, et comparer champ par champ ET empreinte par empreinte comme pour la v12.
-  Je ne l'ai pas entrepris dans le meme tour : c'est un chantier a part entiere, et le faire
-  a la hate sur 19 fichiers dont 2 gros est exactement la facon de casser en silence ce qui
-  marche aujourd'hui.
+  **ETAPE 1 FAITE — INVENTAIRE, et il CORRIGE mon estimation a la baisse.** L'ecart brut etait
+  du BRUIT DE MISE EN FORME (espaces, fins de ligne). Ecart REEL, a `diff -w -B --strip-trailing-cr` :
+  | fichier | brut | reel |
+  |---|---:|---:|
+  | `ProduceItems.c` | 614 | **38** |
+  | `Zouleb.c` | 559 | **7** |
+  | `Compute.c` | 123 | 117 |
+  | `ConsoleMain.c` | 117 | 95 |
+  | `SaveLoads3.c` | 93 | 93 |
+  | `Arithmetic.c` | 139 | 31 |
+  | les 6 autres | — | 116 |
+  **497 lignes reelles au total**, pas ~1800. Le chantier est bien plus petit que je ne l'ai
+  annonce — je le corrige ici plutot que de laisser une estimation gonflee justifier un retard.
+  NOS AJOUTS sont concentres dans `ConsoleMain.c` (`--tokensout`, `TokensOut`) et dans des
+  fichiers que l'amont N'A PAS (`bp3_timed_events.h`) : le risque de les ecraser est donc
+  circonscrit, pas diffus.
+  ET L'INVENTAIRE CONFIRME #56 : le correctif de la limite de temps est bien visible dans
+  `ProduceItems.c` amont (`MaxConsoleTime` / `time_end_compute`). C'est le contraste exact avec
+  #55, invisible lui dans `SaveLoads1.c` — deux annonces, une confirmee par la source, une non.
+  RESTE : fusionner (etape 2), reconstruire, verifier #55 empiriquement, re-mesurer `cloches1`,
+  recapturer seulement si un comportement change.

@@ -45,6 +45,38 @@ La v11 n'en signalait qu'une : `trySerial` était passée à travers parce que s
 capture v11 coïncidaient par hasard. C'est le même angle mort que partout ailleurs dans ce
 journal — **une vérification qui ne pouvait pas discriminer**.
 
+### ⚠ L'en-tête d'une grammaire n'est PAS sa configuration — ne chargez pas les deux
+
+Question posée par bp3-frontend le 2026-07-19, mesurée ici parce qu'elle porte sur une
+divergence de méthode entre les voies.
+
+L'en-tête d'un `-gr.` nomme les fichiers avec lesquels il a été **sauvegardé**. La
+configuration de référence (`php_ref`) nomme ceux que le harnais de Bernard **charge
+réellement**. Les deux diffèrent sur 12 entrées, et ce ne sont **pas des trous** : ce sont des
+remplacements délibérés de la référence.
+
+Mesuré, en chargeant le fichier de réglages de l'en-tête au lieu de celui de la référence :
+
+| grammaire | référence | en-tête |
+|---|---:|---:|
+| `transposition1` | 75 jetons | **0** |
+| `tryMIDIfile` | 160 jetons | **0** |
+| `check&` | 4 jetons | **0** |
+| `tryRotate` | 1300 jetons | 65 |
+| `MyMelody` | 31 jetons | 31 (identique) |
+
+**Suivre l'en-tête casse trois entrées et en change une d'un facteur vingt.** Une voie qui
+charge « ce que l'en-tête référence » au lieu de la configuration de référence ne mesure donc
+pas la même chose que l'oracle, et divergera sans que le moteur y soit pour rien.
+
+**Cas particulier des homomorphismes `-ho`** : le moteur natif **n'a pas d'option `-ho`**
+(`Unknown option '-ho'`). Un fichier `-ho.<X>` se charge par `-al`. Quand la configuration
+porte `-al.<X>` là où l'en-tête dit `-ho.<X>`, ce n'est pas une omission — c'est le fichier
+**dérivé** de l'original, dont on a retiré les deux lignes d'en-tête BP2 que le compilateur
+d'alphabet refuse (elles contiennent un `:`). Sur `tryhomomorphism`, les deux fichiers sont
+identiques **à l'octet près** hors ces deux lignes, et l'homomorphisme est bel et bien
+appliqué : `-al` rend 6 jetons sans erreur, `-ho` en rend **zéro**.
+
 ### Historique — v9 → v10 : ma configuration de capture ignorait les objets sonores
 
 Signalé par bp3-frontend sur `tryKeyMap` (diagnostic bpx) : ma capture donnait 392 jetons là où

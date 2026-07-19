@@ -35,7 +35,10 @@ CFLAGS_COMMON = -O2 -g -fno-common
 NATIVE_CFLAGS = $(CFLAGS_COMMON) -I$(NATIVE_SRC) -MMD -MP
 
 # WASM flags
-WASM_CFLAGS = $(CFLAGS_COMMON) \
+# Doublure libcurl : Emscripten n'a pas la bibliotheque, dont le moteur amont depend
+# sans condition depuis la v3.4.7 (-BP3.h:97). On la lui fournit plutot que de modifier
+# les sources amont — voir csrc/wasm/curl-doublure/curl/curl.h.
+WASM_CFLAGS = $(CFLAGS_COMMON) -Icsrc/wasm/curl-doublure \
 	-include $(WASM_SRC)/bp3_wasm_platform.h \
 	-D__BP3_WASM__=1 \
 	-I$(SHARED_SRC) \

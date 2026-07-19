@@ -111,10 +111,35 @@ if os.path.isdir(CANON) and os.path.isdir(COPIE):
             ecarts.append(f"« {f} » DIVERGE entre csrc/bp3/ (canonique) et source/BP3/ "
                           f"(ce que build.sh compile) — relancez `./build.sh` deux fois")
 
+# ── 3. les binaires construits ne doivent pas etre PLUS VIEUX que leurs sources ──
+# Ajoute le 2026-07-19 apres m'etre fait prendre : j'ai passe le moteur en v3.4.7 et le
+# portillon est reste VERT — parce que ses 14 gardes tournaient contre un build WASM
+# date du 26 avril, anterieur de trois mois a la mise a jour. Un garde vert contre un
+# artefact perime ne mesure pas ce qu'il annonce ; c'est la meme faute que tout le reste
+# de la journee, sur l'artefact au lieu du code.
+ARTEFACTS = [("bp3", [os.path.join("source", "BP3")]),
+             ("build/bp3.js", [os.path.join("csrc", "bp3"), os.path.join("csrc", "wasm")])]
+for art, sources in ARTEFACTS:
+    pa = os.path.join(R, art)
+    if not os.path.isfile(pa):
+        ecarts.append(f"l'artefact « {art} » est ABSENT — rien a mesurer, reconstruisez")
+        continue
+    t_art = os.path.getmtime(pa)
+    plus_recents = []
+    for d in sources:
+        for base, _, fics in os.walk(os.path.join(R, d)):
+            for f in fics:
+                if f.endswith((".c", ".h")) and os.path.getmtime(os.path.join(base, f)) > t_art:
+                    plus_recents.append(os.path.relpath(os.path.join(base, f), R))
+    if plus_recents:
+        ecarts.append(f"« {art} » est plus VIEUX que {len(plus_recents)} de ses sources "
+                      f"(ex. {plus_recents[0]}) — reconstruisez, sinon les gardes mesurent "
+                      f"un artefact perime")
+
 if ecarts:
     print(f"ANTI-RÉTROCOMPAT : {len(ecarts)} probleme(s) :")
     for e in ecarts:
         print("   -", e)
     sys.exit(1)
-print(f"anti-retrocompat : aucun symbole au retrait avec appelant vivant ; "
-      f"les deux arbres de sources du moteur sont identiques.")
+print("anti-retrocompat : aucun symbole au retrait avec appelant vivant ; les deux arbres "
+      "de sources du moteur sont identiques ; les binaires sont plus recents que leurs sources.")

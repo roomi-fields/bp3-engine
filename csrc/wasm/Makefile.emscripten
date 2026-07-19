@@ -8,6 +8,11 @@ CC = emcc
 
 # Source directories
 BP3_SRC = csrc/bp3
+# Emscripten n'a pas libcurl, dont le moteur amont depend sans condition depuis la
+# v3.4.7. On lui fournit une DOUBLURE plutot que de modifier les sources amont :
+# diverger de csrc/bp3/ obligerait a re-fusionner a chaque version. Voir le commentaire
+# en tete de csrc/wasm/curl-doublure/curl/curl.h.
+CURL_DOUBLURE = csrc/wasm/curl-doublure
 WASM_SRC = csrc/wasm
 
 # Compiler flags
@@ -32,10 +37,12 @@ LDFLAGS = \
 	-s EXPORT_NAME='BP3Module' \
 	-s FILESYSTEM=1 \
 	--preload-file $(WASM_SRC)/console_strings.json@/console_strings.json \
+	-I$(CURL_DOUBLURE) \
 	-lm
 
 # BP3 core sources
 BP3_SRCS = \
+	$(CURL_DOUBLURE)/curl_doublure.c \
 	$(BP3_SRC)/ConsoleMain.c \
 	$(BP3_SRC)/ConsoleMemory.c \
 	$(BP3_SRC)/ConsoleMessages.c \

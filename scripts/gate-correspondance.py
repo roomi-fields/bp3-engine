@@ -1,0 +1,70 @@
+#!/usr/bin/env python3
+"""Garde : la table de correspondance de la bibliotheque Kanopi reste-t-elle vraie ?
+
+Trois volets, tous echouants :
+  1. CHEMIN MORT   — la table reference un fichier qui n existe pas dans la bibliotheque.
+  2. ORPHELINE     — une grammaire de scenes/BP3-tests/ n a aucune entree dans la table.
+  3. FANTOME       — la table decrit une grammaire absente de la bibliotheque.
+
+Pourquoi les trois : une table qui ment est pire que pas de table, parce qu elle se lit
+comme une verite. Le couple grammaire/auxiliaires n est porte par RIEN d autre depuis le
+renommage (voir l en-tete de correspondance.json), donc sa corruption est silencieuse.
+
+Sortie 0 = vert. Sortie 1 = rouge.
+"""
+import json, os, sys
+
+KANOPI = "/home/romi/dev/bp/kanopi/packages/library"
+TABLE = os.path.join(KANOPI, "test-assets", "bp3", "correspondance.json")
+DIR_SCENES = os.path.join(KANOPI, "scenes", "BP3-tests")
+
+
+def main():
+    # La bibliotheque vit dans un AUTRE depot. Si ce depot n est pas la, il n y a rien a
+    # verifier et le dire est honnete. Mais si la bibliotheque EST la et que la table
+    # manque, c est le defaut meme que ce garde surveille : rouge, pas de passe-droit.
+    if not os.path.isdir(DIR_SCENES):
+        print(f"sans objet : bibliotheque Kanopi absente de cette machine ({DIR_SCENES})")
+        return 0
+    if not os.path.isfile(TABLE):
+        print(f"ROUGE : la bibliotheque est la mais la table manque — {TABLE}")
+        return 1
+    t = json.load(open(TABLE, encoding="utf-8"))
+    entrees = t["grammaires"]
+
+    morts, orphelines, fantomes = [], [], []
+
+    for e in entrees:
+        if not os.path.isfile(os.path.join(KANOPI, e["grammaire"])):
+            fantomes.append(f'{e["nom"]} -> {e["grammaire"]}')
+        for cle, a in e["auxiliaires"].items():
+            if not os.path.isfile(os.path.join(KANOPI, a["chemin"])):
+                morts.append(f'{e["nom"]} [{cle}] -> {a["chemin"]}')
+
+    if os.path.isdir(DIR_SCENES):
+        decrites = {e["grammaire"].rsplit("/", 1)[-1] for e in entrees}
+        for f in sorted(os.listdir(DIR_SCENES)):
+            if f.endswith(".gr") and f not in decrites:
+                orphelines.append(f)
+
+    rouge = False
+    for titre, liste in (("CHEMIN MORT", morts),
+                         ("GRAMMAIRE ORPHELINE (aucune entree dans la table)", orphelines),
+                         ("ENTREE FANTOME (grammaire absente de la bibliotheque)", fantomes)):
+        if liste:
+            rouge = True
+            print(f"ROUGE — {titre} : {len(liste)}")
+            for x in liste[:15]:
+                print("   " + x)
+            if len(liste) > 15:
+                print(f"   … et {len(liste) - 15} autre(s)")
+
+    if not rouge:
+        n_aux = sum(len(e["auxiliaires"]) for e in entrees)
+        print(f"vert : {len(entrees)} grammaires, {n_aux} references auxiliaires, "
+              f"0 chemin mort, 0 orpheline, 0 fantome")
+    return 1 if rouge else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

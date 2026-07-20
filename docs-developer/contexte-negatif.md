@@ -53,6 +53,52 @@ Le `#` ne « se déplace » pas d'un côté à l'autre : à gauche il **capture*
 **restitue**. Les trois `#` de droite consomment `instan[]` dans l'ordre, et l'ordre
 d'écriture est ce qui produit la permutation.
 
+## 3 bis. Le pas #1 expliqué symbole par symbole — et la coïncidence de noms
+
+```
+avant :  A   A2  A3  A1  A  A
+après :  A   A2  A3  A   A  A1
+```
+
+La fenêtre couvre les positions **2 à 6**, ce qui n'est pas une déduction : la sonde
+`--> ZZZ` du §4 donne `A ZZZ`, donc la position 1 survit et les cinq suivantes sont
+consommées.
+
+| élément de la règle | apparié à | capture | négation |
+| --- | --- | --- | --- |
+| `#A1` | position 2 = `A2` | capture 1 = `A2` | `A2` ≠ `A1` → mise en défaut |
+| `#A2` | position 3 = `A3` | capture 2 = `A3` | `A3` ≠ `A2` → mise en défaut |
+| `#A3` | position 4 = `A1` | capture 3 = `A1` | `A1` ≠ `A3` → mise en défaut |
+| `A` | position 5 = `A` | — | littéral |
+| `A` | position 6 = `A` | — | littéral |
+
+Côté droit, `#A1 #A2 A A #A3` réémet **capture 1, capture 2, `A`, `A`, capture 3** =
+`A2 A3 A A A1`. Avec la position 1 conservée : `A A2 A3 A A A1`. C'est la trace.
+
+**Le nom écrit dans `#Xn` ne désigne pas le symbole apparié.** Il ne sert qu'au test de
+négation. Le symbole qui « se déplace » est celui qui occupait la **troisième fente**, parce
+que la troisième capture est **écrite en dernier** à droite. Qu'il s'appelle `A1` est une
+**coïncidence**, et c'est elle qui rend la règle illisible.
+
+**Preuve : on casse la coïncidence.** Même règle, chaîne sans aucun `A1`/`A2`/`A3` :
+
+| chaîne | résultat |
+| --- | --- |
+| `A P Q R A A` | `A P Q A A R` — puis `A P A A Q R` |
+
+Aucun nom ne correspond, la règle s'applique quand même, et c'est la **troisième capture**
+(`R`) qui part à la fin. L'appariement est **positionnel**, pas nominal.
+
+**Les noms ne sont pas décoratifs pour autant** — ils portent la garde, et elle rejette :
+
+| chaîne | les trois captures | résultat |
+| --- | --- | --- |
+| `A A1 A2 A3 A A` | égales à leurs noms | **aucun appariement** |
+| `A P A2 A3 A A` | une seule diffère | `A ZZZ` — apparié |
+
+Ces deux lignes prouvent à la fois que la garde mord et qu'elle est **disjonctive** (§2) :
+une seule mise en défaut suffit.
+
 ## 4. Pourquoi la chaîne cesse de changer aux étapes 4 et 5
 
 **Réponse : `A A A A2 A3 A1` est un point fixe — le motif ne s'y apparie plus nulle part.**
@@ -112,3 +158,27 @@ marqueur après parenthèse ouvrante est **obligatoire**, avec un message d'erre
 message qui exige un marqueur dont le sens n'est écrit nulle part.
 
 Voir aussi [`marqueurs-structurels.md`](marqueurs-structurels.md) pour `=` et `:`.
+
+## 7. La correspondance annoncée avec BPScript ne tient pas
+
+**Axe : moteur BP3 natif v3.4.7, chaîne de travail.** Je n'ai pas mesuré BPScript ; ce qui
+suit porte sur ce que fait BP3, confronté à ce que leur spécification annonce.
+
+`BPscript/docs/EBNF.md:1256` donne la correspondance `#X -> #X, identique`, et
+`LANGUAGE.md` (section « Contextes `()` et `#` ») définit le contexte négatif comme une
+**garde** : `#(X Y) Z -> W` signifie « `Z` **non précédé** de `X Y` ». Une garde ne consomme
+rien et ne se réécrit pas.
+
+**En BP3, ce n'est pas ce que fait `#`** — mesuré aux §1 et §3 bis :
+
+| | garde (spéc. BPScript) | `#` en BP3 (mesuré) |
+| --- | --- | --- |
+| consomme une position | non | **oui** (§1) |
+| capture le symbole présent | non | **oui**, dans `instan[]` |
+| apparaît à droite | non | **oui**, comme joker |
+| peut réordonner la chaîne | non | **oui** (§3 bis) |
+
+Les deux mécanismes partagent la notation et l'idée de négation, mais pas la sémantique :
+en BP3 le contexte négatif **fait partie de ce qui est réécrit**. La correspondance « `#X` →
+`#X`, identique » est donc trop forte — à vérifier côté BPScript, qui seul peut mesurer le
+sien.

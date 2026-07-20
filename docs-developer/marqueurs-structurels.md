@@ -48,6 +48,40 @@ C'est exactement l'usage de la grammaire d'exemple : `(= V8 )` … plus loin `(:
 **Conséquence** : `=` et `:` ne sont pas substituables l'un à l'autre — les intervertir
 change le maître en esclave et casse la règle.
 
+### Sur quoi porte exactement le lien : la DÉRIVATION, pas la durée (mesuré 2026-07-20)
+
+Le mécanisme est plus fort qu'une répétition : le contenu de l'esclave est **effacé** et
+remplacé par une référence au maître. `Encode.c:1510` le dit en clair — `/* Erase content
+of slaves... */` — puis `Encode.c:1517-1518` écrase les jetons du bloc esclave, et
+`Encode.c:1498` mémorise la longueur du maître pour savoir combien effacer. L'esclave n'est
+donc pas un second tirage : c'est un **pointeur** vers le résultat du maître.
+
+**Preuve empirique.** Grammaire où `A` a deux dérivations équiprobables, huit graines :
+
+| forme | résultat |
+| --- | --- |
+| `S --> (= A ) (: A )` | les deux blocs **identiques aux 8 graines** |
+| `S --> A A` (témoin) | **divergent aux graines 4 et 7** (`C4 D4 E4` puis `G5 A5 B5`) |
+
+Le témoin est ce qui rend la preuve valable : il montre que la mesure **pouvait** faire
+apparaître une différence. Sans lui, l'identité observée ne prouverait rien.
+
+**Le lien ne porte PAS sur le temps.** Mesuré avec `--tokensout` sur
+`S --> {3, (= A )} {1, (: A )}` : mêmes symboles, mais le maître occupe 3000 ms et
+l'esclave 1000 ms. La durée reste gouvernée par la structure polymétrique environnante,
+indépendamment du lien maître/esclave.
+
+**En une phrase** : `(= X )` … `(: X )` garantit que les deux occurrences dérivent vers
+**exactement la même chose**, dans une grammaire où elles auraient pu différer. C'est une
+contrainte d'identité, pas une contrainte de tempo ni de durée.
+
+### Lacune de documentation à signaler à l'amont
+
+`BP3_help.txt` ne contient **aucune occurrence** de « master » ou « slave », et les deux
+seules lignes sur les marqueurs (`:97-99`) donnent la liste des quatre glyphes sans aucun
+sens. Le mécanisme est pourtant **obligatoire** après une parenthèse ouvrante, avec un
+message d'erreur dédié (`Encode.c:1659`). Un utilisateur ne peut pas le découvrir seul.
+
 ## `;` — barrière de dérivation ; le saut de ligne est du code mort
 
 **Correction du 2026-07-19, après test empirique** (demande [112]). J'avais écrit ici que

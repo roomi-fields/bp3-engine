@@ -1,5 +1,28 @@
 # Baseline native « original » — jeu unique, daté, vérifié
 
+## ⚠️ Lequel des trois dossiers fait autorité
+
+**`captures/` fait autorité, et lui seul.** C'est le seul dossier suivi par git ; c'est lui que
+`baseline.json` référence et que les gardes vérifient. Les deux autres sont des zones de travail
+vides au repos, ignorées par git (`.gitignore`), et ne doivent jamais être lues comme une mesure :
+
+| dossier                 | rôle                                                                             | suivi git |
+| ----------------------- | -------------------------------------------------------------------------------- | --------- |
+| `captures/`             | **la référence publiée** — 163 fichiers, cités par `baseline.json`                | ✅ oui    |
+| `captures.en-cours/`    | zone d'écriture d'une recapture complète, renommée sur `captures/` à la fin       | ❌ non    |
+| `captures-a-la-demande/`| sortie du mode mono-grammaire `capture.py <grammaire>` — vérification ponctuelle  | ❌ non    |
+
+Les deux zones de travail existent pour une raison précise : **une recapture ne doit jamais écrire
+dans le dossier publié pendant qu'elle tourne.** Le 2026-07-19, une recapture en cours a été lue
+par un autre agent comme si c'était la référence, qui a conclu à 27 captures manquantes — elles ne
+manquaient pas, elles n'étaient pas encore écrites. D'où la bascule atomique (`captures.en-cours/`
+puis renommage, `capture.py:33`) et la zone à part du mode unitaire (`capture.py:163`), qui
+n'efface rien et ne bascule rien.
+
+**Si l'un de ces deux dossiers n'est pas vide, c'est un résidu, pas une mesure** — un travail
+interrompu ou une vérification ponctuelle qu'on a oublié de balayer. On peut le supprimer sans
+rien perdre : tout y est régénérable.
+
 ## 🔖 **baseline v13 — figée le 2026-07-19 — moteur v3.4.7**
 
 **98 productibles**, **2 doublons**, **13 muettes réelles**, **113 entrées au total**.
@@ -14,10 +37,10 @@ empreinte sur les 163 captures. Une seule divergence est réelle : **`tryRotate`
 l'opérateur n'était plus appliqué — **c'était faux**, et bpscript me l'a fait voir en signalant
 que leur mesure porte sur les jetons MIDI, l'axe que je n'avais pas regardé.
 
-| | v3.4.4 | v3.4.7 |
-|---|---|---|
-| jetons MIDI | `E4 F4 G4 C4 D4 …` | `E4 F4 G4 C4 D4 …` — **identiques à l'octet près** |
-| sortie texte | `/6 {E4 F4 G4 C4 D4} …` | `/6 {_rotate(K1=2) C4 D4 E4 F4 G4} …` |
+|              | v3.4.4                  | v3.4.7                                             |
+| ------------ | ----------------------- | -------------------------------------------------- |
+| jetons MIDI  | `E4 F4 G4 C4 D4 …`      | `E4 F4 G4 C4 D4 …` — **identiques à l'octet près** |
+| sortie texte | `/6 {E4 F4 G4 C4 D4} …` | `/6 {_rotate(K1=2) C4 D4 E4 F4 G4} …`              |
 
 **La rotation est bien appliquée** : `E4 F4 G4 C4 D4` est la rotation de `C4 D4 E4 F4 G4`, et
 les 65 jetons MIDI sont identiques entre les deux versions. Ce qui change, c'est que le marqueur
@@ -57,10 +80,10 @@ et c'est la mienne qui était incomplète : elle ne chargeait pas le fichier d'o
 
 ⚠ **Deux références changent. Ne mesurez plus contre les anciennes :**
 
-| grammaire | avant | après |
-|---|---|---|
+| grammaire   | avant      | après                                  |
+| ----------- | ---------- | -------------------------------------- |
 | `tryKeyMap` | 392 jetons | **410** — exactement ce que dérive BPx |
-| `dhati` | 23 jetons | **66** |
+| `dhati`     | 23 jetons  | **66**                                 |
 
 `tryCsoundObjects` est inchangée (son fichier d'objets sonores n'ajoute pas de jetons minutés).
 Ce sont les **3 seules** grammaires du corpus disposant d'un `-so`.
@@ -123,11 +146,11 @@ avait tort. En vérifiant, le défaut est plus large que le cas signalé.
 Le moteur refuse l'énumération par **trois messages distincts**, et le détecteur n'en connaissait
 qu'un :
 
-| message | fichier | connu de v5-v7 ? |
-|---|---|---|
-| `Can't produce all items in 'SUB' or 'SUB1' or 'POSLONG' subgrammar gram#N` | `ProduceItems.c:770` | oui |
-| `You cannot produce all items in a 'SUB' subgrammar` | `Compute.c:1156` | **non** |
-| `Cannot produce all items because this grammar contains a '…' instruction` | `CompileProcs.c:568` | **non** |
+| message                                                                     | fichier              | connu de v5-v7 ? |
+| --------------------------------------------------------------------------- | -------------------- | ---------------- |
+| `Can't produce all items in 'SUB' or 'SUB1' or 'POSLONG' subgrammar gram#N` | `ProduceItems.c:770` | oui              |
+| `You cannot produce all items in a 'SUB' subgrammar`                        | `Compute.c:1156`     | **non**          |
+| `Cannot produce all items because this grammar contains a '…' instruction`  | `CompileProcs.c:568` | **non**          |
 
 Les 30 grammaires classées `produce-all` ont été **toutes** re-vérifiées avec les trois messages.
 **Trois étaient mal classées**, pas une : `koto1`, `koto2`, `look-and-say`. Elles passent en
@@ -198,24 +221,24 @@ Les autres pistes ont été essayées et **écartées sur mesure**, sans être d
 convention ne corrige ni `Rajeev` (27 erreurs), ni `checkrests` (12, identiques en français),
 ni `dhin` (22), ni `checkVolChan` (6), ni `checkAllCsound` (30). Leur cause est ailleurs.
 
-| version | figée le | productibles | MIDI | capture | commit |
-|---|---|---|---|---|---|
-| v1 | 2026-07-18 | 74 | 51 | répétition (N items) | `579ca59` |
-| v2 | 2026-07-18 | 86 | 52 | répétition (N items) | `7a970ac` |
-| v3 | 2026-07-18 | 88 | 54 | répétition (N items) | `b59091c` |
-| v5 | 2026-07-18 | 89 | 54 | par action | `8dd3ec5` |
-| v6 | 2026-07-19 | 90 | 55 | par action | `5dd8c41` |
-| v7 | 2026-07-19 | 95 | 60 | par action | `cc7912f` |
-| v8 | 2026-07-19 | 94 | 60 | par action | `2740868` |
-| v9 | 2026-07-19 | 96 | 60 | par action | `b06ec47` |
-| **v10** | **2026-07-19** | **96** | **60** | par action + objets sonores | ce commit |
+| version | figée le       | productibles | MIDI   | capture                     | commit    |
+| ------- | -------------- | ------------ | ------ | --------------------------- | --------- |
+| v1      | 2026-07-18     | 74           | 51     | répétition (N items)        | `579ca59` |
+| v2      | 2026-07-18     | 86           | 52     | répétition (N items)        | `7a970ac` |
+| v3      | 2026-07-18     | 88           | 54     | répétition (N items)        | `b59091c` |
+| v5      | 2026-07-18     | 89           | 54     | par action                  | `8dd3ec5` |
+| v6      | 2026-07-19     | 90           | 55     | par action                  | `5dd8c41` |
+| v7      | 2026-07-19     | 95           | 60     | par action                  | `cc7912f` |
+| v8      | 2026-07-19     | 94           | 60     | par action                  | `2740868` |
+| v9      | 2026-07-19     | 96           | 60     | par action                  | `b06ec47` |
+| **v10** | **2026-07-19** | **96**       | **60** | par action + objets sonores | ce commit |
 
-| version | figée le | productibles | MIDI | capture | commit |
-|---|---|---|---|---|---|
-| v1 | 2026-07-18 | 74 | 51 | répétition (N items) | `579ca59` |
-| v2 | 2026-07-18 | 86 | 52 | répétition (N items) | `7a970ac` |
-| v3 | 2026-07-18 | 88 | 54 | répétition (N items) | `b59091c` |
-| **v5** | **2026-07-18** | **89** | **54** | **par action** | ce commit |
+| version | figée le       | productibles | MIDI   | capture              | commit    |
+| ------- | -------------- | ------------ | ------ | -------------------- | --------- |
+| v1      | 2026-07-18     | 74           | 51     | répétition (N items) | `579ca59` |
+| v2      | 2026-07-18     | 86           | 52     | répétition (N items) | `7a970ac` |
+| v3      | 2026-07-18     | 88           | 54     | répétition (N items) | `b59091c` |
+| **v5**  | **2026-07-18** | **89**       | **54** | **par action**       | ce commit |
 
 **v3 → v5 : +1 productible, 0 perdue, 0 changement de mode natif.** La seule grammaire
 gagnée est `look-and-say`, et elle est **sous réserve** (voir plus bas) : la baseline
@@ -234,10 +257,10 @@ Application de la décision `2026-07-18-cardinalite-produce-all-settings-existan
 
 `baseline.json` expose donc, pour chaque grammaire, un champ **`action`** :
 
-| action | sens | capture |
-|---|---|---|
-| **`single`** | la grammaire **joue** un morceau | **une** réalisation, **1 item**, graine 1 |
-| **`produce-all`** | production purement **symbolique** | **l'ensemble** énuméré par le moteur |
+| action            | sens                               | capture                                   |
+| ----------------- | ---------------------------------- | ----------------------------------------- |
+| **`single`**      | la grammaire **joue** un morceau   | **une** réalisation, **1 item**, graine 1 |
+| **`produce-all`** | production purement **symbolique** | **l'ensemble** énuméré par le moteur      |
 
 Champs d'accompagnement, pour que le consommateur voie *pourquoi* :
 `joue`, `items_enumeres`, `enumeration_refusee_par_le_moteur`.
@@ -257,13 +280,13 @@ Aucune décision de notre part à aucune de ces trois étapes.
 ou *ne rien rendre*, sans message. Le champ **`enumeration_statut`** dit lequel des cas
 s'applique, pour chaque grammaire qui produit :
 
-| `enumeration_statut` | n |
-|---|---|
-| sans objet : la grammaire joue, on capture le jeu | 54 |
-| acceptée par le moteur | 30 |
-| refusée par le moteur (`SUB`/`SUB1`/`POSLONG`) | 3 |
-| blocage > 90 s — `gramgene2` | 1 |
-| aucun item produit, sans message — `asymmetric` | 1 |
+| `enumeration_statut`                              | n   |
+| ------------------------------------------------- | --- |
+| sans objet : la grammaire joue, on capture le jeu | 54  |
+| acceptée par le moteur                            | 30  |
+| refusée par le moteur (`SUB`/`SUB1`/`POSLONG`)    | 3   |
+| blocage > 90 s — `gramgene2`                      | 1   |
+| aucun item produit, sans message — `asymmetric`   | 1   |
 
 Le booléen `enumeration_refusee_par_le_moteur` reste vrai **uniquement** pour le refus
 explicite ; il vaut `false` pour un blocage ou une énumération vide. Lire
@@ -312,12 +335,12 @@ minutage. Passe **jetée, jamais diffusée**.
 
 Preuve — même grammaire, même graine, même configuration, seul le verbe change :
 
-| grammaire | `produce-all` | `produce` |
-|---|---|---|
-| `tunings` | 0 jeton, 1 item | **16 jetons** |
-| `koto3` | 0 jeton, 0 item | **2 jetons** |
-| `mohanam` | 0 jeton, 16 items | **27 jetons** |
-| `all-items` | 0 jeton, **12 items** | 0 jeton |
+| grammaire   | `produce-all`         | `produce`     |
+| ----------- | --------------------- | ------------- |
+| `tunings`   | 0 jeton, 1 item       | **16 jetons** |
+| `koto3`     | 0 jeton, 0 item       | **2 jetons**  |
+| `mohanam`   | 0 jeton, 16 items     | **27 jetons** |
+| `all-items` | 0 jeton, **12 items** | 0 jeton       |
 
 La dernière ligne montre la coupure : `all-items` est purement symbolique, l'énumération
 est **sa** vraie action ; les trois autres jouent, et l'énumération leur ferait perdre le jeu.
@@ -332,11 +355,11 @@ Le diagnostic vient de **bp3-frontend**, qui avait posé la bonne question avant
 BPx avait porté le dédoublonnage natif (`csrc/bp3/ProduceItems.c:1975-2038`) et refusait de
 réconcilier ses tests sur sa propre sortie. Les captures v5 tranchent, **au terminal près** :
 
-| grammaire | natif v5 | mesure BPx | ancienne référence |
-|---|---|---|---|
-| `tryAllItems0` | 8 items / 20 term. | **8 / 20** | 16 / 40 |
-| `tryAllItems1` | 12 / 36 | **12 / 36** | 42 / 134 |
-| `tryPatternGrammar` | 4 / 52 | **4 / 52** | 24 / 312 |
+| grammaire           | natif v5           | mesure BPx  | ancienne référence |
+| ------------------- | ------------------ | ----------- | ------------------ |
+| `tryAllItems0`      | 8 items / 20 term. | **8 / 20**  | 16 / 40            |
+| `tryAllItems1`      | 12 / 36            | **12 / 36** | 42 / 134           |
+| `tryPatternGrammar` | 4 / 52             | **4 / 52**  | 24 / 312           |
 
 Trois concordances exactes sur deux implémentations indépendantes : ce ne sont pas les
 sorties de BPx qui ont dérivé, ce sont les anciennes références qui étaient périmées.

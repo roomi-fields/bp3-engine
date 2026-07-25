@@ -52,6 +52,32 @@ Question ouverte pour Bernard Bel (constat #59), beaucoup plus étroite que ce q
 d'abord écrit : la sortie texte doit-elle montrer l'expression avant ou après application des
 outils sériels ? **Rien n'est cassé dans la production musicale.**
 
+### ⚠️ Six grammaires portent une valeur hors-domaine dans leurs réglages LIVRÉS — marquées « non référence musicale »
+
+Constat #64 (2026-07-25). Leurs fichiers de réglages livrés portent `Nature_of_time`
+**hors du domaine `{0,1}`** (`SMOOTH=0` / `STRIATED=1`). Le moteur ne le contrôle pas au
+chargement (`SaveLoads1.c:643`) et **dégénère en silence** : tout le minutage tombe à zéro.
+Mesuré sur témoin (`Nature_of_time` = 0 → 1000 ms/note, = 1 → identique, = 100 → durées nulles).
+
+**On ne corrige RIEN ici** — décision de l'architecte : la donnée est **livrée par l'amont**, la
+baseline reste **fidèle** à « natif + réglages livrés », et l'avertissement voyage avec elle.
+La capture est correcte ; c'est la donnée d'entrée qui est fausse. Rien à re-capturer (gel
+#48-#52). Le défaut est remonté à Bernard Bel (registre, constat #64).
+
+| grammaire         | `Nature_of_time` | mode  | conséquence |
+| ----------------- | ---------------- | ----- | ----------- |
+| `simpletemplates` | `100`            | MIDI  | **musicalement CASSÉE** — 7 jetons tous à durée nulle. **N'EST PAS une référence musicale.** |
+| `polyphony1`      | `200`            | TEXTE | dégénérescence non entendue (pas de MIDI émis) |
+| `tryGOTO`         | `100`            | TEXTE | dégénérescence non entendue |
+| `tryLIN`          | `100`            | TEXTE | dégénérescence non entendue |
+| `trytemplates`    | `100`            | TEXTE | dégénérescence non entendue |
+| `trytemplates2`   | `100`            | TEXTE | dégénérescence non entendue |
+
+Marquées aussi dans `baseline.json` (champ `avertissement_donnee_livree` sur chacune de ces
+entrées) pour qu'un outil qui lit une entrée voie l'avertissement sans passer par ce README.
+Un 7ᵉ fichier livré porte la même valeur (`-se.gramgene`, `100`) mais sa grammaire n'est **pas**
+dans le corpus des 113.
+
 Les trois autres écarts ne sont pas des changements de comportement :
 
 - `trySrand` et `trySerial` — les deux captures **non comparables**, dont l'ordre varie à graine

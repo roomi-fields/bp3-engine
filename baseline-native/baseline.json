@@ -1618,7 +1618,8 @@
    "declare": "midi",
    "capture": "captures/polyphony1.text.txt",
    "texte_structure": true,
-   "capture_comparable": true
+   "capture_comparable": true,
+   "avertissement_donnee_livree": "Nature_of_time=200 hors domaine {0,1} dans les reglages livres — degenerescence silencieuse (minutage nul), non entendue car mode texte. Donnee amont, non corrigee. Constat #64."
   },
   {
    "grammaire": "repeat",
@@ -1736,7 +1737,8 @@
    "convention_source": "php_ref",
    "declare": "midi",
    "capture": "captures/simpletemplates.tokens.json",
-   "capture_comparable": true
+   "capture_comparable": true,
+   "avertissement_donnee_livree": "Nature_of_time=100 hors domaine {0,1} dans les reglages livres — MIDI musicalement CASSEE (jetons a duree nulle), N'EST PAS une reference musicale. Donnee amont, non corrigee (gel #48-#52). Constat #64."
   },
   {
    "grammaire": "templates",
@@ -2037,7 +2039,8 @@
    "convention_source": "php_ref",
    "declare": "text",
    "capture": "captures/tryGOTO.text.txt",
-   "capture_comparable": true
+   "capture_comparable": true,
+   "avertissement_donnee_livree": "Nature_of_time=100 hors domaine {0,1} dans les reglages livres — degenerescence silencieuse (minutage nul), non entendue car mode texte. Donnee amont, non corrigee. Constat #64."
   },
   {
    "grammaire": "tryKeyMap",
@@ -2110,7 +2113,8 @@
    "convention_source": "php_ref",
    "declare": "text",
    "capture": "captures/tryLIN.text.txt",
-   "capture_comparable": true
+   "capture_comparable": true,
+   "avertissement_donnee_livree": "Nature_of_time=100 hors domaine {0,1} dans les reglages livres — degenerescence silencieuse (minutage nul), non entendue car mode texte. Donnee amont, non corrigee. Constat #64."
   },
   {
    "grammaire": "tryMIDIfile",
@@ -2446,7 +2450,8 @@
    "convention_source": "php_ref",
    "declare": "text",
    "capture": "captures/trytemplates.text.txt",
-   "capture_comparable": true
+   "capture_comparable": true,
+   "avertissement_donnee_livree": "Nature_of_time=100 hors domaine {0,1} dans les reglages livres — degenerescence silencieuse (minutage nul), non entendue car mode texte. Donnee amont, non corrigee. Constat #64."
   },
   {
    "grammaire": "trytemplates2",
@@ -2470,7 +2475,8 @@
    "convention_source": "php_ref",
    "declare": "text",
    "capture": "captures/trytemplates2.text.txt",
-   "capture_comparable": true
+   "capture_comparable": true,
+   "avertissement_donnee_livree": "Nature_of_time=100 hors domaine {0,1} dans les reglages livres — degenerescence silencieuse (minutage nul), non entendue car mode texte. Donnee amont, non corrigee. Constat #64."
   },
   {
    "grammaire": "tunings",

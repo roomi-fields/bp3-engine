@@ -56,6 +56,25 @@ le `*1` (scale=1) est **injecté par l'imprimeur**, il n'est pas dans l'entrée.
 > `**4` ». `**4` donnerait `scale = 1/4` → part échelle `**4`. `*1/4` est `scale=1`,
 > `speed=4`. Deux choses différentes.
 
+**Pièce C — `*x/y` est bien la paire (scale, speed), pas une fraction atomique.**
+`*1/2 do re` et `/2 do re` donnent des durées IDENTIQUES (`[166,167]` ms) et `*1/2`
+**ressort réécrit `/2`** : donc `*1/2` = `*1` (scale=1) + `/2` (speed=2) = tempo 2, plus
+RAPIDE. Une fraction « un demi » donnerait l'inverse (plus lent). L'exemple d'autorité
+`*2/1` se mesure de même : `scale=2, speed=1`, tempo=1/2 → notes deux fois plus longues
+(`[666,667]` ms, ressort `do_ re_`).
+
+**Confrontation avec l'autorité Atlas (axe : moteur natif).** L'autorité range `*x/y`
+(redimensionnement structurel de voix) et `/N` (tempo) comme des **natures
+différentes**. Au niveau du MOTEUR, ce n'est pas le cas : les deux alimentent les
+**mêmes** variables `scale`/`speed` et le même `tempo = speed/scale`. `*x/y` rend les
+deux variables (`scale=x`, `speed=y`, rapport de dilatation `x/y = scale/speed = 1/tempo`) ;
+`/N` n'en rend qu'une (la vitesse, `scale=1` par défaut). Un `/N` écrit ressort `*1/N` à
+une frontière de bloc parce que l'imprimeur y vide l'ÉTAT COMPLET, `*1` compris. La
+distinction « structurel vs tempo » est une taxonomie de LANGAGE (ressort d'Atlas /
+Romain, hors de mon périmètre) ; au niveau natif il y a **un seul mécanisme à deux
+variables**. Je le signale pour qu'un « natures différentes au niveau moteur » ne se
+propage pas comme un fait.
+
 ## 3. Pourquoi DEUX formes pour la même entrée `/N` — la frontière de bloc
 
 Question 3. Ce qui discrimine n'est **ni la valeur, ni le contexte polymétrique** : c'est
@@ -124,6 +143,29 @@ sont vraies sur des axes différents et ne se contredisent pas :
 « Multiplier la BASE » n'est pas « multiplier la valeur COURANTE ». `/4 /8` donne les
 vitesses 4 puis 8, jamais 4 puis 32. Pour nous, la vérité opératoire est celle de la
 décision : **absolu**. Le « multiplie » de B12 décrit le rapport à la base, pas un cumul.
+
+## 4bis. `/N` vs `_tempo(N)` : étiqueter l'un par l'autre est une ERREUR DE SENS
+
+Question tranchée pour [169] : poser notre étiquette `_tempo(...)` sur un `/N` natif
+est-il un simple écart de NOM ou une erreur de SENS ? **Erreur de sens**, mesurée.
+
+- **En séquence linéaire, ils coïncident** (écart de nom seulement). Pièce C :
+  `/2 do re /3 mi fa` et `_tempo(2) do re _tempo(3) mi fa` donnent les MÊMES durées
+  `[166, 167, 111, 111]` ms.
+- **En polymétrie, ils DIVERGENT** (écart de sens). Pièce C, même structure à deux voix,
+  tempo externe puis tempo interne dans la 2ᵉ voix :
+
+| grammaire | durées mesurées (ms) |
+| --- | --- |
+| `/2 {do re mi fa, /3 sol la}`               | `[55, 56, 55, 56, 111, 111]` |
+| `_tempo(2) {do re mi fa, _tempo(3) sol la}` | `[111, 111, 111, 111, 111, 111]` |
+
+Cause : `/N` est **absolu + fixtempo** — le `/3` interne fixe sa vitesse indépendamment
+du `/2` externe. `_tempo(x)` est **relatif et se COMPOSE** en polymétrie — le profil
+devient uniforme. C'est exactement le « `_tempo(2)` n'est PAS l'équivalent strict de
+`/2` » de Bernard (`BP3_help.txt:1650`), dont le code donne la raison (absolu-fixe vs
+relatif-composant). **Conclusion : `_tempo(N)` sur un `/N` est sûr en séquence plate,
+faux dès qu'il y a composition polymétrique.**
 
 ## 5. `{N,...}` n'est pas du tempo — ratio structurel local, rationnel
 

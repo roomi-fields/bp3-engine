@@ -62,3 +62,36 @@ Rien à voir avec le lexeur de terminaux. `-ho.dhin--`, `-gr.dhin--`, `-se.dhin-
 tels quels (jamais lexés comme des terminaux). Le `--` y est une chaîne de nom de fichier, pas
 un silence. `-gr.dhin1` porte d'ailleurs le commentaire *« An initial version of '-gr.dhin--' »*
 — c'est un identifiant de scène, sans rapport avec le sens grammatical de `-`.
+
+## 5. Le natif SEGMENTE un long nom — au plus long bol DÉCLARÉ, pas au tiret
+
+Un terminal d'un seul tenant est **découpé** en plusieurs bols. `gram#6[2]` écrit un nom de
+~50 caractères d'affilée :
+
+```
+Q24 <-> dhin--dhagenadha--dhagenadhatigegenakadheenedheenagena
+```
+
+Le natif (config d'origine, `Errors:0`) le rend en **24 jetons** :
+
+```
+dhin - - dha ge na dha - - dha ge na dha ti ge ge na ka dhee ne dhee na ge na
+```
+
+Un seul nom écrit → 24 jetons. **Le compte prouve le découpage.** Et la coupe n'est **pas**
+faite par les tirets : `dhagena` (sans aucun tiret) devient `dha ge na`, `dhatigegenaka` devient
+`dha ti ge ge na ka`. La segmentation est **pilotée par l'alphabet déclaré**.
+
+**Le code qui segmente** : à l'encodage (`Encode.c:888-918`, `SEARCHTERMINAL`), le moteur balaie
+**tous** les bols déclarés et retient à chaque position le **plus long** qui apparie —
+`for(j=0; j<Jbol; j++) { if(Match(...,(*p_Bol)[j],l) && l > lmax) { lmax=l; jj=j; } }` — émet ce
+bol (`T3` + indice), avance le pointeur derrière lui (`*pp = qmax`), et **recommence** sur le
+reste. Les `-` sont pris comme silences en parallèle. La segmentation dépend donc entièrement de
+**quels bols sont déclarés** (`Jbol`/`p_Bol`, ici le fichier `-ho.dhin--`), pas de la table de
+transcription ni d'une règle de lexeur fixe : un run dont aucun préfixe n'est un bol déclaré
+échoue (§2).
+
+**Conséquence** (fait, sans remède, hors de mon périmètre) : un nom laissé **entier**
+n'intersecte pas la table car le natif ne le compare jamais entier — il le compare **segment par
+segment**. Une écriture bols **séparés** est ce que le natif produit ; une écriture d'un seul
+tenant décrit la même chose *à condition que le lecteur segmente comme le fait le moteur*.

@@ -7,8 +7,8 @@ Fork du [Bol Processor BP3](https://github.com/bolprocessor/bolprocessor) (Berna
 ## Architecture
 
 ```
-source/BP3/    Code moteur Bernard (v3.3.19) — synchronisé depuis upstream
-csrc/bp3/      Copie de source/BP3/ + nos ajouts (bp3_timed_events, bp3_random)
+source/BP3/    Copie de csrc/bp3/ (v3.4.7) — écrasée par `make sync`, reçoit aussi les mises à jour amont via `git checkout upstream/... -- source/BP3/`
+csrc/bp3/      Source canonique + nos ajouts (bp3_timed_events, bp3_random)
 csrc/wasm/     Couche API WASM (bp3_api.c, stubs, platform shim)
 builds/        Archives versionnées (non tracké git)
 build.sh       Script de build 3 targets + archivage
@@ -78,7 +78,9 @@ git diff upstream/graphics-for-BP3 -- source/BP3/
 # Mettre à jour source/BP3/ depuis Bernard
 git checkout upstream/graphics-for-BP3 -- source/BP3/
 
-# Synchro source/BP3/ → csrc/bp3/
+# Synchro csrc/bp3/ → source/BP3/ (ecrase dans source/BP3/ tout fichier partage qui differe
+# de csrc/bp3/ — ne fait PAS remonter les changements de Bernard vers csrc/bp3/ ; ce geste-la
+# reste manuel, a faire AVANT `make sync` si on veut preserver les nouveautes amont)
 make sync
 ```
 
@@ -88,5 +90,5 @@ Voir `WASM_PORT.md` pour la documentation de l'API JavaScript (`bp3_init`, `bp3_
 
 ## Changelogs
 
-- `CHANGELOG_ENGINE.md` — Modifications au code moteur de Bernard (historique, tout intégré dans v3.3.19)
+- `CHANGELOG_ENGINE.md` — Modifications au code moteur de Bernard (historique, tout intégré dans v3.4.7)
 - `CHANGELOG_WASM.md` — Évolution de la couche WASM (bp3_api.c, stubs, builds)

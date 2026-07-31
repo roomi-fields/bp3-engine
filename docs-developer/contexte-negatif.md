@@ -159,26 +159,34 @@ message qui exige un marqueur dont le sens n'est écrit nulle part.
 
 Voir aussi [`marqueurs-structurels.md`](marqueurs-structurels.md) pour `=` et `:`.
 
-## 7. La correspondance annoncée avec BPScript ne tient pas
+## 7. Écart documenté avec `LANGUAGE.md`, depuis corrigé côté BPScript
 
 **Axe : moteur BP3 natif v3.4.7, chaîne de travail.** Je n'ai pas mesuré BPScript ; ce qui
-suit porte sur ce que fait BP3, confronté à ce que leur spécification annonce.
+suit porte sur ce que fait BP3, confronté à ce que leur documentation annonçait AU MOMENT
+DE LA MESURE.
 
-`BPscript/docs/EBNF.md:1256` donne la correspondance `#X -> #X, identique`, et
-`LANGUAGE.md` (section « Contextes `()` et `#` ») définit le contexte négatif comme une
-**garde** : `#(X Y) Z -> W` signifie « `Z` **non précédé** de `X Y` ». Une garde ne consomme
-rien et ne se réécrit pas.
+`BPscript/docs/EBNF.md:1256` donne la correspondance `#X -> #X, identique` — cette ligne
+s'est révélée CORRECTE (voir note ci-dessous). Mais `LANGUAGE.md` (section « Contextes
+`()` et `#` ») définissait alors le contexte négatif comme une **garde** : `#(X Y) Z -> W`
+signifiant « `Z` **non précédé** de `X Y` ». Une garde ne consomme rien et ne se réécrit pas.
 
-**En BP3, ce n'est pas ce que fait `#`** — mesuré aux §1 et §3 bis :
+**Ce n'est pas ce que fait `#` en BP3** — mesuré aux §1 et §3 bis :
 
-| | garde (spéc. BPScript) | `#` en BP3 (mesuré) |
+| | garde (`LANGUAGE.md`, prose alors périmée) | `#` en BP3 (mesuré) |
 | --- | --- | --- |
 | consomme une position | non | **oui** (§1) |
 | capture le symbole présent | non | **oui**, dans `instan[]` |
 | apparaît à droite | non | **oui**, comme joker |
 | peut réordonner la chaîne | non | **oui** (§3 bis) |
 
-Les deux mécanismes partagent la notation et l'idée de négation, mais pas la sémantique :
-en BP3 le contexte négatif **fait partie de ce qui est réécrit**. La correspondance « `#X` →
-`#X`, identique » est donc trop forte — à vérifier côté BPScript, qui seul peut mesurer le
-sien.
+Les deux mécanismes partagent la notation et l'idée de négation, mais pas la sémantique
+que `LANGUAGE.md` prêtait alors à `#` : en BP3 le contexte négatif **fait partie de ce qui
+est réécrit**.
+
+**Vérifié côté BPScript depuis, et CORRIGÉ** : la correspondance « `#X` → `#X`, identique »
+de `EBNF.md` était CORRECTE dès le départ — les deux moteurs consomment bien la position.
+Voir BPscript, commit `9de4e5a` (2026-07-20) et `docs/spec/EBNF.md`, note « Pourquoi
+"identique" est vrai, et vérifié » : l'AST place les `#X` comme `Symbol negated:true` dans
+`lhs`, à leur position, exactement comme mesuré ici au natif. C'était la prose de
+`LANGUAGE.md` décrivant `#` comme garde de largeur nulle qui était fausse — pas la ligne de
+correspondance de `EBNF.md` — et elle a depuis été corrigée dans ce même commit.

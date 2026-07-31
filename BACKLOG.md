@@ -306,7 +306,7 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   Il reste en voie lente, avec ce chiffre ecrit noir sur blanc plutot qu'une couverture supposee.
 
 
-- **BPE-23** `ouvert` [P1] — PASSAGE-MOTEUR-v3.4.7 : l'amont a publie v3.4.5, v3.4.6 et v3.4.7
+- **BPE-23** `fait` [P1] — PASSAGE-MOTEUR-v3.4.7 : l'amont a publie v3.4.5, v3.4.6 et v3.4.7
   (etiquette `v3.4.7`, commit amont `39512c9`, 2026-07-19). Nous sommes en **v3.4.4** (`b094e18`).
   ECART MESURE sur les sources partagees `csrc/bp3/` : **19 fichiers**, dont `ProduceItems.c`
   (614 lignes), `Zouleb.c` (559), `Arithmetic.c` (139), `Compute.c` (123), `ConsoleMain.c` (117).
@@ -373,3 +373,12 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   RESTE : accord pour installer `libcurl4-openssl-dev`, puis reappliquer le patch, reconstruire
   en DOUBLE passage, lancer `./scripts/gate.sh rouge` pour trancher #55, re-mesurer `cloches1`,
   recapturer seulement si un comportement change.
+  **CLOS le jour meme (2026-07-19, 16:22) : l'accord a ete obtenu, `libcurl4-openssl-dev` installe
+  et cable via pkg-config (non en dur). Patch reapplique, double passage effectue.
+  `./bp3 --short-version` = **3.4.7** (commit `38a8f32`). Bug #55 CORRIGE, verdict empirique via
+  `verif-bug55.sh` (seul juge). Build WASM casse par la mise a jour puis repare (commit `d93048a`),
+  changelog documente (commit `1c984d3`), appel `--tokensout` restaure apres regression
+  (commit `49c0b12`). La baseline v13 (`baseline-native/baseline.json`, `"binaire": "bp3 v3.4.7"`)
+  tourne sur ce binaire.**
+- **BPE-24** `ouvert` [P2] — Tracabilite du binaire natif (constat #65) : aucune empreinte fiable — deux md5 distincts impriment la meme version et le meme horodatage, la provenance de la baseline est tapee a la main et FAUSSE pour 14 entrees, le md5 n est consigne nulle part. Reponse retenue : que la capture enregistre le md5 du binaire + l IDSTRING complet. Re-capture des 14 = arbitrage Romain, INTERDITE sans son mot.
+- **BPE-25** `abandonné` [P3] — checktemplates : fausse alerte. Deja ancre nativement, sous le nom de corpus « templates » (entree #25 des 113, `baseline-native/baseline.json:1743-1764` et `hub/projets/iso-100-grammaires/BASELINE-CENTRALE.md:89`), avec `produit:true`, `capture_comparable:true` et une capture deja presente (`baseline-native/captures/templates.text.txt`, 5 lignes). L'absence du literal « checktemplates » comme nom de grammaire avait ete confondue avec l'absence d'ancre — la source `-gr.checktemplates` / `-se.checktemplates` est bien celle du corpus « templates ».

@@ -467,7 +467,17 @@ en alerte volume. Leur capture est **tronquée à 2 Mo** pour rester versionnabl
 `.TRONQUEE.txt` à côté donne la taille réelle et l'empreinte sha256 du fichier complet.
 Ces deux-là ne doivent pas servir de référence en l'état.
 
-## Les 24 muettes
+## Les 13 muettes (v13)
 
-Le détail motivé, grammaire par grammaire, est dans `TABLEAU.md`. Le prochain lot annoncé
-reste le **tri des 11 erreurs de compilation**.
+*(section perimee : ecrite pour la v5 avec 24 muettes, jamais mise a jour depuis — le
+tri des 11 erreurs de compilation qu'elle annonce comme "a venir" a ete fait pour
+BACKLOG.md BPE-16, BPE-19, BPE-20, RESOLU 2026-07-19. BPE-17 a corrige un defaut reel
+(silence indetermine mal converti) mais NE resout PAS les 12 erreurs de compilation de
+`checkrests` : celles-ci viennent d'un conflit de convention de notes (notation
+francaise avec la convention "english" declaree, `grammars.json` `php_ref`, documente
+des le 2026-06-09) — `checkrests` reste donc dans les muettes pour cette raison, non
+corrigee. BPE-18 reste en attente d'arbitrage. La baseline courante compte
+**13 muettes réelles** sur 113 entrées, cf. l'en-tete "baseline v13" plus haut dans ce
+fichier.)*
+
+Le détail motivé, grammaire par grammaire, est dans `TABLEAU.md`.

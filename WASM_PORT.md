@@ -8,7 +8,7 @@ Le moteur BP3 (C, console) est compilé en WebAssembly via Emscripten (v5.0.2) p
 
 ```
 Code C de Bernard              Notre couche WASM
-(source/BP2/ — intact)         (csrc/ — copies adaptées + API)
+(source/BP3/ — intact)         (csrc/ — copies adaptées + API)
 
 bolprocessor/bolprocessor      csrc/bp3/     31 fichiers C (copies nettoyées)
   ↓ fork                       csrc/wasm/    3 fichiers (API, stubs, platform shim)
@@ -16,16 +16,18 @@ roomi-fields/bp3-engine        Makefile.emscripten
   branche: wasm
 ```
 
-## Pourquoi des copies de source/BP2/ ?
+## Pourquoi des copies de source/BP3/ ?
 
-Les fichiers dans `source/BP2/` ne compilent pas directement en WASM à cause de :
+Les fichiers dans `source/BP3/` ne compilent pas directement en WASM à cause de :
 - **Headers Mac OS** : `midi1.h`, `NavServWrapper.h`, `WASTEIntf.h` — types Mac inexistants (`ProcPtr`, `TEHandle`, `FSSpec`, `AppleEvent`...)
 - **Caractères Mac Roman** : `OkBolChar()` et `OkBolChar2()` dans `CompileGrammar.c` contiennent des `case 'é':` en encodage Mac — Clang/WASM refuse les multi-byte character literals
 - **Nommage** : `-BP2.h` renommé en `-BP3.h` (les `#include` dans les .c référencent `-BP3.h`)
 
-Les fichiers dans `csrc/bp3/` sont des **copies nettoyées** de `source/BP2/` : headers Mac supprimés/commentés, caractères accentués retirés, fichiers renommés. Le code métier (grammaires, dérivation, polymétrie, TimeSet) est **identique**.
+Les fichiers dans `csrc/bp3/` sont des **copies nettoyées** de `source/BP3/` : headers Mac supprimés/commentés, caractères accentués retirés, fichiers renommés. Le code métier (grammaires, dérivation, polymétrie, TimeSet) est **identique**.
 
-Quand Bernard met à jour ses sources dans `source/BP2/`, il faut comparer manuellement et reporter les changements dans `csrc/bp3/`. Les divergences sont minimes et isolées par des `#ifdef __BP3_WASM__`.
+Quand Bernard met à jour ses sources dans `source/BP3/`, il faut comparer manuellement et reporter les changements dans `csrc/bp3/`. Les divergences sont minimes et isolées par des `#ifdef __BP3_WASM__`.
+
+*(`source/BP2/` est un répertoire local non suivi par git, vestigial depuis le rebase du 2026-03-19 sur `graphics-for-BP3` et l'unification du build du 2026-04-05 — ce n'est plus la source de référence.)*
 
 ## Modifications au code C de Bernard
 
@@ -388,8 +390,8 @@ Le binaire natif de Bernard compile aussi depuis ce repo :
 
 ```bash
 cd bp3-engine
-make        # utilise source/BP2/ et le Makefile de Bernard
-./bp produce -gr test-data/-gr.Visser3 -se test-data/-se.Visser3
+make linux  # utilise source/BP3/ via le Makefile unifié
+./bp3 produce -gr test-data/-gr.Visser3 -se test-data/-se.Visser3
 ```
 
 C'est utile pour comparer les résultats WASM vs natif.

@@ -115,7 +115,7 @@
 | grammaire | raison |
 |---|---|
 | `a` | 4 erreur(s) de compilation : Error code 52: Missing slash after /flag/ in gram#2 rule 3 |
-| `checkcontext` | => Calculation overflow (10000 derivations): task abandoned. Loop? |
+| `checkcontext` | natif tronqué à 10 000, BPx complet à 10 005 — divergence assumée (hub/decisions/2026-07-25-checkcontext-pas-de-plafond-divergence-assumee.md) |
 | `checkrests` | 12 erreur(s) de compilation : Variable must start with uppercase character or '/'. Can't make sense  |
 | `checkVolChan` | 5 erreur(s) de compilation : => Incorrect note. (May be wrong note convention) |
 | `cloches1` | blocage (> 90 s sans rendre la main) |

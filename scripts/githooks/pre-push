@@ -21,3 +21,15 @@ fi
 echo
 echo "PUSH REFUSÉ : le portillon est rouge. Corrigez, ou expliquez-vous avec --no-verify."
 exit 1
+
+# --- gardes documentaires du hub (deployer-gardes.sh) ---
+# Source unique : hub/tools/. Jamais copiés ici — quinze copies divergeraient.
+__hub="$(cd "$(git rev-parse --show-toplevel)/.." && pwd)/hub"
+__moi="$(basename "$(git rev-parse --show-toplevel)")"
+if [ -f "$__hub/tools/garde-navigation.py" ]; then
+  python3 "$__hub/tools/garde-navigation.py" --depot "$__moi" || exit 1
+  python3 "$__hub/tools/garde-copies.py"      --depot "$__moi" || exit 1
+else
+  echo "⚠️  gardes documentaires NON EXÉCUTÉS — hub introuvable à $__hub"
+fi
+# --- fin gardes documentaires ---

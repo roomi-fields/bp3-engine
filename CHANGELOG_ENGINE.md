@@ -8,6 +8,43 @@ Chaque section référence le point correspondant dans `FEEDBACK_BERNARD.md` (te
 ---
 
 
+## 2026-08-04 — passage du moteur amont v3.4.7 → v3.5.0 (liste d'événements)
+
+Amont : Bernard publie **BP3 v3.5.0**, première version à produire une **liste détaillée
+d'événements sonores en texte** (option `--eventlistout`, CSV) plus un **JSON de description des
+prototypes d'objets sonores**. But annoncé : remplacer à terme les sorties MIDI et Csound pour
+connecter des dispositifs sonores.
+
+Portage sur notre arbre restructuré (`csrc/bp3/` partagé + `source/BP3/` natif), diff amont
+`9b68cfe`→`v3.5.0` = 25 fichiers, ~458 insertions. Méthode : mesure de divergence par fichier,
+reprise directe des fichiers sans delta local, fusion à trois voies (`git merge-file`) pour les 3
+qui portent nos deltas.
+
+- **15 fichiers partagés repris tels quels** dans `csrc/bp3/` (identiques à l'amont 3.4.7 chez
+  nous) : `-BP3.h -BP3.proto.h -BP3decl.h -BP3main.h FillPhaseDiagram.c Inits.c MakeSound.c Misc.c
+  ProduceItems.c SaveLoads1.c SetObjectFeatures.c SoundObjects2.c TimeSet.c TimeSetFunctions.c
+  Zouleb.c`.
+- **3 fichiers fusionnés** (nos deltas + 3.5.0) :
+  - `csrc/bp3/ConsoleMain.c` : garde nos options `--tokensout`/`--trace-production`/chmod, ajoute
+    l'option amont `--eventlistout`.
+  - `source/BP3/PlayThings.c` (natif-seul) : garde notre hook `EmitTimedTokensItem` (oracle
+    `--tokensout`), prend la ligne de trace amont.
+  - `source/BP3/Graphic.c` (natif-seul) : fusion propre.
+- **Nouveau fichier** `source/BP3/EventListfiles.c` (natif-seul, auto-globé par le Makefile).
+  ⚠️ Pas encore ajouté à la liste WASM (`WASM_BP3_SRCS`) : `--eventlistout` est **natif seulement**
+  pour l'instant.
+- **3 fichiers natif-seul repris** : `CsoundScoreMake.c MIDIfiles.c MIDIstuff.c`.
+- **Renommage de struct amont absorbé** : `s_SoundObjectInstanceParameters.lastistranspose`
+  → `transposefirst` (3.5.0). Impact sur NOS fichiers qui lisent ce champ :
+  `source/BP3/TokensOut.c` (natif) et `csrc/wasm/bp3_api.c`, `csrc/wasm/bp3_wasm_stubs.c` (voir
+  CHANGELOG_WASM.md). Pur renommage, sémantique inchangée.
+
+Vérifs : natif construit `Version 3.5.0`, `--eventlistout` présent ; **non-régression 111/113
+identiques** au corpus (graine figée) vs 3.4.7 — les 2 écarts sont des non-régressions
+(`cloches1` timeout des deux côtés ; `trySerial` ordre non-déterministe déjà marqué
+`capture_comparable:false`). WASM construit. 21 gardes vertes après commit (le canari
+`gate-legacy-injection.sh` = `csrc/bp3/Misc.c` exige que le changement soit committé).
+
 ## 2026-07-19 — passage du moteur amont v3.4.4 → v3.4.7
 
 Fusion à trois versions (base de fork `b094e18` / notre arbre / amont `39512c9`) via

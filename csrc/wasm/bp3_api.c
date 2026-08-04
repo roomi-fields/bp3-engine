@@ -24,7 +24,7 @@ typedef struct {
     int scale;
     short transposition;
     short xpandkey, xpandval;
-    char lastistranspose;
+    char transposefirst;
 } WasmInstanceAccum;
 
 /* Debug: expose trace_compute toggle for SUB loop investigation */
@@ -944,7 +944,7 @@ const char* bp3_get_timed_tokens(void) {
             int trans = use_accum ? wasm_accum[k].transposition : (*p_Instance)[k].transposition;
             short xpk = use_accum ? wasm_accum[k].xpandkey : (*p_Instance)[k].xpandkey;
             short xpv = use_accum ? wasm_accum[k].xpandval : (*p_Instance)[k].xpandval;
-            char lit = use_accum ? wasm_accum[k].lastistranspose : (*p_Instance)[k].lastistranspose;
+            char lit = use_accum ? wasm_accum[k].transposefirst : (*p_Instance)[k].transposefirst;
             if(lit) {
                 if(trans != 0) TransposeKey(&midiKey, trans);
                 midiKey = ExpandKey(midiKey, xpk, xpv);

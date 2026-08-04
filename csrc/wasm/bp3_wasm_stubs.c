@@ -71,7 +71,7 @@ typedef struct {
     int scale;
     short transposition;
     short xpandkey, xpandval;
-    char lastistranspose;
+    char transposefirst;
 } WasmInstanceAccum;
 
 WasmInstanceAccum *wasm_accum = NULL;
@@ -500,7 +500,7 @@ int PlayBuffer1(tokenbyte ***pp_buff, int onlypianoroll) {
             int trans = (*p_Instance)[k].transposition;
             short xpk = (*p_Instance)[k].xpandkey;
             short xpv = (*p_Instance)[k].xpandval;
-            if((*p_Instance)[k].lastistranspose) {
+            if((*p_Instance)[k].transposefirst) {
                 if(trans != 0) TransposeKey(&midiKey, trans);
                 midiKey = ExpandKey(midiKey, xpk, xpv);
             } else {
@@ -754,7 +754,7 @@ int PlayBuffer1(tokenbyte ***pp_buff, int onlypianoroll) {
             wasm_accum[wasm_accum_count].transposition = (*p_Instance)[k].transposition;
             wasm_accum[wasm_accum_count].xpandkey = (*p_Instance)[k].xpandkey;
             wasm_accum[wasm_accum_count].xpandval = (*p_Instance)[k].xpandval;
-            wasm_accum[wasm_accum_count].lastistranspose = (*p_Instance)[k].lastistranspose;
+            wasm_accum[wasm_accum_count].transposefirst = (*p_Instance)[k].transposefirst;
             if((*p_Instance)[k].endtime > item_max_end)
                 item_max_end = (*p_Instance)[k].endtime;
             wasm_accum_count++;

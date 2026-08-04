@@ -8,6 +8,19 @@ Pour l'architecture générale, voir `WASM_PORT.md`.
 ---
 
 
+## 2026-08-04 — montée moteur v3.5.0 : renommage de champ `lastistranspose` → `transposefirst`
+
+Le passage du moteur amont à **v3.5.0** (voir CHANGELOG_ENGINE.md) renomme le champ de struct
+`s_SoundObjectInstanceParameters.lastistranspose` en `transposefirst`. Nos fichiers WASM lisent ce
+champ de la struct moteur et le recopient dans leur accumulateur local :
+
+- `csrc/wasm/bp3_api.c` : champ local `transposefirst` + lecture `(*p_Instance)[k].transposefirst`.
+- `csrc/wasm/bp3_wasm_stubs.c` : idem (déclaration + deux lectures).
+
+Pur renommage suivant l'amont, sémantique inchangée. WASM reconstruit (`build/bp3.js`) sans autre
+changement. Note : la nouvelle sortie liste d'événements (`--eventlistout`, `EventListfiles.c`)
+n'est **pas** portée au WASM pour l'instant — feature native seulement.
+
 ## 2026-07-19 — doublure libcurl, rendue nécessaire par le moteur amont v3.4.7
 
 Le moteur amont inclut désormais libcurl **sans condition** (`csrc/bp3/-BP3.h:97`), pour la

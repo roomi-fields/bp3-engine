@@ -103,7 +103,7 @@ void EmitTimedTokensItem(tokenbyte ***pp_buff, long kmax) {
             int   trans = (*p_Instance)[k].transposition;
             short xpk   = (*p_Instance)[k].xpandkey;
             short xpv   = (*p_Instance)[k].xpandval;
-            char  lit   = (*p_Instance)[k].lastistranspose;
+            char  lit   = (*p_Instance)[k].transposefirst;  /* 3.5.0: lastistranspose renomme transposefirst (amont) */
             int   scale = (*p_Instance)[k].scale;
             if(lit) {
                 if(trans != 0) TransposeKey(&midiKey, trans);

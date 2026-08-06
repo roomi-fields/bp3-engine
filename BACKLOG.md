@@ -3,7 +3,7 @@
 Dette technique **interne** au moteur. Un id court + statut par item.
 Statuts : `ouvert` · `en-cours` · `bloqué` · `fait`. Vue globale : `tour backlog` (hub).
 Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
-`hub/projets/backlog-langage-bps.md` via `tour` (pas ici).
+`hub/projets/2026-06-15-backlog-langage-bps/README.md` via `tour` (pas ici).
 
 ## Bugs moteur — bloquants pour l'oracle natif (amont Bernard)
 
@@ -381,4 +381,4 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   (commit `49c0b12`). La baseline v13 (`baseline-native/baseline.json`, `"binaire": "bp3 v3.4.7"`)
   tourne sur ce binaire.**
 - **BPE-24** `ouvert` [P2] — Tracabilite du binaire natif (constat #65) : aucune empreinte fiable — deux md5 distincts impriment la meme version et le meme horodatage, la provenance de la baseline est tapee a la main et FAUSSE pour 14 entrees, le md5 n est consigne nulle part. Reponse retenue : que la capture enregistre le md5 du binaire + l IDSTRING complet. Re-capture des 14 = arbitrage Romain, INTERDITE sans son mot.
-- **BPE-25** `abandonné` [P3] — checktemplates : fausse alerte. Deja ancre nativement, sous le nom de corpus « templates » (entree #25 des 113, `baseline-native/baseline.json:1743-1764` et `hub/projets/iso-100-grammaires/BASELINE-CENTRALE.md:89`), avec `produit:true`, `capture_comparable:true` et une capture deja presente (`baseline-native/captures/templates.text.txt`, 5 lignes). L'absence du literal « checktemplates » comme nom de grammaire avait ete confondue avec l'absence d'ancre — la source `-gr.checktemplates` / `-se.checktemplates` est bien celle du corpus « templates ».
+- **BPE-25** `abandonné` [P3] — checktemplates : fausse alerte. Deja ancre nativement, sous le nom de corpus « templates » (entree #25 des 113, `baseline-native/baseline.json:1743-1764` et `hub/projets/2026-07-16-iso-100-grammaires/BASELINE-CENTRALE.md:89`), avec `produit:true`, `capture_comparable:true` et une capture deja presente (`baseline-native/captures/templates.text.txt`, 5 lignes). L'absence du literal « checktemplates » comme nom de grammaire avait ete confondue avec l'absence d'ancre — la source `-gr.checktemplates` / `-se.checktemplates` est bien celle du corpus « templates ».

@@ -19,13 +19,13 @@ amont **externe** : il **ne lit pas la tour** ; les bugs se lui remontent à la 
   à Bernard Bel hors-tour.
 - Demander un arbitrage : `tour send architecte "..."` ; décision : `tour decide <slug> --impacts ...`.
 - Fin de session : MAJ ma propre ligne TABLEAU + ma fiche `projets/<moi>.md` + ma colonne
-  `baseline-status.json`. La fiche `projets/bp3-engine.md` (oracle, pas de colonne testée) est
+  `baseline-status.json`. La fiche `projets/agents/bp3-engine.md` (oracle, pas de colonne testée) est
   tenue par l'agent qui fait le travail moteur. **Le code fait foi.**
 
-## Backlog (décision Romain, 2026-06-17 — hub/projets/backlog-STRUCTURE.md)
+## Backlog (décision Romain, 2026-06-17 — hub/projets/2026-06-20-backlog-STRUCTURE/README.md)
 - Je maintiens un `BACKLOG.md` à la RACINE du dépôt (dette technique INTERNE, un id + statut par item).
 - Tout item qui touche le **langage** (syntaxe/sémantique) → backlog CENTRAL
-  `hub/projets/backlog-langage-bps.md` via `tour` (pas dans le local).
+  `hub/projets/2026-06-15-backlog-langage-bps/README.md` via `tour` (pas dans le local).
 - Vue globale = `tour backlog` (hub). Aucun backlog parallèle ailleurs.
 
 ## Règles moteur

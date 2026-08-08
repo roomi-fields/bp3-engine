@@ -29,6 +29,9 @@ servir dans le dépôt d'un autre, d'où ce lot).
    La sortie dépend des sorties demandées : `koto3` rend une fin à 28 734 ms avec `--eventlistout`
    seul, 35 470 ms dès qu'on ajoute `--midiout` (constat #67, amont Bernard). Une référence
    d'oracle sans sa commande complète est ambiguë.
+   ⚠️ **Régression v3.5.1 (constat #68)** : `--eventlistout` **seul** rend **0 ligne** (silencieux,
+   Errors:0) — il faut lui adjoindre `-o` (ou `--midiout`) pour peupler la liste. En v3.5.0,
+   `--eventlistout` seul suffisait. Contournement : toujours passer `-o` avec `--eventlistout`.
 
 ## Procédure de montée de version (par `bp3-engine`)
 

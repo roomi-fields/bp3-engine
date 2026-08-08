@@ -68,8 +68,8 @@ if(MyDisposeHandle(&ptr) != OK) return(ABORT);
       = (*p_PostRollMode)[j] = RELATIF;
 (*p_MaxCoverBeg)[j] = (*p_MaxCoverEnd)[j] = 100L;
 (*p_MaxTruncBeg)[j] = (*p_MaxTruncEnd)[j] = 0L;
-(*p_PivPos)[j] = (*p_PreRoll)[j] = (*p_PostRoll)[j] = (*p_BeforePeriod)[j] = ZERO;
-(*p_PeriodMode)[j] = IRRELEVANT;
+(*p_PivPos)[j] = (*p_PreRoll)[j] = (*p_PostRoll)[j] = (*p_CyclicAfter)[j] = ZERO;
+(*p_CyclicMode)[j] = IRRELEVANT;
 
 (*p_AlphaCtrlNr)[j] = 255; (*p_AlphaCtrlChan)[j] = 255;
 (*p_Ifrom)[j] = 0;
@@ -88,7 +88,7 @@ if(MyDisposeHandle(&ptr) != OK) return(ABORT);
 (*p_Dur)[j] = ZERO;
 (*p_Resolution)[j] = 1;
 (*p_Tref)[j] = 1000L;
-(*p_ForceIntegerPeriod)[j] = FALSE;
+(*p_ForceIntegerCycles)[j] = FALSE;
 (*p_DefaultChannel)[j] = (*p_Quan)[j] = 0;
 (*p_StrikeAgain)[j] = -1;
 (*p_Tpict)[j] = ZERO;
@@ -143,12 +143,6 @@ if((*p_MIDIsize)[j] == ZERO) {
 		(*p_Type)[j] &= (255-1);
 		}
 	}
-else  {
-/*	if(!((*p_Type)[j] & 1)) {
-		(*p_Type)[j] |= 1;
-		if(iProto == j) SwitchOn(NULL,wPrototype1,bMIDIsequence);
-		} */
-	}
    
 if((*p_Resolution)[j] <= ZERO) {
    if(trace_inconsistencies) BPPrintMessage(0,odError,"=> Err. CheckConsistency(). (*p_Resolution)[j] <= ZERO\n");
@@ -159,7 +153,6 @@ if((*p_FixScale)[j]) {
    }
 if((*p_Tref)[j] < EPSILON) {
    (*p_Tref)[j] = ZERO;
-   (*p_OkRelocate)[j] = TRUE;
    }
 if((*p_PivType)[j] < 1 || (*p_PivType)[j] > 7) {
 	if(trace_inconsistencies) BPPrintMessage(0,odInfo,"CheckConsistency() (*p_PivType)[%d] = %d\n",j,(*p_PivType)[j]);
@@ -223,12 +216,12 @@ switch((*p_PivType)[j]) {
          }
    }
    
-if((*p_CoverBeg)[j] && dur > EPSILON) {
+/* if((*p_CoverBeg)[j] && dur > EPSILON) {
    (*p_MaxCoverBeg)[j] = 100L; (*p_CoverBegMode)[j] = RELATIF;
    }
 if((*p_CoverEnd)[j] && dur > EPSILON) {
    (*p_MaxCoverEnd)[j] = 100L; (*p_CoverEndMode)[j] = RELATIF;
-   }
+   } */
 if((*p_MaxCoverBeg)[j] < 0) {
    (*p_MaxCoverBeg)[j] = 0; bugg++;
    }
@@ -254,17 +247,17 @@ if((*p_CoverBegMode)[j] == RELATIF && (*p_CoverEndMode)[j] == RELATIF) {
       (*p_MaxCoverBeg)[j] = (maxcover1 * 100) / dur;
       }
    }
-if((*p_CoverBegMode)[j] == RELATIF && (*p_MaxCoverBeg)[j] == 100L)
+/* if((*p_CoverBegMode)[j] == RELATIF && (*p_MaxCoverBeg)[j] == 100L)
    (*p_CoverBeg)[j] = TRUE;
 if((*p_CoverEndMode)[j] == RELATIF && (*p_MaxCoverEnd)[j] == 100L)
-   (*p_CoverEnd)[j] = TRUE;
+   (*p_CoverEnd)[j] = TRUE; */
    
-if((*p_TruncBeg)[j] && dur > EPSILON) {
+/* if((*p_TruncBeg)[j] && dur > EPSILON) {
    (*p_MaxTruncBeg)[j] = 100L; (*p_TruncBegMode)[j] = RELATIF;
    }
 if((*p_TruncEnd)[j] && dur > EPSILON) {
    (*p_MaxTruncEnd)[j] = 100L; (*p_TruncEndMode)[j] = RELATIF;
-   }
+   } */
 if((*p_MaxTruncBeg)[j] < 0) {
    (*p_MaxTruncBeg)[j] = 0; bugg++;
    }
@@ -290,14 +283,12 @@ if((*p_TruncBegMode)[j] == RELATIF && (*p_TruncEndMode)[j] == RELATIF) {
       (*p_MaxTruncBeg)[j] = (maxtrunc1 * 100) / dur;
       }
    }
-if((*p_TruncBegMode)[j] == RELATIF && (*p_MaxTruncBeg)[j] == 100L)
+/* if((*p_TruncBegMode)[j] == RELATIF && (*p_MaxTruncBeg)[j] == 100L)
    (*p_TruncBeg)[j] = TRUE;
 if((*p_TruncEndMode)[j] == RELATIF && (*p_MaxTruncEnd)[j] == 100L)
-   (*p_TruncEnd)[j] = TRUE;
+   (*p_TruncEnd)[j] = TRUE; */
 if(check && (bugg > 0)) {
-   my_sprintf(Message,"Found inconsistencies in sound-object prototype '%s'. These have been corrected.\n",
-      *((*p_Bol)[j]));
-   Print(wTrace,Message);
+   BPPrintMessage(0,odInfo,"Found inconsistencies in sound-object prototype '%s'. These have been corrected.\n",(*p_Bol)[j]);
    }
 return(OK);
 }
@@ -495,11 +486,11 @@ return(OK);
 
 int CopyPage6(int i,int j)
 {
-(*p_BeforePeriod)[j] = (*p_BeforePeriod)[i];
-(*p_PeriodMode)[j] = (*p_PeriodMode)[i];
+(*p_CyclicAfter)[j] = (*p_CyclicAfter)[i];
+(*p_CyclicMode)[j] = (*p_CyclicMode)[i];
 (*p_StrikeAgain)[j] = (*p_StrikeAgain)[i];
 (*p_DiscardNoteOffs)[j] = (*p_DiscardNoteOffs)[i];
-(*p_ForceIntegerPeriod)[j] = (*p_ForceIntegerPeriod)[i];
+(*p_ForceIntegerCycles)[j] = (*p_ForceIntegerCycles)[i];
 return(OK);
 }
 

@@ -52,8 +52,7 @@ int MakeEventListFile(OutFileInfo* finfo) {
 		}
 	else EventListPtr = fout;
 	BPPrintMessage(0,odInfo,"👉 An event list file has been created\n");
-//	WriteToEventListFile("Tcurr,event,item,k,id proto,label,start time,end time,trunc beg,trunc end,dilation ratio beta,dilation ratio alpha,cycles,articul,preroll,postroll,transpos,transpose first,expand value,expand key");
-	WriteToEventListFile("event,item,k,id proto,label,start time,end time,trunc beg,trunc end,dilation ratio beta,dilation ratio alpha,cycles,articul,preroll,postroll,transpos,transpose first,expand value,expand key");
+	WriteToEventListFile("event,item,k,id proto,label,start time,end time,trunc beg,trunc end,dilation ratio beta,dilation ratio alpha,cycles,cyclic after,force integer number of cycles,articul,preroll,postroll,transpos,transpose first,expand value,expand key,volume start,volume end,volume channel,volume mode (2 = continuous),modulation start,modulation end,modulation channel,modulation mode,panoramic start,panoramic end,panoramic channel,panoramic mode,pressure start,pressure end,pressure channel, pressure mode,pitchbend start,pitchbend end,pitchbend channel,pitchbend mode");
 	return result;
 	}
 
@@ -84,11 +83,11 @@ int WriteToEventListFile(const char *line) {
 
 int AddEventToList(int k) {
 	long starttime,endtime,shift;
-	int j,id_proto,articul,trans;
+	int j,id_proto,articul,trans,cyclic_after;
 	short xpandval,xpandkey;
 	char line[MAXLIN],label[MAXNAME];
 	double alpha,dilationratio,preroll,postroll,expand;
-	int transposefirst;
+	int transposefirst,forceintegercycles;
 
     if(EventListPtr == NULL) {
         BPPrintMessage(0,odError, "=> Could not add event to list\n");
@@ -97,14 +96,48 @@ int AddEventToList(int k) {
 	j = (*p_Instance)[k].object;
 	if(j == -1) return(OK);
 	if(j == 0) return(OK);
+	if(j < 16384 && j >= Jbol) return(OK); // Time-pattern
+	cyclic_after = forceintegercycles = 0;
+	int volumestart = VolumeStart(k);
+	int volumeend = VolumeEnd(k);
+	int volumechannel = VolumeChannel(k);
+	int volumemode = VolumeMode(k);
+
+	int modulationstart = ModulationStart(k);
+	int modulationend = ModulationEnd(k);
+	int modulationchannel = ModulationChannel(k);
+	int modulationmode = ModulationMode(k);
+
+	int panoramicstart = PanoramicStart(k);
+	int panoramicend = PanoramicEnd(k);
+	int panoramicchannel = PanoramicChannel(k);
+	int panoramicmode = PanoramicMode(k);
+
+	int pressurestart = PressureStart(k);
+	int pressureend = PressureEnd(k);
+	int pressurechannel = PressureChannel(k);
+	int pressuremode = PressureMode(k);
+
+	int pitchbendstart = PitchbendStart(k);
+	int pitchbendend = PitchbendEnd(k);
+	int pitchbendchannel = PitchbendChannel(k);
+	int pitchbendmode = PitchbendMode(k);
+
 	if(j < 16384) {
-		if(j >= Jbol) return(OK); // Time-pattern
 		if(j < 0) {
 			j = -j;
 			my_sprintf(label,"<<%s>>",*((*p_Bol)[j]));
 			}
 		else if(j == 1) my_sprintf(label,"-");
-		else my_sprintf(label,"%s",*((*p_Bol)[j]));
+		else {
+			my_sprintf(label,"%s",*((*p_Bol)[j]));
+			if((*p_Instance)[k].ncycles > 1) {
+				if((*p_CyclicMode)[j] == ABSOLU) cyclic_after = (int)(*p_CyclicAfter)[j];
+				else
+					cyclic_after = (int) ((double)(*p_CyclicAfter)[j] * (*p_Dur)[j]) / 100.;
+				forceintegercycles = (*p_ForceIntegerCycles)[j];
+				}
+			}
 		id_proto = j;
 		dilationratio = (*p_Instance)[k].dilationratio;
 		if((*p_PreRollMode)[j] == ABSOLU) preroll = (*p_PreRoll)[j];
@@ -115,6 +148,7 @@ int AddEventToList(int k) {
 	else {
 		id_proto = 0;
 		preroll = postroll = 0.;
+		dilationratio = (*p_Instance)[k].dilationratio;
 		my_sprintf(label,"%s",*((*(p_NoteName[NoteConvention]))[j-16384]));
 		}
 	if(p_Articul != NULL) articul =	(*p_Articul)[k];
@@ -134,8 +168,7 @@ int AddEventToList(int k) {
 	starttime = (*p_Instance)[k].starttime + shift;
 	endtime = (*p_Instance)[k].endtime  + shift;
 	EventNumber++;
-	// my_sprintf(line,"%ld,#%ld,%ld,(%d),%d,%s,%ld,%ld,%ld,%ld,%.4f,%.4f,%d,%d,%.4f,%.4f,%d,%d,%.4f,%d",(Tcurr * Time_res),EventNumber,ItemNumber,k,id_proto,label,starttime,endtime,(*p_Instance)[k].truncbeg,(*p_Instance)[k].truncend,dilationratio,(*p_Instance)[k].alpha,(*p_Instance)[k].ncycles,articul,preroll,postroll,trans,transposefirst,expand,xpandkey);
-	my_sprintf(line,"#%ld,%ld,(%d),%d,%s,%ld,%ld,%ld,%ld,%.4f,%.4f,%d,%d,%.4f,%.4f,%d,%d,%.4f,%d",EventNumber,ItemNumber,k,id_proto,label,starttime,endtime,(*p_Instance)[k].truncbeg,(*p_Instance)[k].truncend,dilationratio,(*p_Instance)[k].alpha,(*p_Instance)[k].ncycles,articul,preroll,postroll,trans,transposefirst,expand,xpandkey);
+	my_sprintf(line,"#%ld,%ld,(%d),%d,%s,%ld,%ld,%ld,%ld,%.4f,%.4f,%d,%d,%d,%d,%.4f,%.4f,%d,%d,%.4f,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",EventNumber,ItemNumber,k,id_proto,label,starttime,endtime,(*p_Instance)[k].truncbeg,(*p_Instance)[k].truncend,dilationratio,(*p_Instance)[k].alpha,(*p_Instance)[k].ncycles,cyclic_after,forceintegercycles,articul,preroll,postroll,trans,transposefirst,expand,xpandkey,volumestart,volumeend,volumechannel,volumemode,modulationstart,modulationend,modulationchannel,modulationmode,panoramicstart,panoramicend,panoramicchannel,panoramicmode,pressurestart,pressureend,pressurechannel,pressuremode,pitchbendstart,pitchbendend,pitchbendchannel,pitchbendmode);
 	if(WriteToEventListFile(line) != OK) return MISSED;
 	return(OK);
 	}

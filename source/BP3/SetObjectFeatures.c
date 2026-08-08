@@ -42,6 +42,7 @@ int trace_object_features = 0;
 int trace_get_duration = 0;
 int trace_set_variation = 0;
 int trace_table = 0;
+int check_limits = 0;
 
 int SetObjectParams(int isobject,int level,int nseq,long k,int j,
 	CurrentParameters *p_currentparameters,ContParameters **p_contparameters,
@@ -274,6 +275,8 @@ int SetObjectParams(int isobject,int level,int nseq,long k,int j,
 	(*p_Instance)[k].scale = p_currentparameters->scale;
 	if(trace_scale) BPPrintMessage(0,odInfo,"4) scale = %d\n",p_currentparameters->scale); 
 	(*p_Instance)[k].blockkey = p_currentparameters->blockkey;
+
+// = DeftVolume;
 
 /*	VolumeStart(k) = DEFTVOLUME;
 	PanoramicStart(k) = DEFTPANORAMIC;
@@ -1032,7 +1035,7 @@ if(nature_time == STRIATED || nseq == 0) {
 		beta = alpha;
 	//	if(j > 16383) goto OKALPHA1;
 		if(j >= Jbol) goto OKALPHA1;
-		if((*p_FixScale)[j] && (*p_PeriodMode)[j] == IRRELEVANT) {
+		if((*p_FixScale)[j] && (*p_CyclicMode)[j] == IRRELEVANT) {
 			alpha = beta = 1.; goto OKALPHA1;
 			}
 		if(FixDilationRatioInCyclicObject(j,d,&alpha,&beta,&ncycles) == OK) goto OKALPHA1;
@@ -1212,7 +1215,7 @@ FINDNEXTMARKED:
 		beta = alpha; ncycles = 1;
 	//	if(j > 16383) goto OKALPHA2;
 		if(j >= Jbol) goto OKALPHA2;
-		if((*p_FixScale)[j] && (*p_PeriodMode)[j] == IRRELEVANT) {
+		if((*p_FixScale)[j] && (*p_CyclicMode)[j] == IRRELEVANT) {
 			alpha = beta = 1.; goto OKALPHA2;
 			}
 		if(FixDilationRatioInCyclicObject(j,d,&alpha,&beta,&ncycles) == OK) goto OKALPHA2;
@@ -1242,19 +1245,19 @@ return(OK);
 
 int FixDilationRatioInCyclicObject(int j,double d,double *p_alpha,double *p_dilationratio,
 	int *p_ncycles)
-/* Examine objects with periodical part and see whether that part could be repeated */
-/* If so, fix the number of repetitions and the actual dilation ratio,... */
-/* ... and change alpha if necessary */
+/* Examine objects with periodical part and see whether that part could be repeated
+If so, fix the number of repetitions and the actual dilation ratio,...
+ ... and change alpha if necessary */
 {
 int n1,n2,limit;
-double objectperiod,beforeperiod,ncycles,pivpos;
+double objectperiod,cyclicafter,ncycles,pivpos;
 
 *p_dilationratio = *p_alpha;
 if(j > 16383) return(OK);
 
 // We're only concerned about cyclic objects with dilation ratio > 1.
-if((*p_alpha) <= 1. || (*p_PeriodMode)[j] == IRRELEVANT) return(MISSED);
-if(GetPeriod(j,1.,&objectperiod,&beforeperiod) == MISSED) return(MISSED);
+if((*p_alpha) <= 1. || (*p_CyclicMode)[j] == IRRELEVANT) return(MISSED);
+if(GetPeriod(j,1.,&objectperiod,&cyclicafter) == MISSED) return(MISSED);
 
 if(!(*p_FixScale)[j] && !(*p_OkExpand)[j] && !(*p_OkCompress)[j])
 	limit = TRUE;		/* dilation ratio has a specified upper limit */
@@ -1268,15 +1271,16 @@ if(PlayFromInsertionPoint) pivpos = 0.;
 	
 // First consider objects that can't be stretched
 
-if(!limit && (!(*p_OkExpand)[j] || (*p_PeriodMode)[j] == ABSOLU)) {
+if(!limit && (!(*p_OkExpand)[j] || (*p_CyclicMode)[j] == ABSOLU)) {
 	*p_dilationratio = 1.;
 FINDCYCLES:
 	ncycles = (double)(((*p_alpha) * (*p_Dur)[j] / (*p_dilationratio))
-		- beforeperiod + pivpos) / objectperiod;
-	if((*p_ForceIntegerPeriod)[j]) {
+		- cyclicafter + pivpos) / objectperiod;
+	if((*p_ForceIntegerCycles)[j]) {
 		if((ncycles - (int)ncycles) > 0.5) ncycles = ceil(ncycles);
 		else ncycles = floor(ncycles);
 		}
+//	BPPrintMessage(0,odInfo,"@@@ j = %d, ncycles = %.4f\n",j,ncycles);
 	goto SORTIR;
 	}
 
@@ -1286,12 +1290,12 @@ ncycles = d;
 
 // Adjust dilation ratio so that the duration is correct
 
-*p_dilationratio = (*p_alpha) * (*p_Dur)[j] / (beforeperiod - pivpos + (ncycles * objectperiod));
+*p_dilationratio = (*p_alpha) * (*p_Dur)[j] / (cyclicafter - pivpos + (ncycles * objectperiod));
 
 // If beta is too large, fix limit value and increase ncycles
 
 if((!limit && !(*p_OkExpand)[j] && *p_dilationratio > 1.)
-		|| (limit && *p_dilationratio > (*p_AlphaMax)[j])) {
+		|| (limit && (*p_dilationratio > (*p_AlphaMax)[j]))) {
 	if(limit) *p_dilationratio = (*p_AlphaMax)[j];
 	else *p_dilationratio = 1.;
 	goto FINDCYCLES;
@@ -1299,7 +1303,7 @@ if((!limit && !(*p_OkExpand)[j] && *p_dilationratio > 1.)
 
 SORTIR:
 if((*p_Dur)[j] > EPSILON) {
-	*p_alpha = *p_dilationratio * (beforeperiod + (ncycles * objectperiod)) / (*p_Dur)[j];
+	*p_alpha = *p_dilationratio * (cyclicafter + (ncycles * objectperiod)) / (*p_Dur)[j];
 	*p_ncycles = (int) ncycles;
 	}
 else {
@@ -1312,82 +1316,111 @@ return(OK);
 
 int SetLimits(int nseq,Milliseconds** p_maxcoverbeg,Milliseconds** p_maxcoverend,
 	Milliseconds** p_maxgapbeg,Milliseconds** p_maxgapend,Milliseconds** p_maxtruncbeg,
-	Milliseconds** p_maxtruncend)
-{
-int j,k;
-long i;		
-Milliseconds maxcover1,maxcover2,maxgap1,maxgap2,maxtrunc1,maxtrunc2,dur;
+	Milliseconds** p_maxtruncend) {
+	int j,k;
+	long i;		
+	Milliseconds maxcover1,maxcover2,maxgap1,maxgap2,maxtrunc1,maxtrunc2,dur;
 
-if(nseq >= Maxconc) {
-	BPPrintMessage(0,odError,"=> Err. SetLimits(). nseq >= Maxconc\n");
+	if(nseq >= Maxconc) {
+		BPPrintMessage(0,odError,"=> Err. SetLimits(). nseq >= Maxconc\n");
+		return(OK);
+		}
+	for(i=ZERO;; i++) {
+		k = (*((*p_Seq)[nseq]))[i];
+		if(k == -1) break;
+		if(k < 1) continue;
+		if(k >= Maxevent) {
+			BPPrintMessage(0,odError,"=> Err. SetLimits(). k >= Maxevent\n");
+			return(ABORT);
+			}
+		j = (*p_Instance)[k].object;
+		if(j <= 0) {
+			j = -j; dur = ZERO;
+			}
+		else {
+			if(j < 16384) dur = (*p_Instance)[k].dilationratio * (*p_Dur)[j];
+			else dur = (*p_Instance)[k].dilationratio * 1000L;	/* Simple note */
+			}
+
+		maxcover1 = maxcover2 = Infpos;
+		if(j > 1 && j < 16384) {
+			if((*p_CoverBeg)[j]) {
+				if((*p_CoverBegMode)[j] == OK) maxcover1 = Infpos;
+				else if((*p_CoverBegMode)[j] == ABSOLU) maxcover1 = (*p_MaxCoverBeg)[j];
+				else maxcover1 = (dur * (*p_MaxCoverBeg)[j]) / 100.;
+				if(check_limits) BPPrintMessage(0,odInfo,"@@ maxcover1 = %ld, j = %d\n",maxcover1,j);
+				}
+			else maxcover1 = ZERO;
+			}
+		if(j > 1 && j < 16384) {
+			if((*p_CoverEnd)[j]) {
+				if((*p_CoverEndMode)[j] == OK) maxcover2 = Infpos;
+				else if((*p_CoverEndMode)[j] == ABSOLU) maxcover2 = (*p_MaxCoverEnd)[j];
+				else maxcover2 = (dur * (*p_MaxCoverEnd)[j]) / 100.;
+				if(check_limits) BPPrintMessage(0,odInfo,"@@ maxcover2 = %ld, j = %d\n",maxcover2,j);
+				}
+			else maxcover2 = ZERO;
+			} 
+		
+		if((maxcover1 + maxcover2) >= dur && maxcover1 != Infpos && maxcover2 != Infpos)
+			(*p_maxcoverbeg)[i] = (*p_maxcoverend)[i] = Infpos;
+		else {
+			(*p_maxcoverbeg)[i] = maxcover1;
+			(*p_maxcoverend)[i] = maxcover2;
+			if(check_limits) BPPrintMessage(0,odInfo,"@@ (*p_maxcoverbeg)[%d] = %ld\n",i,(*p_maxcoverbeg)[i]);
+			if(check_limits) BPPrintMessage(0,odInfo,"@@ (*p_maxcoverend)[%d] = %ld\n",i,(*p_maxcoverend)[i]);
+			}
+		
+		maxgap1 = maxgap2 = Infpos;
+		if(j > 1 && j < 16384) {
+			if((*p_ContBeg)[j]) {
+				if((*p_ContBegMode)[j] == OK) maxgap1 = ZERO;
+				else if((*p_ContBegMode)[j] == ABSOLU) maxgap1 = (*p_MaxBegGap)[j];
+				else maxgap1 = (dur * (*p_MaxBegGap)[j]) / 100.;
+				if(check_limits) BPPrintMessage(0,odInfo,"@@ maxgap1 = %ld, j = %d\n",maxgap1,j);
+				}
+			}
+		(*p_maxgapbeg)[i] = maxgap1;
+		
+		if(j > 1 && j < 16384) {
+			if((*p_ContEnd)[j]) {
+				if((*p_ContEndMode)[j] == OK) maxgap2 = ZERO;
+				else if((*p_ContEndMode)[j] == ABSOLU) maxgap2 = (*p_MaxEndGap)[j];
+				else maxgap2 = (dur * (*p_MaxEndGap)[j]) / 100.;
+				if(check_limits) BPPrintMessage(0,odInfo,"@@ maxgap2 = %ld, j = %d\n",maxgap2,j);
+				}
+			}
+		(*p_maxgapend)[i] = maxgap2;
+		
+		maxtrunc1 = maxtrunc2 = dur;
+		if(j > 1 && j < 16384) {
+			if((*p_TruncBeg)[j]) {
+				if((*p_TruncBegMode)[j] == OK) maxtrunc1 = dur;
+				else if((*p_TruncBegMode)[j] == ABSOLU) maxtrunc1 = (*p_MaxTruncBeg)[j];
+				else maxtrunc1 = (dur * (*p_MaxTruncBeg)[j]) / 100.;
+				if(check_limits) BPPrintMessage(0,odInfo,"@@ maxtrunc1 = %ld, j = %d\n",maxtrunc1,j);
+				}
+			else maxtrunc1 = ZERO;
+			}
+		if(maxtrunc1 < dur) (*p_maxtruncbeg)[i] = maxtrunc1;
+		else (*p_maxtruncbeg)[i] = dur;
+		if(check_limits) BPPrintMessage(0,odInfo,"@@ (*p_maxtruncbeg)[%d] = %ld\n",i,(*p_maxtruncbeg)[i]);
+		
+		if(j > 1 && j < 16384) {
+			if((*p_TruncEnd)[j]) {
+				if((*p_TruncEndMode)[j] == OK) maxtrunc2 = dur;
+				else if((*p_TruncEndMode)[j] == ABSOLU) maxtrunc2 = (*p_MaxTruncEnd)[j];
+				else maxtrunc2 = (dur * (*p_MaxTruncEnd)[j]) / 100.;
+				if(check_limits) BPPrintMessage(0,odInfo,"@@ maxtrunc2 = %ld, j = %d\n",maxtrunc2,j);
+				}
+			else maxtrunc2 = ZERO;
+			}
+		if(maxtrunc2 < dur) (*p_maxtruncend)[i] = maxtrunc2;
+		else (*p_maxtruncend)[i] = dur;
+		if(check_limits) BPPrintMessage(0,odInfo,"@@ (*p_maxtruncend)[%d] = %ld\n",i,(*p_maxtruncend)[i]);
+		}
 	return(OK);
-	}		
-// for(i=1;; i++) {
-for(i=ZERO;; i++) { // Fixed by BB 2021-03-22
-	k = (*((*p_Seq)[nseq]))[i];
-	if(k == -1) break;
-	if(k < 1) continue;
-	if(k >= Maxevent) {
-		BPPrintMessage(0,odError,"=> Err. SetLimits(). k >= Maxevent\n");
-		return(ABORT);
-		}
-	j = (*p_Instance)[k].object;
-	if(j <= 0) {
-		j = -j; dur = ZERO;
-		}
-	else {
-		if(j < 16384) dur = (*p_Instance)[k].dilationratio * (*p_Dur)[j];
-		else dur = (*p_Instance)[k].dilationratio * 1000L;	/* Simple note */
-		}
-
-	maxcover1 = maxcover2 = Infpos;
-	if(j > 1 && j < 16384 && !(*p_CoverBeg)[j]) {
-		if((*p_CoverBegMode)[j] == ABSOLU) maxcover1 = (*p_MaxCoverBeg)[j];
-		else maxcover1 = (dur * (*p_MaxCoverBeg)[j]) / 100.;
-		}
-	
-	if(j > 1 && j < 16384 && !(*p_CoverEnd)[j]) {
-		if((*p_CoverEndMode)[j] == ABSOLU) maxcover2 = (*p_MaxCoverEnd)[j];
-		else maxcover2 = (dur * (*p_MaxCoverEnd)[j]) / 100.;
-		} 
-	
-	if((maxcover1 + maxcover2) >= dur && maxcover1 != Infpos && maxcover2 != Infpos)
-		(*p_maxcoverbeg)[i] = (*p_maxcoverend)[i] = Infpos;
-	else {
-		(*p_maxcoverbeg)[i] = maxcover1;
-		(*p_maxcoverend)[i] = maxcover2;
-		}
-	
-	maxgap1 = maxgap2 = Infpos;
-	if(j > 1 && j < 16384 && (*p_ContBeg)[j]) {
-		if((*p_ContBegMode)[j] == ABSOLU) maxgap1 = (*p_MaxBegGap)[j];
-		else maxgap1 = (dur * (*p_MaxBegGap)[j]) / 100.;
-		}
-	(*p_maxgapbeg)[i] = maxgap1;
-	
-	if(j > 1 && j < 16384 && (*p_ContEnd)[j]) {
-		if((*p_ContEndMode)[j] == ABSOLU) maxgap2 = (*p_MaxEndGap)[j];
-		else maxgap2 = (dur * (*p_MaxEndGap)[j]) / 100.;
-		}
-	(*p_maxgapend)[i] = maxgap2;
-	
-	maxtrunc1 = maxtrunc2 = dur;
-	if(j > 1 && j < 16384 && !(*p_TruncBeg)[j]) {
-		if((*p_TruncBegMode)[j] == ABSOLU) maxtrunc1 = (*p_MaxTruncBeg)[j];
-		else maxtrunc1 = (dur * (*p_MaxTruncBeg)[j]) / 100.;
-		}
-	if(maxtrunc1 < dur) (*p_maxtruncbeg)[i] = maxtrunc1;
-	else (*p_maxtruncbeg)[i] = dur;
-	
-	if(j > 1 && j < 16384 && !(*p_TruncEnd)[j]) {
-		if((*p_TruncEndMode)[j] == ABSOLU) maxtrunc2 = (*p_MaxTruncEnd)[j];
-		else maxtrunc2 = (dur * (*p_MaxTruncEnd)[j]) / 100.;
-		}
-	if(maxtrunc2 < dur) (*p_maxtruncend)[i] = maxtrunc2;
-	else (*p_maxtruncend)[i] = dur;
 	}
-return(OK);
-}
 
 
 int AssignValue(int index,double value,int p,int level,long* p_kmx,

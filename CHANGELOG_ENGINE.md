@@ -8,6 +8,29 @@ Chaque section référence le point correspondant dans `FEEDBACK_BERNARD.md` (te
 ---
 
 
+## 2026-08-08 — passage du moteur amont v3.5.0 → v3.5.1
+
+Amont : Bernard publie **v3.5.1** (tag `v3.5.1`, `4897d7d`, ligne graphics-for-BP3). Diff
+`v3.5.0`→`v3.5.1` = 16 fichiers source, ~484 insertions, dont du **code de minutage**
+(`TimeSet.c`, `TimeSetFunctions.c`, `MakeSound.c`, `SetObjectFeatures.c`, `SoundObjects2/3.c`,
+`FillPhaseDiagram.c`, `GetRelease.c`) + `EventListfiles.c`, `SaveLoads1.c`.
+
+Portage : les 13 fichiers partagés changés étaient identiques à l'amont v3.5.0 chez nous →
+repris tels quels dans `csrc/bp3/`. `EventListfiles.c` (natif-seul) repris tel quel. Seul
+`Graphic.c` (natif-seul, notre delta graphique) fusionné à trois voies, propre. Aucun renommage
+de struct cette fois.
+
+**Effet mesuré sur le minutage — RIEN.** Non-régression `bp3-3.5.0` vs `bp3-3.5.1`, corpus
+entier à graine figée, comparaison texte + jetons minutés : **identiques partout**. Seuls
+`cloches1` (timeout des deux côtés, grammaire à limite de calcul) et `watch` (variance de charge
+en parallèle ; **identique** vérifié en série : 2105 jetons des deux côtés) sortent, aucun n'est
+une divergence de version. En particulier **Visser.Waves = 366 événements, fin 186 291 ms,
+identique en 3.5.0 et 3.5.1** (`--eventlistout` seul, graine 1) — les chiffres de la flotte du
+2026-08-08 restent valides, rien à remesurer.
+
+Binaire : `Version 3.5.1`, md5 `963c1ff9512b453e97bdbbbd5f8aae4a`. Oracles précédents préservés
+(3.5.0 `5877fa2…`, 3.4.7 figé `0fa0f3d…`). Procédure de montée + traçabilité : `ORACLE-BINAIRE.md`.
+
 ## 2026-08-04 — passage du moteur amont v3.4.7 → v3.5.0 (liste d'événements)
 
 Amont : Bernard publie **BP3 v3.5.0**, première version à produire une **liste détaillée

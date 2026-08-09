@@ -202,13 +202,27 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   ramene a 30 s avec un seul item, le moteur ne s'arrete pas dans les 60 s : la limite de temps
   de calcul ne coupe pas pendant l'expansion du tampon. Remonte a Bernard Bel : **bug #56**.
 
-- **BPE-15** `ouvert` [P2] — REGLES DE DRAPEAUX SEULS refusees (« Error code 8: incorrect
-  expression or bad derivation »). Signature partagee par plusieurs muettes : une regle qui ne
-  contient QUE des drapeaux, sans membre gauche ni fleche — ex. `-gr.tryTranspose` rule 2
-  (`/Atimes = 20/ /Btimes = 19/ /Ctimes = 5/ /Dtimes = 5/`), et 20 occurrences dans `-gr.Rajeev`.
-  `-gr.a` presente une variante proche (« Error code 52: Missing slash after /flag/ » sur
-  `Dummy --> /K2 = 11/`). A instruire : notation BP2 d'initialisation de drapeaux abandonnee,
-  ou defaut du compilateur ? Non tranche, aucun correctif applique.
+- **BPE-15** `CAUSE ETABLIE 2026-08-09 — DATA/CORPUS (BP2), PAS DEFAUT MOTEUR` [P2] — l'intitule
+  d'origine (« regles de drapeaux seuls refusees ») est FAUX, confronte au binaire sur les deux cas :
+  une RHS de drapeaux SEULS compile (`S --> /x = 3/` → Errors:0), et `Dummy --> /K2 = 11/` (cite
+  pour `-gr.a`) aussi. Ce n'est donc pas une regle de drapeaux qui casse.
+  VRAIE CAUSE, bisectee au binaire (bp3 3.5.1) :
+  (a) BP3 exige une regle COMPLETE par ligne. Une ligne NUE sans `-->` est refusee « Error code 8 »,
+      que ce soit des drapeaux (`/Atimes = 20/ …`) OU des notes (`D4 E4`) — meme erreur, rien de
+      specifique aux drapeaux. Le corpus (tryTranspose l.9, Rajeev) porte la RHS MULTI-LIGNES de BP2,
+      que le parseur ligne-a-ligne de BP3 n'accepte pas. → correctif DATA : rejoindre chaque regle
+      sur une seule ligne.
+  (b) `¬` (U+00AC, octets c2 ac) en entree de RHS → « Error code 15 ». C'est un marqueur de
+      saut-de-ligne d'AFFICHAGE (BP3_help.txt:538-541 le montre en sortie `abba.bcca.¬`), pas un
+      jeton d'entree ; il a fuite dans la grammaire (tryTranspose l.8). Le vrai marqueur de battement
+      `.` fonctionne. → correctif DATA : retirer `¬`.
+  (c) `-gr.a` : son echec vient de `--.` au lieu de `-->` (l.16) et du mojibake `≥` (famille BPE-5/9),
+      pas des drapeaux.
+  CONCLUSION : rien a remonter a Bernard — le compilateur est coherent (une regle par ligne, `-->`
+  obligatoire). Meme famille que BPE-2/5/16 (conventions BP2 dans le corpus). RESTE (data, borne) :
+  reecrire tryTranspose/Rajeev en une-regle-par-ligne + retirer `¬` ; NB tryTranspose porte AUSSI un
+  « Error code 15 » distinct sur `_keyxpand(A4,1.3) _transpose(-2) {a N}` (rules 5-6) — sous-question
+  a part, non liee aux drapeaux.
 
 - **BPE-16** `RESOLU 2026-07-19` [P2] — CORPUS-FINS-DE-LIGNE-MAC : 14 fichiers du corpus
   n'avaient que des retours chariot Mac (`0x0D`) et aucun saut de ligne — le moteur y lit une
@@ -382,3 +396,5 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   tourne sur ce binaire.**
 - **BPE-24** `ouvert` [P2] — Tracabilite du binaire natif (constat #65) : aucune empreinte fiable — deux md5 distincts impriment la meme version et le meme horodatage, la provenance de la baseline est tapee a la main et FAUSSE pour 14 entrees, le md5 n est consigne nulle part. Reponse retenue : que la capture enregistre le md5 du binaire + l IDSTRING complet. Re-capture des 14 = arbitrage Romain, INTERDITE sans son mot.
 - **BPE-25** `abandonné` [P3] — checktemplates : fausse alerte. Deja ancre nativement, sous le nom de corpus « templates » (entree #25 des 113, `baseline-native/baseline.json:1743-1764` et `hub/projets/2026-07-16-iso-100-grammaires/BASELINE-CENTRALE.md:89`), avec `produit:true`, `capture_comparable:true` et une capture deja presente (`baseline-native/captures/templates.text.txt`, 5 lignes). L'absence du literal « checktemplates » comme nom de grammaire avait ete confondue avec l'absence d'ancre — la source `-gr.checktemplates` / `-se.checktemplates` est bien celle du corpus « templates ».
+- **BPE-26** `ouvert` [P2] — ISO-100 -- _stepOn et _stepOff sont INECRIVABLES : le controle de perf _step les masque par match de prefixe glouton SANS garde de frontiere (CompileProcs.c:722-732), erreur code 15 a toute position. Declarees en GramProcedure et inatteignables. Constat #69. A REMONTER A BERNARD (decision Romain 2026-08-09 : backlog).
+- **BPE-27** `ouvert` [P3] — ISO-100 -- CINQ directives sans comportement observable en lot, preuve source : _stop (InterruptCompute est un stub console, ConsoleStubs.c:142) ; _capture et _part (sautees en production, ProduceItems.c:1239 et Compute.c:1664, MIDI temps-reel seulement) ; _printOn et _printOff (basculent DisplayProduce, Compute.c:243, aucun differentiel en produce console). Fait mesure, pas echec. Decision Romain 2026-08-09 : backlog.

@@ -80,7 +80,7 @@ domaine, sur pièces : `fichier:ligne`, ou commande et sortie réelle.
 | --- | --- |
 | une doc, un « où » ou un « quoi » documentaire | **RTFM** |
 | la structure du code | **codegraph** |
-| le langage BPScript | le skill **`oracle-bpscript`** |
+| la **forme** du langage — il ne compile pas | le skill **`bpscript-oracle`** |
 | l'architecture, l'autorité | **Atlas** |
 | un comportement de production | le **binaire natif** |
 
@@ -119,6 +119,12 @@ Avant de déclarer un blocage humain sur une **dépendance de construction** :
 Demander l'accord pour une action irréversible reste juste. Le demander pour une chose que je peux
 faire, vérifier et défaire coûte du temps à tout le monde.
 
+## ⛔ Le repli sous pression
+
+Un blocage se solde par **une question, jamais par un contournement**. Sont des replis : un test
+sauté, une valeur écrite en dur pour faire passer, une assertion ajustée à ce qui sort, une seconde
+autorité « en attendant ». Face au blocage, j'attends.
+
 ## Coder
 
 - **Le code mort s'élague** dans le mouvement qui le rend mort. Une branche sans appelant vivant sort.
@@ -126,6 +132,9 @@ faire, vérifier et défaire coûte du temps à tout le monde.
 - **Les commentaires sont utiles et proportionnés** : ils disent ce que le code ne montre pas.
 
 ## Écrire un document
+
+Cette section porte sur les **documents**. Un commentaire de code relève de « Coder » : il dit ce que
+le code ne montre pas, y compris ce qui a rendu un seuil nécessaire.
 
 - **Descriptif et factuel** : le document décrit **ce qui est**, dans son état d'aujourd'hui.
 - **Affirmatif** : on décrit l'objet. La forme négative se réécrit en énoncé positif.
@@ -162,7 +171,8 @@ préfixe : `BP_AGENT=bp3-engine ~/dev/bp/hub/tour <commande>`.
    qui écrit.
 7. **Fin de session** : je mets à jour ma ligne du `TABLEAU.md`, ma fiche projet et ma colonne de
    `baseline-status.json`. **Le code fait foi** : un statut se vérifie sur pièces.
+
 ## Backlog
 
 `BACKLOG.md` porte ma dette interne, avec un identifiant et un statut par entrée. Un item qui touche
-le **langage** remonte au backlog central par `tour`. La vue globale se consulte avec `tour backlog`.
+le **langage** remonte au backlog central par `tour`. La vue globale se consulte avec `tour backlog`. **Je reporte, l'architecte clôt** : passer un item à « fait » moi-même n'est pas mon geste.

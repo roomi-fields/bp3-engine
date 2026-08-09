@@ -219,10 +219,18 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   (c) `-gr.a` : son echec vient de `--.` au lieu de `-->` (l.16) et du mojibake `≥` (famille BPE-5/9),
       pas des drapeaux.
   CONCLUSION : rien a remonter a Bernard — le compilateur est coherent (une regle par ligne, `-->`
-  obligatoire). Meme famille que BPE-2/5/16 (conventions BP2 dans le corpus). RESTE (data, borne) :
-  reecrire tryTranspose/Rajeev en une-regle-par-ligne + retirer `¬` ; NB tryTranspose porte AUSSI un
-  « Error code 15 » distinct sur `_keyxpand(A4,1.3) _transpose(-2) {a N}` (rules 5-6) — sous-question
-  a part, non liee aux drapeaux.
+  obligatoire). Meme famille que BPE-2/5/16 (conventions BP2 dans le corpus).
+  DIAGNOSTIC COMPLET de tryTranspose (bisecte au binaire, 4 erreurs) : 2 sont BPE-15 (ligne de
+  drapeaux nue + `¬`), 2 sont BPE-3 (« Error code 15 » sur `{a N}`/`{a P}` = terminal MINUSCULE non
+  defini car l'alphabet `-ho.tryKeyMap` n'etait pas charge ; `a` est defini l.5 de ce fichier).
+  ZERO bug moteur. PREUVE de correctif : joindre l.8-9 en une ligne + retirer `¬`, ET charger
+  l'alphabet en `-al` → `Errors: 0` ET la DERIVATION fonctionne (work-string expanse sous `-D` :
+  20× `_transpose(0.20){A4…}` etc.).
+  ⚠️ MAIS `-o` rend 0 octet la ou `-D` affiche l'item — canal de sortie a instruire (sous-question
+  SEPAREE, non liee aux drapeaux ; possiblement -se/limite/taille). RESTE, donc, avant de declarer
+  un gain : (1) elucider `-o` vide (compile+derive ≠ item ecrit) ; (2) reecriture data de
+  tryTranspose/Rajeev ; (3) config alphabet cote bpscript (php_ref.alphabet, famille BPE-3). Je
+  n'ai PAS mute le corpus : pas de gain declare non verifie end-to-end.
 
 - **BPE-16** `RESOLU 2026-07-19` [P2] — CORPUS-FINS-DE-LIGNE-MAC : 14 fichiers du corpus
   n'avaient que des retours chariot Mac (`0x0D`) et aucun saut de ligne — le moteur y lit une

@@ -1,0 +1,4 @@
+// -gr.iso_traceoff — traceoff (dérivation multi-pas ; la directive active la trace stdout, sans flag CLI).
+gram#1[1] S --> A
+gram#1[2] _traceOn A --> B B
+gram#1[3] _traceOff B --> C4 D4

@@ -1,0 +1,3 @@
+// -gr.iso_velfixed — grammaire de référence ISO-100 (directive _velfixed)
+// Générée par bp3-engine, lot [200]. Témoin/test : la comparaison prouve.
+gram#1[1] S --> {_velcont _vel(20) C4 C4 C4 _vel(120) , _velfixed _vel(20) C4 C4 C4 _vel(120)}

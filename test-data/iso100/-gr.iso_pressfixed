@@ -1,0 +1,3 @@
+// -gr.iso_pressfixed — grammaire de référence ISO-100 (directive _pressfixed)
+// Générée par bp3-engine, lot [200]. Témoin/test : la comparaison prouve.
+gram#1[1] S --> {_presscont _press(10) C4 C4 C4 _press(120) , _pressfixed _press(10) C4 C4 C4 _press(120)}

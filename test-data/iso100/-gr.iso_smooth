@@ -1,0 +1,4 @@
+// -gr.iso_smooth — _smooth bascule le temps en continu (défaut moteur = striated).
+// Mesure CROISÉE : comparer les onsets de CETTE grammaire à la même SANS _smooth.
+_mm(60.0000) _smooth
+gram#1[1] S --> {2/3, C4 C4 C4}

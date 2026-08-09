@@ -1,0 +1,3 @@
+// -gr.iso_transposestep — grammaire de référence ISO-100 (directive _transposestep)
+// Générée par bp3-engine, lot [200]. Témoin/test : la comparaison prouve.
+gram#1[1] S --> {_transpose(0) C4 C4 C4 C4 , _transposestep _transpose(0) C4 C4 C4 _transpose(12)}

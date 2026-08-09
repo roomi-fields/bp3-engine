@@ -1,0 +1,3 @@
+// -gr.iso_volumecontrol — grammaire de référence ISO-100 (directive _volumecontrol)
+// Générée par bp3-engine, lot [200]. Témoin/test : la comparaison prouve.
+gram#1[1] S --> {_volumecont _volume(10) C4 C4 C4 _volume(120) , _volumecontrol(11) _volumecont _volume(10) C4 C4 C4 _volume(120)}

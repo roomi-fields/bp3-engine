@@ -1,0 +1,6 @@
+// -gr.iso_stepon — INÉCRIVABLE (aucune règle possible).
+// Le contrôle de performance _step masque _stepon par match de préfixe glouton
+// (CompileProcs.c:726-732, sans garde de frontière) : _stepon est lu comme _step+... → erreur 15.
+// Directive déclarée en GramProcedure mais inatteignable en texte de grammaire.
+// (Grammaire minimale valide, sans la directive, pour que le corpus ait une entrée.)
+gram#1[1] S --> C4 D4 E4

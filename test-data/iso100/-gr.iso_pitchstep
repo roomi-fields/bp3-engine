@@ -1,0 +1,3 @@
+// -gr.iso_pitchstep — grammaire de référence ISO-100 (directive _pitchstep)
+// Générée par bp3-engine, lot [200]. Témoin/test : la comparaison prouve.
+gram#1[1] S --> {_pitchcont _pitchbend(0) C4 C4 C4 _pitchbend(16000) , _pitchstep _pitchbend(0) C4 C4 C4 _pitchbend(16000)}

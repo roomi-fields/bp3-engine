@@ -33,6 +33,12 @@ lancer() { # lancer <nom> <delai> <commande...>
 
 if [ "$VOIE" = rapide ] || [ "$VOIE" = tout ]; then
   echo "── voie RAPIDE ───────────────────────────────"
+  # PRÉ-ÉTAPE (arbitrage architecte 2026-08-09, [202] pt 1) : GARANTIR l'artefact WASM que
+  # dix gardes de cette voie mesurent. La réparation est de garantir l'artefact, pas
+  # d'affaiblir le garde. Si la construction ÉCHOUE, cette ligne rougit EN LE DISANT et les
+  # gardes WASM qui suivent échouent aussi, visiblement — jamais un saut silencieux qui
+  # rendrait le même vert qu'un portillon ayant tout mesuré.
+  lancer "wasm-build"            300 ./build.sh wasm
   # Listés un par un, et non par une boucle : le méta-garde anti-bypass doit pouvoir
   # lire ce fichier sans interpréter du shell. Un garde qui doit deviner ne garde rien.
   lancer "test-midi-bug"          60 node scripts/test-midi-bug.js

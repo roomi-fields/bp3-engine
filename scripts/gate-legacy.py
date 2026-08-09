@@ -111,14 +111,15 @@ if os.path.isdir(CANON) and os.path.isdir(COPIE):
             ecarts.append(f"« {f} » DIVERGE entre csrc/bp3/ (canonique) et source/BP3/ "
                           f"(ce que build.sh compile) — relancez `./build.sh` deux fois")
 
-# ── 3. les binaires construits ne doivent pas etre PLUS VIEUX que leurs sources ──
-# Ajoute le 2026-07-19 apres m'etre fait prendre : j'ai passe le moteur en v3.4.7 et le
-# portillon est reste VERT — parce que ses 14 gardes tournaient contre un build WASM
-# date du 26 avril, anterieur de trois mois a la mise a jour. Un garde vert contre un
-# artefact perime ne mesure pas ce qu'il annonce ; c'est la meme faute que tout le reste
-# de la journee, sur l'artefact au lieu du code.
-ARTEFACTS = [("bp3", [os.path.join("source", "BP3")]),
-             ("build/bp3.js", [os.path.join("csrc", "bp3"), os.path.join("csrc", "wasm")])]
+# ── 3. le binaire NATIF ne doit pas etre PLUS VIEUX que ses sources ──
+# Ajoute le 2026-07-19 apres m'etre fait prendre : un portillon vert contre un artefact
+# perime ne mesure pas ce qu'il annonce.
+# ⛔ STOP WASM (arbitrage Romain 2026-08-09, [203]) : l'ORACLE est le binaire NATIF. Le
+# WASM est un portage PARTIEL qui ne fait autorite sur rien, et le portillon ne le batit
+# pas ; exiger sa fraicheur ici rendrait ce garde rouge sur tout arbre sans WASM et
+# bloquerait chaque push. On ne mesure donc QUE la fraicheur du natif « bp3 » (l'oracle).
+# Les gardes comportementaux WASM vivent en voie `wasm`, informative et non bloquante.
+ARTEFACTS = [("bp3", [os.path.join("source", "BP3")])]
 for art, sources in ARTEFACTS:
     pa = os.path.join(R, art)
     if not os.path.isfile(pa):

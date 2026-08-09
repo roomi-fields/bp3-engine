@@ -33,23 +33,13 @@ lancer() { # lancer <nom> <delai> <commande...>
 
 if [ "$VOIE" = rapide ] || [ "$VOIE" = tout ]; then
   echo "── voie RAPIDE ───────────────────────────────"
-  # PRÉ-ÉTAPE (arbitrage architecte 2026-08-09, [202] pt 1) : GARANTIR l'artefact WASM que
-  # dix gardes de cette voie mesurent. La réparation est de garantir l'artefact, pas
-  # d'affaiblir le garde. Si la construction ÉCHOUE, cette ligne rougit EN LE DISANT et les
-  # gardes WASM qui suivent échouent aussi, visiblement — jamais un saut silencieux qui
-  # rendrait le même vert qu'un portillon ayant tout mesuré.
-  lancer "wasm-build"            300 ./build.sh wasm
+  # ⛔ STOP WASM (arbitrage Romain 2026-08-09, [203]) : l'ORACLE est le binaire NATIF. Le
+  # WASM est un portage PARTIEL qui ne fait autorité sur rien — le portillon NE LE BÂTIT PAS.
+  # Les gardes COMPORTEMENTAUX WASM (test-*) quittent donc la voie qui BLOQUE le push : ils
+  # restent visibles en voie `wasm` (non bloquante, cf. plus bas). Un push qui ne touche que
+  # test-data ou la doc n'a rien à voir avec un artefact WASM. Reco (b), retenue par Romain.
   # Listés un par un, et non par une boucle : le méta-garde anti-bypass doit pouvoir
   # lire ce fichier sans interpréter du shell. Un garde qui doit deviner ne garde rien.
-  lancer "test-midi-bug"          60 node scripts/test-midi-bug.js
-  lancer "test-midi-reinit"       60 node scripts/test-midi-reinit.js
-  lancer "test-reinit"            60 node scripts/test-reinit.js
-  lancer "test-repro-exact"       60 node scripts/test-repro-exact.js
-  lancer "test-sequence"          60 node scripts/test-sequence.js
-  lancer "test-visser3-only"      60 node scripts/test-visser3-only.js
-  lancer "test-visser3-sequence"  60 node scripts/test-visser3-sequence.js
-  lancer "test-visser3-setting"   60 node scripts/test-visser3-setting.js
-  lancer "test-settings-params"   60 node scripts/test-settings-params.js
   lancer "baseline-integrite" 60 python3 scripts/gate-baseline.py
   lancer "anti-bypass"        60 python3 scripts/gate-meta.py
   lancer "anti-bypass-morsure" 90 ./scripts/gate-meta-injection.sh
@@ -77,6 +67,24 @@ if [ "$VOIE" = rouge ] || [ "$VOIE" = tout ]; then
   echo "   depuis la v3.4.7 et garde desormais sa non-reapparition en voie rapide)"
 fi
 
+# La voie WASM porte les gardes COMPORTEMENTAUX qui tournent contre le portage WASM.
+# ⛔ Elle NE BLOQUE PAS le push et n'entre PAS dans « tout » : le WASM n'est pas l'oracle
+# (STOP WASM, [203]), le portillon ne le bâtit pas, donc ces gardes exigent un build/bp3.js
+# monté à la main. Informative : lancer explicitement `gate.sh wasm` après avoir bâti le
+# WASM soi-même. Un rouge ici = artefact absent ou périmé, PAS un défaut du moteur natif.
+if [ "$VOIE" = wasm ]; then
+  echo "── voie WASM (informative, non bloquante — exige un build/bp3.js manuel) ──"
+  lancer "test-midi-bug"          60 node scripts/test-midi-bug.js
+  lancer "test-midi-reinit"       60 node scripts/test-midi-reinit.js
+  lancer "test-reinit"            60 node scripts/test-reinit.js
+  lancer "test-repro-exact"       60 node scripts/test-repro-exact.js
+  lancer "test-sequence"          60 node scripts/test-sequence.js
+  lancer "test-visser3-only"      60 node scripts/test-visser3-only.js
+  lancer "test-visser3-sequence"  60 node scripts/test-visser3-sequence.js
+  lancer "test-visser3-setting"   60 node scripts/test-visser3-setting.js
+  lancer "test-settings-params"   60 node scripts/test-settings-params.js
+fi
+
 if [ "$VOIE" = lente ] || [ "$VOIE" = tout ]; then
   echo "── voie LENTE ────────────────────────────────"
   # ⚠ COUVERTURE REELLE MESUREE : 25 grammaires sur 110 (23 %). Il ne va PAS plus loin :
@@ -89,6 +97,7 @@ fi
 echo "─────────────────────────────────────────────"
 echo "  $VERT vert(s), $ROUGE rouge(s)"
 [ "$VOIE" = rouge ] && exit 0   # cette voie est informative : son rouge est attendu
+[ "$VOIE" = wasm ]  && exit 0   # informative aussi : rouge attendu si le WASM n'est pas monté
 exit $(( ROUGE > 0 ? 1 : 0 ))
 
 # ── EXCLUS NOMMÉMENT — outils d'exploration, pas des gardes ───────────────────

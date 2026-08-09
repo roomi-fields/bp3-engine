@@ -406,3 +406,19 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
 - **BPE-25** `abandonné` [P3] — checktemplates : fausse alerte. Deja ancre nativement, sous le nom de corpus « templates » (entree #25 des 113, `baseline-native/baseline.json:1743-1764` et `hub/projets/2026-07-16-iso-100-grammaires/BASELINE-CENTRALE.md:89`), avec `produit:true`, `capture_comparable:true` et une capture deja presente (`baseline-native/captures/templates.text.txt`, 5 lignes). L'absence du literal « checktemplates » comme nom de grammaire avait ete confondue avec l'absence d'ancre — la source `-gr.checktemplates` / `-se.checktemplates` est bien celle du corpus « templates ».
 - **BPE-26** `ouvert` [P2] — ISO-100 -- _stepOn et _stepOff sont INECRIVABLES : le controle de perf _step les masque par match de prefixe glouton SANS garde de frontiere (CompileProcs.c:722-732), erreur code 15 a toute position. Declarees en GramProcedure et inatteignables. Constat #69. A REMONTER A BERNARD (decision Romain 2026-08-09 : backlog).
 - **BPE-27** `ouvert` [P3] — ISO-100 -- CINQ directives sans comportement observable en lot, preuve source : _stop (InterruptCompute est un stub console, ConsoleStubs.c:142) ; _capture et _part (sautees en production, ProduceItems.c:1239 et Compute.c:1664, MIDI temps-reel seulement) ; _printOn et _printOff (basculent DisplayProduce, Compute.c:243, aucun differentiel en produce console). Fait mesure, pas echec. Decision Romain 2026-08-09 : backlog.
+- **BPE-28** `ouvert` [P2] — SEGFAULT NATIF sur l'ecriture `-o` d'un item profondement imbrique
+  (chemin de serialisation fichier). Trouve 2026-08-09 en instruisant BPE-15. REPRO FIABLE (100 %),
+  bp3 natif 3.5.1 : prendre `-gr.tryTranspose`, joindre ses lignes 8-9 en une seule regle + retirer
+  le `¬` (correctif BPE-15), puis
+  `./bp3 produce -gr <tryTranspose-corrige> -al test-data/-ho.tryKeyMap -o <fichier> --seed 1`
+  -> **Erreur de segmentation (code 139)**. DISCRIMINANT NET, meme item : `-D` (affichage terminal)
+  reussit et montre l'expansion (20x `_transpose(0.20){A4 ...}` imbriques + parties N/P) ; `-o`
+  (ecriture fichier) CRASHE. Le « 0 octet » initialement observe etait le crash AVANT ecriture, pas
+  un item vide. Axe : chemin d'ECRITURE FICHIER de l'item produit (PrintArg->FILE / serialisation),
+  distinct de la derivation (qui, elle, fonctionne). Suspect : debordement de pile d'un imprimeur
+  recursif sur l'imbrication polymetrique profonde forcee par les gardes de drapeaux (Atimes=20...).
+  MINIMISATION INCOMPLETE : les items minuscules ({a}, _transpose(1){a}, _keyxpand(..){a}) n'ont PAS
+  crashe ; il faut la profondeur reelle de tryTranspose, que mes grammaires minimales n'ont pas
+  reproduite (recursion garde-forcee non declenchee hors contexte). A MINIMISER avant remontee a
+  Bernard (repro solide exige). Lie a BPE-15 (le crash n'apparait qu'une fois la muette rendue
+  compilable) et a la memoire oracle-texte-option-o (Bernard a deja touche au chemin PrintArg->FILE).

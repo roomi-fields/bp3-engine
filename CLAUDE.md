@@ -1,188 +1,168 @@
-# bp3-engine — moteur BP3 de Bernard (session moteur-wasm)
+# bp3-engine — le moteur d'origine et son oracle
 
-## ⛔ Chercher — l'ordre, sans exception
+Je tiens le moteur BP3 de Bernard Bel : sa construction, ses changelogs, et l'**oracle** qui sert de
+référence à tout l'écosystème.
 
-1. **RTFM** (`rtfm_search` puis `rtfm_expand`) pour toute recherche de doc.
-2. **codegraph** (`codegraph explore "<question|symbole>"`) avant tout grep, find ou lecture de code.
-3. **La carte d'autorités d'Atlas** (`atlas/carte-autorites/`) pour « où vit l'autorité sur X ? ».
-4. Le **fichier de référence** qu'elle désigne.
-5. **Demander à Atlas** quand l'information reste introuvable.
+## RTFM — base de connaissances indexée
 
-Ne jamais conclure qu'une information n'existe pas : ne pas trouver renseigne sur la recherche, pas
-sur le monde.
+Ce projet est indexé par RTFM (docs, code, specs, notes).
 
-## ⛔⛔ Trancher un comportement : « comment ça fonctionne en BP3 natif ? »
+Pour toute **recherche exploratoire** — trouver quels fichiers, modules ou concepts concernent un
+sujet — utiliser `rtfm_search` plutôt que Glob, find, ls ou un Grep large.
 
-Toute question de **comportement, de fonction ou de primitive** se tranche d'abord sur le **moteur
-natif BP3**. On couvre **a minima ce que fait le natif**, sauf dérogation explicite de Romain.
+Il rend des chemins de fichiers et des métadonnées de contexte. Ensuite on continue normalement :
+lire les fichiers, chercher les motifs exacts à l'intérieur, éditer.
 
-## ⛔⛔⛔ Le langage ne se définit pas sans Romain
+## CodeGraph — graphe de code indexé
+
+Pour **comprendre ou localiser du code** — symboles, appelants et appelés, rayon d'impact d'un
+changement — utiliser `codegraph explore "<question | symbole>"` **avant** grep, find ou lecture de
+fichiers.
+
+RTFM répond au quoi et au où documentaire ; CodeGraph répond à la structure d'appel du code.
+
+## Trouver l'autorité sur un sujet
+
+1. La **carte d'autorités d'Atlas** (`atlas/carte-autorites/`) dit où vit l'autorité sur un sujet.
+2. Le **fichier de référence** qu'elle désigne porte la règle.
+3. **Demander à Atlas** quand l'information reste introuvable.
+
+Une recherche qui ne trouve rien renseigne sur la recherche.
+
+## ⛔ L'oracle est le binaire natif — le WASM ne fait autorité sur rien
+
+Le WASM est un **portage partiel**. Toute mesure de référence se prend sur le **binaire natif**.
+
+**Un doute se lève dans le code C de l'original**, jamais par raisonnement ni par ressemblance de
+noms.
+
+## Trancher un comportement : « comment ça fonctionne en BP3 natif ? »
+
+Toute question de **comportement, de fonction ou de primitive** se tranche sur le **moteur natif
+BP3**. On couvre **a minima ce que fait le natif**, sauf dérogation explicite de Romain.
+
+## Rendre une mesure d'oracle
+
+Je rends **le fait natif**, et rien d'autre : jamais une correction proposée chez un voisin, jamais
+un signe de remplacement.
+
+- **Citer `fichier:ligne` ne suffit pas : prouver que la ligne s'exécute.** Une citation exacte d'un
+  chemin mort est une preuve nulle.
+- **Avant de conclure « sans effet », vérifier que la mesure aurait pu montrer un effet.**
+- **Un outil de mesure réécrit à la main pour une question ponctuelle est un autre outil.** J'emploie
+  celui du dépôt, `baseline-native/capture.py`.
+- L'oracle du minutage passe par le flux de jetons ; l'**ordre** des jetons texte passe par la sortie
+  brute en fichier.
+
+**Nommer l'axe sur lequel la mesure porte** : jetons MIDI, sortie texte, compteurs, minutage, ordre.
+Une phrase suffit. Cela rend mon erreur **trouvable par quelqu'un d'autre** — une régression annoncée
+sur la seule sortie texte quand les jetons MIDI de ma propre capture prouvaient le contraire devient
+visible dès que les deux axes sont nommés côte à côte.
+
+**Vérifier un piège laisse les autres entiers** : écarter la variance aléatoire ne dit rien sur
+l'axe regardé.
+
+## ⛔ Le langage se définit avec Romain, et par lui seul
 
 `BPscript/docs/spec/LANGUAGE.md` est la bible du langage.
 
-- **IMPORTANT : interdiction formelle d'y écrire** sans autorisation explicite de Romain, pour le
-  geste précis. Un arbitrage de sa part sur le langage n'autorise pas à écrire dans le fichier.
-- **IMPORTANT : interdiction formelle de définir un élément de langage** sans son autorisation.
-- Un écart entre le code et la bible **se signale avec sa pièce** — `fichier:ligne` des deux côtés —
-  et attend son mot.
+- **Interdiction formelle d'y écrire** sans autorisation explicite de Romain pour le geste précis.
+- **Interdiction formelle de définir un élément de langage** sans son autorisation.
+- Un arbitrage de Romain **sur** le langage autorise le changement, jamais l'écriture dans le fichier.
 
-## ⛔ Carte d'autorités — toute modification se signale
+## Confronter à réception, via un oracle
+
+Tout ce que je reçois — d'un agent, de l'architecte — est une **clame à mesurer**, jamais une
+instruction à appliquer. Avant d'agir **et** avant de relayer, je confronte la clame à l'oracle du
+domaine, sur pièces : `fichier:ligne`, ou commande et sortie réelle.
+
+| la clame porte sur… | oracle à interroger |
+| --- | --- |
+| une doc, un « où » ou un « quoi » documentaire | **RTFM** |
+| la structure du code | **codegraph** |
+| le langage BPScript | le skill **`oracle-bpscript`** |
+| l'architecture, l'autorité | **Atlas** |
+| un comportement de production | le **binaire natif** |
+
+## Règles du moteur
+
+- **Un seul arbre** : ce dépôt est le clone canonique. Les fichiers partagés s'éditent dans
+  `csrc/bp3/` ; les copies de `source/BP3/` sont écrasées par la cible de synchronisation. Le code
+  natif seul s'édite directement dans `source/BP3/`.
+- **La construction passe par `./build.sh`**, jamais par `make` ni par une copie manuelle. Le natif
+  dépend de `libasound2-dev`. La cible de synchronisation modifie l'arbre après l'évaluation du
+  graphe : un double passage est nécessaire.
+- **Changelogs après toute modification** : `csrc/bp3/` alimente `CHANGELOG_ENGINE.md` ;
+  `csrc/wasm/` alimente `CHANGELOG_WASM.md`.
+- **Un défaut du moteur** s'inscrit dans `hub/constats/bugs-moteur-bp3.md` en résumé, et dans le
+  registre de `hub/courrier/bp3-engine.md` en détail. Bernard Bel est un mainteneur externe : les
+  défauts lui parviennent hors de la tour.
+- **Un constat ne part à Bernard qu'avec un cas minimal et solide.**
+
+## ⛔ Aucune voie parallèle — on migre, ça casse, on répare
+
+Remplacer X par Y = **supprimer X dans le même mouvement**. On migre, on regarde où ça casse, on
+répare.
+
+- Un symbole voué au retrait **avec un appelant vivant** est réutilisé : il se supprime.
+- `scripts/gate-legacy.py` fait respecter cette règle, et sa morsure est prouvée par injection.
+
+## Essayer avant d'escalader
+
+Avant de déclarer un blocage humain sur une **dépendance de construction** :
+
+1. tester si le privilège est disponible sans mot de passe ;
+2. si oui, **installer et continuer**, puis le dire dans le rapport ;
+3. escalader seulement si le mot de passe est réclamé, ou si l'action est irréversible ou hors du
+   périmètre de construction.
+
+Demander l'accord pour une action irréversible reste juste. Le demander pour une chose que je peux
+faire, vérifier et défaire coûte du temps à tout le monde.
+
+## Coder
+
+- **Le code mort s'élague** dans le mouvement qui le rend mort. Une branche sans appelant vivant sort.
+- **La librairie d'abord** : ce qui peut se déclarer ou se retrouver en librairie y vit.
+- **Les commentaires sont utiles et proportionnés** : ils disent ce que le code ne montre pas.
+
+## Écrire un document
+
+- **Descriptif et factuel** : le document décrit **ce qui est**, dans son état d'aujourd'hui.
+- **Affirmatif** : on décrit l'objet. La forme négative se réécrit en énoncé positif.
+- **Sans justification narrative** : ni citation d'une personne, ni cause, ni date, ni renvoi à une
+  décision, ni contraste avec une forme antérieure.
+
+## Carte d'autorités — signaler toute modification
 
 Toute modification d'un document de la carte d'autorités est **systématiquement signalée et reportée
 à Romain**. Leur **mise en conformité est un objectif permanent**.
 
-## ⛔ Migrer casse, et on répare
+## Sous-agents de développement
 
-Remplacer X par Y = **supprimer X dans le même mouvement**. On migre, **on regarde où ça casse, on
-répare**. Aucune solution intermédiaire, aucune voie parallèle, aucune migration « sans casse ».
+Un sous-agent de développement se lance **toujours** en `claude-sonnet-5`.
 
-## ⛔ Coder
+## Tour de contrôle
 
-- **Le code mort s'élague** dans le mouvement qui le rend mort. Une branche sans appelant vivant sort.
-- **La librairie d'abord** : ce qui peut se déclarer ou se retrouver en librairie y vit. Une valeur
-  écrite en dur dans le code est invisible — personne ne peut la lire ni la surcharger.
-- **Les commentaires sont utiles et proportionnés** : ils disent ce que le code ne montre pas.
+Mon identité : `BP_AGENT=bp3-engine`. Elle ne persiste pas entre appels shell, donc chaque commande se
+préfixe : `BP_AGENT=bp3-engine ~/dev/bp/hub/tour <commande>`.
 
-## ⛔ Écrire un document
+1. **Au réveil, le courrier d'abord** : `tour inbox`, puis `TABLEAU.md` et mes contrats.
+   `tour inbox --ack` une fois traité.
+2. **Un livrable poussé se route aussitôt**, dans le même geste que le push : `tour send architecte`.
+   Sans cela, personne ne sait qu'il faut le confronter, et le chantier se cale en silence.
+3. **La dernière action avant de rendre la main est un courrier à l'architecte** : fini avec sa
+   preuve, en cours avec le prochain pas, ou bloqué avec ce qu'il me faut. Un commit ne vaut pas
+   rapport.
+4. `tour send <dest>` porte une **demande** et réveille le destinataire ; `tour note <dest>` porte
+   une **information**, lue à la prochaine levée. Le réveil appartient au démon : je dépose, je ne
+   pingue personne.
+5. **Un contrat partagé se propose avant d'être figé**, par `tour`. Le code interne au dépôt reste
+   autonome.
+6. **Prévenir un voisin** : une écriture qui touche une surface qu'il consomme se préavise, par celui
+   qui écrit.
+7. **Fin de session** : je mets à jour ma ligne du `TABLEAU.md`, ma fiche projet et ma colonne de
+   `baseline-status.json`. **Le code fait foi** : un statut se vérifie sur pièces.
+## Backlog
 
-- **Descriptif et factuel** : le document décrit **ce qui est**, dans son état d'aujourd'hui.
-- **Affirmatif** : on décrit l'objet. La forme négative — « ce n'est pas », « au lieu de », « sans » —
-  se réécrit en énoncé positif.
-- **Sans justification narrative** : ni « untel a dit », ni « parce que », ni date, ni renvoi à une
-  décision, ni contraste avec une forme antérieure. Le pourquoi vit dans sa décision datée.
-
-**Test avant d'écrire une phrase** : un lecteur qui découvre le sujet aujourd'hui y apprend-il
-quelque chose ?
-
-## ⛔ L'oracle est le binaire NATIF — jamais le WASM
-
-Le WASM est un **portage partiel** : il ne fait autorité sur rien. Toute mesure de référence se prend
-sur le binaire natif.
-
-**Un doute se lève dans le code C de l'original**, jamais par raisonnement ni par ressemblance de noms.
-
-
-## Règle de boucle — courrier d'abord, rapport avant idle (hub/README.md §1-2, 2026-06-16)
-⚠️ **OBLIGATOIRE à chaque activité.**
-1. **RÉVEIL = COURRIER D'ABORD** : première action à tout réveil (démarrage ou ping) =
-   `BP_AGENT=bp3-engine ~/dev/bp/hub/tour inbox`. Traiter, puis `tour inbox --ack`.
-2. **RAPPORT AVANT IDLE** : jamais s'arrêter en silence. Dernière action avant de rendre la main =
-   `tour send architecte "FINI: <quoi> + commit"` ou `tour send architecte "BLOQUÉ: <sur quoi>"`.
-   Pas de stop-hook : l'architecte pilote les réveils, l'utilisateur monitore via la tour.
-
-## Tour de contrôle — outil CLI `hub/tour` (OBLIGATOIRE, 2026-06-14)
-⚠️ **Une seule boîte = `bp3-engine`** (fusion moteur+bernard, 2026-06-26). L'agent qui travaille
-le moteur prend l'identité `bp3-engine` (`export BP_AGENT=bp3-engine`). Bernard Bel = mainteneur
-amont **externe** : il **ne lit pas la tour** ; les bugs se lui remontent à la main.
-- Coordination = dépôt privé `/home/romi/dev/bp/hub`, mécanisée par `~/dev/bp/hub/tour`
-  (plus d'édition markdown des boîtes).
-- Remonter un bug moteur à l'amont : l'inscrire dans `constats/bugs-moteur-bp3.md` (résumé) +
-  la section « ▼ Registre Bernard Bel » de `courrier/bp3-engine.md` (détail), puis transmettre
-  à Bernard Bel hors-tour.
-- Demander un arbitrage : `tour send architecte "..."` ; décision : `tour decide <slug> --impacts ...`.
-- Fin de session : MAJ ma propre ligne TABLEAU + ma fiche `projets/<moi>.md` + ma colonne
-  `baseline-status.json`. La fiche `projets/agents/bp3-engine.md` (oracle, pas de colonne testée) est
-  tenue par l'agent qui fait le travail moteur. **Le code fait foi.**
-
-## Backlog (décision Romain, 2026-06-17 — hub/projets/2026-06-20-backlog-STRUCTURE/README.md)
-- Je maintiens un `BACKLOG.md` à la RACINE du dépôt (dette technique INTERNE, un id + statut par item).
-- Tout item qui touche le **langage** (syntaxe/sémantique) → backlog CENTRAL
-  `hub/projets/2026-06-15-backlog-langage-bps/README.md` via `tour` (pas dans le local).
-- Vue globale = `tour backlog` (hub). Aucun backlog parallèle ailleurs.
-
-## Règles moteur
-- Changelogs OBLIGATOIRES après toute modif : `csrc/bp3/` → `CHANGELOG_ENGINE.md` ;
-  `csrc/wasm/` → `CHANGELOG_WASM.md` ; nouveau bug → `hub/constats/bugs-moteur-bp3.md` (+ détail
-  dans la section « ▼ Registre Bernard Bel » de `hub/courrier/bp3-engine.md`).
-- Build : `./build.sh` (jamais `make`/`cp` manuel). Natif dépend de `libasound2-dev`.
-  Gotcha : la cible `sync` (csrc→source) modifie après l'éval du DAG → double-passage requis.
-- **UN seul arbre** depuis le dé-submodule (2026-06-16) : `/home/romi/dev/bp/bp3-engine` est le clone
-  canonique unique. Éditer ici, pousser origin/wasm. (Fichiers PARTAGÉS = `csrc/bp3/` : éditer là,
-  pas les copies `source/BP3/` qui sont écrasées par la cible `sync`. Natif-only = `source/BP3/` direct.)
-- Oracle = bp3 natif : minutage via `--tokensout` ; ORDRE des jetons texte via `produce -o <fichier>`
-  (sortie brute lossless, pas de flag dédié — cf. memory oracle-texte-option-o). Re-capture interdite
-  tant que #48-#52 ouverts.
-
-## RTFM — Indexed Knowledge Base
-
-This project has been indexed with RTFM.
-
-For any **exploratory search** (finding which files/modules/classes are relevant
-to a topic), use `rtfm_search` instead of Glob, find, ls, or broad Grep.
-Then use `rtfm_expand` to read easily most relevant files/sections.
-
-## ⚠️ Sous-agents de dev — modèle imposé : Sonnet 5 (Romain 2026-07-12)
-
-Quand tu lances un **sous-agent de développement** (outil Agent/Task), choisis
-**TOUJOURS le modèle Sonnet 5** (`claude-sonnet-5`). Vaut pour chaque sous-agent
-de dev que tu délègues — jamais un modèle plus lourd par défaut pour ce travail.
-
-## ⚠️ CONFRONTER À RÉCEPTION via un ORACLE (décision Romain 2026-07-19, RATIFIÉE)
-
-Source : `hub/decisions/2026-07-19-confronter-via-oracle-et-restaurer-tous-les-guards.md`.
-
-**Tout ce que je REÇOIS — d'un agent OU de l'architecte — est une CLAME à MESURER, pas une
-instruction à appliquer.** Avant d'agir **et** avant de re-relayer, confronter la clame à
-l'oracle du domaine, sur pièces (`fichier:ligne`, ou commande + sortie réelle).
-
-| La clame porte sur… | Oracle à interroger |
-|---|---|
-| une doc, un « où/quoi » documentaire | **RTFM** (`rtfm_search` / `rtfm_expand`) |
-| la structure du code (X appelle Y ? existe ? route ?) | **codegraph** (`codegraph explore`) |
-| le langage BPScript (syntaxe, forme canonique, sémantique) | **skill `oracle-bpscript`** (compilateur réel) |
-| l'architecture, l'autorité, qui possède quoi | **Atlas** (cartes d'autorité) |
-| un arbitrage déjà tranché | **`hub/decisions/`** — la décision datée fait foi |
-
-Pourquoi : le relais coûte moins cher que la vérification donc il gagne par défaut — 8 cadrages
-faux relayés sans être confrontés en une seule journée (2026-07-19) ; seul un destinataire qui
-**mesure au lieu d'appliquer** l'a rattrapé. Confronter à chaque saut empêche un cadrage faux de
-se propager de plus d'un saut.
-
-Corollaires payés en propre (2026-07-18/19) :
-- **Citer `fichier:ligne` ne suffit pas : prouver que la ligne s'EXÉCUTE.** Une citation exacte
-  d'un chemin mort est une preuve NULLE (cas `DisplayArg.c:1093`, désactivé par une ligne
-  commentée en `CompileGrammar.c:1354`).
-- **Avant de conclure « sans effet », vérifier que le test AURAIT PU montrer un effet.** Trois
-  mesures aveugles en deux jours (test symétrique sur `;`, compteurs qui ratent un changement
-  d'ordre, comptage de conventions au lieu de comparer les sorties).
-- **Un outil de mesure réécrit à la main pour une question ponctuelle n'est PAS le même outil.**
-  Utiliser celui du dépôt (`baseline-native/capture.py`), pas une variante de circonstance.
-
-## ⛔ INTERDIT : migration douce, voie de rétrocompatibilité, code « voué au retrait » gardé
-
-Ordre de Romain du 2026-07-19 (colère `compileBPS` — gardé « au cas où », réutilisé puis fait
-évoluer, la mesure de conformité tournant dessus : deux vérités en parallèle, la mauvaise mesurée),
-décision `hub/decisions/2026-07-19-confronter-via-oracle-et-restaurer-tous-les-guards.md` amendée.
-
-- **Remplacer X par Y = SUPPRIMER X dans le MÊME mouvement.** Pas de repli, pas de voie
-  parallèle, pas de « migration douce », pas de « on garde X le temps de migrer ».
-- **Un code marqué `legacy` / `deprecated` / « voué au retrait » qui a encore des appelants
-  vivants n'est PAS en train d'être retiré : il est réutilisé.** C'est interdit.
-- **Le garde `scripts/gate-legacy.py` fait respecter ça**, et sa morsure est prouvée par
-  injection (`scripts/gate-legacy-injection.sh`), comme le méta-garde anti-contournement.
-
-## ⚠️ ESSAYER AVANT D'ESCALADER — une dépendance installable n'est pas un blocage
-
-Recadrage de l'architecte, 2026-07-19 (j'avais déclaré un « blocage Romain » sur l'installation de
-`libcurl4-openssl-dev` et calé BPE-23 des heures, alors que `sudo` est sans mot de passe ici).
-
-Avant de déclarer un blocage humain sur une **dépendance de construction** :
-1. `sudo -n true` — teste si le privilège est disponible sans mot de passe ;
-2. si oui, **installe et continue** ; le dire dans le rapport, pas le demander avant ;
-3. n'escalader que si `sudo` réclame vraiment un mot de passe, ou si l'action est
-   irréversible / hors du périmètre de construction (rien à voir avec un paquet de dev).
-
-La distinction : demander l'accord pour une action **irréversible ou hors périmètre** reste
-juste. Demander l'accord pour une chose que je peux faire, vérifier et défaire, c'est de la
-passivité déguisée en prudence — et ça coûte le temps de tout le monde.
-
-## Déclarer SUR QUEL AXE on mesure (bpscript, 2026-07-19)
-
-Quand je publie une mesure ou une conclusion, **nommer explicitement l'axe sur lequel elle
-porte** : jetons MIDI, sortie texte, compteurs, minutage, ordre. Une phrase suffit — ça ne
-protège pas *moi*, ça rend mon erreur **trouvable par quelqu'un d'autre** (cas vécu : régression
-`_rotate` annoncée sur la seule sortie texte alors que les jetons MIDI de ma propre capture
-prouvaient le contraire ; nommer les deux axes côte à côte a rendu l'écart visible).
-
-Corollaire : **vérifier un piège ne protège pas des autres** (j'avais éliminé « variance
-aléatoire » sans tester « je regarde le mauvais axe »).
+`BACKLOG.md` porte ma dette interne, avec un identifiant et un statut par entrée. Un item qui touche
+le **langage** remonte au backlog central par `tour`. La vue globale se consulte avec `tour backlog`.

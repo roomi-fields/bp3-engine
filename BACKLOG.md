@@ -417,8 +417,12 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   un item vide. Axe : chemin d'ECRITURE FICHIER de l'item produit (PrintArg->FILE / serialisation),
   distinct de la derivation (qui, elle, fonctionne). Suspect : debordement de pile d'un imprimeur
   recursif sur l'imbrication polymetrique profonde forcee par les gardes de drapeaux (Atimes=20...).
-  MINIMISATION INCOMPLETE : les items minuscules ({a}, _transpose(1){a}, _keyxpand(..){a}) n'ont PAS
-  crashe ; il faut la profondeur reelle de tryTranspose, que mes grammaires minimales n'ont pas
-  reproduite (recursion garde-forcee non declenchee hors contexte). A MINIMISER avant remontee a
-  Bernard (repro solide exige). Lie a BPE-15 (le crash n'apparait qu'une fois la muette rendue
-  compilable) et a la memoire oracle-texte-option-o (Bernard a deja touche au chemin PrintArg->FILE).
+  MINIMISE 2026-08-09 — REPRO MINIMAL TROUVE, remonte a Bernard (constat #70) :
+  `gram#1[1] S --> {A4 {A4 … A4}}` avec **17 niveaux** de groupes polymetriques imbriques →
+  `./bp3 produce -gr <g> -o <f>` SEGFAULTE. Seuil EXACT : 16 niveaux OK, 17 crash ; tout au-dela
+  crashe. DISCRIMINANT : a profondeur 50, `-D` (terminal) et `compile` REUSSISSENT, seul `-o`
+  (ecriture fichier) crashe → debordement de pile d'un imprimeur RECURSIF sur le chemin de
+  serialisation FICHIER (PrintArg->FILE, cf. memoire oracle-texte-option-o). Aucune dependance
+  (ni drapeaux, ni alphabet, ni motif de temps) : c'est la PROFONDEUR d'imbrication seule.
+  Lien BPE-15 : tryTranspose ne l'exposait qu'une fois rendue compilable (sa recursion garde-forcee
+  atteint ~40 niveaux). `_stepOn`/... sans rapport. Statut : `remonte a Bernard`.

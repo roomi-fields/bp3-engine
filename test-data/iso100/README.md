@@ -8,6 +8,14 @@ comparaison étant ce qui prouve. **Je produis les grammaires ; BPx mesure au bi
 mesure pas ce que fait chaque directive, je garantis seulement qu'un différentiel EXISTE sur l'axe
 déclaré.
 
+> ⚠️ **Ces 35 ne sont PAS la baseline ISO-100 et ne la doublent pas.** La baseline centrale ISO-100
+> compte **113 grammaires** (98 productibles) — ce sont les grammaires **de Bernard**, mesurées le
+> long de la chaîne frontal → BPx → Kairos → Kronos
+> (`hub/projets/2026-07-16-iso-100-grammaires/BASELINE-CENTRALE.md`). Les 35 d'ici sont **fabriquées**
+> pour les directives que ces 113 n'écrivent **jamais**. Deux corpus, deux rôles : la baseline
+> mesure la conformité de productions réelles ; ce corpus-ci isole des directives orphelines. Ne pas
+> les confondre ni les fusionner.
+
 - Régénérer : `bash generate.sh`
 - Valider (compile + différentiel sur l'axe) : `python3 validate.py` → **28/28 différentiels prouvés**.
 

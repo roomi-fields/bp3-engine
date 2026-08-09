@@ -8,17 +8,23 @@ chantier veut que chaque exemple POINTE vers une scène réelle testée au NATIF
 - **Écriture des scènes = bpscript** (canonique, sens/matière/produit) ; **atlas** lie ; **kanopi** héberge (samples).
 - Les scènes ISO-100 (`test-data/iso100/`) sont MES témoins déjà écrits (lot [200]).
 
-Bilan : 44 déjà dans le corpus · 26 scènes ISO-100 · **0 à écrire** · 4 à marquer.
+Bilan : 45 déjà dans le corpus · 26 scènes ISO-100 · **0 à écrire** · 3 à marquer · 1 libellé faux à corriger.
 
-⚠️ **Le seul « à écrire » du balayage — `_trace` — est en fait une INEXACTITUDE de la page.** `_trace`
-nu n'existe pas dans le moteur : la table `GramProcedure` porte `_traceOn` (15) et `_traceOff` (16),
-tous deux déjà couverts par des scènes ISO-100 (`-gr.iso_traceon`, `-gr.iso_traceoff`). Correctif de
-page : remplacer la ligne `_trace` par `_traceOn`/`_traceOff`. Donc **aucune scène à écrire**.
+⚠️ **`_trace` — INEXACTITUDE de la page, pas une scène à écrire.** `_trace` nu n'existe pas : la table
+`GramProcedure` porte `_traceOn` (15) et `_traceOff` (16), un COUPLE activation/désactivation
+(BP3_help.txt:457-461, « _traceOff Cancels the effect of _traceOn »), tous deux déjà couverts par des
+scènes ISO-100 (`-gr.iso_traceon`, `-gr.iso_traceoff`). Correctif : une entrée `_trace` → deux entrées.
 
-⚠️ **Les 4 « à marquer » ne sont PAS des exemples manquants mais des formes que le natif ne peut pas
-démontrer** (BPE-26/27, prouvé) : `_stop`, `_capture`, `_part` (inertes en batch), et `_step` (la
-famille `_stepOn`/`_stepOff` est INÉCRIVABLE, masquée par `_step`). Elles reçoivent une bannière
-datée + renvoi, pas une scène — quel que soit l'arbitrage sur la nature de la page.
+⚠️ **`_step` — LIBELLÉ FAUX (corrigé ici), PAS une forme morte.** La page décrit un « pas-à-pas de
+débogage » : c'est faux. BP3_help.txt:680-681 : `### _step [Performance control]` / « _step(param)
+indicates that Performance parameter param varies stepwise » — contrôle FONCTIONNEL (cousin de
+`_cont`/`_fixed`), présent dans le corpus (blurb : `_step(blurb)`). Le pas-à-pas de débogage, ce sont
+`_stepOn`/`_stepOff` (Grammar procedures, BP3_help.txt:453-456), INÉCRIVABLES (BPE-26) — mais ce ne
+sont PAS des entrées de cette page.
+
+⚠️ **Les 3 « à marquer » sont des formes que le natif ne DÉMONTRE PAS en batch** (BPE-27, prouvé) :
+`_stop`, `_capture`, `_part`. Bannière datée + renvoi, pas une scène — quel que soit l'arbitrage sur
+la nature de la page.
 
 | Contrôle | Statut | Scène / motif |
 |---|---|---|
@@ -29,7 +35,7 @@ datée + renvoi, pas une scène — quel que soit l'arbitrage sur la nature de l
 | `_srand` | corpus | -gr.trySrand |
 | `_transpose` | corpus | -gr.transposition3 |
 | `_randomize` | corpus | -gr.trySrand |
-| `_step` | MARQUER | famille _stepOn/_stepOff INÉCRIVABLE, masquée par _step (CompileProcs.c:722-732), BPE-26 |
+| `_step` | corpus (LIBELLÉ à corriger) | contrôle fonctionnel `_step(param)` = param stepwise (BP3_help.txt:680) ; corpus : -gr.blurb |
 | `_cont` | corpus | -gr.vina3 |
 | `_pitchrange` | corpus | -gr.tryRagas |
 | `_rotate` | corpus | -gr.Visser.Waves |

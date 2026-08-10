@@ -10,10 +10,9 @@ quels fichiers, modules ou notes concernent un sujet ; `codegraph explore "<symb
 pour *l'appel* — symboles, appelants, rayon d'impact. On ne fouille **jamais** le dépôt à la main
 pour **trouver** où une chose vit.
 
-| réflexe | à la place |
-| --- | --- |
-| `grep -r`, `grep --include`, `find`, `ls -R` | `rtfm_search` · `codegraph explore` |
-| `cat`, `head`, `tail`, `sed -n` **sur un fichier** | localiser par l'index, puis lire par l'outil de lecture |
+- `grep -r`, `grep --include`, `find`, `ls -R` → `rtfm_search` · `codegraph explore`
+- `cat`, `head`, `tail`, `sed -n 'x,yp'` pour **regarder** un fichier → `rtfm_search`, puis
+  `rtfm_expand` sur le résultat
 
 **Seuls usages shell légitimes** : `grep <motif> <fichier déjà nommé>` · `sed`/`cat` dans un pipeline
 d'**édition** · le filtrage d'une **sortie de commande**, qui n'est pas un fichier.

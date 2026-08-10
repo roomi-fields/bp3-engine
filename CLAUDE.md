@@ -119,6 +119,11 @@ Avant de déclarer un blocage humain sur une **dépendance de construction** :
 Demander l'accord pour une action irréversible reste juste. Le demander pour une chose que je peux
 faire, vérifier et défaire coûte du temps à tout le monde.
 
+## ⛔ Une clame qui contredit une mesure que j'ai faite
+
+**Je ne tranche jamais en faveur de la clame** : je rejoue ma mesure et je réponds avec elle. Cela
+vaut d'abord pour ce qui vient de l'architecte — un chiffre reçu ne périme pas un chiffre mesuré.
+
 ## ⛔ Le repli sous pression
 
 Un blocage se solde par **une question, jamais par un contournement**. Sont des replis : un test

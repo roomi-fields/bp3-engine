@@ -59,6 +59,6 @@ servir dans le dépôt d'un autre, d'où ce lot).
 
 | version | md5 | rôle |
 |---|---|---|
-| 3.5.1 | 963c1ff9512b453e97bdbbbd5f8aae4a | **courant** (`./bp3`, 2026-08-08) |
-| 3.5.0 | 5877fa2d4c05beb651a9d3bac30b50c4 | précédent |
+| 3.5.1 | b100125b660287ea3cb0ce3eb9fb23f9 | **courant** (`./bp3`, byte-identique à `builds/…auto.51`, premier build 2026-08-08 19:18:26) |
+| 3.5.0 | 53eae9c6c987b3cd5aec7a90e2b7c925 | précédent (`builds/…auto.50`) |
 | 3.4.7 | 0fa0f3d466613974b4ea2f1c78548955 | oracle ISO figé (`builds/…auto.31`) |

@@ -341,6 +341,13 @@ n_ok = [r for r in rows if r["produit"]]
 meta = dict(version="v5", figee_le=datetime.date.today().isoformat(),
             date=datetime.date.today().isoformat(),
             binaire="bp3 v3.4.4 (graphics-for-BP3)", seed=SEED, n=len(rows),
+            binaire_md5=hashlib.md5(open(BP3, "rb").read()).hexdigest(),
+            script_commit=subprocess.run(
+                ["git", "-C", ROOT, "rev-parse", "--short", "HEAD"],
+                capture_output=True, text=True).stdout.strip(),
+            commande="bp3 <action> -e -gr <gr-nettoyee> --seed " + SEED
+                     + " [conv] [cfg...] -o <texte> --tokensout <jetons> ;"
+                     + " cwd=capture-run ; clean capture.py:52-61 ; un-item capture.py:96-110",
             capture="par ACTION : single (le jeu, 1 item, graine fixe) des que la grammaire joue ; produce-all (l ensemble) pour les grammaires purement symboliques quand le moteur accepte d enumerer",
             productibles=len(n_ok),
             produce_all=len([r for r in n_ok if r["action"] == "produce-all"]),

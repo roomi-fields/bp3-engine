@@ -1,0 +1,29 @@
+{
+  "_comment": "Scellé de provenance de la baseline v13 : ce qui a produit les captures, rangé AVEC elles. Le binaire se nomme par md5 (le numéro de version n'est pas une empreinte, constat #65) ; la commande fait partie du scellé car elle change le CONTENU, pas seulement le minutage (une capture -o et une capture --midiout répondent à des questions différentes).",
+  "reference": "baseline-native v13",
+  "figee_le": "2026-07-19",
+  "binaire": {
+    "version_affichee": "bp3 3.4.7 (graphics-for-BP3)",
+    "md5": "0fa0f3d466613974b4ea2f1c78548955",
+    "archive": "builds/v3.4.2-wasm.2_auto.31/bp3",
+    "note": "Seul le md5 fait foi. Voir ORACLE-BINAIRE.md."
+  },
+  "script_capture": {
+    "fichier": "baseline-native/capture.py",
+    "commit": "d45e564",
+    "date": "2026-07-19"
+  },
+  "commande": {
+    "gabarit": "bp3 <action> -e -gr <gr-nettoyée> --seed 1 [<flag-convention>] [<flags-config: -se -al -to -cs -so ...>] -o <texte> --tokensout <jetons>",
+    "cwd": "capture-run",
+    "seed": "1",
+    "action_par_grammaire": "baseline.json:grammaires[].action — produce (le jeu, 1 item) ou produce-all (l'ensemble)",
+    "nettoyage": "capture.py:52-61 — retire l'entête avant la 1re ligne utile et TOUTES les lignes 'INIT:' (ex. dhati: 'INIT: Play I46' qui ferait tomber la compilation)",
+    "un_item": "capture.py:96-110 — force MaxItemsProduce=1 dans les réglages -se pour les grammaires qui jouent"
+  },
+  "preuve": {
+    "reproductible_bit_a_bit": "8/8 sur les grammaires litigieuses, par bp3-frontend, sur le binaire 0fa0f3d avec ce protocole exact (jeton, début, fin compris)",
+    "detail": "MyMelody 31, dhati 66, doeslittle 7, harmony 20, ruwet 126, simpletemplates 7, transposition1 75, tryMIDIfile 8",
+    "extension": "rejeu des 98 productibles demandé à bp3-frontend pour un scellé prouvé sur l'ensemble"
+  }
+}

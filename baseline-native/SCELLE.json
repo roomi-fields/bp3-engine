@@ -24,7 +24,7 @@
   "preuve": {
     "reproductible_bit_a_bit": "96/98 octet-à-octet contre 0fa0f3d (rejeu bp3-frontend, protocole exact), confirme par bp3-engine sur koto3/ames/templates (jetons + texte)",
     "independant_du_binaire": "meme 96/98 contre b100125b (3.5.1) — le protocole rend les MEMES octets sous 3.4.7 et 3.5.1 ; confirme par bp3-engine (koto3/ames/templates byte-a-byte). ISO-100 n'est donc pas lie a 3.4.7.",
-    "bilan": "IDENTIQUES 96 | non-comparables-par-sequence 2 | depassements 0 | sans capture 0",
+    "bilan": "REPRODUCTIBLES bit-à-bit 96 | NON DÉTERMINISTES par construction 2 (hors comparaison) | dépassements 0 | sans capture 0",
     "reproductibles_96": [
       "765432",
       "Alarm",
@@ -128,9 +128,11 @@
         "trySerial",
         "trySrand"
       ],
-      "nature": "trySerial 8 jetons (3 rangs sur 8 permutes), trySrand 25 jetons (9 sur 25). MEME nombre d'octets, MEMES noms tries, MEMES instants tries : seul l'appariement nom-instant permute. C'est une permutation des noms sur une grille de temps figee.",
-      "decision": "DANS le perimetre, comparees par MULTISET (noms + instants + compteurs), JAMAIS par la sequence nom-instant. Un tri de triplets nom-debut-fin est le mauvais instrument (un nom qui change de case change le triplet).",
-      "axe": "ordre des jetons a graine fixe"
+      "statut": "PRODUCTIBLES mais NON COMPARABLES a une reference figee — non deterministes PAR CONSTRUCTION",
+      "cause": "-se declare Seed=0 et la grammaire appelle _rndseq ; le natif lit time(NULL) pour la sequence MEME sous --seed. Le message 'Seed forced to 1' ne couvre pas _rndseq. Une identite run-a-run est une coincidence de seconde d'horloge, pas du determinisme.",
+      "consequence": "Ni bit-a-bit ni MULTISET ne les compare de facon fiable : le compteur lui-meme varie selon le protocole/horloge (trySrand : 25 jetons sous le protocole capture.py, 35 STABLE sous un autre protocole/horloge — bp3-frontend). Une reference figee ne les caracterise pas.",
+      "decision": "HORS des 96 reproductibles et hors comparaison. On les documente, on ne les scelle pas comme comparables. Correction d'une version anterieure du scelle qui promettait une comparaison au multiset.",
+      "axe": "sequence ET nombre de jetons a graine forcee"
     }
   }
 }

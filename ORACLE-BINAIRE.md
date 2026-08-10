@@ -24,7 +24,9 @@ servir dans le dépôt d'un autre, d'où ce lot).
 2. ⚠️ **Le numéro de version seul n'est PAS une empreinte** (constat #65) : c'est un `#define`
    incrémenté à la main, et l'horodatage vient d'une seule unité de compilation (deux binaires
    distincts peuvent l'afficher identique). **La seule empreinte de contenu fiable est le md5** :
-   `md5sum bp3`.
+   `md5sum bp3`. Un même binaire peut même afficher **deux horodatages selon le chemin** : sur
+   `b100125b`, la bannière de `produce` rend `19:18:22`, `--version` rend `19:18:21` — deux unités
+   compilées à une seconde d'écart. Le md5 est identique ; c'est lui qui tranche.
 3. **Toute mesure publiée cite : version + md5 + LA COMMANDE COMPLÈTE** (pas seulement la graine).
    La sortie dépend des sorties demandées : `koto3` rend une fin à 28 734 ms avec `--eventlistout`
    seul, 35 470 ms dès qu'on ajoute `--midiout` (constat #67, amont Bernard). Une référence
@@ -33,6 +35,13 @@ servir dans le dépôt d'un autre, d'où ce lot).
    lui adjoindre `-o` (ou `--midiout`) pour peupler la liste. **Ce n'est PAS une régression 3.5.1** :
    le 3.5.0 committé (rebuild de `31b37fd`) exige `-o` autant que le 3.5.1 — le gate d'émission de
    `MakeSound.c` est identique entre les deux. Toujours passer `-o` avec `--eventlistout`.
+   ⚠️ **`--eventlistout` dépose AUSSI un JSON de prototypes à côté du fichier `-so` chargé**
+   (`SaveLoads1.c:821-856`, sous `EventListOn`) : nommé d'après le `-so`, préfixe `-so.` retiré +
+   `.json` (`-so.abc1` → `abc1.json`), dans le dossier du `-so`. Il porte **la hauteur** — octets MIDI
+   bruts par prototype (`byte_1/2/3`) — que la liste d'événements ne porte pas ; appariement par
+   identifiant de prototype. Le natif l'annonce sur stdout (`👉 Creating json file of prototypes:`
+   puis `Closing file:`) ; ce n'est PAS silencieux, mais le flux message séparé par `-o`
+   (`ConsoleMain.c:134`) peut le masquer d'une lecture partielle.
 
 ## Procédure de montée de version (par `bp3-engine`)
 

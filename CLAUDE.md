@@ -125,6 +125,14 @@ Un blocage se solde par **une question, jamais par un contournement**. Sont des 
 sauté, une valeur écrite en dur pour faire passer, une assertion ajustée à ce qui sort, une seconde
 autorité « en attendant ». Face au blocage, j'attends.
 
+## ⛔ Cinq gestes de mesure
+
+- **Éprouver un témoin de compensation avec une valeur NON NULLE** — à zéro il ne distingue pas une soustraction faite d'une oubliée.
+- **Vérifier le dépôt concerné AU MOMENT du relais** — l'état ne dit jamais quand il a été mesuré.
+- **Retirer une affirmation du CODE dans le même geste** que du message — un commentaire se relit comme une preuve.
+- **Retirer une conversion de type AVANT de conclure** — elle ne cache pas l'écart, elle cache lequel.
+- **Vérifier qu'un composant abonné est BRANCHÉ** chez qui tient le canal — l'abonnement seul reste vert des deux côtés.
+
 ## Coder
 
 - **Le code mort s'élague** dans le mouvement qui le rend mort. Une branche sans appelant vivant sort.

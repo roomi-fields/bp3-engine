@@ -28,9 +28,9 @@ dépôt porte le sien, et `rtfm_search` ne voit que le courant. `--tous` interro
 2. Le **fichier de référence** qu'elle désigne porte la règle.
 3. **Demander à Atlas** si l'information reste introuvable.
 
-## ⛔ L'oracle est le binaire natif — le WASM ne fait autorité sur rien
+## ⛔ L'oracle est le binaire natif
 
-Le WASM est un **portage partiel**. Toute mesure de référence se prend sur le **binaire natif**.
+Toute mesure de référence se prend sur le **binaire natif**, et sur lui seul.
 
 **Un doute se lève dans le code C de l'original**, jamais par raisonnement ni par ressemblance de
 noms.
@@ -85,14 +85,11 @@ domaine, sur pièces : `fichier:ligne`, ou commande et sortie réelle.
 
 ## Règles du moteur
 
-- **Un seul arbre** : ce dépôt est le clone canonique. Les fichiers partagés s'éditent dans
-  `csrc/bp3/` ; les copies de `source/BP3/` sont écrasées par la cible de synchronisation. Le code
-  natif seul s'édite directement dans `source/BP3/`.
+- **Un seul arbre** : ce dépôt est le clone canonique, et tout le code moteur vit dans
+  `source/BP3/`.
 - **La construction passe par `./build.sh`**, jamais par `make` ni par une copie manuelle. Le natif
-  dépend de `libasound2-dev`. La cible de synchronisation modifie l'arbre après l'évaluation du
-  graphe : un double passage est nécessaire.
-- **Changelogs après toute modification** : `csrc/bp3/` alimente `CHANGELOG_ENGINE.md` ;
-  `csrc/wasm/` alimente `CHANGELOG_WASM.md`.
+  dépend de `libasound2-dev`.
+- **Changelog après toute modification** : `source/BP3/` alimente `CHANGELOG_ENGINE.md`.
 - **Un défaut du moteur** s'inscrit dans `hub/constats/bugs-moteur-bp3.md` en résumé, et dans le
   registre de `hub/courrier/bp3-engine.md` en détail. Bernard Bel est un mainteneur externe : les
   défauts lui parviennent hors de la tour.

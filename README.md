@@ -1,70 +1,63 @@
-# BP3 Engine — Fork WASM
+# BP3 Engine — le moteur natif et son oracle
 
-Fork du [Bol Processor BP3](https://github.com/bolprocessor/bolprocessor) (Bernard Bel) avec portage WebAssembly et build unifié.
+Fork du [Bol Processor BP3](https://github.com/bolprocessor/bolprocessor) (Bernard Bel) avec
+build unifié. Le binaire natif de ce dépôt est l'**oracle** de tout l'écosystème : toute
+mesure de référence s'y prend.
 
 **Branche active :** `wasm` (synchronisée avec `graphics-for-BP3` de Bernard)
 
 ## Architecture
 
 ```
-source/BP3/    Copie de csrc/bp3/ (v3.4.7) — écrasée par `make sync`, reçoit aussi les mises à jour amont via `git checkout upstream/... -- source/BP3/`
-csrc/bp3/      Source canonique + nos ajouts (bp3_timed_events, bp3_random)
-csrc/wasm/     Couche API WASM (bp3_api.c, stubs, platform shim)
+source/BP3/    Un seul arbre de sources — moteur amont + nos ajouts (bp3_timed_events, bp3_random)
+test-data/     Corpus d'origine : grammaires -gr et leurs auxiliaires
+baseline-native/  La référence gelée, son scellé et l'outil de capture
 builds/        Archives versionnées (non tracké git)
-build.sh       Script de build 3 targets + archivage
-Makefile       Build unifié linux/windows/wasm
+build.sh       Script de build + archivage
+Makefile       Build unifié linux/windows
 ```
-
-Le code dans `csrc/bp3/` est synchronisé avec `source/BP3/` via `make sync`. Les deux sont identiques sauf `bp3_timed_events.c/.h` (notre ajout).
 
 ## Build
 
 Prérequis :
-- GCC (Linux natif)
+- GCC et `libasound2-dev` (Linux natif)
 - mingw-w64 (`x86_64-w64-mingw32-gcc`, pour le cross-compile Windows)
-- [Emscripten](https://emscripten.org/) (pour le WASM)
 
 ```bash
-# Activer Emscripten
-source /path/to/emsdk/emsdk_env.sh
-
-# Compiler les 3 targets
+# Compiler les deux cibles
 ./build.sh all
 
 # Compiler + archiver avec un tag de version
-./build.sh all --archive --version=v3.3.19-wasm.1
+./build.sh all --archive --version=v3.5.2-build.1
 
-# Compiler un seul target
+# Compiler une seule cible
 ./build.sh linux
 ./build.sh windows
-./build.sh wasm
 
 # Voir le status
 ./build.sh --status
 ```
 
 `build.sh` produit :
-- `bp3` — binaire Linux natif
+- `bp3` — binaire Linux natif, l'oracle
 - `bp.exe` — binaire Windows (cross-compilé via mingw)
-- `bp3.js` + `bp3.wasm` + `bp3.data` — module WASM
 
-Les binaires sont déployés automatiquement dans :
-- `BPscript/dist/` (WASM)
-- `BPweb/dist/` (WASM)
-- MAMP/bolprocessor/ (bp.exe, si disponible)
+`bp.exe` est déployé dans MAMP/bolprocessor/ si le répertoire existe ; `bp3` reste en place,
+utilisé directement par l'outil de capture.
 
 ## Archivage
 
 ```bash
 # Archiver le build courant
-./build.sh all --archive --version=v3.3.19-wasm.1
+./build.sh all --archive --version=v3.5.2-build.1
 
 # Le tag est écrit dans builds/LAST
 cat builds/LAST
-# → v3.3.19-wasm.1
 ```
 
-Les archives sont dans `builds/{tag}/` avec les 3 binaires + un `BUILD_INFO.md`.
+Les archives sont dans `builds/{tag}/` avec les binaires + un `BUILD_INFO.md`. Les archives
+antérieures au 2026-08-11 portent un suffixe `-wasm.N` : c'est un compteur de construction,
+et il reste lisible par la numérotation automatique.
 
 ## Synchronisation avec Bernard
 
@@ -77,18 +70,10 @@ git diff upstream/graphics-for-BP3 -- source/BP3/
 
 # Mettre à jour source/BP3/ depuis Bernard
 git checkout upstream/graphics-for-BP3 -- source/BP3/
-
-# Synchro csrc/bp3/ → source/BP3/ (ecrase dans source/BP3/ tout fichier partage qui differe
-# de csrc/bp3/ — ne fait PAS remonter les changements de Bernard vers csrc/bp3/ ; ce geste-la
-# reste manuel, a faire AVANT `make sync` si on veut preserver les nouveautes amont)
-make sync
 ```
 
-## API WASM
+Les fichiers qui portent nos deltas se fusionnent à trois voies (`git merge-file`).
 
-Voir `WASM_PORT.md` pour la documentation de l'API JavaScript (`bp3_init`, `bp3_load_grammar`, `bp3_produce`, `bp3_get_timed_tokens`, etc.).
+## Changelog
 
-## Changelogs
-
-- `CHANGELOG_ENGINE.md` — Modifications au code moteur de Bernard (historique, tout intégré dans v3.4.7)
-- `CHANGELOG_WASM.md` — Évolution de la couche WASM (bp3_api.c, stubs, builds)
+- `CHANGELOG_ENGINE.md` — Modifications au code moteur de Bernard

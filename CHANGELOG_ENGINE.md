@@ -1,7 +1,10 @@
-# Changelog — Moteur BP3 (csrc/bp3/)
+# Changelog — Moteur BP3 (source/BP3/)
 
-Modifications au code moteur de Bernard, appliquées dans `csrc/bp3/` (branche `wasm`).
-Ces changements affectent le natif ET le WASM. L'objectif est que Bernard les intègre dans son `source/BP3/`.
+Modifications au code moteur de Bernard, appliquées dans `source/BP3/` (branche `wasm`).
+L'objectif est que Bernard les intègre dans son propre arbre.
+
+Les entrées antérieures au 2026-08-11 nomment `csrc/bp3/` : c'était l'arbre partagé avec le
+portage WASM, replié depuis dans `source/BP3/`.
 
 Chaque section référence le point correspondant dans `FEEDBACK_BERNARD.md` (test/grammars/ du repo BPscript).
 

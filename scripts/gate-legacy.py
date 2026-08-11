@@ -6,22 +6,18 @@ migrer » en parallèle de la nouvelle. Remplacer X par Y, c'est SUPPRIMER X dan
 mouvement. Un code marqué `legacy`/`deprecated` qui a encore des appelants vivants n'est
 pas en train d'être retiré : il est réutilisé.
 
-Ce que le garde vérifie, et pourquoi ces deux points-là :
+Ce que le garde vérifie :
 
 1. AUCUN SYMBOLE MARQUÉ legacy/deprecated N'A D'APPELANT VIVANT, dans le code que ce dépôt
    possède. Le mal réel : `compileBPS` a été gardé « au cas où », réutilisé, puis fait
    évoluer — et la mesure de conformité tournait dessus.
 
-2. LES DEUX ARBRES DE SOURCES DU MOTEUR RESTENT IDENTIQUES. C'est la bifurcation
-   silencieuse propre à CE dépôt : la source canonique est `csrc/bp3/`, mais `build.sh:81`
-   et `Makefile:20` compilent depuis la COPIE `source/BP3/`, alimentée par une cible
-   `sync` qui exige un double passage. Si `sync` n'est pas relancé, on construit la copie
-   PÉRIMÉE en croyant construire la source. C'est exactement le mode d'échec `compileBPS`,
-   transposé : deux vérités en parallèle, et rien qui garantisse laquelle on mesure.
+2. LE BINAIRE NATIF N'EST PAS PLUS VIEUX QUE SES SOURCES. Un portillon vert contre un
+   artefact périmé ne mesure pas ce qu'il annonce.
 
-Périmètre : `csrc/wasm/`, `scripts/`, `baseline-native/` — le code que ce dépôt écrit.
-`csrc/bp3/` est le moteur amont de Bernard Bel : ses marqueurs ne sont pas les nôtres, et
-les policer ici reviendrait à forker le moteur. Exclu délibérément, pas oublié.
+Périmètre : `scripts/`, `baseline-native/` — le code que ce dépôt écrit. `source/BP3/` est
+le moteur amont de Bernard Bel : ses marqueurs ne sont pas les nôtres, et les policer ici
+reviendrait à forker le moteur. Exclu délibérément, pas oublié.
 """
 import os, re, subprocess, sys
 
@@ -29,7 +25,7 @@ import os, re, subprocess, sys
 # dossiers caches » ci-dessous y voit un « /. » et saute TOUT le depot. C'est la
 # faute qui rendait ce garde muet — trouvee par l'injection, pas par relecture.
 R = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
-POSSEDE = ["csrc/wasm", "scripts", "baseline-native"]
+POSSEDE = ["scripts", "baseline-native"]
 # Exclu NOMMEMENT : ce script porte le leurre en clair pour prouver la morsure du garde.
 # Le scanner sans l'exclure, c'est se mordre soi-meme et rendre la preuve impossible.
 EXCLUS = {"scripts/gate-legacy-injection.sh", "scripts/gate-legacy.py"}
@@ -97,28 +93,9 @@ for sym, (ou, ligne_decl) in suspects.items():
         for a in appels[:4]:
             ecarts.append("      " + a.strip()[:110])
 
-# ── 2. les deux arbres de sources du moteur doivent rester identiques ────────
-CANON, COPIE = os.path.join(R, "csrc", "bp3"), os.path.join(R, "source", "BP3")
-if os.path.isdir(CANON) and os.path.isdir(COPIE):
-    for f in sorted(os.listdir(CANON)):
-        if not f.endswith((".c", ".h")):
-            continue
-        a, b = os.path.join(CANON, f), os.path.join(COPIE, f)
-        if not os.path.isfile(b):
-            ecarts.append(f"« {f} » existe dans csrc/bp3/ mais PAS dans source/BP3/ — "
-                          f"la construction ne le verrait pas")
-        elif open(a, "rb").read() != open(b, "rb").read():
-            ecarts.append(f"« {f} » DIVERGE entre csrc/bp3/ (canonique) et source/BP3/ "
-                          f"(ce que build.sh compile) — relancez `./build.sh` deux fois")
-
-# ── 3. le binaire NATIF ne doit pas etre PLUS VIEUX que ses sources ──
+# ── 2. le binaire NATIF ne doit pas etre PLUS VIEUX que ses sources ──
 # Ajoute le 2026-07-19 apres m'etre fait prendre : un portillon vert contre un artefact
-# perime ne mesure pas ce qu'il annonce.
-# ⛔ STOP WASM (arbitrage Romain 2026-08-09, [203]) : l'ORACLE est le binaire NATIF. Le
-# WASM est un portage PARTIEL qui ne fait autorite sur rien, et le portillon ne le batit
-# pas ; exiger sa fraicheur ici rendrait ce garde rouge sur tout arbre sans WASM et
-# bloquerait chaque push. On ne mesure donc QUE la fraicheur du natif « bp3 » (l'oracle).
-# Les gardes comportementaux WASM vivent en voie `wasm`, informative et non bloquante.
+# perime ne mesure pas ce qu'il annonce. L'oracle est le binaire natif, et lui seul.
 ARTEFACTS = [("bp3", [os.path.join("source", "BP3")])]
 for art, sources in ARTEFACTS:
     pa = os.path.join(R, art)
@@ -142,5 +119,5 @@ if ecarts:
     for e in ecarts:
         print("   -", e)
     sys.exit(1)
-print("anti-retrocompat : aucun symbole au retrait avec appelant vivant ; les deux arbres "
-      "de sources du moteur sont identiques ; les binaires sont plus recents que leurs sources.")
+print("anti-retrocompat : aucun symbole au retrait avec appelant vivant ; "
+      "le binaire natif est plus recent que ses sources.")

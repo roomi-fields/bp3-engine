@@ -4,18 +4,17 @@
 # On injecte les DEUX fautes qu'il doit attraper, séparément.
 set -u
 cd "$(dirname "$0")/.."
-LEG="csrc/wasm/bp3_leurre_legacy.c"
-CANON="csrc/bp3/Misc.c"
+LEG="scripts/bp3_leurre_legacy.c"
+SRC="source/BP3/Misc.c"
 echec=0
-# On memorise la date du fichier canonique AVANT de le toucher, et on la restaure apres :
-# `git checkout` restaure le CONTENU mais pas la DATE, et le controle de fraicheur des
-# artefacts (volet 3 du garde) verrait alors une source plus recente que les binaires.
+# On memorise la date de la source AVANT de la toucher, et on la restaure apres : le
+# controle de fraicheur des artefacts (volet 2 du garde) verrait sinon une source plus
+# recente que le binaire, et resterait rouge apres la preuve.
 # Une preuve d injection ne doit rien laisser derriere elle, pas meme une date.
-DATE_CANON=$(stat -c %y "$CANON")
+DATE_SRC=$(stat -c %y "$SRC")
 nettoie() {
   rm -f "$LEG"
-  git checkout -- "$CANON" 2>/dev/null || true
-  touch -d "$DATE_CANON" "$CANON" 2>/dev/null || true
+  touch -d "$DATE_SRC" "$SRC" 2>/dev/null || true
 }
 trap nettoie EXIT
 
@@ -40,22 +39,22 @@ else
 fi
 rm -f "$LEG"
 
-echo "3. injection B — les deux arbres de sources du moteur divergent"
-printf '\n/* divergence injectee */\n' >> "$CANON"
+echo "3. injection B — une source du moteur devient plus récente que le binaire"
+touch "$SRC"
 sortie=$(python3 scripts/gate-legacy.py 2>&1); code=$?
 if [ $code -eq 0 ]; then
-  echo "   ÉCHEC : le garde ne voit pas la divergence des deux arbres"; echec=1
-elif ! printf '%s' "$sortie" | grep -q "Misc.c"; then
-  echo "   ÉCHEC : rouge mais sans nommer le fichier divergent"; echec=1
+  echo "   ÉCHEC : le garde ne voit pas que l'oracle est périmé"; echec=1
+elif ! printf '%s' "$sortie" | grep -q "bp3"; then
+  echo "   ÉCHEC : rouge mais sans nommer l'artefact périmé"; echec=1
 else
-  echo "   rouge, et il nomme le fichier ✔"
+  echo "   rouge, et il nomme l'artefact ✔"
 fi
-git checkout -- "$CANON"; touch -d "$DATE_CANON" "$CANON"
+touch -d "$DATE_SRC" "$SRC"
 
 echo "4. retrait des deux leurres — le garde doit redevenir VERT"
 vert && echo "   vert ✔" || { echo "   ÉCHEC : reste rouge après retrait"; echec=1; }
 
 echo "─────────────────────────────────────────────"
-[ $echec -eq 0 ] && echo "MORSURE PROUVÉE sur les DEUX volets : appelant vivant, et divergence des arbres." \
+[ $echec -eq 0 ] && echo "MORSURE PROUVÉE sur les DEUX volets : appelant vivant, et oracle périmé." \
                 || echo "MORSURE NON PROUVÉE — le garde ne protège pas ce qu'il annonce."
 exit $echec

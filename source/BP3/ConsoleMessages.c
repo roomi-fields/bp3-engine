@@ -62,11 +62,7 @@ static FILE*	gOutDestinations[MAXOUTDEST] =
 static bp_message_callback_t	gMessageCallback = NULL;
 
 void ConsoleMessagesInit() {
-#ifdef __BP3_WASM__
-    FILE* dest = NULL;
-#else
     FILE* dest = stdout;
-#endif
     gOutDestinations[odiDisplay] = dest;
     gOutDestinations[odiMidiDump] = dest;
     gOutDestinations[odiCsScore] = dest;
@@ -146,9 +142,7 @@ int BPPrintMessage(int force,int dest, const char *format, ...) {
     if(dest & odError) {
         va_start(args, format);
     //    vfprintf(gOutDestinations[odiError], format, args);
-#ifndef __BP3_WASM__
         vfprintf(stdout, format, args);
-#endif
         va_end(args);
         }
     if((dest & odWarning) && !PlayAllChunks && (!Improvize || ItemNumber < 1)) {
@@ -160,11 +154,9 @@ int BPPrintMessage(int force,int dest, const char *format, ...) {
         va_start(args, format);
    //     fprintf(stderr, "ok %s\n",format);
    //     vfprintf(gOutDestinations[odiInfo], format, args);
-#ifndef __BP3_WASM__
         NumberMessages++; // 2026-03-24
         result = vfprintf(stdout, format, args);
         if(result < 0) fprintf(stderr, "Error occurred during writing to stdout.\n");
-#endif
         va_end(args);
         }
 	return OK;

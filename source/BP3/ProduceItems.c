@@ -1858,9 +1858,6 @@ int PrintWorkString(int expand,int w,int datamode,int ifunc,tokenbyte ***pp_a) {
 	double maxseqapprox;
 
 	r = OK;
-#ifdef __BP3_WASM__
-	expand = FALSE;
-#endif
 	if(expand && datamode && !ifunc) {
 		if((p_b=(tokenbyte**) GiveSpace((Size) MyGetHandleSize((Handle)*pp_a))) == NULL) {
 			r = ABORT; goto QUIT;

@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 #
-# build.sh — Build BP3 engine (Linux, Windows, WASM)
+# build.sh — Build BP3 engine (Linux, Windows)
 #
 # Usage:
-#   ./build.sh                    → build all 3 targets
+#   ./build.sh                    → build both targets
 #   ./build.sh linux              → build Linux only
 #   ./build.sh windows            → build Windows only
-#   ./build.sh wasm               → build WASM only
 #   ./build.sh linux windows      → build Linux + Windows
 #   ./build.sh all --archive      → build all + archive in builds/
 #   ./build.sh --status           → show build status (dates, staleness)
@@ -19,7 +18,6 @@ set -e
 
 # === Paths ===
 ENGINE_DIR="$(cd "$(dirname "$0")" && pwd)"
-EMSDK_ENV="/home/romi/dev/bp/emsdk/emsdk_env.sh"
 
 # Deploy destinations (migration PC2 natif 2026-06-14 : ex-WSL /mnt/c, /mnt/d morts)
 BPSCRIPT_DIR="/home/romi/dev/bp/BPscript"
@@ -48,14 +46,14 @@ ARCHIVE_VERSION=""
 
 for arg in "$@"; do
     case "$arg" in
-        linux|windows|wasm) TARGETS+=("$arg") ;;
-        all)                TARGETS=(linux windows wasm) ;;
+        linux|windows) TARGETS+=("$arg") ;;
+        all)           TARGETS=(linux windows) ;;
         --archive)          DO_ARCHIVE=1 ;;
         --status)           DO_STATUS=1 ;;
         --clean)            DO_CLEAN=1 ;;
         --version=*)        ARCHIVE_VERSION="${arg#--version=}" ;;
         -h|--help)
-            echo "Usage: $0 [linux|windows|wasm|all] [--archive] [--status] [--clean] [--version=TAG]"
+            echo "Usage: $0 [linux|windows|all] [--archive] [--status] [--clean] [--version=TAG]"
             exit 0
             ;;
         *)
@@ -67,7 +65,7 @@ done
 
 # Default: build all
 if [ ${#TARGETS[@]} -eq 0 ] && [ $DO_STATUS -eq 0 ] && [ $DO_CLEAN -eq 0 ]; then
-    TARGETS=(linux windows wasm)
+    TARGETS=(linux windows)
 fi
 
 cd "$ENGINE_DIR"
@@ -76,11 +74,10 @@ cd "$ENGINE_DIR"
 if [ $DO_STATUS -eq 1 ]; then
     echo -e "${CYAN}=== Build Status ===${NC}"
 
-    for target in linux windows wasm; do
+    for target in linux windows; do
         case $target in
             linux)   bin="bp3";       src_dirs="source/BP3" ;;
             windows) bin="bp.exe";    src_dirs="source/BP3" ;;
-            wasm)    bin="build/bp3.js"; src_dirs="csrc/bp3 csrc/wasm" ;;
         esac
         latest_src=$(find $src_dirs -name '*.c' -o -name '*.h' 2>/dev/null | xargs ls -t 2>/dev/null | head -1)
         latest_src_date=$(stat -c '%Y' "$latest_src" 2>/dev/null || echo 0)
@@ -166,9 +163,6 @@ auto_archive() {
         mkdir -p "$auto_dir"
         [ -f bp3 ] && cp bp3 "$auto_dir/"
         [ -f bp.exe ] && cp bp.exe "$auto_dir/"
-        [ -f build/bp3.js ] && cp build/bp3.js "$auto_dir/"
-        [ -f build/bp3.wasm ] && cp build/bp3.wasm "$auto_dir/"
-        [ -f build/bp3.data ] && cp build/bp3.data "$auto_dir/"
         echo -e "${YELLOW}Auto-archived current binaries → $auto_dir/${NC}"
     fi
 }
@@ -198,20 +192,6 @@ for target in "${TARGETS[@]}"; do
             make -j"$JOBS" windows 2>&1
             BUILT+=("windows")
             ;;
-        wasm)
-            # Source emsdk if emcc not in PATH
-            if ! command -v emcc &>/dev/null; then
-                if [ -f "$EMSDK_ENV" ]; then
-                    echo "Sourcing emsdk..."
-                    source "$EMSDK_ENV" 2>/dev/null
-                else
-                    echo -e "${RED}emcc not found and $EMSDK_ENV missing${NC}"
-                    exit 1
-                fi
-            fi
-            make -j"$JOBS" wasm 2>&1
-            BUILT+=("wasm")
-            ;;
     esac
 
     end_time=$(date +%s)
@@ -231,18 +211,6 @@ for target in "${BUILT[@]}"; do
                 echo -e "  bp.exe → ${GREEN}$MAMP_DIR/${NC}"
             fi
             ;;
-        wasm)
-            if [ -f build/bp3.js ]; then
-                for dest in "$BPSCRIPT_DIST" "$BPWEB_DIST"; do
-                    if [ -d "$dest" ]; then
-                        cp build/bp3.js "$dest/bp3.js"
-                        cp build/bp3.wasm "$dest/bp3.wasm"
-                        [ -f build/bp3.data ] && cp build/bp3.data "$dest/bp3.data"
-                        echo -e "  bp3.js+wasm → ${GREEN}$dest/${NC}"
-                    fi
-                done
-            fi
-            ;;
         linux)
             # bp3 stays in engine dir, used directly by test scripts
             echo -e "  bp3 → ${GREEN}$ENGINE_DIR/bp3${NC} (in place)"
@@ -256,10 +224,12 @@ if [ $DO_ARCHIVE -eq 1 ]; then
     echo -e "${CYAN}━━━ Archive ━━━${NC}"
 
     # Determine version
-    # Use base tag from LAST (strip -wasm.N suffix) or fall back to git tag on current branch
+    # Use base tag from LAST (strip the build counter) or fall back to git tag on current branch
+    # Les archives d'avant 2026-08-11 portent un suffixe -wasm.N : c'est un compteur de
+    # construction, pas une etiquette de cible. On le lit encore, on n'en mint plus.
     git_hash=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
     if [ -f builds/LAST ]; then
-        base_tag=$(cat builds/LAST | sed 's/-wasm\.[0-9]*$//')
+        base_tag=$(cat builds/LAST | sed -E 's/-(wasm|build)\.[0-9]+$//')
     else
         base_tag=$(git tag --sort=-version:refname --merged HEAD 2>/dev/null | head -1)
     fi
@@ -269,11 +239,13 @@ if [ $DO_ARCHIVE -eq 1 ]; then
     if [ -n "$ARCHIVE_VERSION" ]; then
         version="$ARCHIVE_VERSION"
     else
-        # Auto-increment: find next wasm build number for this base tag
+        # Auto-increment: next build number for this base tag, legacy -wasm.N compris
+        # pour que la numerotation ne reparte pas a 1.
         # Only consider primary archives (not _auto.N backups)
-        last_num=$(ls -d builds/${base_tag}-wasm.[0-9]* 2>/dev/null | grep -v '_auto' | sort -t. -k2 -n | tail -1 | grep -oP '(?<=-wasm\.)\d+' || echo 0)
+        last_num=$(ls -d builds/${base_tag}-wasm.[0-9]* builds/${base_tag}-build.[0-9]* 2>/dev/null | grep -v '_auto' | grep -oP '(?<=[-.])\d+$' | sort -n | tail -1 || echo 0)
+        last_num=${last_num:-0}
         next_num=$((last_num + 1))
-        version="${base_tag}-wasm.${next_num}"
+        version="${base_tag}-build.${next_num}"
     fi
 
     archive_dir="builds/$version"
@@ -282,18 +254,11 @@ if [ $DO_ARCHIVE -eq 1 ]; then
     # Copy binaries
     [ -f bp3 ]           && cp bp3 "$archive_dir/"
     [ -f bp.exe ]        && cp bp.exe "$archive_dir/"
-    [ -f build/bp3.js ]  && cp build/bp3.js "$archive_dir/"
-    [ -f build/bp3.wasm ] && cp build/bp3.wasm "$archive_dir/"
-    [ -f build/bp3.data ] && cp build/bp3.data "$archive_dir/"
 
     # Collect changelog summaries
     changelog_engine=""
-    changelog_wasm=""
     if [ -f CHANGELOG_ENGINE.md ]; then
         changelog_engine=$(head -80 CHANGELOG_ENGINE.md | grep -E "^###|^- |^\| " | head -20)
-    fi
-    if [ -f CHANGELOG_WASM.md ]; then
-        changelog_wasm=$(head -80 CHANGELOG_WASM.md | grep -E "^###|^- |^\| " | head -20)
     fi
 
     # FEEDBACK_BERNARD points count
@@ -304,7 +269,7 @@ if [ $DO_ARCHIVE -eq 1 ]; then
     fi
 
     # Diff since previous version
-    prev_dir=$(ls -d builds/${base_tag}-wasm.* 2>/dev/null | sort -t. -k2 -n | tail -2 | head -1)
+    prev_dir=$(ls -d builds/${base_tag}-wasm.* builds/${base_tag}-build.* 2>/dev/null | sort -t. -k2 -n | tail -2 | head -1)
     diff_section=""
     if [ -n "$prev_dir" ] && [ "$prev_dir" != "$archive_dir" ]; then
         prev_version=$(basename "$prev_dir")
@@ -329,13 +294,10 @@ FEEDBACK_BERNARD points: $feedback_count
 $(ls -la "$archive_dir"/ | grep -v BUILD_INFO | grep -v "^total" | grep -v "^d")
 
 ## Changelogs
-See: CHANGELOG_ENGINE.md (fixes for Bernard), CHANGELOG_WASM.md (WASM-only)
+See: CHANGELOG_ENGINE.md (fixes for Bernard)
 
 ### Engine highlights
 $changelog_engine
-
-### WASM highlights
-$changelog_wasm
 
 $diff_section
 
@@ -356,6 +318,5 @@ for target in "${BUILT[@]}"; do
     case $target in
         linux)   echo -e "  ${GREEN}✓${NC} bp3      $(ls -l --time-style=long-iso bp3 2>/dev/null | awk '{print $5, $6, $7}')" ;;
         windows) echo -e "  ${GREEN}✓${NC} bp.exe   $(ls -l --time-style=long-iso bp.exe 2>/dev/null | awk '{print $5, $6, $7}')" ;;
-        wasm)    echo -e "  ${GREEN}✓${NC} bp3.wasm $(ls -l --time-style=long-iso build/bp3.wasm 2>/dev/null | awk '{print $5, $6, $7}')" ;;
     esac
 done

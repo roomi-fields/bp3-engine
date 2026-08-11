@@ -98,7 +98,6 @@ int WarnedBlockKey,WarnedRangeKey;
 int PrototypesLoaded = FALSE;
 int WeightsFileExists = FALSE;
 
-#ifndef __BP3_WASM__
 int main (int argc, char* args[]) {
 	int  result,i,j,this_size;
 	long forgotten_mem, memory_before;
@@ -379,7 +378,6 @@ CLEANUP:
 	free(eventStack);
 	return EXIT_SUCCESS;
 	}
-#endif /* __BP3_WASM__ */
 
 void CreateDoneFile(void) {
 	FILE * thisfile;
@@ -1735,7 +1733,7 @@ void StopWaiting(int key,char ch) {
 	return;
 	}
 
-#if !defined(_WIN64) && !defined(__BP3_WASM__)
+#if !defined(_WIN64)
 struct termios orig_termios;
 void disable_raw_mode() {
     // Restore the original terminal settings

@@ -6,10 +6,11 @@ la **pièce partagée dont dépendent TOUS les oracles de la flotte**. Une page,
 ## Où vit le binaire de référence
 
 - **Natif** : `/home/romi/dev/bp/bp3-engine/bp3` — dépôt `bp3-engine`, branche `wasm`. C'est
-  l'oracle de la campagne ISO. Il est **construit sur place** par `./build.sh` et n'est **pas**
-  suivi par git (chaque version figée est archivée dans `builds/`).
-- **WASM** : `build/bp3.js` + `build/bp3.wasm`, déployés par `build.sh` dans `BPscript/dist/`.
-- **Versions figées archivées** : `builds/…/bp3` (ex. l'oracle 3.4.7 `md5 0fa0f3d…`).
+  l'oracle de la campagne ISO, et le seul. Il est **construit sur place** par `./build.sh` et
+  n'est **pas** suivi par git (chaque version figée est archivée dans `builds/`).
+- **Versions figées archivées** : `builds/…/bp3` (ex. l'oracle 3.4.7 `md5 0fa0f3d…`). Les
+  archives antérieures au 2026-08-11 portent un suffixe `-wasm.N` : c'est un compteur de
+  construction, pas une cible.
 
 ## Qui le monte — UNE SEULE main
 
@@ -47,18 +48,15 @@ servir dans le dépôt d'un autre, d'où ce lot).
 
 1. `git fetch upstream --tags` ; repérer le tag `vX.Y.Z` (ligne `graphics-for-BP3`).
 2. Mesurer le diff amont par fichier ; reprendre tel quel les fichiers sans delta local, fusionner
-   à trois voies (`git merge-file`) ceux qui portent nos deltas. **Partagé → `csrc/bp3/` ;
-   natif-seul → `source/BP3/`** (dont `Graphic.c`, `PlayThings.c`, `TokensOut.c`,
-   `EventListfiles.c`).
-3. `./build.sh linux` **deux fois** (la cible `sync` copie `csrc→source` après l'éval du DAG).
-   Idem WASM si les fichiers partagés changent.
+   à trois voies (`git merge-file`) ceux qui portent nos deltas. Tout va dans `source/BP3/`,
+   l'arbre unique.
+3. `./build.sh linux`.
 4. **Non-régression AVANT tout** : dériver le corpus à graine figée avec l'ANCIENNE et la NOUVELLE
    version, comparer texte + jetons minutés production par production. Toute divergence est un FAIT
    à rapporter, jamais à absorber. Ne rien re-capturer (gel #48-#52).
-5. `scripts/gate.sh` → 21/21 vertes (le canari anti-legacy est `csrc/bp3/Misc.c` : committer
-   avant de lancer les gardes).
-6. Changelog obligatoire : `csrc/bp3/`→`CHANGELOG_ENGINE.md`, `csrc/wasm/`→`CHANGELOG_WASM.md`.
-   Committer, pousser `origin/wasm`.
+5. `scripts/gate.sh` → toutes vertes.
+6. Changelog obligatoire : `source/BP3/` → `CHANGELOG_ENGINE.md`. Committer, pousser
+   `origin/wasm`.
 7. **ACTION DE FRONTIÈRE, À LA FRAPPE** : annoncer la nouvelle version (numéro **+ md5**) aux
    dépôts qui mesurent contre le natif — **bp3-frontend, BPx, kairos, kanopi** — via
    `tour send`. Une montée non annoncée fait mesurer un voisin contre une version qu'il n'énonce

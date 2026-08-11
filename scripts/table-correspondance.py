@@ -12,7 +12,7 @@ manque, on n ecrit RIEN et on sort en erreur.
 
 Usage : scripts/table-correspondance.py [--verifier-seulement]
 """
-import json, os, sys
+import json, os, re, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 KANOPI = "/home/romi/dev/bp/kanopi/packages/library"
@@ -37,13 +37,11 @@ POURQUOI = [
     "La seule voie qui charge reellement un auxiliaire est le drapeau de ligne de commande",
     "(ConsoleMain.c:951-963), dont le chemin est arbitraire.",
     "",
-    "ET CES EN-TETES SONT PARFOIS FAUSSES — mesure du 2026-07-20 sur les 113 :",
-    "  · 7 grammaires declarent un reglage DIFFERENT du reglage reellement utilise",
-    "    (ex. 'MyMelody' declare '-se.MyMelody', le vrai est '-se.765432')",
-    "  · 13 grammaires utilisent une facette que leur en-tete ne mentionne pas du tout",
-    "  · soit 20 grammaires sur 113 ou l en-tete induit en erreur",
-    "Pire : les fichiers nommes par ces en-tetes EXISTENT. Reconstruire le couple depuis les en-tetes",
-    "donnerait donc une reponse plausible et silencieusement FAUSSE pour une grammaire sur six.",
+    # L ecart entre en-tete et couple retenu est RECALCULE a chaque generation, et son exemple
+    # avec lui. Fige a la main, il survit a l arbitrage qui le dement : le 2026-08-11 la prose
+    # citait encore MyMelody comme preuve qu une en-tete ment, le jour ou son en-tete a ete
+    # reconnue juste. Une ligne au present se met a jour, ou elle se calcule.
+    "%%ECART_ENTETES%%",
     "",
     "AUTRE FAIT A NE PAS OUBLIER : l extension '.gr' n est PAS reconnue par le moteur BP3, dont la",
     "table d extensions dit '.bpgr' (source/BP3/-BP3main.h:397). Un '.gr' passe en argument nu est",
@@ -115,6 +113,76 @@ def motif_du_couple(cle, utilise, stem, origine):
             f"{origine} et rend une production differente. Le substituer change la reference.")
 
 
+def declarations_de_l_entete(stem):
+    """Ce que l en-tete de la grammaire amont annonce, par facette.
+
+    Le moteur SAUTE ces lignes (CompileGrammar.c:251) : elles n ont aucun effet sur la
+    production. On ne les lit que pour mesurer l ecart avec le couple reellement retenu.
+    '-ho.' est l ancien prefixe de l alphabet : les deux nomment la meme facette.
+    """
+    p = os.path.join(TD, f"-gr.{stem}")
+    if not os.path.isfile(p):
+        return {}
+    tete = open(p, encoding="utf-8", errors="replace").read()
+    d = {}
+    for pref in ("-se", "-al", "-ho", "-cs", "-to", "-so"):
+        m = re.search(rf"^{re.escape(pref)}\.(\S+)", tete, re.M)
+        if m:
+            d.setdefault("-al" if pref == "-ho" else pref, f"{pref}.{m.group(1)}")
+    return d
+
+
+def meme_contenu(a, b):
+    """Deux noms d auxiliaire designent-ils la meme chose ?
+
+    Le nom seul ne suffit pas : '-ho.X' et '-al.X' sont l ancien et le nouveau prefixe de
+    l alphabet. Sur les 21 radicaux ou les deux existent, 4 portent le meme contenu octet
+    pour octet et 17 different — le prefixe ne dit donc RIEN, ni dans un sens ni dans
+    l autre. Seul le contenu tranche.
+    """
+    if a == b:
+        return True
+    pa, pb = os.path.join(TD, a), os.path.join(TD, b)
+    if not (os.path.isfile(pa) and os.path.isfile(pb)):
+        return False
+    return open(pa, "rb").read() == open(pb, "rb").read()
+
+
+def ecart_des_entetes(base):
+    """Compte les grammaires dont l en-tete induit en erreur, et rend un exemple vivant."""
+    divergentes, muettes, exemple = [], [], None
+    for g in base["grammaires"]:
+        src = g["source"]
+        stem = src[4:] if src.startswith("-gr.") else src
+        dec = declarations_de_l_entete(stem)
+        cfg = g.get("config") or {}
+        ecarts = [k for k, v in cfg.items() if k in dec and not meme_contenu(dec[k], v)]
+        if ecarts:
+            divergentes.append(g["grammaire"])
+            # On prefere illustrer par un ecart de NOM : '-ho.abc' contre '-al.abc' est un
+            # vrai ecart de contenu, mais il se lit comme une coquille de prefixe et ferait
+            # douter le lecteur de la mesure elle-meme.
+            franc = [k for k in ecarts
+                     if dec[k].split(".", 1)[-1] != cfg[k].split(".", 1)[-1]]
+            if franc and (exemple is None or not exemple[3]):
+                exemple = (g["grammaire"], dec[franc[0]], cfg[franc[0]], True)
+            elif exemple is None:
+                exemple = (g["grammaire"], dec[ecarts[0]], cfg[ecarts[0]], False)
+        if any(k not in dec for k in cfg):
+            muettes.append(g["grammaire"])
+    total = len(set(divergentes) | set(muettes))
+    ex = (f" (ex. '{exemple[0]}' declare '{exemple[1]}', le couple retenu porte '{exemple[2]}')"
+          if exemple else "")
+    return [
+        f"ET CES EN-TETES SONT PARFOIS FAUSSES — mesure sur les {len(base['grammaires'])} :",
+        f"  · {len(divergentes)} grammaires declarent une facette DIFFERENTE de celle retenue{ex}",
+        f"  · {len(muettes)} grammaires utilisent une facette que leur en-tete ne mentionne pas du tout",
+        f"  · soit {total} grammaires sur {len(base['grammaires'])} ou l en-tete induit en erreur",
+        "Pire : les fichiers nommes par ces en-tetes EXISTENT. Reconstruire le couple depuis les",
+        "en-tetes donnerait donc une reponse plausible et silencieusement FAUSSE.",
+    ]
+
+
 def construire():
     base = json.load(open(BASELINE, encoding="utf-8"))
     entrees, absents = [], []
@@ -169,8 +237,12 @@ def main():
     if "--verifier-seulement" in sys.argv:
         return 0
 
+    prose = []
+    for ligne in POURQUOI:
+        prose.extend(ecart_des_entetes(base) if ligne == "%%ECART_ENTETES%%" else [ligne])
+
     table = {
-        "pourquoi_ce_fichier_existe": POURQUOI,
+        "pourquoi_ce_fichier_existe": prose,
         "produit_par": "bp3-engine/scripts/table-correspondance.py",
         "source": f"bp3-engine/baseline-native/baseline.json (baseline v{base['version']}, {base['figee_le']})",
         # Sans ses conditions, une donnee ne dit pas contre quoi elle a ete prise : elle ne

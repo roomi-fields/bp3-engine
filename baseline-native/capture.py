@@ -340,7 +340,9 @@ for idx, name in enumerate(names, 1):
 n_ok = [r for r in rows if r["produit"]]
 meta = dict(version="v5", figee_le=datetime.date.today().isoformat(),
             date=datetime.date.today().isoformat(),
-            binaire="bp3 v3.4.4 (graphics-for-BP3)", seed=SEED, n=len(rows),
+            binaire=subprocess.run([BP3, "--version"], capture_output=True, text=True)
+                    .stdout.strip().splitlines()[-1].strip(),
+            seed=SEED, n=len(rows),
             binaire_md5=hashlib.md5(open(BP3, "rb").read()).hexdigest(),
             script_commit=subprocess.run(
                 ["git", "-C", ROOT, "rev-parse", "--short", "HEAD"],

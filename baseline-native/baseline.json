@@ -1,10 +1,10 @@
 {
- "version": "v13",
+ "version": "v14",
  "figee_le": "2026-07-19",
- "date": "2026-07-19",
- "binaire": "bp3 v3.4.7 (graphics-for-BP3)",
- "binaire_md5": "0fa0f3d466613974b4ea2f1c78548955",
- "binaire_archive": "builds/v3.4.2-wasm.2_auto.31/bp3",
+ "date": "2026-08-11",
+ "binaire": "bp3 v3.5.1 (graphics-for-BP3)",
+ "binaire_md5": "fb6df5ad5ee18a0398ae3cdb1817287d",
+ "binaire_archive": "builds/v3.5.1-iso.1/bp3",
  "scelle": "baseline-native/SCELLE.json (commande complète, protocole, preuve 96/98)",
  "seed": "1",
  "commande": "bp3 <action> -e -gr <gr-nettoyee> --seed 1 [conv] [cfg...] -o <texte> --tokensout <jetons> ; cwd=capture-run ; clean capture.py:52-61 ; un-item capture.py:96-110",
@@ -132,11 +132,11 @@
    "enumeration_refusee_par_le_moteur": false,
    "joue": true,
    "config": {
-    "-se": "-se.765432",
+    "-se": "-se.MyMelody",
     "-al": "-ho.Frenchnotes"
    },
    "convention": "french",
-   "config_source": "php_ref",
+   "config_source": "reglage nominal (arbitrage Romain 2026-08-11 : le reglage d une grammaire est le sien des qu il fonctionne)",
    "convention_source": "php_ref",
    "declare": "midi",
    "capture": "captures/MyMelody.tokens.json",
@@ -2225,16 +2225,16 @@
    "produit": true,
    "raison": null,
    "jetons_midi": 65,
-   "mots_texte": 78,
+   "mots_texte": 67,
    "items": 1,
    "items_enumeres": 1,
    "enumeration_refusee_par_le_moteur": false,
    "joue": true,
    "config": {
-    "-se": "-se.asymmetric1"
+    "-se": "-se.tryRotate"
    },
    "convention": "english",
-   "config_source": "php_ref",
+   "config_source": "reglage nominal (arbitrage Romain 2026-08-11 : le reglage d une grammaire est le sien des qu il fonctionne)",
    "convention_source": "php_ref",
    "declare": "midi",
    "capture": "captures/tryRotate.tokens.json",
@@ -2697,5 +2697,6 @@
    "capture": "captures/watch.tokens.json",
    "capture_comparable": true
   }
- ]
+ ],
+ "nouveaute_v14": "Deux entrees seulement changent, sur arbitrage de Romain du 2026-08-11 : le reglage d une grammaire est le sien des qu il fonctionne. MyMelody passe de l emprunt -se.765432 a -se.MyMelody, tryRotate de -se.asymmetric1 a -se.tryRotate. tryRotate rend les MEMES jetons qu avant (65) parce que le protocole force MaxItemsProduce a 1, ce qui neutralisait deja l Improvize de l emprunt ; seule sa sortie texte change (78 -> 67 mots). MyMelody rend les memes 31 jetons mais un MINUTAGE ENTIEREMENT DIFFERENT : la ligne publiee commencait a -50 et finissait a 1361, la fraiche commence a 0 et finit a 4000. La ligne publiee avait ete prise sous des conditions qui ne sont pas celles du protocole scelle ; elle etait la seule divergente de mes 96 au rejeu. Mesure confirmee independamment par runtime-midi et par bpscript, dont l instantane fige coincide avec la fraiche. Le reste des 113 entrees est inchange."
 }

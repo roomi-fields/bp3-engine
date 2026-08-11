@@ -3,10 +3,10 @@
  "reference": "baseline-native v13",
  "figee_le": "2026-07-19",
  "binaire": {
-  "version_affichee": "bp3 3.4.7 (graphics-for-BP3)",
-  "md5": "0fa0f3d466613974b4ea2f1c78548955",
-  "archive": "builds/v3.4.2-wasm.2_auto.31/bp3",
-  "note": "Seul le md5 fait foi. Voir ORACLE-BINAIRE.md."
+  "version_affichee": "bp3 3.5.1 (Aug 11 2026 - 13:16:56)",
+  "md5": "fb6df5ad5ee18a0398ae3cdb1817287d",
+  "archive": "builds/v3.5.1-iso.1/bp3",
+  "note": "Seul le md5 fait foi. Voir ORACLE-BINAIRE.md. Binaire de campagne fige le 2026-08-11, annonce a la tour."
  },
  "script_capture": {
   "fichier": "baseline-native/capture.py",
@@ -22,8 +22,8 @@
   "un_item": "capture.py:96-110 — force MaxItemsProduce=1 dans les réglages -se pour les grammaires qui jouent"
  },
  "preuve": {
-  "reproductible_bit_a_bit": "96/98 octet-à-octet contre 0fa0f3d (rejeu bp3-frontend, protocole exact), confirme par bp3-engine sur koto3/ames/templates (jetons + texte)",
-  "independant_du_binaire": "MESURE 2026-08-11, rejeu des 96 par l outil du depot en mode une-grammaire, en comparant EXACTEMENT le fichier que baseline.json nomme pour chaque grammaire : 95/96 octet-a-octet contre 3.5.1. MyMelody DIVERGE sur ses jetons MIDI, et diverge DEJA avec b100125b : l ecart est entre 3.4.7 et 3.5.1, il ne vient d aucune modification locale. Une version anterieure de ce scelle annoncait 96/98 a 3.5.1 : c est FAUX, elle reposait sur un rejeu que je n avais pas refait moi-meme. ISO-100 n est pas lie a 3.4.7 pour 95 des 96 ; MyMelody se compare a son binaire.",
+  "reproductible_bit_a_bit": "96/96 octet-a-octet contre le binaire de campagne fb6df5ad, rejeu du 2026-08-11 par l outil du depot en mode une-grammaire, en comparant exactement le fichier que baseline.json nomme pour chaque grammaire. Zero divergente, zero non produite.",
+  "independant_du_binaire": "MESURE 2026-08-11, rejeu des 96 en comparant EXACTEMENT le fichier que baseline.json nomme : 95/96 octet-a-octet contre 3.5.1. La seule divergente, MyMelody, l etait parce que MA LIGNE PUBLIEE etait fausse — prise sous des conditions autres que le protocole scelle, minutage de -50 a 1361 la ou le protocole rend 0 a 4000. Recapturee en v14. La divergence ne venait donc ni du binaire ni du retrait du WASM.",
   "bilan": "REPRODUCTIBLES bit-à-bit 96 | NON DÉTERMINISTES par construction 2 (hors comparaison) | dépassements 0 | sans capture 0",
   "reproductibles_96": [
    "765432",

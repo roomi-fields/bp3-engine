@@ -1,0 +1,27 @@
+{
+ "_comment": "Sceau de gel de la baseline v14. Ce fichier ne decrit pas la baseline : il la VERROUILLE. Tant qu il porte ces empreintes, toute modification de baseline.json, de SCELLE.json ou d une capture fait rougir le portillon et bloque le push.",
+ "decision": "La baseline v14 est LA reference de l ecosysteme. Elle ne se modifie plus.",
+ "decide_par": "Romain",
+ "decide_le": "2026-08-11",
+ "ce_qu_elle_porte": "Pour chaque terminal : le nom, l instant de debut, l instant de fin. Le nom porte la hauteur, transposition et expansion appliquees.",
+ "assiette": {
+  "grammaires_scellees": 96,
+  "qui_jouent": 59,
+  "en_texte": 37,
+  "hors_scelle": ["trySerial", "trySrand"]
+ },
+ "binaire": {
+  "version_affichee": "bp3 3.5.1 (Aug 11 2026 - 13:16:56)",
+  "md5": "fb6df5ad5ee18a0398ae3cdb1817287d",
+  "archive": "builds/v3.5.1-iso.1/bp3"
+ },
+ "empreintes": {
+  "baseline.json": "c6a016fc13b439245861a1e3dda1cbee827565da8bff1f7517e663651f383887",
+  "SCELLE.json": "089bac2d95725431ea0481f8ae5aedd6a58eb7e2b50e0749fea57a898ab61c57",
+  "captures": "765d152d9eea6db81c4a09c1c5705019108c8b8e92ccafa6b111198bc983f68d",
+  "captures_n": 163,
+  "methode": "captures : sha256 du nom puis du contenu de chaque fichier, dans l ordre alphabetique"
+ },
+ "pour_degeler": "Le degel appartient a Romain. Il se fait en une seule fois : sa decision, puis regeneration de ce fichier par scripts/gel-baseline.py --refaire. Modifier une empreinte a la main annule le gel sans laisser de trace, et c est precisement ce que ce fichier empeche.",
+ "reporte_par_le_gel": "Le moteur calcule deja, note par note, la hauteur MIDI, la velocite, le canal et le numero de sequence ; l ecriture des jetons les jette. Les ajouter exige de reconstruire le binaire gele et de recapturer les 96."
+}

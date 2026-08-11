@@ -44,6 +44,8 @@ if [ "$VOIE" = rapide ] || [ "$VOIE" = tout ]; then
   lancer "sonde-morsure"     120 ./scripts/gate-sonde-injection.sh
   lancer "correspondance"     60 python3 scripts/gate-correspondance.py
   lancer "correspondance-morsure" 90 ./scripts/gate-correspondance-injection.sh
+  lancer "gel-baseline"       60 python3 scripts/gel-baseline.py
+  lancer "gel-morsure"        90 ./scripts/gate-gel-injection.sh
 fi
 
 # La voie ROUGE porte les défauts MOTEUR connus et non corrigés. On ne les maquille jamais :

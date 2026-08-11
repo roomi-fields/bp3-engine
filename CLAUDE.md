@@ -19,6 +19,9 @@ d'**édition** · le filtrage d'une **sortie de commande**, qui n'est pas un fic
 
 Une recherche qui ne trouve rien renseigne sur la recherche : reformuler, jamais retomber sur `grep`.
 
+**L'index d'un VOISIN se lit par `~/dev/bp/hub/tools/rtfm-tour.sh <dépôt> "<requête>"`** — chaque
+dépôt porte le sien, et `rtfm_search` ne voit que le courant. `--tous` interroge toute la tour.
+
 ## Autorité sur un sujet
 
 1. La **carte d'autorités d'Atlas** (`../atlas/carte-autorites/`) dit où vit l'autorité sur un sujet.

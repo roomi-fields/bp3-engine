@@ -50,6 +50,21 @@ POURQUOI = [
     "REFUSE. Tout appelant du binaire natif doit passer les drapeaux explicites ; la chaine Kanopi",
     "passe par son propre frontal, donc ca ne la mord pas — mais c est le genre de fait qu on oublie.",
     "",
+    "UN AUXILIAIRE QUI NE PORTE PAS LE NOM DE SA GRAMMAIRE PORTE SON MOTIF, mesure cas par cas,",
+    "dans 'pourquoi_pas_le_fichier_de_meme_nom'. Trois realites s y cachent, et un remede en bloc",
+    "en casserait deux sur trois :",
+    "  · le fichier de meme nom est au format 'texte BP2' : le binaire natif l ouvre, en deverse les",
+    "    valeurs brutes et ne produit rien. L emprunt est indispensable.",
+    "  · il est au format JSON et se charge, mais le couple retenu vient de la reference PHP et rend",
+    "    une AUTRE production. Le substituer change la reference.",
+    "  · ce n est pas un emprunt : c est une variante de la meme grammaire, declaree par sa propre",
+    "    en-tete (ex. 'ShapesInRhythm' declare '-se.ShapesInRhythm.QTM').",
+    "SEULS LES REGLAGES CONNAISSENT CES DEUX FORMES. Les 81 alphabets, csound, objets et tonalites",
+    "sont du texte par nature : leur champ 'format' dit 'texte', sans opposition BP2/BP3.",
+    "LE COMPTE SEUL NE TRANCHE RIEN : sur 'shapes-rhythm' les deux reglages rendent 1952 jetons et",
+    "4685 mots — et les 1952 jetons different tous, d une octave et d un placement (C4key 48 vs 60,",
+    "Quantization 30 vs 10). Comparer des totaux aurait conclu 'identique'.",
+    "",
     "Chemins RELATIFS a packages/library, pour rester valides ou qu on clone.",
     "Regenerer avec bp3-engine/scripts/table-correspondance.py (verifie chaque chemin avant d ecrire).",
 ]
@@ -58,6 +73,47 @@ POURQUOI = [
 FACETTES = {"-se": "reglages", "-al": "alphabet", "-cs": "csound",
             "-to": "tonalite", "-so": "objets", "-or": "orchestre"}
 
+TD = os.path.join(ROOT, "test-data")   # corpus d origine : c est lui qui porte le format
+
+
+def format_fichier(cle, chemin):
+    """Format MESURE d un auxiliaire.
+
+    Seuls les REGLAGES connaissent deux formes : le binaire natif n accepte que le JSON.
+    Presente a un reglage BP2, il l ouvre, en deverse les valeurs brutes sur la sortie
+    (65535 / 65535 / 0 / ...) et ne produit rien : la lecture reussit, le reglage ne prend
+    pas. C est ce format, et lui seul, qui rend un emprunt indispensable.
+
+    Les autres facettes — alphabet, csound, objets, tonalite — sont du texte par nature :
+    les 81 mesurees le sont toutes. Les qualifier de 'BP2' inventerait une opposition.
+    """
+    try:
+        d = json.load(open(chemin, encoding="utf-8"))
+    except Exception:
+        return "texte BP2" if cle == "-se" else "texte"
+    return "JSON BP3" if isinstance(d, dict) and "header" in d else "JSON court"
+
+
+def motif_du_couple(cle, utilise, stem, origine):
+    """Pourquoi ce couple est celui-la, quand l auxiliaire ne porte pas le nom de la grammaire.
+
+    Sans ce motif, un lecteur en aval retrouve le fichier de meme nom, le croit oublie, et
+    rouvre la question a chaque passage.
+    """
+    propre = f"{cle}.{stem}"
+    if utilise == propre or not os.path.isfile(os.path.join(TD, propre)):
+        return None
+    fmt = format_fichier(cle, os.path.join(TD, propre))
+    if utilise.startswith(propre + "."):
+        return (f"variante de la meme grammaire : '{utilise}' est declare par l en-tete de la "
+                f"grammaire elle-meme. '{propre}' ({fmt}) existe et se charge, mais rend une "
+                f"autre production.")
+    if fmt == "texte BP2":
+        return (f"emprunt indispensable : '{propre}' est au format {fmt}, que le binaire natif "
+                f"n exploite pas — la grammaire ne produit rien avec lui.")
+    return (f"emprunt atteste : '{propre}' ({fmt}) se charge, mais le couple retenu vient de "
+            f"{origine} et rend une production differente. Le substituer change la reference.")
+
 
 def construire():
     base = json.load(open(BASELINE, encoding="utf-8"))
@@ -65,6 +121,8 @@ def construire():
 
     for g in base["grammaires"]:
         nom = g["grammaire"]
+        src = g["source"]
+        stem = src[4:] if src.startswith("-gr.") else src
         rel_gr = f"{DIR_SCENES}/{nom}.gr"
         if not os.path.isfile(os.path.join(KANOPI, rel_gr)):
             absents.append(f"grammaire {nom} -> {rel_gr}")
@@ -74,15 +132,23 @@ def construire():
             rel = f"{DIR_AUX}/{fichier}"
             if not os.path.isfile(os.path.join(KANOPI, rel)):
                 absents.append(f"{nom} [{cle}] -> {rel}")
-            aux[cle] = {"role": FACETTES.get(cle, cle), "chemin": rel, "nom_amont": fichier}
+            amont = os.path.join(TD, fichier)
+            if not os.path.isfile(amont):
+                absents.append(f"{nom} [{cle}] amont -> {amont}")
+            aux[cle] = {"role": FACETTES.get(cle, cle), "chemin": rel, "nom_amont": fichier,
+                        "format": format_fichier(cle, amont) if os.path.isfile(amont) else None}
+            motif = motif_du_couple(cle, fichier, stem, g.get("config_source"))
+            if motif:
+                aux[cle]["pourquoi_pas_le_fichier_de_meme_nom"] = motif
 
         entrees.append({
             "nom": nom,
             "grammaire": rel_gr,
-            "nom_amont": g["source"],
+            "nom_amont": src,
             "auxiliaires": aux,
             "produit": g.get("produit"),
             "convention": g.get("convention"),
+            "origine_du_couple": g.get("config_source"),
         })
 
     return base, entrees, absents
@@ -107,6 +173,16 @@ def main():
         "pourquoi_ce_fichier_existe": POURQUOI,
         "produit_par": "bp3-engine/scripts/table-correspondance.py",
         "source": f"bp3-engine/baseline-native/baseline.json (baseline v{base['version']}, {base['figee_le']})",
+        # Sans ses conditions, une donnee ne dit pas contre quoi elle a ete prise : elle ne
+        # rougit jamais et derive en silence.
+        "conditions_de_mesure": {
+            "binaire": base["binaire"],
+            "empreinte": base.get("binaire_md5"),
+            "archive": base.get("binaire_archive"),
+            "graine": base.get("seed"),
+            "commande": base.get("commande"),
+            "scelle": base.get("scelle"),
+        },
         "moteur": base["binaire"],
         "racine_des_chemins": "packages/library",
         "n": len(entrees),

@@ -238,10 +238,12 @@
   },
   "check&": {
    "source": "-gr.check&",
-   "auxiliaires": {},
+   "auxiliaires": {
+    "-se": "-se.check&"
+   },
    "convention": "french",
    "convention_source": "php_ref",
-   "origine_du_couple": "aucun reglage : celui que la grammaire declare, -se.check&, est au format texte BP2 et arrete le moteur ; la mesure se prend sur ses valeurs par defaut",
+   "origine_du_couple": "le couple est celui que la grammaire declare. Son fichier de reglages est au format texte BP2 : le moteur le refuse et s arrete. L entree ne produit rien, et c est la mesure.",
    "mode_declare": "midi",
    "statut_amont": "to_be_tested"
   },
@@ -605,24 +607,24 @@
   "koto1": {
    "source": "-gr.koto1",
    "auxiliaires": {
-    "-se": "-se.koto3",
-    "-al": "-al.abc1"
+    "-se": "-se.koto1",
+    "-al": "-ho.abc1"
    },
    "convention": "english",
    "convention_source": "sans objet : les 4 conventions qui compilent rendent la meme sortie",
-   "origine_du_couple": "php_ref",
+   "origine_du_couple": "le couple est celui que la grammaire declare. Son fichier de reglages est au format texte BP2 : le moteur le refuse et s arrete. L entree ne produit rien, et c est la mesure.",
    "mode_declare": "text",
    "statut_amont": "active"
   },
   "koto2": {
    "source": "-gr.koto2",
    "auxiliaires": {
-    "-se": "-se.koto3",
-    "-al": "-al.abc1"
+    "-se": "-se.koto1",
+    "-al": "-ho.abc1"
    },
    "convention": "english",
    "convention_source": "sans objet : les 4 conventions qui compilent rendent la meme sortie",
-   "origine_du_couple": "php_ref",
+   "origine_du_couple": "le couple est celui que la grammaire declare. Son fichier de reglages est au format texte BP2 : le moteur le refuse et s arrete. L entree ne produit rien, et c est la mesure.",
    "mode_declare": "text",
    "statut_amont": "active"
   },
@@ -905,12 +907,12 @@
   "transposition1": {
    "source": "-gr.transposition1",
    "auxiliaires": {
-    "-se": "-se.transposition3",
+    "-se": "-se.transposition",
     "-al": "-ho.transposition"
    },
    "convention": "english",
    "convention_source": "php_ref",
-   "origine_du_couple": "php_ref",
+   "origine_du_couple": "le couple est celui que la grammaire declare. Son fichier de reglages est au format texte BP2 : le moteur le refuse et s arrete. L entree ne produit rien, et c est la mesure.",
    "mode_declare": "midi",
    "statut_amont": "to_be_tested"
   },
@@ -1023,11 +1025,11 @@
   "tryMIDIfile": {
    "source": "-gr.tryMIDIfile",
    "auxiliaires": {
-    "-se": "-se.asymmetric1"
+    "-se": "-se.tryMIDIfile"
    },
    "convention": "english",
    "convention_source": "php_ref",
-   "origine_du_couple": "php_ref",
+   "origine_du_couple": "le couple est celui que la grammaire declare. Son fichier de reglages est au format texte BP2 : le moteur le refuse et s arrete. L entree ne produit rien, et c est la mesure.",
    "mode_declare": "midi",
    "statut_amont": "to_be_tested"
   },

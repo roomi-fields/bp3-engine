@@ -40,9 +40,12 @@ for x in G:
 
 # Une entree qui « produit » doit avoir produit quelque chose de mesurable.
 for x in G:
-    if x["produit"] and x["jetons_midi"] == 0 and x["mots_texte"] == 0:
+    # Une ligne qui ne produit pas ne porte PAS les champs de mesure : ni capture.py sur une
+    # source absente, ni sortir-de-l-assiette.py ne les ecrivent. Les lire par .get evite de
+    # confondre « champ absent » et « mesure nulle ».
+    if x["produit"] and not x.get("jetons_midi") and not x.get("mots_texte"):
         ecarts.append(f"{x['grammaire']} : marquee produit=true mais 0 jeton ET 0 mot")
-    if not x["produit"] and (x["jetons_midi"] or x["mots_texte"]):
+    if not x["produit"] and (x.get("jetons_midi") or x.get("mots_texte")):
         ecarts.append(f"{x['grammaire']} : marquee produit=false mais porte des mesures")
 
 # Les noms doivent etre uniques : deux entrees homonymes rendent la baseline inexploitable.

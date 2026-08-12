@@ -43,7 +43,6 @@
    "beatrix-dice",
    "bells",
    "blurb",
-   "check&",
    "checkAllCsound",
    "checkBT",
    "checkHomo",
@@ -70,8 +69,6 @@
    "gramgene2",
    "graphics",
    "harmony",
-   "koto1",
-   "koto2",
    "koto3",
    "kss2",
    "livecode1",
@@ -93,7 +90,6 @@
    "testNC1",
    "testTie7",
    "time-patterns",
-   "transposition1",
    "transposition3",
    "tryAllItems0",
    "tryAllItems1",
@@ -102,7 +98,6 @@
    "tryKeyMap",
    "tryKeyXpand",
    "tryLIN",
-   "tryMIDIfile",
    "tryObjects",
    "tryPatternGrammar",
    "tryRagas",
@@ -134,6 +129,45 @@
    "decision": "HORS des 96 reproductibles et hors comparaison. On les documente, on ne les scelle pas comme comparables. Correction d'une version anterieure du scelle qui promettait une comparaison au multiset.",
    "axe": "sequence ET nombre de jetons a graine forcee"
   },
-  "neutralite_du_retrait_wasm": "MESURE 2026-08-11 : les 10 conditionnelles __BP3_WASM__ retirees du moteur, l arbre partage csrc/ replie dans source/BP3/. Aucune production ne change — memes 95/96 conformes avant et apres, et la seule divergente (MyMelody) diverge deja avec le binaire d avant le retrait. L empreinte du binaire, elle, bouge a chaque recompilation : elle date la construction, elle ne juge pas le comportement."
+  "neutralite_du_retrait_wasm": "MESURE 2026-08-11 : les 10 conditionnelles __BP3_WASM__ retirees du moteur, l arbre partage csrc/ replie dans source/BP3/. Aucune production ne change — memes 95/96 conformes avant et apres, et la seule divergente (MyMelody) diverge deja avec le binaire d avant le retrait. L empreinte du binaire, elle, bouge a chaque recompilation : elle date la construction, elle ne juge pas le comportement.",
+  "assiette": 91,
+  "sorties_de_l_assiette": [
+   {
+    "entrees": [
+     "check&",
+     "koto1",
+     "koto2",
+     "transposition1",
+     "tryMIDIfile"
+    ],
+    "cause": "le fichier de reglages que la grammaire declare est au format texte BP2 : le moteur le refuse et s arrete avant de compiler. Toute capture reposerait sur un reglage emprunte, choisi par nous.",
+    "decide_par": "Romain",
+    "le": "2026-08-12"
+   },
+   {
+    "entrees": [
+     "check&",
+     "koto1",
+     "koto2",
+     "transposition1",
+     "tryMIDIfile"
+    ],
+    "cause": "le fichier de reglages que la grammaire declare est au format texte BP2 : le moteur le refuse et s arrete avant de compiler. Toute capture reposerait sur un reglage emprunte, choisi par nous.",
+    "decide_par": "Romain",
+    "le": "2026-08-12"
+   },
+   {
+    "entrees": [
+     "check&",
+     "koto1",
+     "koto2",
+     "transposition1",
+     "tryMIDIfile"
+    ],
+    "cause": "le fichier de reglages que la grammaire declare est au format texte BP2 : le moteur le refuse et s arrete avant de compiler. Toute capture reposerait sur un reglage emprunte, choisi par nous.",
+    "decide_par": "Romain",
+    "le": "2026-08-12"
+   }
+  ]
  }
 }

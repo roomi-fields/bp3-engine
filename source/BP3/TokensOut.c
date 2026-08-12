@@ -61,7 +61,7 @@ static void tok_write_file(void) {
 /* Appelé depuis PlayBuffer1 juste après TimeSet, pour chaque item.
    kmax = nombre d'instances calculé par TimeSet (sortie p_kmx). */
 void EmitTimedTokensItem(tokenbyte ***pp_buff, long kmax) {
-    long k, time_offset;
+    long k;
     char note_name[64];
 
     if(TokensOutFile[0] == '\0') return;
@@ -82,8 +82,6 @@ void EmitTimedTokensItem(tokenbyte ***pp_buff, long kmax) {
         }
     }
 
-    /* Offset de quantization Kpress (#35) : même correction que wasm_kpress_offset. */
-    time_offset = (Kpress >= 2.0 && Quantization > 0) ? (long)Quantization : 0;
 
     for(k = 2; k <= kmax; k++) {
         int j = (*p_Instance)[k].object;
@@ -93,8 +91,12 @@ void EmitTimedTokensItem(tokenbyte ***pp_buff, long kmax) {
         if(j == 0) continue;
         if(j == -1) break;
 
-        start_ms = (long)(*p_Instance)[k].starttime - time_offset;
-        end_ms   = (long)(*p_Instance)[k].endtime   - time_offset;
+        /* La mesure se prend AVANT toute compensation de gigue (décision Romain du
+           2026-08-12) : les instants sortent tels que le moteur les produit. Une
+           soustraction de la quantification vivait ici ; elle rendait les captures
+           antérieures d'un pas à ce que le fichier MIDI écrit. */
+        start_ms = (long)(*p_Instance)[k].starttime;
+        end_ms   = (long)(*p_Instance)[k].endtime;
 
         if(j == 1) continue;  /* silence : non émis en verbose=0 */
 

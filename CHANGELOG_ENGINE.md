@@ -11,6 +11,34 @@ Chaque section référence le point correspondant dans `FEEDBACK_BERNARD.md` (te
 ---
 
 
+## 2026-08-12 — la mesure se prend avant la compensation de gigue (`TokensOut.c`)
+
+Décision de Romain : la capture doit porter les instants que le moteur **produit**, pas ceux
+qu'une compensation a corrigés.
+
+`TokensOut.c` retranchait la quantification des deux bornes de chaque jeton quand le taux de
+compression dépassait 2 — portage de `wasm_kpress_offset` (#35). Cette soustraction est retirée :
+`start_ms` et `end_ms` sortent tels que `p_Instance` les porte.
+
+**Effet mesuré**, binaire à binaire, corpus à graine figée :
+
+- `transposition3` : les jetons passent de `E1 −10 → 1300` à `E1 0 → 1310`, et coïncident
+  désormais **exactement** avec la liste d'événements et avec le premier `NoteOn` du fichier MIDI,
+  tous deux à 0 ms. Plus aucun instant négatif.
+- L'écart est **uniforme par grammaire** et vaut la quantification du réglage, quand le taux de
+  compression annoncé par le moteur dépasse 1 : `acceleration` +10 sur les 78 jetons, `Djinns` +50
+  sur les 895.
+- Les grammaires dont le taux annoncé vaut 1 sont **inchangées** : `kss2` 97 jetons, `765432`
+  823 jetons, `Nadaka-1er-essai` 4 jetons, écart nul sur les deux bornes.
+
+Mesure et preuves : `docs-developer/instant-negatif.md`.
+
+Binaire : `Version 3.5.1`, md5 `372dd047bc52fd152ff51ec6715fae74`, archive
+`builds/v3.5.1-iso.2/bp3`. Le précédent reste `fb6df5ad5ee18a0398ae3cdb1817287d`
+(`builds/v3.5.1-iso.1/bp3`). **La chaîne de version affichée est identique dans les deux** — seule
+l'empreinte les distingue.
+
+
 ## 2026-08-08 — passage du moteur amont v3.5.0 → v3.5.1
 
 Amont : Bernard publie **v3.5.1** (tag `v3.5.1`, `4897d7d`, ligne graphics-for-BP3). Diff

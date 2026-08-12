@@ -3,6 +3,20 @@
 Je tiens le moteur BP3 de Bernard Bel : sa construction, ses changelogs, et l'**oracle** qui sert de
 référence à tout l'écosystème.
 
+## ⛔ Le moteur d'origine ne se modifie pas sans l'accord de Romain
+
+Le code de Bernard est à Bernard. Toute écriture dans `source/BP3/` sur un fichier venu de lui
+demande **l'accord explicite de Romain pour le geste précis**. Un accord sur un chantier n'ouvre
+pas le fichier suivant.
+
+**Toute modification existante se déclare.** `docs-developer/inventaire-des-deltas.md` porte, pour
+chaque écart avec l'amont, de qui vient le fichier, ce que nous y avons changé, et sur quel accord.
+La montée de version amont s'y confronte : un delta qui disparaît d'une fusion est une régression
+silencieuse.
+
+Nos propres fichiers — ceux que ce dépôt a créés — se modifient librement, et figurent quand même
+à l'inventaire.
+
 ## L'index d'abord — règle, pas préférence
 
 Ce dépôt est indexé. Toute investigation **commence** par l'index : `rtfm_search` pour *le quoi* —

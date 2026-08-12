@@ -200,3 +200,12 @@ préfixe : `BP_AGENT=bp3-engine ~/dev/bp/hub/tour <commande>`.
 
 `BACKLOG.md` porte ma dette interne, avec un identifiant et un statut par entrée. Un item qui touche
 le **langage** remonte au backlog central par `tour`. La vue globale se consulte avec `tour backlog`. **Je reporte, l'architecte clôt** : passer un item à « fait » moi-même n'est pas mon geste.
+
+## ⛔ Un dépôt lié est consommé VIVANT
+
+Les dépôts s'intègrent par **lien symbolique** : ce que j'enregistre atteint mes consommateurs **sans
+construction ni publication**. Un fichier non commité est déjà en usage chez eux — « hors du dépôt »
+n'est pas « hors d'usage ». Kairos lit BPx ; Kanopi lit BPx, bp3-frontend et les cinq runtimes.
+
+Un agent qui **compile** publie **deux instances** : une de développement, une de production.
+

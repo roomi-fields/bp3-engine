@@ -32,7 +32,7 @@ CAP_PUBLIE = os.path.join(OUT, "captures")
 # intact.
 CAP = os.path.join(OUT, "captures.en-cours")
 RUN = os.path.join(ROOT, "capture-run")  # cwd du binaire : ../csound_resources/ y resout
-GRJ = "/home/romi/dev/bp/BPscript/test/grammars/grammars.json"
+REG = os.path.join(TD, "REGISTRE.json")   # le corpus et son couplage vivent DANS ce depot
 TMP = "/tmp/claude-1000/-home-romi-dev-bp-bp3-engine/2886bb74-5c18-4f37-8f64-8d3075d1375c/scratchpad/v4"
 os.makedirs(TMP, exist_ok=True)
 if os.path.isdir(CAP):
@@ -46,13 +46,7 @@ REFUS_MSGS = ["Can't produce all items in 'SUB' or 'SUB1' or 'POSLONG'",
               "Cannot produce all items because this grammar contains"]
 TRUNC = 2 * 1024 * 1024
 
-G = {k: v for k, v in json.load(open(GRJ)).items() if isinstance(v, dict) and k != "_comment"}
-
-# La reference gelee, quand elle existe : elle porte le couple grammaire <-> auxiliaires
-# et la convention de notes tels qu'ils ont ete MESURES. Voir son usage en mode unitaire.
-_ref_figee = os.path.join(OUT, "baseline.json")
-BASE_FIGEE = ({x["grammaire"]: x for x in json.load(open(_ref_figee, encoding="utf-8"))["grammaires"]}
-              if os.path.isfile(_ref_figee) else {})
+G = json.load(open(REG, encoding="utf-8"))["grammaires"]
 
 
 def clean(src, dst):
@@ -67,36 +61,19 @@ def clean(src, dst):
         "\n".join(l for l in lines[st:] if not l.strip().startswith("INIT:")))
 
 
-def config(gd, raw):
-    pr = gd.get("php_ref") or {}
-    cfg, src = {}, "php_ref" if pr else "en-tete"
-    for key, flag in (("settings", "-se"), ("alphabet", "-al"), ("tonality", "-to"), ("csound", "-cs")):
-        v = pr.get(key)
-        if v and os.path.isfile(os.path.join(TD, v)):
-            cfg[flag] = v
-    for pref in ("-se", "-al", "-to", "-cs"):
-        if pref in cfg:
-            continue
-        m = re.search(rf"^{re.escape(pref)}\.(\S+)", raw, re.M)
-        if m and os.path.isfile(os.path.join(TD, f"{pref}.{m.group(1)}")):
-            cfg[pref] = f"{pref}.{m.group(1)}"
-    if "-al" not in cfg:
-        m = re.search(r"^-ho\.(\S+)", raw, re.M)
-        if m:
-            for cand in (f"-al.{m.group(1)}", f"-ho.{m.group(1)}"):
-                if os.path.isfile(os.path.join(TD, cand)):
-                    cfg["-al"] = cand
-                    break
-    conv = (pr.get("note_convention") or "").lower() or None
-    return cfg, conv, src
+def config(gd):
+    """Le couple grammaire <-> auxiliaires et la convention, lus dans le REGISTRE.
 
+    Ils y sont figes parce qu'ils ont ete etablis une fois : mesures, puis arbitres par
+    Romain le 2026-08-11 quand deux d'entre eux etaient en litige. Les redecouvrir a chaque
+    capture — par l'en-tete de la grammaire, ou par un registre voisin — c'est accepter
+    qu'un oracle change de reponse sans que personne ait rien decide.
 
-def add_so(cfg, bern):
-    """Objets sonores : aucune grammaire ne les declare, ils suivent la convention de nom
-    -so.<nom de la grammaire>. Meme regle que -ho.<X> pour l'alphabet."""
-    if "-so" not in cfg and os.path.isfile(os.path.join(TD, f"-so.{bern}")):
-        cfg["-so"] = f"-so.{bern}"
-    return cfg
+    L'en-tete de la grammaire ne peut pas servir de source : le moteur la SAUTE
+    (CompileGrammar.c:251) et elle designe un autre auxiliaire que celui retenu pour 39 des
+    113 grammaires. Elle est plausible et fausse, ce qui est le pire des deux.
+    """
+    return dict(gd.get("auxiliaires") or {}), gd.get("convention"), gd.get("origine_du_couple")
 
 
 def se_un_item(se_rel, slug):
@@ -215,71 +192,17 @@ rows = []
 names = [UNE] if UNE else sorted(G)
 for idx, name in enumerate(names, 1):
     gd = G[name]
-    bern = gd.get("bernard", name)
-    gsrc = os.path.join(TD, f"-gr.{bern}")
+    src = gd["source"]                       # le REGISTRE nomme le fichier source
+    gsrc = os.path.join(TD, src)
     slug = re.sub(r"[^A-Za-z0-9_.-]", "_", name)
     if not os.path.isfile(gsrc):
-        rows.append(dict(grammaire=name, source=f"-gr.{bern}", action=None, modalite=None,
+        rows.append(dict(grammaire=name, source=src, action=None, modalite=None,
                          produit=False, raison="source -gr absente du corpus"))
         continue
-    raw = open(gsrc, encoding="utf-8", errors="replace").read()
-    cfg, conv, cfgsrc = config(gd, raw)
-    cfg = add_so(cfg, bern)
-    # UN REJEU SE PREND SUR LA REFERENCE GELEE, PAS SUR UN REGISTRE VOISIN.
-    # config() lit grammars.json, qui vit chez BPscript. Le 2026-08-12 ils en ont retire
-    # les auxiliaires puis la convention de notes — a raison, la table de correspondance
-    # les porte mieux — et six grammaires du scelle ont cesse de produire ici sans que
-    # rien n ait bouge chez moi : koto1, koto2, testHO2, check&, transposition1, tryMIDIfile.
-    # La reference etait intacte ; c est l instrument qui ne savait plus la reproduire.
-    # En mode unitaire on prend donc le couple et la convention DANS baseline.json, gelee.
-    # Le mode complet garde grammars.json : c est lui qui etablit une baseline neuve, il ne
-    # peut pas se lire dans celle qu il remplace.
-    if UNE and name in BASE_FIGEE:
-        _b = BASE_FIGEE[name]
-        if _b.get("config"):
-            cfg = dict(_b["config"])
-            conv, cfgsrc = _b.get("convention"), "baseline gelee"
+    cfg, conv, cfgsrc = config(gd)
+    convsrc = gd.get("convention_source")
     g = os.path.join(TMP, f"g.{slug}")
     clean(gsrc, g)
-    # Convention de notes non declaree : on la DERIVE, mais seulement si elle est
-    # DETERMINEE — c'est-a-dire si une seule des quatre conventions compile sans
-    # erreur. Si plusieurs compilent, c'est ambigu : on ne devine pas, on laisse
-    # non declaree. Le champ convention_source dit toujours d'ou vient la valeur.
-    convsrc = "php_ref" if conv else None
-    if conv is None:
-        ok_conv = []
-        for c in ("english", "french", "indian", "keys"):
-            lg, tt = run("produce", g, cfg, c, None,
-                         os.path.join(TMP, f"c.{slug}.tok"), os.path.join(TMP, f"c.{slug}.txt"))
-            m = re.search(r"Errors:\s*(\d+)", lg)
-            if (not tt) and m and int(m.group(1)) == 0:
-                ok_conv.append(c)
-        if len(ok_conv) == 1:
-            conv, convsrc = ok_conv[0], "derivee : seule convention qui compile"
-        elif len(ok_conv) > 1:
-            # Plusieurs conventions compilent : ce n'est ambigu QUE si elles donnent des
-            # sorties DIFFERENTES. Si elles rendent toutes le meme resultat, la convention
-            # ne mord sur rien (grammaire a symboles, sans nom de note) : elle est SANS OBJET.
-            # On compare les sorties reelles, pas le nombre de conventions qui compilent —
-            # compter les compilations ne peut pas discriminer les deux cas.
-            groupes = {}
-            for c in ok_conv:
-                tk = os.path.join(TMP, f"k.{slug}.tok"); tx = os.path.join(TMP, f"k.{slug}.txt")
-                for f in (tk, tx):
-                    if os.path.isfile(f):
-                        os.remove(f)
-                run("produce", g, cfg, c, None, tk, tx)
-                # une sortie VIDE n'est pas une sortie : deux vides ne prouvent pas l'egalite
-                blob = b"".join(open(f, "rb").read() for f in (tk, tx) if os.path.isfile(f))
-                cle = hashlib.sha256(blob).hexdigest()[:10] if blob.strip() else f"vide-{c}"
-                groupes.setdefault(cle, []).append(c)
-            if len(groupes) == 1:
-                conv = ok_conv[0]
-                convsrc = ("sans objet : les %d conventions qui compilent rendent la meme sortie"
-                           % len(ok_conv))
-            else:
-                convsrc = ("ambigue : %d sorties differentes selon la convention (%s)"
-                           % (len(groupes), " | ".join("+".join(v) for v in groupes.values())))
     toks = os.path.join(CAP, f"{slug}.tokens.json")
     text = os.path.join(CAP, f"{slug}.text.txt")
 
@@ -350,13 +273,13 @@ for idx, name in enumerate(names, 1):
         open(text + ".TRONQUEE.txt", "w").write(
             f"capture tronquee a {TRUNC} octets\ntaille reelle : {real} octets\nsha256 complet : {h}\n")
 
-    rows.append(dict(grammaire=name, source=f"-gr.{bern}", action=action, modalite=modal,
+    rows.append(dict(grammaire=name, source=src, action=action, modalite=modal,
                      produit=ok, raison=why, jetons_midi=ntok, mots_texte=nw,
                      items=len(items), items_enumeres=n_enum,
                      enumeration_refusee_par_le_moteur=bool(refus),
                      joue=bool(joue),
                      config={k: v for k, v in cfg.items()}, convention=conv,
-                     config_source=cfgsrc, convention_source=convsrc, declare=gd.get("production_mode"),
+                     config_source=cfgsrc, convention_source=convsrc, declare=gd.get("mode_declare"),
                      capture=(f"captures/{slug}." + ("tokens.json" if modal == "MIDI" else "text.txt")) if ok else None))
     print(f"[{idx}/{len(names)}] {name:26} {str(action):11} {str(modal):6} "
           f"{'OK' if ok else 'non':3} items={len(items)}", flush=True)

@@ -1,0 +1,1307 @@
+{
+ "_comment": "Registre du corpus natif. Il dit quelle grammaire va avec quels auxiliaires, et il vit ICI. Toute mesure d oracle s y refere ; aucun fichier hors de ce depot n intervient.",
+ "etabli_le": "2026-08-12",
+ "pourquoi": "Le couple grammaire<->auxiliaires vivait dans le registre de BPscript. Le 2026-08-12 ils en ont retire les auxiliaires puis la convention de notes, a raison, et six grammaires du scelle ont cesse de produire ici sans qu une ligne ait bouge dans ce depot. Une reference gelee dont l instrument depend d une source externe mutable n est pas reproductible.",
+ "autorite": "Le couple et la convention sont ceux que la baseline v14 gelee a mesures. Le mode declare et le statut viennent du registre amont, pour information : ils n entrent dans aucune mesure.",
+ "n": 113,
+ "grammaires": {
+  "765432": {
+   "source": "-gr.765432",
+   "auxiliaires": {
+    "-se": "-se.765432"
+   },
+   "convention": "french",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "active"
+  },
+  "Alarm": {
+   "source": "-gr.Alarm",
+   "auxiliaires": {
+    "-al": "-ho.Frenchnotes"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "to_be_tested"
+  },
+  "Djinns": {
+   "source": "-gr.Djinns",
+   "auxiliaires": {
+    "-se": "-se.Djinns"
+   },
+   "convention": "french",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "active"
+  },
+  "Mozartexpression": {
+   "source": "-gr.Mozartexpression",
+   "auxiliaires": {
+    "-se": "-se.Mozartexpression"
+   },
+   "convention": "french",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "active"
+  },
+  "MyMelody": {
+   "source": "-gr.MyMelody",
+   "auxiliaires": {
+    "-se": "-se.MyMelody",
+    "-al": "-ho.Frenchnotes"
+   },
+   "convention": "french",
+   "convention_source": "php_ref",
+   "origine_du_couple": "reglage nominal (arbitrage Romain 2026-08-11 : le reglage d une grammaire est le sien des qu il fonctionne)",
+   "mode_declare": "midi",
+   "statut_amont": "to_be_tested"
+  },
+  "Nadaka-1er-essai": {
+   "source": "-gr.Nadaka-1er-essai",
+   "auxiliaires": {
+    "-se": "-se.hamsad"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "to_be_tested"
+  },
+  "Nadaka1": {
+   "source": "-gr.Nadaka1",
+   "auxiliaires": {
+    "-se": "-se.hamsad"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "to_be_tested"
+  },
+  "PP": {
+   "source": "-gr.PP",
+   "auxiliaires": {
+    "-se": "-se.koto3",
+    "-al": "-al.abc"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "excluded"
+  },
+  "Rajeev": {
+   "source": "-gr.Rajeev",
+   "auxiliaires": {
+    "-se": "-se.Rajeev"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "to_be_tested"
+  },
+  "a": {
+   "source": "-gr.a",
+   "auxiliaires": {},
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "to_be_tested"
+  },
+  "a.html": {
+   "source": "-gr.a.html",
+   "auxiliaires": {},
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": null,
+   "statut_amont": "to_be_tested"
+  },
+  "acceleration": {
+   "source": "-gr.acceleration",
+   "auxiliaires": {
+    "-se": "-se.Visser2"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "active"
+  },
+  "acceleration_v2": {
+   "source": "-gr.acceleration",
+   "auxiliaires": {
+    "-se": "-se.Visser2"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "active"
+  },
+  "alan-dice": {
+   "source": "-gr.Alan",
+   "auxiliaires": {
+    "-se": "-se.Alan"
+   },
+   "convention": "french",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "active"
+  },
+  "all-items": {
+   "source": "-gr.tryAllItems",
+   "auxiliaires": {
+    "-se": "-se.tryAllItems"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "active"
+  },
+  "all-items1": {
+   "source": "-gr.tryAllItems1",
+   "auxiliaires": {
+    "-se": "-se.tryAllItems1"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "active"
+  },
+  "ames": {
+   "source": "-gr.Ames",
+   "auxiliaires": {
+    "-se": "-se.Ames"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "active"
+  },
+  "asymmetric": {
+   "source": "-gr.asymmetric1",
+   "auxiliaires": {
+    "-se": "-se.asymmetric1",
+    "-al": "-al.asymmetric1"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "active"
+  },
+  "beatrix-dice": {
+   "source": "-gr.Beatrix",
+   "auxiliaires": {
+    "-se": "-se.Beatrix"
+   },
+   "convention": "french",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "active"
+  },
+  "bells": {
+   "source": "-gr.bells",
+   "auxiliaires": {
+    "-se": "-se.cloches",
+    "-al": "-ho.cloches1"
+   },
+   "convention": null,
+   "convention_source": "ambigue : 2 sorties differentes selon la convention (english+french+keys | indian)",
+   "origine_du_couple": "en-tete",
+   "mode_declare": "midi",
+   "statut_amont": "skip"
+  },
+  "blurb": {
+   "source": "-gr.blurb",
+   "auxiliaires": {
+    "-se": "-se.blurb",
+    "-cs": "-cs.tryCsound"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "to_be_tested"
+  },
+  "check&": {
+   "source": "-gr.check&",
+   "auxiliaires": {
+    "-se": "-se.765432"
+   },
+   "convention": "french",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "to_be_tested"
+  },
+  "checkAllCsound": {
+   "source": "-gr.checkAllCsound",
+   "auxiliaires": {
+    "-se": "-se.checkAllCsound",
+    "-cs": "-cs.tryCsound"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "to_be_tested"
+  },
+  "checkBT": {
+   "source": "-gr.checkBT",
+   "auxiliaires": {
+    "-se": "-se.koto3",
+    "-al": "-al.abc1"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "to_be_tested"
+  },
+  "checkHomo": {
+   "source": "-gr.checkHomo",
+   "auxiliaires": {
+    "-al": "-al.checkhomo"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "to_be_tested"
+  },
+  "checkSUB": {
+   "source": "-gr.checkSUB",
+   "auxiliaires": {
+    "-al": "-al.abc"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "to_be_tested"
+  },
+  "checkSUB.new": {
+   "source": "-gr.checkSUB.new",
+   "auxiliaires": {
+    "-al": "-al.abc"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "to_be_tested"
+  },
+  "checkSUB1": {
+   "source": "-gr.checkSUB1",
+   "auxiliaires": {
+    "-se": "-se.checkSUB1",
+    "-al": "-al.abc"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "active"
+  },
+  "checkVolChan": {
+   "source": "-gr.checkVolChan",
+   "auxiliaires": {
+    "-al": "-ho.Frenchnotes"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "to_be_tested"
+  },
+  "checkVolMasterSlave": {
+   "source": "-gr.checkVolMasterSlave",
+   "auxiliaires": {},
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "active"
+  },
+  "checkcontext": {
+   "source": "-gr.checkcontext",
+   "auxiliaires": {
+    "-se": "-se.koto3",
+    "-al": "-al.abc"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "excluded"
+  },
+  "checkhomo2": {
+   "source": "-gr.checkhomo2",
+   "auxiliaires": {
+    "-al": "-al.checkhomo"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "to_be_tested"
+  },
+  "checkrests": {
+   "source": "-gr.checkrests",
+   "auxiliaires": {},
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "to_be_tested"
+  },
+  "cloches1": {
+   "source": "-gr.cloches1",
+   "auxiliaires": {
+    "-se": "-se.cloches",
+    "-al": "-ho.cloches1"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "to_be_tested"
+  },
+  "csound": {
+   "source": "-gr.tryCsound",
+   "auxiliaires": {
+    "-se": "-se.tryCsound",
+    "-cs": "-cs.tryCsound"
+   },
+   "convention": "english",
+   "convention_source": "sans objet : les 4 conventions qui compilent rendent la meme sortie",
+   "origine_du_couple": "en-tete",
+   "mode_declare": "midi",
+   "statut_amont": "excluded"
+  },
+  "destru": {
+   "source": "-gr.tryDESTRU",
+   "auxiliaires": {
+    "-se": "-se.tryDESTRU",
+    "-al": "-al.abc"
+   },
+   "convention": "french",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "active"
+  },
+  "dhadhatite": {
+   "source": "-gr.dhadhatite",
+   "auxiliaires": {
+    "-se": "-se.dhadhatite",
+    "-al": "-al.dhadhatite"
+   },
+   "convention": "french",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "active"
+  },
+  "dhadhatite1": {
+   "source": "-gr.dhadhatite1",
+   "auxiliaires": {
+    "-se": "-se.dhadhatite",
+    "-al": "-al.dhadhatite"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "to_be_tested"
+  },
+  "dhadhatite_v2": {
+   "source": "-gr.dhadhatite",
+   "auxiliaires": {
+    "-se": "-se.dhadhatite",
+    "-al": "-al.dhadhatite"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "partial"
+  },
+  "dhati": {
+   "source": "-gr.dhati",
+   "auxiliaires": {
+    "-se": "-se.dhati",
+    "-al": "-al.dhati",
+    "-so": "-so.dhati"
+   },
+   "convention": "french",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "active"
+  },
+  "dhati2": {
+   "source": "-gr.dhati2",
+   "auxiliaires": {
+    "-se": "-se.dhati2",
+    "-al": "-al.dhati"
+   },
+   "convention": "english",
+   "convention_source": "sans objet : les 4 conventions qui compilent rendent la meme sortie",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "active"
+  },
+  "dhati3": {
+   "source": "-gr.dhati3",
+   "auxiliaires": {
+    "-se": "-se.dhati2",
+    "-al": "-al.dhati"
+   },
+   "convention": "english",
+   "convention_source": "sans objet : les 4 conventions qui compilent rendent la meme sortie",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "active"
+  },
+  "dhin": {
+   "source": "-gr.dhin--",
+   "auxiliaires": {
+    "-se": "-se.dhin--",
+    "-al": "-al.dhin--"
+   },
+   "convention": "english",
+   "convention_source": "sans objet : les 4 conventions qui compilent rendent la meme sortie",
+   "origine_du_couple": "en-tete",
+   "mode_declare": "text",
+   "statut_amont": "excluded"
+  },
+  "dhin1": {
+   "source": "-gr.dhin1",
+   "auxiliaires": {
+    "-se": "-se.dhin--",
+    "-al": "-ho.dhin--"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "to_be_tested"
+  },
+  "doeslittle": {
+   "source": "-gr.doeslittle",
+   "auxiliaires": {
+    "-se": "-se.doeslittle"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "to_be_tested"
+  },
+  "drum": {
+   "source": "-gr.drum",
+   "auxiliaires": {},
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "active"
+  },
+  "ek-do-tin": {
+   "source": "-gr.12345678",
+   "auxiliaires": {
+    "-se": "-se.EkDoTin",
+    "-al": "-al.EkDoTin"
+   },
+   "convention": "french",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "active"
+  },
+  "flags": {
+   "source": "-gr.tryFlags",
+   "auxiliaires": {
+    "-al": "-al.abc"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "active"
+  },
+  "gramgene1": {
+   "source": "-gr.gramgene1",
+   "auxiliaires": {
+    "-se": "-se.gramgene",
+    "-al": "-al.gramgene"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "active"
+  },
+  "gramgene2": {
+   "source": "-gr.gramgene2",
+   "auxiliaires": {
+    "-se": "-se.gramgene",
+    "-al": "-al.gramgene"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "active"
+  },
+  "graphics": {
+   "source": "-gr.tryGraphics",
+   "auxiliaires": {
+    "-se": "-se.tryGraphics"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "active"
+  },
+  "harmony": {
+   "source": "-gr.tryHarmony",
+   "auxiliaires": {
+    "-se": "-se.tryHarmony",
+    "-to": "-to.tryHarmony",
+    "-cs": "-cs.tryHarmony"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "active"
+  },
+  "keys": {
+   "source": "-gr.keys",
+   "auxiliaires": {
+    "-se": "-se.koto3",
+    "-al": "-ho.keys"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "to_be_tested"
+  },
+  "koto1": {
+   "source": "-gr.koto1",
+   "auxiliaires": {
+    "-se": "-se.koto3",
+    "-al": "-al.abc1"
+   },
+   "convention": "english",
+   "convention_source": "sans objet : les 4 conventions qui compilent rendent la meme sortie",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "active"
+  },
+  "koto2": {
+   "source": "-gr.koto2",
+   "auxiliaires": {
+    "-se": "-se.koto3",
+    "-al": "-al.abc1"
+   },
+   "convention": "english",
+   "convention_source": "sans objet : les 4 conventions qui compilent rendent la meme sortie",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "active"
+  },
+  "koto3": {
+   "source": "-gr.koto3",
+   "auxiliaires": {
+    "-se": "-se.koto3",
+    "-al": "-al.abc1"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "active"
+  },
+  "kss2": {
+   "source": "-gr.kss2",
+   "auxiliaires": {
+    "-se": "-se.kss"
+   },
+   "convention": "indian",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "active"
+  },
+  "livecode1": {
+   "source": "-gr.livecode1",
+   "auxiliaires": {
+    "-se": "-se.livecode1"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "active"
+  },
+  "livecode2": {
+   "source": "-gr.livecode2",
+   "auxiliaires": {
+    "-se": "-se.livecode2"
+   },
+   "convention": "english",
+   "convention_source": "sans objet : les 3 conventions qui compilent rendent la meme sortie",
+   "origine_du_couple": "en-tete",
+   "mode_declare": "midi",
+   "statut_amont": "excluded"
+  },
+  "look-and-say": {
+   "source": "-gr.look-and-say",
+   "auxiliaires": {
+    "-se": "-se.look-and-say"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "active"
+  },
+  "major-minor": {
+   "source": "-gr.tryMajorMinor",
+   "auxiliaires": {
+    "-se": "-se.tryMajorMinor",
+    "-cs": "-cs.Mozart"
+   },
+   "convention": null,
+   "convention_source": "ambigue : 2 sorties differentes selon la convention (english+keys | french+indian)",
+   "origine_du_couple": "en-tete",
+   "mode_declare": "text",
+   "statut_amont": "to_be_tested"
+  },
+  "mohanam": {
+   "source": "-gr.trial.mohanam",
+   "auxiliaires": {
+    "-se": "-se.trial.mohanam",
+    "-al": "-al.trial.mohanam",
+    "-to": "-to.trial.mohanam",
+    "-cs": "-cs.trial.mohanam"
+   },
+   "convention": "indian",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "active"
+  },
+  "mozart-dice": {
+   "source": "-gr.Mozart",
+   "auxiliaires": {
+    "-se": "-se.Mozart",
+    "-to": "-to.Mozart",
+    "-cs": "-cs.Mozart"
+   },
+   "convention": "french",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "active"
+  },
+  "nadaka": {
+   "source": "-gr.Nadaka",
+   "auxiliaires": {
+    "-se": "-se.hamsad",
+    "-to": "-to.Nadaka",
+    "-cs": "-cs.Nadaka"
+   },
+   "convention": "indian",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "active"
+  },
+  "negative-context": {
+   "source": "-gr.checkNegativeContext",
+   "auxiliaires": {
+    "-se": "-se.checkNegativeContext"
+   },
+   "convention": "french",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "active"
+  },
+  "not-reich": {
+   "source": "-gr.NotReich",
+   "auxiliaires": {
+    "-se": "-se.NotReich"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "active"
+  },
+  "one-scale": {
+   "source": "-gr.tryOneScale",
+   "auxiliaires": {
+    "-se": "-se.tryOneScale",
+    "-to": "-to.tryOneScale",
+    "-cs": "-cs.tryOneScale"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "active"
+  },
+  "polyphony1": {
+   "source": "-gr.polyphony1",
+   "auxiliaires": {
+    "-se": "-se.polyphony1",
+    "-al": "-al.abc"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "to_be_tested"
+  },
+  "repeat": {
+   "source": "-gr.tryrepeat",
+   "auxiliaires": {
+    "-se": "-se.tryrepeat",
+    "-al": "-al.abc"
+   },
+   "convention": "french",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "active"
+  },
+  "ruwet": {
+   "source": "-gr.Ruwet",
+   "auxiliaires": {
+    "-se": "-se.Ruwet",
+    "-al": "-al.Ruwet"
+   },
+   "convention": "french",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "active"
+  },
+  "scales": {
+   "source": "-gr.tryScales",
+   "auxiliaires": {
+    "-se": "-se.tryScales",
+    "-cs": "-cs.tryScales"
+   },
+   "convention": null,
+   "convention_source": null,
+   "origine_du_couple": "en-tete",
+   "mode_declare": "midi",
+   "statut_amont": "excluded"
+  },
+  "shapes-rhythm": {
+   "source": "-gr.ShapesInRhythm",
+   "auxiliaires": {
+    "-se": "-se.ShapesInRhythm.QTM"
+   },
+   "convention": "english",
+   "convention_source": "sans objet : les 3 conventions qui compilent rendent la meme sortie",
+   "origine_du_couple": "en-tete",
+   "mode_declare": null,
+   "statut_amont": "excluded"
+  },
+  "simpletemplates": {
+   "source": "-gr.simpletemplates",
+   "auxiliaires": {
+    "-se": "-se.simpletemplates"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "to_be_tested"
+  },
+  "templates": {
+   "source": "-gr.checktemplates",
+   "auxiliaires": {
+    "-se": "-se.checktemplates"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "active"
+  },
+  "testHO2": {
+   "source": "-gr.testHO2",
+   "auxiliaires": {
+    "-al": "-al.abc"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "active"
+  },
+  "testNC1": {
+   "source": "-gr.testNC1",
+   "auxiliaires": {},
+   "convention": null,
+   "convention_source": "ambigue : 2 sorties differentes selon la convention (english+keys | french+indian)",
+   "origine_du_couple": "en-tete",
+   "mode_declare": "midi",
+   "statut_amont": "to_be_tested"
+  },
+  "testTie7": {
+   "source": "-gr.testTie7",
+   "auxiliaires": {},
+   "convention": "french",
+   "convention_source": "derivee : seule convention qui compile",
+   "origine_du_couple": "en-tete",
+   "mode_declare": "midi",
+   "statut_amont": "to_be_tested"
+  },
+  "time-patterns": {
+   "source": "-gr.tryTimePatterns",
+   "auxiliaires": {
+    "-se": "-se.tryTimePatterns"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "active"
+  },
+  "transposition": {
+   "source": "-gr.tryTranspose",
+   "auxiliaires": {
+    "-se": "-se.tryTranspose",
+    "-al": "-al.tryKeyMap"
+   },
+   "convention": null,
+   "convention_source": null,
+   "origine_du_couple": "en-tete",
+   "mode_declare": "midi",
+   "statut_amont": "excluded"
+  },
+  "transposition1": {
+   "source": "-gr.transposition1",
+   "auxiliaires": {
+    "-se": "-se.transposition3",
+    "-al": "-ho.transposition"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "to_be_tested"
+  },
+  "transposition3": {
+   "source": "-gr.transposition3",
+   "auxiliaires": {
+    "-se": "-se.transposition3"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "active"
+  },
+  "tryAllItems0": {
+   "source": "-gr.tryAllItems0",
+   "auxiliaires": {
+    "-se": "-se.tryAllItems0",
+    "-al": "-al.abc"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "active"
+  },
+  "tryAllItems1": {
+   "source": "-gr.tryAllItems1",
+   "auxiliaires": {
+    "-se": "-se.tryAllItems1"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "active"
+  },
+  "tryConsoleMaxTime": {
+   "source": "-gr.tryConsoleMaxTime",
+   "auxiliaires": {},
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "excluded"
+  },
+  "tryCsoundObjects": {
+   "source": "-gr.tryCsoundObjects",
+   "auxiliaires": {
+    "-se": "-se.tryCsoundObjects",
+    "-al": "-al.tryCsoundObjects",
+    "-cs": "-cs.tryCsoundObjects",
+    "-so": "-so.tryCsoundObjects"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "active"
+  },
+  "tryGOTO": {
+   "source": "-gr.tryGOTO",
+   "auxiliaires": {
+    "-se": "-se.tryGOTO",
+    "-al": "-al.abc"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "to_be_tested"
+  },
+  "tryKeyMap": {
+   "source": "-gr.tryKeyMap",
+   "auxiliaires": {
+    "-se": "-se.tryKeyMap",
+    "-al": "-al.tryKeyMap",
+    "-so": "-so.tryKeyMap"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "active"
+  },
+  "tryKeyXpand": {
+   "source": "-gr.tryKeyXpand",
+   "auxiliaires": {
+    "-se": "-se.tryKeyXpand",
+    "-al": "-al.tryKeyXpand"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "active"
+  },
+  "tryLIN": {
+   "source": "-gr.tryLIN",
+   "auxiliaires": {
+    "-se": "-se.tryLIN",
+    "-al": "-al.abc"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "excluded"
+  },
+  "tryMIDIfile": {
+   "source": "-gr.tryMIDIfile",
+   "auxiliaires": {
+    "-se": "-se.asymmetric1"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "to_be_tested"
+  },
+  "tryObjects": {
+   "source": "-gr.tryObjects",
+   "auxiliaires": {
+    "-se": "-se.koto3",
+    "-al": "-al.abc1"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "active"
+  },
+  "tryPatternGrammar": {
+   "source": "-gr.tryPatternGrammar",
+   "auxiliaires": {
+    "-se": "-se.tryPatternGrammar",
+    "-al": "-al.tryPatternGrammar"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "to_be_tested"
+  },
+  "tryRagas": {
+   "source": "-gr.tryRagas",
+   "auxiliaires": {
+    "-se": "-se.tryRagas",
+    "-to": "-to.raga",
+    "-cs": "-cs.raga"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "to_be_tested"
+  },
+  "tryRotate": {
+   "source": "-gr.tryRotate",
+   "auxiliaires": {
+    "-se": "-se.tryRotate"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "reglage nominal (arbitrage Romain 2026-08-11 : le reglage d une grammaire est le sien des qu il fonctionne)",
+   "mode_declare": "midi",
+   "statut_amont": "to_be_tested"
+  },
+  "trySerial": {
+   "source": "-gr.trySerial",
+   "auxiliaires": {
+    "-se": "-se.trySerial",
+    "-al": "-al.abc"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "to_be_tested"
+  },
+  "tryShruti": {
+   "source": "-gr.tryShruti",
+   "auxiliaires": {
+    "-se": "-se.tryShruti",
+    "-to": "-to.tryShruti",
+    "-cs": "-cs.tryShruti"
+   },
+   "convention": "indian",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "active"
+  },
+  "trySrand": {
+   "source": "-gr.trySrand",
+   "auxiliaires": {
+    "-se": "-se.trySrand",
+    "-al": "-al.tryKeyXpand"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "active"
+  },
+  "tryTicks": {
+   "source": "-gr.tryTicks",
+   "auxiliaires": {
+    "-se": "-se.tryTicks"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "to_be_tested"
+  },
+  "tryflags2": {
+   "source": "-gr.tryflags2",
+   "auxiliaires": {
+    "-se": "-se.tryflags2",
+    "-al": "-al.abc"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "to_be_tested"
+  },
+  "tryflags3": {
+   "source": "-gr.tryflags3",
+   "auxiliaires": {
+    "-se": "-se.tryflags3",
+    "-al": "-al.abc"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "active"
+  },
+  "tryflags3.html": {
+   "source": "-gr.tryflags3.html",
+   "auxiliaires": {},
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": null,
+   "statut_amont": "to_be_tested"
+  },
+  "tryhomomorphism": {
+   "source": "-gr.tryhomomorphism",
+   "auxiliaires": {
+    "-se": "-se.tryhomomorphism",
+    "-al": "-al.tryhomomorphism"
+   },
+   "convention": "french",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "active"
+  },
+  "trytemplates": {
+   "source": "-gr.trytemplates",
+   "auxiliaires": {
+    "-se": "-se.trytemplates",
+    "-al": "-al.abc"
+   },
+   "convention": "french",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "active"
+  },
+  "trytemplates2": {
+   "source": "-gr.trytemplates2",
+   "auxiliaires": {
+    "-se": "-se.trytemplates2",
+    "-al": "-al.abc"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "to_be_tested"
+  },
+  "tunings": {
+   "source": "-gr.tryTunings",
+   "auxiliaires": {
+    "-se": "-se.tryTunings",
+    "-cs": "-cs.tryTunings"
+   },
+   "convention": null,
+   "convention_source": "ambigue : 2 sorties differentes selon la convention (english+keys | french+indian)",
+   "origine_du_couple": "en-tete",
+   "mode_declare": "text",
+   "statut_amont": "to_be_tested"
+  },
+  "vina": {
+   "source": "-gr.vina",
+   "auxiliaires": {
+    "-se": "-se.Vina",
+    "-cs": "-cs.Vina"
+   },
+   "convention": "indian",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "active"
+  },
+  "vina2": {
+   "source": "-gr.vina2",
+   "auxiliaires": {
+    "-se": "-se.Vina",
+    "-cs": "-cs.Vina"
+   },
+   "convention": "indian",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "text",
+   "statut_amont": "active"
+  },
+  "vina3": {
+   "source": "-gr.vina3",
+   "auxiliaires": {
+    "-se": "-se.Vina3",
+    "-to": "-to.Vina",
+    "-cs": "-cs.Vina"
+   },
+   "convention": "english",
+   "convention_source": "sans objet : les 4 conventions qui compilent rendent la meme sortie",
+   "origine_du_couple": "en-tete",
+   "mode_declare": "midi",
+   "statut_amont": "excluded"
+  },
+  "visser-shapes": {
+   "source": "-gr.Visser.Shapes",
+   "auxiliaires": {
+    "-se": "-se.Visser.Shapes"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "active"
+  },
+  "visser-waves": {
+   "source": "-gr.Visser.Waves",
+   "auxiliaires": {
+    "-se": "-se.Visser.Waves"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "active"
+  },
+  "visser3": {
+   "source": "-gr.Visser3",
+   "auxiliaires": {
+    "-se": "-se.Visser3"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "active"
+  },
+  "visser5": {
+   "source": "-gr.Visser5",
+   "auxiliaires": {
+    "-se": "-se.Visser5"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "active"
+  },
+  "watch": {
+   "source": "-gr.Watch_What_Happens",
+   "auxiliaires": {
+    "-se": "-se.Watch_What_Happens"
+   },
+   "convention": "english",
+   "convention_source": "php_ref",
+   "origine_du_couple": "php_ref",
+   "mode_declare": "midi",
+   "statut_amont": "active"
+  }
+ }
+}

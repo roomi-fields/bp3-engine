@@ -1,1 +1,1 @@
-/5 {C3 B3 E3 F3 G3}{_srand(1) B4 F4 C4 E4 G4} _randomize {B4 E4 F4 G4 C4}{B5 E5 F5 G5 C5}{_srand(1) B5 F5 C5 E5 G5}{_rndvel(50) _vel(80) a a a a a b b b b b}
+/5 {B3 G3 F3 C3 E3}{_srand(1) B4 F4 C4 E4 G4} _randomize {C4 E4 B4 F4 G4}{C5 E5 B5 F5 G5}{_srand(1) B5 F5 C5 E5 G5}{_rndvel(50) _vel(80) a a a a a b b b b b}

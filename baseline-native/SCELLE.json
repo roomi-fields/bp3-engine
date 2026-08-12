@@ -1,17 +1,17 @@
 {
  "_comment": "Scellé de provenance de la baseline v13 : ce qui a produit les captures, rangé AVEC elles. Le binaire se nomme par md5 (le numéro de version n'est pas une empreinte, constat #65) ; la commande fait partie du scellé car elle change le CONTENU, pas seulement le minutage (une capture -o et une capture --midiout répondent à des questions différentes).",
- "reference": "baseline-native v13",
- "figee_le": "2026-07-19",
+ "reference": "baseline-native v15",
+ "figee_le": "2026-08-12",
  "binaire": {
   "version_affichee": "bp3 3.5.1 (Aug 11 2026 - 13:16:56)",
-  "md5": "fb6df5ad5ee18a0398ae3cdb1817287d",
-  "archive": "builds/v3.5.1-iso.1/bp3",
-  "note": "Seul le md5 fait foi. Voir ORACLE-BINAIRE.md. Binaire de campagne fige le 2026-08-11, annonce a la tour."
+  "md5": "372dd047bc52fd152ff51ec6715fae74",
+  "archive": "builds/v3.5.1-iso.2/bp3",
+  "note": "Seul le md5 fait foi. La chaine de version affichee est IDENTIQUE a celle du binaire precedent fb6df5ad — elle est figee a la compilation d origine et ne date pas le build. Voir ORACLE-BINAIRE.md."
  },
  "script_capture": {
   "fichier": "baseline-native/capture.py",
-  "commit": "d45e564",
-  "date": "2026-07-19"
+  "commit": "bd6fca4",
+  "date": "2026-08-12"
  },
  "commande": {
   "gabarit": "bp3 <action> -e -gr <gr-nettoyée> --seed 1 [<flag-convention>] [<flags-config: -se -al -to -cs -so ...>] -o <texte> --tokensout <jetons>",
@@ -22,9 +22,9 @@
   "un_item": "capture.py:96-110 — force MaxItemsProduce=1 dans les réglages -se pour les grammaires qui jouent"
  },
  "preuve": {
-  "reproductible_bit_a_bit": "96/96 octet-a-octet contre le binaire de campagne fb6df5ad, rejeu du 2026-08-11 par l outil du depot en mode une-grammaire, en comparant exactement le fichier que baseline.json nomme pour chaque grammaire. Zero divergente, zero non produite.",
+  "reproductible_bit_a_bit": "91/91 octet-a-octet contre le binaire 372dd047, rejeu du 2026-08-12 apres recapture complete : 56 sonnantes, 35 en texte, 0 divergente, 0 non produite.",
   "independant_du_binaire": "MESURE 2026-08-11, rejeu des 96 en comparant EXACTEMENT le fichier que baseline.json nomme : 95/96 octet-a-octet contre 3.5.1. La seule divergente, MyMelody, l etait parce que MA LIGNE PUBLIEE etait fausse — prise sous des conditions autres que le protocole scelle, minutage de -50 a 1361 la ou le protocole rend 0 a 4000. Recapturee en v14. La divergence ne venait donc ni du binaire ni du retrait du WASM.",
-  "bilan": "REPRODUCTIBLES bit-à-bit 96 | NON DÉTERMINISTES par construction 2 (hors comparaison) | dépassements 0 | sans capture 0",
+  "bilan": "REPRODUCTIBLES bit-a-bit 91 | NON DETERMINISTES par construction 2 (hors comparaison) | HORS ASSIETTE, reglage declare illisible 5",
   "reproductibles_96": [
    "765432",
    "Alarm",
@@ -168,6 +168,7 @@
     "decide_par": "Romain",
     "le": "2026-08-12"
    }
-  ]
+  ],
+  "ce_qui_a_change_depuis_v14": "La soustraction de la quantification est retiree du serialiseur de jetons : les instants sortent tels que le moteur les produit, et coincident avec la liste d evenements. Les cinq grammaires dont le reglage declare est au format BP2 sortent de l assiette. PP se recapture sur les valeurs par defaut, sa grammaire ne declarant aucun reglage."
  }
 }

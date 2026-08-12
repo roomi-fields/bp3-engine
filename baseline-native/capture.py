@@ -307,8 +307,13 @@ meta = dict(version="v5", figee_le=datetime.date.today().isoformat(),
                      + " cwd=capture-run ; clean capture.py:52-61 ; un-item capture.py:96-110",
             capture="par ACTION : single (le jeu, 1 item, graine fixe) des que la grammaire joue ; produce-all (l ensemble) pour les grammaires purement symboliques quand le moteur accepte d enumerer",
             productibles=len(n_ok),
-            produce_all=len([r for r in n_ok if r["action"] == "produce-all"]),
-            single=len([r for r in n_ok if r["action"] == "single"]),
+            # Les compteurs d'ACTION se comptent sur TOUTES les lignes, pas sur les seules
+            # productibles : c'est la definition que gate-baseline.py verifie. cloches1 la rend
+            # visible — elle porte une action « single » et depasse le delai sans produire.
+            produce_all=len([r for r in rows if r.get("action") == "produce-all"]),
+            single=len([r for r in rows if r.get("action") == "single"]),
+            doublons=len([r for r in rows if r.get("doublon_de")]),
+            captures_texte_structurees=len([r for r in rows if r.get("texte_structure")]),
             grammaires=rows)
 if UNE:
     # On n'ecrit PAS baseline.json : la reference publiee ne bouge que sur republication.

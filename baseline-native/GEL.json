@@ -19,9 +19,9 @@
   "archive": "builds/v3.5.1-iso.1/bp3"
  },
  "empreintes": {
-  "baseline.json": "0575aa5acd9970dd32b5a499a57e37272c9d7585d3d634a50dfe544e09729c9c",
-  "SCELLE.json": "cadae9ffbcfd520ac167114acd7571355d9caa5891a1263a2bdb7ce54de9228d",
-  "captures": "4eb4dd63eb5862be8f81f524329691943822fe4e5da591f4b2b359d551d4c26c",
+  "baseline.json": "99868cfa79ffec592dbb468baaf924343b29e9105e80eef517c6d8acc3e002c9",
+  "SCELLE.json": "4bae30cc3030024de291f8790202a16aa31e99ebe4b64a7105ba15fcd1b489f6",
+  "captures": "9f5f9c2d39e31ac8d9de09beba416870a55e062e260edb4ab61fa26a08602135",
   "captures_n": 158,
   "methode": "captures : sha256 du nom puis du contenu de chaque fichier, dans l ordre alphabetique"
  },

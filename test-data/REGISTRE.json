@@ -86,12 +86,11 @@
   "PP": {
    "source": "-gr.PP",
    "auxiliaires": {
-    "-se": "-se.koto3",
-    "-al": "-al.abc"
+    "-al": "-ho.abc"
    },
    "convention": "english",
    "convention_source": "php_ref",
-   "origine_du_couple": "php_ref",
+   "origine_du_couple": "declare par la grammaire (en-tete -ho.abc, aucun reglage)",
    "mode_declare": "text",
    "statut_amont": "excluded"
   },
@@ -239,12 +238,10 @@
   },
   "check&": {
    "source": "-gr.check&",
-   "auxiliaires": {
-    "-se": "-se.765432"
-   },
+   "auxiliaires": {},
    "convention": "french",
    "convention_source": "php_ref",
-   "origine_du_couple": "php_ref",
+   "origine_du_couple": "aucun reglage : celui que la grammaire declare, -se.check&, est au format texte BP2 et arrete le moteur ; la mesure se prend sur ses valeurs par defaut",
    "mode_declare": "midi",
    "statut_amont": "to_be_tested"
   },

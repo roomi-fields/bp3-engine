@@ -136,6 +136,14 @@ def mesure(toks, text):
 # Demande par bpscript le 2026-07-19, apres la suppression de son pipeline S0-S5 :
 # ses consommateurs ont besoin d'un oracle frais sans attendre notre version suivante.
 UNE = None
+# `--ligne <chemin>` ecrit la ligne de baseline mesuree pour cette grammaire. Elle sert au
+# degel partiel (scripts/recapture-entree.py) : la ligne se REMESURE par la chaine normale
+# au lieu de se recomposer a la main chez l'appelant, ou elle divergerait en silence.
+LIGNE = None
+if "--ligne" in sys.argv:
+    i = sys.argv.index("--ligne")
+    LIGNE = sys.argv[i + 1]
+    del sys.argv[i:i + 2]
 if len(sys.argv) > 1:
     UNE = sys.argv[1]
     if UNE not in G:
@@ -305,6 +313,8 @@ meta = dict(version="v5", figee_le=datetime.date.today().isoformat(),
 if UNE:
     # On n'ecrit PAS baseline.json : la reference publiee ne bouge que sur republication.
     x = rows[0]
+    if LIGNE:
+        json.dump(x, open(LIGNE, "w", encoding="utf-8"), indent=1, ensure_ascii=False)
     print(f"\noracle frais pour « {UNE} » — baseline PUBLIEE INCHANGEE")
     print(f"  action={x.get('action')}  mode={x.get('modalite')}  "
           f"jetons={x.get('jetons_midi')}  mots={x.get('mots_texte')}  items={x.get('items')}")

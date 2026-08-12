@@ -8,7 +8,10 @@
   "grammaires_scellees": 96,
   "qui_jouent": 59,
   "en_texte": 37,
-  "hors_scelle": ["trySerial", "trySrand"]
+  "hors_scelle": [
+   "trySerial",
+   "trySrand"
+  ]
  },
  "binaire": {
   "version_affichee": "bp3 3.5.1 (Aug 11 2026 - 13:16:56)",
@@ -16,9 +19,9 @@
   "archive": "builds/v3.5.1-iso.1/bp3"
  },
  "empreintes": {
-  "baseline.json": "c6a016fc13b439245861a1e3dda1cbee827565da8bff1f7517e663651f383887",
+  "baseline.json": "66c2929163b5edf9f54c4eda8f4629492edc5cebd4f3c7a01919207a6b06173f",
   "SCELLE.json": "089bac2d95725431ea0481f8ae5aedd6a58eb7e2b50e0749fea57a898ab61c57",
-  "captures": "765d152d9eea6db81c4a09c1c5705019108c8b8e92ccafa6b111198bc983f68d",
+  "captures": "09f304e2c387e7f06aaeb70debd9e929be73bf24032acf5ea00374b939195cfb",
   "captures_n": 163,
   "methode": "captures : sha256 du nom puis du contenu de chaque fichier, dans l ordre alphabetique"
  },

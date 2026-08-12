@@ -48,6 +48,12 @@ TRUNC = 2 * 1024 * 1024
 
 G = {k: v for k, v in json.load(open(GRJ)).items() if isinstance(v, dict) and k != "_comment"}
 
+# La reference gelee, quand elle existe : elle porte le couple grammaire <-> auxiliaires
+# et la convention de notes tels qu'ils ont ete MESURES. Voir son usage en mode unitaire.
+_ref_figee = os.path.join(OUT, "baseline.json")
+BASE_FIGEE = ({x["grammaire"]: x for x in json.load(open(_ref_figee, encoding="utf-8"))["grammaires"]}
+              if os.path.isfile(_ref_figee) else {})
+
 
 def clean(src, dst):
     lines = open(src, encoding="utf-8", errors="replace").read().split("\n")
@@ -159,8 +165,12 @@ if len(sys.argv) > 1:
         print(f"grammaire inconnue : {UNE}")
         print("noms disponibles : " + ", ".join(sorted(G)[:12]) + " …")
         sys.exit(2)
-    # mode unitaire : zone a part, on n'efface rien et on ne bascule rien
-    CAP = os.path.join(OUT, "captures-a-la-demande")
+    # Mode unitaire : zone a part, on n'efface rien et on ne bascule rien.
+    # UNE ZONE PAR APPELANT. run() supprime le fichier cible avant de lancer le binaire ;
+    # deux consommateurs qui partagent la zone se detruisent mutuellement leurs captures —
+    # c'est arrive a runtime-MIDI, qui en a perdu quatre pendant qu'un rejeu tournait.
+    # BP3_CAPTURE_ZONE nomme la zone ; sans lui, le defaut historique reste en place.
+    CAP = os.path.join(OUT, os.environ.get("BP3_CAPTURE_ZONE") or "captures-a-la-demande")
     os.makedirs(CAP, exist_ok=True)
 
 # ── SONDE D ENTREE ───────────────────────────────────────────────────────────
@@ -215,6 +225,20 @@ for idx, name in enumerate(names, 1):
     raw = open(gsrc, encoding="utf-8", errors="replace").read()
     cfg, conv, cfgsrc = config(gd, raw)
     cfg = add_so(cfg, bern)
+    # UN REJEU SE PREND SUR LA REFERENCE GELEE, PAS SUR UN REGISTRE VOISIN.
+    # config() lit grammars.json, qui vit chez BPscript. Le 2026-08-12 ils en ont retire
+    # les auxiliaires puis la convention de notes — a raison, la table de correspondance
+    # les porte mieux — et six grammaires du scelle ont cesse de produire ici sans que
+    # rien n ait bouge chez moi : koto1, koto2, testHO2, check&, transposition1, tryMIDIfile.
+    # La reference etait intacte ; c est l instrument qui ne savait plus la reproduire.
+    # En mode unitaire on prend donc le couple et la convention DANS baseline.json, gelee.
+    # Le mode complet garde grammars.json : c est lui qui etablit une baseline neuve, il ne
+    # peut pas se lire dans celle qu il remplace.
+    if UNE and name in BASE_FIGEE:
+        _b = BASE_FIGEE[name]
+        if _b.get("config"):
+            cfg = dict(_b["config"])
+            conv, cfgsrc = _b.get("convention"), "baseline gelee"
     g = os.path.join(TMP, f"g.{slug}")
     clean(gsrc, g)
     # Convention de notes non declaree : on la DERIVE, mais seulement si elle est

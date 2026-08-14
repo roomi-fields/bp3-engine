@@ -19,10 +19,10 @@
   "archive": "builds/v3.5.1-iso.1/bp3"
  },
  "empreintes": {
-  "baseline.json": "99868cfa79ffec592dbb468baaf924343b29e9105e80eef517c6d8acc3e002c9",
-  "SCELLE.json": "4bae30cc3030024de291f8790202a16aa31e99ebe4b64a7105ba15fcd1b489f6",
-  "captures": "9f5f9c2d39e31ac8d9de09beba416870a55e062e260edb4ab61fa26a08602135",
-  "captures_n": 158,
+  "baseline.json": "1416a4384354ba59db2894460cae28ab10126a507d7217429d1371d4c18c7721",
+  "SCELLE.json": "38b092a27d76674d84c24a8664cecb3afc93751457476488b8f6ac6ae8f7fb9a",
+  "captures": "5abb0b569c5220c0d1776f5edbadcd97d792a7ceddb1c5c3484cc44da0d02670",
+  "captures_n": 163,
   "methode": "captures : sha256 du nom puis du contenu de chaque fichier, dans l ordre alphabetique"
  },
  "pour_degeler": "Le degel appartient a Romain. Il se fait en une seule fois : sa decision, puis regeneration de ce fichier par scripts/gel-baseline.py --refaire. Modifier une empreinte a la main annule le gel sans laisser de trace, et c est precisement ce que ce fichier empeche.",

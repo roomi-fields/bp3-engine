@@ -22,9 +22,9 @@
   "un_item": "capture.py:96-110 — force MaxItemsProduce=1 dans les réglages -se pour les grammaires qui jouent"
  },
  "preuve": {
-  "reproductible_bit_a_bit": "91/91 octet-a-octet contre le binaire 372dd047, rejeu du 2026-08-12 apres recapture complete : 56 sonnantes, 35 en texte, 0 divergente, 0 non produite.",
+  "reproductible_bit_a_bit": "91/91 octet-a-octet contre le binaire 372dd047, rejeu du 2026-08-12. Les CINQ entrees revenues le 2026-08-14 sont mesurees a part : cinq captures chacune par capture.py, une seule empreinte par grammaire, et CONFORMITE cle par cle de leurs reglages contre les 121 fichiers sains du corpus (scripts/conformite-reglages-convertis.py, 22/22, zero cle manquante). L'assiette de 96 n'a pas encore ete rejouee d'un seul tenant.",
   "independant_du_binaire": "MESURE 2026-08-11, rejeu des 96 en comparant EXACTEMENT le fichier que baseline.json nomme : 95/96 octet-a-octet contre 3.5.1. La seule divergente, MyMelody, l etait parce que MA LIGNE PUBLIEE etait fausse — prise sous des conditions autres que le protocole scelle, minutage de -50 a 1361 la ou le protocole rend 0 a 4000. Recapturee en v14. La divergence ne venait donc ni du binaire ni du retrait du WASM.",
-  "bilan": "REPRODUCTIBLES bit-a-bit 91 | NON DETERMINISTES par construction 2 (hors comparaison) | HORS ASSIETTE, reglage declare illisible 5",
+  "bilan": "REPRODUCTIBLES bit-a-bit 96 | NON DETERMINISTES par construction 2 (hors comparaison) | HORS ASSIETTE, reglage declare illisible 5",
   "reproductibles_96": [
    "765432",
    "Alarm",
@@ -43,6 +43,7 @@
    "beatrix-dice",
    "bells",
    "blurb",
+   "check&",
    "checkAllCsound",
    "checkBT",
    "checkHomo",
@@ -69,6 +70,8 @@
    "gramgene2",
    "graphics",
    "harmony",
+   "koto1",
+   "koto2",
    "koto3",
    "kss2",
    "livecode1",
@@ -90,6 +93,7 @@
    "testNC1",
    "testTie7",
    "time-patterns",
+   "transposition1",
    "transposition3",
    "tryAllItems0",
    "tryAllItems1",
@@ -98,6 +102,7 @@
    "tryKeyMap",
    "tryKeyXpand",
    "tryLIN",
+   "tryMIDIfile",
    "tryObjects",
    "tryPatternGrammar",
    "tryRagas",
@@ -130,7 +135,7 @@
    "axe": "sequence ET nombre de jetons a graine forcee"
   },
   "neutralite_du_retrait_wasm": "MESURE 2026-08-11 : les 10 conditionnelles __BP3_WASM__ retirees du moteur, l arbre partage csrc/ replie dans source/BP3/. Aucune production ne change — memes 95/96 conformes avant et apres, et la seule divergente (MyMelody) diverge deja avec le binaire d avant le retrait. L empreinte du binaire, elle, bouge a chaque recompilation : elle date la construction, elle ne juge pas le comportement.",
-  "assiette": 91,
+  "assiette": 96,
   "sorties_de_l_assiette": [
    {
     "entrees": [
@@ -169,6 +174,22 @@
     "le": "2026-08-12"
    }
   ],
-  "ce_qui_a_change_depuis_v14": "La soustraction de la quantification est retiree du serialiseur de jetons : les instants sortent tels que le moteur les produit, et coincident avec la liste d evenements. Les cinq grammaires dont le reglage declare est au format BP2 sortent de l assiette. PP se recapture sur les valeurs par defaut, sa grammaire ne declarant aucun reglage."
+  "ce_qui_a_change_depuis_v14": "La soustraction de la quantification est retiree du serialiseur de jetons : les instants sortent tels que le moteur les produit, et coincident avec la liste d evenements. Les cinq grammaires dont le reglage declare est au format BP2 sortent de l assiette. PP se recapture sur les valeurs par defaut, sa grammaire ne declarant aucun reglage.",
+  "retours_dans_l_assiette": [
+   {
+    "entrees": [
+     "check&",
+     "koto1",
+     "koto2",
+     "transposition1",
+     "tryMIDIfile"
+    ],
+    "cause_levee": "reglage declare illisible — leve par la conversion du corpus, et CONFORMITE cle par cle etablie",
+    "mesure": "22/22 fichiers conformes (scripts/conformite-reglages-convertis.py, 0 cle manquante) + 5 captures par grammaire, une seule empreinte chacune",
+    "decide_par": "Romain",
+    "le": "2026-08-14"
+   }
+  ],
+  "ecart_connu_tryMIDIfile": "tryMIDIfile sonne UNE OCTAVE AU-DESSUS chez runtime-MIDI, sur les 8 jetons sans exception, ecart CONSTANT, cause non etablie. L'entree revient dans l'assiette avec cet ecart NOMME. Romain a demande d'investiguer si c'est la bonne octave au niveau de Kanopi."
  }
 }

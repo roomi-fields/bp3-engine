@@ -87,7 +87,11 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   -gr.tryTranspose (`¬`). RESULTAT : Mozartexpression RECUPEREE (0 erreur, 1255 o). Les 4 autres
   progressent sans passer (a: 4 err, tryflags3: 5, tryTranspose: 4, Rajeev: 27) — causes restantes
   distinctes, a trier.
-- **BPE-6/BPE-7** `en-cours` [P1] — REGLAGES-ANCIEN-FORMAT-NON-LUS.
+- **BPE-6/BPE-7** `fait` [P1] — REGLAGES-ANCIEN-FORMAT-NON-LUS.
+  **CLOS LE 2026-08-14 sur instruction de l'architecte**, après l'arbitrage de Romain « ce qui est
+  conforme reste ». Les 22 fichiers sont convertis, **zéro reste au format BP2**, la conformité est
+  établie clé par clé (`scripts/conformite-reglages-convertis.py`, 22/22, zéro clé manquante) et les
+  cinq grammaires concernées sont revenues dans l'assiette scellée — 91 → 96.
   **REQUALIFIE LE 2026-08-14 SUR LA MESURE DU JOUR, decision de Romain « on convertit »** (relayee
   par l'architecte [329]). Le libelle ci-dessous decrit 84 fichiers et une attente du correctif
   `convertOldSettings` de BPS-24 : les deux sont faux. L'outil attendu n'existe plus, ni chez

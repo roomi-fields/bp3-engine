@@ -9,9 +9,9 @@
  "script_commit": "bd6fca4",
  "commande": "bp3 <action> -e -gr <gr-nettoyee> --seed 1 [conv] [cfg...] -o <texte> --tokensout <jetons> ; cwd=capture-run ; clean capture.py:52-61 ; un-item capture.py:96-110",
  "capture": "par ACTION : single (le jeu, 1 item, graine fixe) des que la grammaire joue ; produce-all (l ensemble) pour les grammaires purement symboliques quand le moteur accepte d enumerer",
- "productibles": 93,
+ "productibles": 98,
  "produce_all": 30,
- "single": 64,
+ "single": 69,
  "grammaires": [
   {
    "grammaire": "765432",
@@ -478,16 +478,16 @@
   {
    "grammaire": "check&",
    "source": "-gr.check&",
-   "action": null,
-   "modalite": null,
-   "produit": false,
-   "raison": "=> Could not parse JSON settings: // Bol Processor version BP2.7.1",
-   "jetons_midi": 0,
-   "mots_texte": 0,
-   "items": 0,
-   "items_enumeres": null,
+   "action": "single",
+   "modalite": "MIDI",
+   "produit": true,
+   "raison": null,
+   "jetons_midi": 4,
+   "mots_texte": 6,
+   "items": 1,
+   "items_enumeres": 1,
    "enumeration_refusee_par_le_moteur": false,
-   "joue": false,
+   "joue": true,
    "config": {
     "-se": "-se.check&"
    },
@@ -495,7 +495,7 @@
    "config_source": "le couple est celui que la grammaire declare. Son fichier de reglages est au format texte BP2 : le moteur le refuse et s arrete. L entree ne produit rien, et c est la mesure.",
    "convention_source": "php_ref",
    "declare": "midi",
-   "capture": null
+   "capture": "captures/check_.tokens.json"
   },
   {
    "grammaire": "checkAllCsound",
@@ -1198,15 +1198,15 @@
   {
    "grammaire": "koto1",
    "source": "-gr.koto1",
-   "action": null,
-   "modalite": null,
-   "produit": false,
-   "raison": "=> Could not parse JSON settings: // Bol Processor version BP2.6.1",
+   "action": "single",
+   "modalite": "TEXTE",
+   "produit": true,
+   "raison": null,
    "jetons_midi": 0,
-   "mots_texte": 0,
-   "items": 0,
+   "mots_texte": 1,
+   "items": 1,
    "items_enumeres": null,
-   "enumeration_refusee_par_le_moteur": false,
+   "enumeration_refusee_par_le_moteur": true,
    "joue": false,
    "config": {
     "-se": "-se.koto1",
@@ -1216,20 +1216,20 @@
    "config_source": "le couple est celui que la grammaire declare. Son fichier de reglages est au format texte BP2 : le moteur le refuse et s arrete. L entree ne produit rien, et c est la mesure.",
    "convention_source": "sans objet : les 4 conventions qui compilent rendent la meme sortie",
    "declare": "text",
-   "capture": null
+   "capture": "captures/koto1.text.txt"
   },
   {
    "grammaire": "koto2",
    "source": "-gr.koto2",
-   "action": null,
-   "modalite": null,
-   "produit": false,
-   "raison": "=> Could not parse JSON settings: // Bol Processor version BP2.6.1",
+   "action": "single",
+   "modalite": "TEXTE",
+   "produit": true,
+   "raison": null,
    "jetons_midi": 0,
-   "mots_texte": 0,
-   "items": 0,
+   "mots_texte": 1,
+   "items": 1,
    "items_enumeres": null,
-   "enumeration_refusee_par_le_moteur": false,
+   "enumeration_refusee_par_le_moteur": true,
    "joue": false,
    "config": {
     "-se": "-se.koto1",
@@ -1239,7 +1239,7 @@
    "config_source": "le couple est celui que la grammaire declare. Son fichier de reglages est au format texte BP2 : le moteur le refuse et s arrete. L entree ne produit rien, et c est la mesure.",
    "convention_source": "sans objet : les 4 conventions qui compilent rendent la meme sortie",
    "declare": "text",
-   "capture": null
+   "capture": "captures/koto2.text.txt"
   },
   {
    "grammaire": "koto3",
@@ -1784,16 +1784,16 @@
   {
    "grammaire": "transposition1",
    "source": "-gr.transposition1",
-   "action": null,
-   "modalite": null,
-   "produit": false,
-   "raison": "=> Could not parse JSON settings: // Bol Processor version BP2.7.3",
-   "jetons_midi": 0,
-   "mots_texte": 0,
-   "items": 0,
-   "items_enumeres": null,
+   "action": "single",
+   "modalite": "MIDI",
+   "produit": true,
+   "raison": null,
+   "jetons_midi": 75,
+   "mots_texte": 107,
+   "items": 1,
+   "items_enumeres": 1,
    "enumeration_refusee_par_le_moteur": false,
-   "joue": false,
+   "joue": true,
    "config": {
     "-se": "-se.transposition",
     "-al": "-ho.transposition"
@@ -1802,7 +1802,7 @@
    "config_source": "le couple est celui que la grammaire declare. Son fichier de reglages est au format texte BP2 : le moteur le refuse et s arrete. L entree ne produit rien, et c est la mesure.",
    "convention_source": "php_ref",
    "declare": "midi",
-   "capture": null
+   "capture": "captures/transposition1.tokens.json"
   },
   {
    "grammaire": "transposition3",
@@ -2012,16 +2012,16 @@
   {
    "grammaire": "tryMIDIfile",
    "source": "-gr.tryMIDIfile",
-   "action": null,
-   "modalite": null,
-   "produit": false,
-   "raison": "=> Could not parse JSON settings: // Bol Processor version BP2.7",
-   "jetons_midi": 0,
-   "mots_texte": 0,
-   "items": 0,
-   "items_enumeres": null,
+   "action": "single",
+   "modalite": "MIDI",
+   "produit": true,
+   "raison": null,
+   "jetons_midi": 8,
+   "mots_texte": 9,
+   "items": 1,
+   "items_enumeres": 1,
    "enumeration_refusee_par_le_moteur": false,
-   "joue": false,
+   "joue": true,
    "config": {
     "-se": "-se.tryMIDIfile"
    },
@@ -2029,7 +2029,7 @@
    "config_source": "le couple est celui que la grammaire declare. Son fichier de reglages est au format texte BP2 : le moteur le refuse et s arrete. L entree ne produit rien, et c est la mesure.",
    "convention_source": "php_ref",
    "declare": "midi",
-   "capture": null
+   "capture": "captures/tryMIDIfile.tokens.json"
   },
   {
    "grammaire": "tryObjects",
@@ -2555,5 +2555,19 @@
   }
  ],
  "doublons": 0,
- "captures_texte_structurees": 0
+ "captures_texte_structurees": 0,
+ "degels_partiels": [
+  {
+   "entrees": [
+    "check&",
+    "koto1",
+    "koto2",
+    "transposition1",
+    "tryMIDIfile"
+   ],
+   "autorise_par": "Romain",
+   "motif": "conformite cle par cle etablie, 22/22, arbitrage du 2026-08-14 : ce qui est conforme reste",
+   "le": "2026-08-14"
+  }
+ ]
 }

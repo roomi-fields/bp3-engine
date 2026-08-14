@@ -3,35 +3,37 @@
 État : **non envoyé**. Rendu à l'architecte le 2026-08-14 pour la relecture de Romain, conformément
 à la décision `hub/decisions/2026-08-13-les-gardes-du-moteur-ne-se-remettent-pas.md`.
 
+Rédigé en français sur arbitrage de Romain du 2026-08-14.
+
 Le brouillon ne porte **qu'un** des deux défauts demandés. La raison figure sous le texte.
 
 ---
 
 ## Texte proposé
 
-> Subject: BP3 3.5.1 — `--traceout` writes a zero-byte image file
+> Objet : BP3 3.5.1 — `--traceout` écrit un fichier image de zéro octet
 >
-> Dear Bernard,
+> Bonjour Bernard,
 >
-> While running the BP3 console application on Linux we came across a behaviour of the `--traceout`
-> option that we thought you would want to know about.
+> En faisant tourner le moteur en ligne de commande sous Linux, nous sommes tombés sur un
+> comportement de l'option `--traceout` dont nous nous sommes dit qu'il vous intéresserait.
 >
-> **Version** — `Bol Processor console app, Version 3.5.1`, built from the `v3.5.1` tag with
-> `gcc -O2 -g -fno-common`, linked with `-lm -lasound -lcurl`.
+> **Version** — `Bol Processor console app, Version 3.5.1`, construite depuis le tag `v3.5.1` avec
+> `gcc -O2 -g -fno-common`, liée avec `-lm -lasound -lcurl`.
 >
-> **What happens** — with `--traceout`, the engine announces that it is creating an image, then
-> reports that it cannot open `php/CANVAS_header.txt`, and leaves the image file empty. The process
-> exits with status 0.
+> **Ce qui se passe** — avec `--traceout`, le moteur annonce qu'il crée une image, signale ensuite
+> qu'il ne peut pas ouvrir `php/CANVAS_header.txt`, et laisse le fichier image vide. Le processus
+> sort avec le code 0.
 >
-> **Minimal case** — any grammar whose settings enable the graphic display. With `-gr.765432` and
-> `-se.765432` from the standard test data, run from a working directory that contains the
-> `csound_resources` folder:
+> **Cas minimal** — n'importe quelle grammaire dont les réglages activent l'affichage graphique.
+> Avec `-gr.765432` et `-se.765432` des données de test, depuis un répertoire de travail qui
+> contient le dossier `csound_resources` :
 >
 > ```
 > bp3 produce -e -gr -gr.765432 --seed 1 -se -se.765432 -o /dev/null --traceout trace.txt
 > ```
 >
-> Console output:
+> Sortie console :
 >
 > ```
 > Pianoroll graphics will be displayed
@@ -39,20 +41,23 @@ Le brouillon ne porte **qu'un** des deux défauts demandés. La raison figure so
 > Errors: 0
 > Image width 44058 was too large: it has been cropped to 32000
 > Creating image #1: trace.txt_image_001_temp.html
-> => Failed to open: <cwd>/php/CANVAS_header.txt in 'rb' mode. Error: No such file or directory
+> => Failed to open: <répertoire courant>/php/CANVAS_header.txt in 'rb' mode.
+>    Error: No such file or directory
 > ```
 >
-> Result: `trace.txt_image_001_temp.html` exists and is **0 bytes**.
+> Résultat : `trace.txt_image_001_temp.html` existe et fait **0 octet**.
 >
-> **What we looked for** — `CANVAS_header.txt` is read by `CreateImageFile` in `ConsoleMain.c`. We
-> could not find the file in the repository: we searched the `master`, `graphics-for-BP3` and
-> `BP3-develop` branches, across all files, and found no match for the name. If it is meant to come
-> from the web distribution rather than from the engine repository, then the console application
-> cannot produce an image on its own, and the exit status of 0 gives no indication of that.
+> **Où nous avons cherché** — `CANVAS_header.txt` est lu par `CreateImageFile`, dans
+> `ConsoleMain.c`. Nous n'avons pas trouvé ce fichier dans le dépôt : nous avons cherché sur les
+> branches `master`, `graphics-for-BP3` et `BP3-develop`, sur l'ensemble des fichiers, sans aucune
+> occurrence du nom. S'il vient de la distribution web plutôt que du dépôt du moteur, alors
+> l'application en ligne de commande ne peut pas produire d'image par elle-même, et le code de
+> sortie 0 n'en donne aucune indication.
 >
-> We are not asking for a change — we simply did not want to keep the observation to ourselves.
+> Nous ne demandons aucune modification — nous ne voulions simplement pas garder l'observation pour
+> nous.
 >
-> With our thanks for the engine,
+> Avec nos remerciements pour le moteur,
 
 ---
 

@@ -48,6 +48,10 @@ if [ "$VOIE" = rapide ] || [ "$VOIE" = tout ]; then
   lancer "gel-morsure"        90 ./scripts/gate-gel-injection.sh
   lancer "autonomie"          60 python3 scripts/gate-autonomie.py
   lancer "autonomie-morsure"  90 ./scripts/gate-autonomie-injection.sh
+  # Les deux gardes documentaires du hub, appelés et non recopiés. Ils vivaient dans un bloc greffé
+  # après `verify` dans le seul crochet de poussée : « verify vert » ne valait pas « portillon
+  # vert ». Ici ils sont au même niveau que les seize autres.
+  lancer "documentaires-hub"  90 ./scripts/garde-documentaires.sh
 fi
 
 # La voie ROUGE porte les défauts MOTEUR connus et non corrigés. On ne les maquille jamais :

@@ -27,6 +27,11 @@ Les notes de rétro-ingénierie du moteur natif, et les bons de travail qui en d
 - [reglages-declares-contre-retenus.md](reglages-declares-contre-retenus.md) — les couples grammaire
   et réglages dont la déclaration diverge de ce que la mesure retient
 
+## Propositions en attente de Romain
+
+- [proposition-assiette-96.md](proposition-assiette-96.md) — cinq grammaires peuvent revenir dans
+  l'assiette scellée, la cause de leur sortie étant levée. **L'assiette reste à 91.**
+
 ## Courriers à Bernard Bel
 
 - [COURRIER-BERNARD-2026-08-11.md](../COURRIER-BERNARD-2026-08-11.md) — deux comportements de la

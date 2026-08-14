@@ -429,6 +429,21 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
 - **BPE-25** `abandonné` [P3] — checktemplates : fausse alerte. Deja ancre nativement, sous le nom de corpus « templates » (entree #25 des 113, `baseline-native/baseline.json:1743-1764` et `hub/projets/2026-07-16-iso-100-grammaires/BASELINE-CENTRALE.md:89`), avec `produit:true`, `capture_comparable:true` et une capture deja presente (`baseline-native/captures/templates.text.txt`, 5 lignes). L'absence du literal « checktemplates » comme nom de grammaire avait ete confondue avec l'absence d'ancre — la source `-gr.checktemplates` / `-se.checktemplates` est bien celle du corpus « templates ».
 - **BPE-26** `ouvert` [P2] — ISO-100 -- _stepOn et _stepOff sont INECRIVABLES : le controle de perf _step les masque par match de prefixe glouton SANS garde de frontiere (CompileProcs.c:722-732), erreur code 15 a toute position. Declarees en GramProcedure et inatteignables. Constat #69. A REMONTER A BERNARD (decision Romain 2026-08-09 : backlog).
 - **BPE-27** `ouvert` [P3] — ISO-100 -- CINQ directives sans comportement observable en lot, preuve source : _stop (InterruptCompute est un stub console, ConsoleStubs.c:142) ; _capture et _part (sautees en production, ProduceItems.c:1239 et Compute.c:1664, MIDI temps-reel seulement) ; _printOn et _printOff (basculent DisplayProduce, Compute.c:243, aucun differentiel en produce console). Fait mesure, pas echec. Decision Romain 2026-08-09 : backlog.
+- **BPE-29** `en-attente-arbitrage` [P2] — ANCRE DE HAUTEUR : le natif ENCODE la note décalée, la
+  tour la recompense à la main. `C4key` s'applique à l'**encodage** (`Encode.c:674` et `:865`), donc
+  avant que la moindre sortie ne voie la note : les quatre axes du moteur — jetons, liste
+  d'événements, score Csound, fichier MIDI — nomment la note décalée, unanimement, et la colonne
+  `transpos` vaut **0**. Le moteur ne tient jamais le nom écrit.
+  Les chaînes d'aval tiennent le nom écrit et déplacent la fréquence : les deux modèles concordent
+  sur les hertz et divergent sur le **nom**, d'une octave, indépendamment de la paire d'ancres
+  (mesuré sur 48/220 et sur 48/440).
+  **Mesure figée** : les quatre combinaisons `C4key` × `A4freq` sur `tryMIDIfile`, deux axes, dans
+  l'historique de ce dépôt ; l'écart et sa cause sont inscrits à `baseline-native/SCELLE.json`.
+  **Coût des deux branches, chiffré par kanopi** : 7 scènes déjà compensées d'un côté, 19 grammaires
+  déclarant les deux ancres de l'autre.
+  ⛔ **Arbitrage de Romain — le nom écrit ou le nom natif.** Aucune mesure de plus ne le tranche :
+  ce sont deux modèles cohérents chacun de son côté. Rien ne se pose, rien ne se mesure, en attente.
+
 - **BPE-28** `ouvert` [P2] — SEGFAULT NATIF sur l'ecriture `-o` d'un item profondement imbrique
   (chemin de serialisation fichier). Trouve 2026-08-09 en instruisant BPE-15. REPRO FIABLE (100 %),
   bp3 natif 3.5.1 : prendre `-gr.tryTranspose`, joindre ses lignes 8-9 en une seule regle + retirer

@@ -429,6 +429,18 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
 - **BPE-25** `abandonné` [P3] — checktemplates : fausse alerte. Deja ancre nativement, sous le nom de corpus « templates » (entree #25 des 113, `baseline-native/baseline.json:1743-1764` et `hub/projets/2026-07-16-iso-100-grammaires/BASELINE-CENTRALE.md:89`), avec `produit:true`, `capture_comparable:true` et une capture deja presente (`baseline-native/captures/templates.text.txt`, 5 lignes). L'absence du literal « checktemplates » comme nom de grammaire avait ete confondue avec l'absence d'ancre — la source `-gr.checktemplates` / `-se.checktemplates` est bien celle du corpus « templates ».
 - **BPE-26** `ouvert` [P2] — ISO-100 -- _stepOn et _stepOff sont INECRIVABLES : le controle de perf _step les masque par match de prefixe glouton SANS garde de frontiere (CompileProcs.c:722-732), erreur code 15 a toute position. Declarees en GramProcedure et inatteignables. Constat #69. A REMONTER A BERNARD (decision Romain 2026-08-09 : backlog).
 - **BPE-27** `ouvert` [P3] — ISO-100 -- CINQ directives sans comportement observable en lot, preuve source : _stop (InterruptCompute est un stub console, ConsoleStubs.c:142) ; _capture et _part (sautees en production, ProduceItems.c:1239 et Compute.c:1664, MIDI temps-reel seulement) ; _printOn et _printOff (basculent DisplayProduce, Compute.c:243, aucun differentiel en produce console). Fait mesure, pas echec. Decision Romain 2026-08-09 : backlog.
+- **BPE-30** `ouvert` [P2] — `test-data/` EST CONSOMMÉ PAR COPIE, SANS CHEMIN DÉRIVÉ. Kanopi en porte
+  une copie complète — 143 fichiers dans `packages/library/test-assets/bp3/commun/`, chargés en glob
+  eager — et **rien ne la dérive de la source**. Mesuré le 2026-08-14 : sa copie était en retard
+  exactement des 22 réglages convertis le matin même, et aucun autre fichier ne différait.
+  **Ce que la porte change** : les consommateurs qui lisent le disque reçoivent une correction sans
+  geste ; celui qui en tient une copie diverge en silence, et son garde de correspondance vérifie que
+  chaque chemin **existe** sans rien dire de sa **fraîcheur** — une copie périmée y passe au vert.
+  **La moitié qui m'appartient** : reporter des fichiers à la main reproduirait la divergence au coup
+  suivant. Le geste juste est un chemin dérivé, et il se décide avec kanopi — sa resynchronisation
+  est inscrite chez lui en KAN-51.
+  ⛔ En attente : le chantier ouvert est celui des entrées, et rien ne se pose ici avant.
+
 - **BPE-29** `en-attente-arbitrage` [P2] — ANCRE DE HAUTEUR : le natif ENCODE la note décalée, la
   tour la recompense à la main. `C4key` s'applique à l'**encodage** (`Encode.c:674` et `:865`), donc
   avant que la moindre sortie ne voie la note : les quatre axes du moteur — jetons, liste

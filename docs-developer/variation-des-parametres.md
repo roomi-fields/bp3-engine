@@ -54,6 +54,20 @@ pas sur un décodage.
 
 La quatrième ligne est le témoin de contrôle : à durées égales, les deux lectures coïncident.
 
+### Les mêmes témoins sur le moteur amont
+
+La liste d'événements et le fichier MIDI sortent de la **même exécution du même binaire** : ils
+partagent tout ce qui précède l'écriture. Les mêmes quatre témoins passés sur le moteur amont pur,
+construit du tag `v3.5.1` avec la même chaîne de compilation, empreinte
+`06244c55d11bd9496c6e7187afea2787` :
+
+**Zéro écart sur huit témoins** — quatre répartitions de durée, sur `_volume` et sur `_vel`, valeurs
+et durées identiques des deux côtés.
+
+Ce que cela ferme : nos écarts avec l'amont ne sont pour rien dans ces valeurs. Ce que cela ne ferme
+pas : les deux binaires compilent le même code pour ce chemin, et le moteur natif reste sa propre
+référence — aucun oracle extérieur ne juge son arithmétique.
+
 ## Les quatre dispositions à durées égales
 
 Volume, écart de 20 à 120, mode `_volumestep`, toutes les notes de même durée. Colonne

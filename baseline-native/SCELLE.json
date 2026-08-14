@@ -190,6 +190,6 @@
     "le": "2026-08-14"
    }
   ],
-  "ecart_connu_tryMIDIfile": "tryMIDIfile sonne UNE OCTAVE AU-DESSUS chez runtime-MIDI, sur les 8 jetons sans exception, ecart CONSTANT, cause non etablie. L'entree revient dans l'assiette avec cet ecart NOMME. Romain a demande d'investiguer si c'est la bonne octave au niveau de Kanopi."
+  "ecart_connu_tryMIDIfile": "CAUSE ETABLIE le 2026-08-14, moins d'une heure apres l'inscription de cet ecart. Le natif emet 57 55 60 69 sur ses huit jetons — mesure sur builds/v3.5.1-iso.2/bp3. La chaine LIVREE de runtime-MIDI et son oracle natif rendent les memes hauteurs. Seule sa COPIE GELEE du 2026-08-11, prise sur le binaire 3a6fa3e7, sonne une octave au-dessus. Cause mesuree par kairos : le reglage declare C4key = 48, que la scene transpilee perd, et l'aval applique 60. Le fichier de reglages de ce depot porte bien C4key = 48 et A4freq = 220.0000, conformes a l'original BP2. L'ecart n'est ni dans le natif ni dans la conversion."
  }
 }

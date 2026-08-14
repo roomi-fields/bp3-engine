@@ -20,7 +20,7 @@
  },
  "empreintes": {
   "baseline.json": "1416a4384354ba59db2894460cae28ab10126a507d7217429d1371d4c18c7721",
-  "SCELLE.json": "38b092a27d76674d84c24a8664cecb3afc93751457476488b8f6ac6ae8f7fb9a",
+  "SCELLE.json": "245a9ad34e4f1c654279670bb8b839250860e561419bdb6c4cb2b3d2c03db4b1",
   "captures": "5abb0b569c5220c0d1776f5edbadcd97d792a7ceddb1c5c3484cc44da0d02670",
   "captures_n": 163,
   "methode": "captures : sha256 du nom puis du contenu de chaque fichier, dans l ordre alphabetique"

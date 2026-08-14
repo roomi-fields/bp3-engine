@@ -39,6 +39,21 @@ dispositions à durées égales ne pouvaient pas trancher.
 
 `_vel` rend les mêmes valeurs — 75, 25, 20 et 80.
 
+### Quatre répartitions de durée, sur les deux axes
+
+Écart 0 → 120, trois notes entre les écritures, une note après. La colonne `volume start` de la
+liste native et les vélocités du fichier MIDI rendent **les mêmes valeurs** : la mesure ne repose
+pas sur un décodage.
+
+| durées | valeurs mesurées | par le rang |
+| --- | --- | --- |
+| 1 3 1 | 0 · **24 96** · 120 | 40 80 |
+| 3 1 1 | 0 · **72 96** · 120 | 40 80 |
+| 1 1 3 | 0 · **24 48** · 120 | 40 80 |
+| 1 1 1 | 0 · **40 80** · 120 | 40 80 |
+
+La quatrième ligne est le témoin de contrôle : à durées égales, les deux lectures coïncident.
+
 ## Les quatre dispositions à durées égales
 
 Volume, écart de 20 à 120, mode `_volumestep`, toutes les notes de même durée. Colonne
@@ -107,8 +122,16 @@ obéissent à la même loi, et **chacun est invisible sur l'axe de l'autre** :
 
 Une mesure qui lit le mauvais axe voit une valeur immobile et conclut à l'absence d'effet.
 
-**Une note écrite à `_vel(0)` porte une vélocité nulle** : un lecteur qui écarte les vélocités nulles
-— convention du note-off — la compte comme absente alors que le moteur l'a bien émise. Lire les
+**Une note écrite à `_vel(0)` écrit bien un NoteOn, de vélocité nulle.** Relevé brut, sans filtrage,
+sur `_vel(0) C4` :
+
+```
+t=0      NoteOn   note=60 velocite=0
+t=1000   NoteOff  note=60 velocite=0
+```
+
+Et la liste native porte l'événement sonnant `C4 0 → 1000`. Un lecteur qui écarte les vélocités
+nulles — convention du note-off — compte la note **absente** alors que le moteur l'a émise. Lire les
 `0x90` sans filtrer, ou lire la liste native.
 
 ## Écrire des durées inégales

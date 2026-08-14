@@ -100,14 +100,24 @@ def lire(L, iv):
     v["Quantization"] = f.ent()
     v["Time_res"] = f.ent()
     v["_MIDIsetUpTime"] = f.ent()      # pas de cle JSON
-    v["_QuantizeOK"] = f.ent()         # pas de cle JSON
+    # La cle JSON « Quantize » EST l'ancien QuantizeOK. Etabli par le commit de Bernard qui a
+    # introduit le JSON, c21ba55 :  strcmp(key,"Quantize") == 0) QuantizeOK = intvalue;  — la
+    # variable a ete renommee ensuite. Ne pas l'ecrire laissait jouer le defaut Quantize = TRUE
+    # de LoadSettings, donc RALLUMAIT silencieusement la quantification sur un fichier qui
+    # l'eteignait. Signale par bp3-frontend, portillon rouge chez eux.
+    v["Quantize"] = f.ent()
     v["Nature_of_time"] = f.ent()
     v["Pclock"] = f.ent()
     v["Qclock"] = f.ent()
     jmax = f.ent()
     v["_jmax"] = jmax
     v["Improvize"] = f.ent()
-    v["_MaxItemsDisplay"] = f.ent()    # distinct de MaxItemsProduce : pas de cle JSON
+    # Meme preuve, meme commit c21ba55 :  strcmp(key,"Max_items_produced") == 0) MaxItemsDisplay
+    # = intvalue;  — la cle des items produits EST l'ancien MaxItemsDisplay. Valeur ecrite BRUTE :
+    # le moteur d'aujourd'hui ecrete lui-meme a 1 (SaveLoads1.c:780) et 57 fichiers sains du
+    # corpus portent 0. Son absence cassait aussi capture.py, dont la surcharge a un item exige
+    # cette cle.
+    v["MaxItemsProduce"] = f.ent()
     v["UseEachSub"] = f.ent()
     v["AllItems"] = f.ent()
     v["DisplayProduce"] = f.ent()

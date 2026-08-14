@@ -11,6 +11,12 @@
   "unit": "ms (deft 10)",
   "boolean": "0"
  },
+ "Quantize": {
+  "name": "Quantize",
+  "value": "0",
+  "unit": "",
+  "boolean": "1"
+ },
  "Nature_of_time": {
   "name": "Striated time",
   "value": "1",
@@ -34,6 +40,12 @@
   "value": "0",
   "unit": "",
   "boolean": "1"
+ },
+ "MaxItemsProduce": {
+  "name": "Max items produced",
+  "value": "0",
+  "unit": "Except in real-time MIDI (deft 20)",
+  "boolean": "0"
  },
  "UseEachSub": {
   "name": "Play each substitution",

@@ -1,0 +1,2237 @@
+{
+"header": "Bol Processor sound-object prototypes",
+"Prototypes": [
+  {
+    "Name": {
+      "key": "Name",
+      "value": "dha"
+      },
+    "Identifier": {
+      "key": "Id",
+      "value": 2
+      },
+    "Object type": {
+      "key": "Type",
+      "value": 1,
+      "unit": "enum"
+      },
+    "Resolution": {
+      "key": "Resolution",
+      "value": 1,
+      "unit": "ms"
+      },
+    "Default MIDI channel": {
+      "key": "DefaultChannel",
+      "value": 0
+      },
+    "Tref": {
+      "key": "Tref",
+      "value": 1000,
+      "unit": "ms"
+      },
+    "Quantization": {
+      "key": "Quan",
+      "value": 10.0000,
+      "unit": "ms"
+      },
+    "Never rescale": {
+      "key": "FixScale",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Expand": {
+      "key": "OkExpand",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Compress": {
+      "key": "OkCompress",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Relocate": {
+      "key": "OkRelocate",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Break tempo after this object (organum)": {
+      "key": "BreakTempo",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Force continuity at the beginning": {
+      "key": "ContBeg",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Force continuity at the end": {
+      "key": "ContEnd",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Cover beginning": {
+      "key": "CoverBeg",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Cover end": {
+      "key": "CoverEnd",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Truncate beginning": {
+      "key": "TruncBeg",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Truncate end": {
+      "key": "TruncEnd",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Pivot type": {
+      "key": "PivType",
+      "value": 1,
+      "unit": "enum"
+      },
+    "Alpha control": {
+      "key": "AlphaCtrl",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Rescale mode": {
+      "key": "RescaleMode",
+      "value": 0,
+      "unit": "enum"
+      },
+    "Minimum expansion": {
+      "key": "AlphaMin",
+      "value": 0.0000
+      },
+    "Maximum expansion": {
+      "key": "AlphaMax",
+      "value": 0.0000
+      },
+    "Delay mode": {
+      "key": "DelayMode",
+      "value": -1,
+      "unit": "enum"
+      },
+    "Forward mode": {
+      "key": "ForwardMode",
+      "value": -1,
+      "unit": "enum"
+      },
+    "Max delay": {
+      "key": "MaxDelay",
+      "value": 0,
+      "unit": "ms"
+      },
+    "Max forward": {
+      "key": "MaxForward",
+      "value": 0,
+      "unit": "ms"
+      },
+    "Break tempo mode": {
+      "key": "BreakTempoMode",
+      "value": 1,
+      "unit": "enum"
+      },
+    "Continuity at beginning mode": {
+      "key": "ContBegMode",
+      "value": 1,
+      "unit": "enum"
+      },
+    "Max gap at beginning": {
+      "key": "MaxBegGap",
+      "value": 0,
+      "unit": "ms"
+      },
+    "Continuity at end mode": {
+      "key": "ContEndMode",
+      "value": 1,
+      "unit": "enum"
+      },
+    "Max gap at end (ms or percent)": {
+      "key": "MaxEndGap",
+      "value": 0,
+      "unit": "ms"
+      },
+    "Cover beginning mode": {
+      "key": "CoverBegMode",
+      "value": 0,
+      "unit": "enum"
+      },
+    "Max cover at beginning": {
+      "key": "MaxCoverBeg",
+      "value": 100,
+      "unit": "ms or percent"
+      },
+    "Cover end mode": {
+      "key": "CoverEndMode",
+      "value": 0,
+      "unit": "enum"
+      },
+    "Max cover at end": {
+      "key": "MaxCoverEnd",
+      "value": 100,
+      "unit": "ms or percent"
+      },
+    "Truncate beginning mode": {
+      "key": "TruncBegMode",
+      "value": 1,
+      "unit": "enum"
+      },
+    "Max truncate beginning": {
+      "key": "MaxTruncBeg",
+      "value": 0,
+      "unit": "ms or percent"
+      },
+    "Truncate end mode": {
+      "key": "TruncEndMode",
+      "value": 1,
+      "unit": "enum"
+      },
+    "Max truncate end": {
+      "key": "MaxTruncEnd",
+      "value": 0,
+      "unit": "ms or percent"
+      },
+    "Pivot mode": {
+      "key": "PivMode",
+      "value": -1,
+      "unit": "enum"
+      },
+    "Pivot position": {
+      "key": "PivPos",
+      "value": 0.0000,
+      "unit": "ms"
+      },
+    "Alpha controller number": {
+      "key": "AlphaCtr",
+      "value": -1
+      },
+    "Alpha controller channel": {
+      "key": "AlphaCtrlChan",
+      "value": 0
+      },
+    "Accept transposition": {
+      "key": "OkTransp",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Accept articulation": {
+      "key": "OkArticul",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Accept volume changes": {
+      "key": "OkVolume",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Accept panoramic changes": {
+      "key": "OkPan",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Accept key expand changes": {
+      "key": "OkMap",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Accept velocity changes": {
+      "key": "OkVelocity",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Preroll": {
+      "key": "Preroll",
+      "value": 0.0000,
+      "unit": "ms"
+      },
+    "Postroll": {
+      "key": "Postroll",
+      "value": 0.0000,
+      "unit": "ms"
+      },
+    "Preroll mode": {
+      "key": "PreRollMode",
+      "value": 0,
+      "unit": "enum"
+      },
+    "Postroll mode": {
+      "key": "PostRollMode",
+      "value": 0,
+      "unit": "enum"
+      },
+    "Cyclic mode": {
+      "key": "CyclicMode",
+      "value": -2,
+      "unit": "enum"
+      },
+    "Cyclic after": {
+      "key": "CyclicAfter",
+      "value": 0.0000,
+      "unit": "ms or percent"
+      },
+    "Force integer number of cycles": {
+      "key": "ForceIntegerCycles",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Discard NoteOff's (cyclic play) exxcept in last cycle": {
+      "key": "DiscardNoteOffs",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Strike (again) mode": {
+      "key": "StrikeAgain",
+      "value": -1,
+      "unit": "enum"
+      },
+    "Force MIDI to Csound instrument #": {
+      "key": "CsoundAssignedInstr",
+      "value": -1
+      },
+    "MIDI to Csound conversion mode": {
+      "key": "CsoundInstr",
+      "value": 0,
+      "unit": "enum"
+      },
+    "Tempo of MF2T code": {
+      "key": "Tpict",
+      "value": 1000000,
+      "unit": "ms"
+      },
+    "Csound score": "<HTML></HTML>",
+    "Size of MIDI code": {
+      "key": "MIDIcodesize",
+      "value": 75
+      },
+    "byte_1": 144,
+    "time_1": 0,
+    "byte_2": 76,
+    "time_2": 0,
+    "byte_3": 76,
+    "time_3": 0,
+    "byte_4": 144,
+    "time_4": 1,
+    "byte_5": 74,
+    "time_5": 1,
+    "byte_6": 83,
+    "time_6": 1,
+    "byte_7": 144,
+    "time_7": 2,
+    "byte_8": 53,
+    "time_8": 2,
+    "byte_9": 80,
+    "time_9": 2,
+    "byte_10": 144,
+    "time_10": 3,
+    "byte_11": 72,
+    "time_11": 3,
+    "byte_12": 99,
+    "time_12": 3,
+    "byte_13": 144,
+    "time_13": 3,
+    "byte_14": 55,
+    "time_14": 3,
+    "byte_15": 83,
+    "time_15": 3,
+    "byte_16": 144,
+    "time_16": 5,
+    "byte_17": 79,
+    "time_17": 5,
+    "byte_18": 55,
+    "time_18": 5,
+    "byte_19": 144,
+    "time_19": 6,
+    "byte_20": 71,
+    "time_20": 6,
+    "byte_21": 92,
+    "time_21": 6,
+    "byte_22": 144,
+    "time_22": 6,
+    "byte_23": 77,
+    "time_23": 6,
+    "byte_24": 59,
+    "time_24": 6,
+    "byte_25": 144,
+    "time_25": 7,
+    "byte_26": 52,
+    "time_26": 7,
+    "byte_27": 83,
+    "time_27": 7,
+    "byte_28": 144,
+    "time_28": 36,
+    "byte_29": 50,
+    "time_29": 36,
+    "byte_30": 86,
+    "time_30": 36,
+    "byte_31": 144,
+    "time_31": 37,
+    "byte_32": 48,
+    "time_32": 37,
+    "byte_33": 83,
+    "time_33": 37,
+    "byte_34": 144,
+    "time_34": 38,
+    "byte_35": 47,
+    "time_35": 38,
+    "byte_36": 71,
+    "time_36": 38,
+    "byte_37": 144,
+    "time_37": 38,
+    "byte_38": 47,
+    "time_38": 38,
+    "byte_39": 0,
+    "time_39": 38,
+    "byte_40": 144,
+    "time_40": 60,
+    "byte_41": 77,
+    "time_41": 60,
+    "byte_42": 0,
+    "time_42": 60,
+    "byte_43": 144,
+    "time_43": 61,
+    "byte_44": 79,
+    "time_44": 61,
+    "byte_45": 0,
+    "time_45": 61,
+    "byte_46": 144,
+    "time_46": 124,
+    "byte_47": 55,
+    "time_47": 124,
+    "byte_48": 0,
+    "time_48": 124,
+    "byte_49": 144,
+    "time_49": 124,
+    "byte_50": 53,
+    "time_50": 124,
+    "byte_51": 0,
+    "time_51": 124,
+    "byte_52": 144,
+    "time_52": 124,
+    "byte_53": 74,
+    "time_53": 124,
+    "byte_54": 0,
+    "time_54": 124,
+    "byte_55": 144,
+    "time_55": 124,
+    "byte_56": 71,
+    "time_56": 124,
+    "byte_57": 0,
+    "time_57": 124,
+    "byte_58": 144,
+    "time_58": 124,
+    "byte_59": 72,
+    "time_59": 124,
+    "byte_60": 0,
+    "time_60": 124,
+    "byte_61": 144,
+    "time_61": 124,
+    "byte_62": 76,
+    "time_62": 124,
+    "byte_63": 0,
+    "time_63": 124,
+    "byte_64": 144,
+    "time_64": 131,
+    "byte_65": 52,
+    "time_65": 131,
+    "byte_66": 0,
+    "time_66": 131,
+    "byte_67": 144,
+    "time_67": 132,
+    "byte_68": 50,
+    "time_68": 132,
+    "byte_69": 0,
+    "time_69": 132,
+    "byte_70": 144,
+    "time_70": 132,
+    "byte_71": 48,
+    "time_71": 132,
+    "byte_72": 0,
+    "time_72": 132,
+    "byte_73": 176,
+    "time_73": 132,
+    "byte_74": 123,
+    "time_74": 132,
+    "byte_75": 0,
+    "time_75": 132,
+    "Comment": "[Comment on this prototype]"
+  },
+  {
+    "Name": {
+      "key": "Name",
+      "value": "ge"
+      },
+    "Identifier": {
+      "key": "Id",
+      "value": 5
+      },
+    "Object type": {
+      "key": "Type",
+      "value": 1,
+      "unit": "enum"
+      },
+    "Resolution": {
+      "key": "Resolution",
+      "value": 1,
+      "unit": "ms"
+      },
+    "Default MIDI channel": {
+      "key": "DefaultChannel",
+      "value": 0
+      },
+    "Tref": {
+      "key": "Tref",
+      "value": 1000,
+      "unit": "ms"
+      },
+    "Quantization": {
+      "key": "Quan",
+      "value": 0.0000,
+      "unit": "ms"
+      },
+    "Never rescale": {
+      "key": "FixScale",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Expand": {
+      "key": "OkExpand",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Compress": {
+      "key": "OkCompress",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Relocate": {
+      "key": "OkRelocate",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Break tempo after this object (organum)": {
+      "key": "BreakTempo",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Force continuity at the beginning": {
+      "key": "ContBeg",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Force continuity at the end": {
+      "key": "ContEnd",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Cover beginning": {
+      "key": "CoverBeg",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Cover end": {
+      "key": "CoverEnd",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Truncate beginning": {
+      "key": "TruncBeg",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Truncate end": {
+      "key": "TruncEnd",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Pivot type": {
+      "key": "PivType",
+      "value": 1,
+      "unit": "enum"
+      },
+    "Alpha control": {
+      "key": "AlphaCtrl",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Rescale mode": {
+      "key": "RescaleMode",
+      "value": 0,
+      "unit": "enum"
+      },
+    "Minimum expansion": {
+      "key": "AlphaMin",
+      "value": 0.0000
+      },
+    "Maximum expansion": {
+      "key": "AlphaMax",
+      "value": 0.0000
+      },
+    "Delay mode": {
+      "key": "DelayMode",
+      "value": -1,
+      "unit": "enum"
+      },
+    "Forward mode": {
+      "key": "ForwardMode",
+      "value": -1,
+      "unit": "enum"
+      },
+    "Max delay": {
+      "key": "MaxDelay",
+      "value": 0,
+      "unit": "ms"
+      },
+    "Max forward": {
+      "key": "MaxForward",
+      "value": 0,
+      "unit": "ms"
+      },
+    "Break tempo mode": {
+      "key": "BreakTempoMode",
+      "value": 1,
+      "unit": "enum"
+      },
+    "Continuity at beginning mode": {
+      "key": "ContBegMode",
+      "value": 1,
+      "unit": "enum"
+      },
+    "Max gap at beginning": {
+      "key": "MaxBegGap",
+      "value": 0,
+      "unit": "ms"
+      },
+    "Continuity at end mode": {
+      "key": "ContEndMode",
+      "value": 1,
+      "unit": "enum"
+      },
+    "Max gap at end (ms or percent)": {
+      "key": "MaxEndGap",
+      "value": 0,
+      "unit": "ms"
+      },
+    "Cover beginning mode": {
+      "key": "CoverBegMode",
+      "value": 0,
+      "unit": "enum"
+      },
+    "Max cover at beginning": {
+      "key": "MaxCoverBeg",
+      "value": 100,
+      "unit": "ms or percent"
+      },
+    "Cover end mode": {
+      "key": "CoverEndMode",
+      "value": 0,
+      "unit": "enum"
+      },
+    "Max cover at end": {
+      "key": "MaxCoverEnd",
+      "value": 100,
+      "unit": "ms or percent"
+      },
+    "Truncate beginning mode": {
+      "key": "TruncBegMode",
+      "value": 1,
+      "unit": "enum"
+      },
+    "Max truncate beginning": {
+      "key": "MaxTruncBeg",
+      "value": 0,
+      "unit": "ms or percent"
+      },
+    "Truncate end mode": {
+      "key": "TruncEndMode",
+      "value": 1,
+      "unit": "enum"
+      },
+    "Max truncate end": {
+      "key": "MaxTruncEnd",
+      "value": 0,
+      "unit": "ms or percent"
+      },
+    "Pivot mode": {
+      "key": "PivMode",
+      "value": -1,
+      "unit": "enum"
+      },
+    "Pivot position": {
+      "key": "PivPos",
+      "value": 0.0000,
+      "unit": "ms"
+      },
+    "Alpha controller number": {
+      "key": "AlphaCtr",
+      "value": -1
+      },
+    "Alpha controller channel": {
+      "key": "AlphaCtrlChan",
+      "value": 0
+      },
+    "Accept transposition": {
+      "key": "OkTransp",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Accept articulation": {
+      "key": "OkArticul",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Accept volume changes": {
+      "key": "OkVolume",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Accept panoramic changes": {
+      "key": "OkPan",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Accept key expand changes": {
+      "key": "OkMap",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Accept velocity changes": {
+      "key": "OkVelocity",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Preroll": {
+      "key": "Preroll",
+      "value": 0.0000,
+      "unit": "ms"
+      },
+    "Postroll": {
+      "key": "Postroll",
+      "value": 0.0000,
+      "unit": "ms"
+      },
+    "Preroll mode": {
+      "key": "PreRollMode",
+      "value": 0,
+      "unit": "enum"
+      },
+    "Postroll mode": {
+      "key": "PostRollMode",
+      "value": 0,
+      "unit": "enum"
+      },
+    "Cyclic mode": {
+      "key": "CyclicMode",
+      "value": -2,
+      "unit": "enum"
+      },
+    "Cyclic after": {
+      "key": "CyclicAfter",
+      "value": 0.0000,
+      "unit": "ms or percent"
+      },
+    "Force integer number of cycles": {
+      "key": "ForceIntegerCycles",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Discard NoteOff's (cyclic play) exxcept in last cycle": {
+      "key": "DiscardNoteOffs",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Strike (again) mode": {
+      "key": "StrikeAgain",
+      "value": -1,
+      "unit": "enum"
+      },
+    "Force MIDI to Csound instrument #": {
+      "key": "CsoundAssignedInstr",
+      "value": -1
+      },
+    "MIDI to Csound conversion mode": {
+      "key": "CsoundInstr",
+      "value": 0,
+      "unit": "enum"
+      },
+    "Tempo of MF2T code": {
+      "key": "Tpict",
+      "value": 1000000,
+      "unit": "ms"
+      },
+    "Csound score": "<HTML>; Csound score<BR>i1 0.000 0.124 8.05 90.000 90.000 0.000 0.000 0.000 0.000 ; F4<BR>i1 0.000 0.146 7.05 90.000 90.000 0.000 0.000 0.000 0.000 ; F3<BR>i1 1.000 0.854 0.00 0 0 ; silence<BR>e<BR></HTML>",
+    "Size of MIDI code": {
+      "key": "MIDIcodesize",
+      "value": 15
+      },
+    "byte_1": 144,
+    "time_1": 0,
+    "byte_2": 65,
+    "time_2": 0,
+    "byte_3": 73,
+    "time_3": 0,
+    "byte_4": 144,
+    "time_4": 0,
+    "byte_5": 53,
+    "time_5": 0,
+    "byte_6": 60,
+    "time_6": 0,
+    "byte_7": 144,
+    "time_7": 124,
+    "byte_8": 65,
+    "time_8": 124,
+    "byte_9": 0,
+    "time_9": 124,
+    "byte_10": 144,
+    "time_10": 146,
+    "byte_11": 53,
+    "time_11": 146,
+    "byte_12": 0,
+    "time_12": 146,
+    "byte_13": 176,
+    "time_13": 146,
+    "byte_14": 123,
+    "time_14": 146,
+    "byte_15": 0,
+    "time_15": 146,
+    "Comment": "ke"
+  },
+  {
+    "Name": {
+      "key": "Name",
+      "value": "kt"
+      },
+    "Identifier": {
+      "key": "Id",
+      "value": 11
+      },
+    "Object type": {
+      "key": "Type",
+      "value": 1,
+      "unit": "enum"
+      },
+    "Resolution": {
+      "key": "Resolution",
+      "value": 1,
+      "unit": "ms"
+      },
+    "Default MIDI channel": {
+      "key": "DefaultChannel",
+      "value": 0
+      },
+    "Tref": {
+      "key": "Tref",
+      "value": 1000,
+      "unit": "ms"
+      },
+    "Quantization": {
+      "key": "Quan",
+      "value": 0.0000,
+      "unit": "ms"
+      },
+    "Never rescale": {
+      "key": "FixScale",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Expand": {
+      "key": "OkExpand",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Compress": {
+      "key": "OkCompress",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Relocate": {
+      "key": "OkRelocate",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Break tempo after this object (organum)": {
+      "key": "BreakTempo",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Force continuity at the beginning": {
+      "key": "ContBeg",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Force continuity at the end": {
+      "key": "ContEnd",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Cover beginning": {
+      "key": "CoverBeg",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Cover end": {
+      "key": "CoverEnd",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Truncate beginning": {
+      "key": "TruncBeg",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Truncate end": {
+      "key": "TruncEnd",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Pivot type": {
+      "key": "PivType",
+      "value": 1,
+      "unit": "enum"
+      },
+    "Alpha control": {
+      "key": "AlphaCtrl",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Rescale mode": {
+      "key": "RescaleMode",
+      "value": 0,
+      "unit": "enum"
+      },
+    "Minimum expansion": {
+      "key": "AlphaMin",
+      "value": 0.0000
+      },
+    "Maximum expansion": {
+      "key": "AlphaMax",
+      "value": 10.0000
+      },
+    "Delay mode": {
+      "key": "DelayMode",
+      "value": -1,
+      "unit": "enum"
+      },
+    "Forward mode": {
+      "key": "ForwardMode",
+      "value": -1,
+      "unit": "enum"
+      },
+    "Max delay": {
+      "key": "MaxDelay",
+      "value": 0,
+      "unit": "ms"
+      },
+    "Max forward": {
+      "key": "MaxForward",
+      "value": 0,
+      "unit": "ms"
+      },
+    "Break tempo mode": {
+      "key": "BreakTempoMode",
+      "value": 1,
+      "unit": "enum"
+      },
+    "Continuity at beginning mode": {
+      "key": "ContBegMode",
+      "value": -1,
+      "unit": "enum"
+      },
+    "Max gap at beginning": {
+      "key": "MaxBegGap",
+      "value": 0,
+      "unit": "ms"
+      },
+    "Continuity at end mode": {
+      "key": "ContEndMode",
+      "value": -1,
+      "unit": "enum"
+      },
+    "Max gap at end (ms or percent)": {
+      "key": "MaxEndGap",
+      "value": 0,
+      "unit": "ms"
+      },
+    "Cover beginning mode": {
+      "key": "CoverBegMode",
+      "value": 0,
+      "unit": "enum"
+      },
+    "Max cover at beginning": {
+      "key": "MaxCoverBeg",
+      "value": 100,
+      "unit": "ms or percent"
+      },
+    "Cover end mode": {
+      "key": "CoverEndMode",
+      "value": 0,
+      "unit": "enum"
+      },
+    "Max cover at end": {
+      "key": "MaxCoverEnd",
+      "value": 100,
+      "unit": "ms or percent"
+      },
+    "Truncate beginning mode": {
+      "key": "TruncBegMode",
+      "value": 0,
+      "unit": "enum"
+      },
+    "Max truncate beginning": {
+      "key": "MaxTruncBeg",
+      "value": 100,
+      "unit": "ms or percent"
+      },
+    "Truncate end mode": {
+      "key": "TruncEndMode",
+      "value": 0,
+      "unit": "enum"
+      },
+    "Max truncate end": {
+      "key": "MaxTruncEnd",
+      "value": 100,
+      "unit": "ms or percent"
+      },
+    "Pivot mode": {
+      "key": "PivMode",
+      "value": -1,
+      "unit": "enum"
+      },
+    "Pivot position": {
+      "key": "PivPos",
+      "value": 0.0000,
+      "unit": "ms"
+      },
+    "Alpha controller number": {
+      "key": "AlphaCtr",
+      "value": 51
+      },
+    "Alpha controller channel": {
+      "key": "AlphaCtrlChan",
+      "value": 1
+      },
+    "Accept transposition": {
+      "key": "OkTransp",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Accept articulation": {
+      "key": "OkArticul",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Accept volume changes": {
+      "key": "OkVolume",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Accept panoramic changes": {
+      "key": "OkPan",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Accept key expand changes": {
+      "key": "OkMap",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Accept velocity changes": {
+      "key": "OkVelocity",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Preroll": {
+      "key": "Preroll",
+      "value": 0.0000,
+      "unit": "ms"
+      },
+    "Postroll": {
+      "key": "Postroll",
+      "value": 0.0000,
+      "unit": "ms"
+      },
+    "Preroll mode": {
+      "key": "PreRollMode",
+      "value": 0,
+      "unit": "enum"
+      },
+    "Postroll mode": {
+      "key": "PostRollMode",
+      "value": 0,
+      "unit": "enum"
+      },
+    "Cyclic mode": {
+      "key": "CyclicMode",
+      "value": -2,
+      "unit": "enum"
+      },
+    "Cyclic after": {
+      "key": "CyclicAfter",
+      "value": 0.0000,
+      "unit": "ms or percent"
+      },
+    "Force integer number of cycles": {
+      "key": "ForceIntegerCycles",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Discard NoteOff's (cyclic play) exxcept in last cycle": {
+      "key": "DiscardNoteOffs",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Strike (again) mode": {
+      "key": "StrikeAgain",
+      "value": -1,
+      "unit": "enum"
+      },
+    "Force MIDI to Csound instrument #": {
+      "key": "CsoundAssignedInstr",
+      "value": -1
+      },
+    "MIDI to Csound conversion mode": {
+      "key": "CsoundInstr",
+      "value": 0,
+      "unit": "enum"
+      },
+    "Tempo of MF2T code": {
+      "key": "Tpict",
+      "value": 0,
+      "unit": "ms"
+      },
+    "Csound score": "<HTML></HTML>",
+    "Size of MIDI code": {
+      "key": "MIDIcodesize",
+      "value": 15
+      },
+    "byte_1": 144,
+    "time_1": 0,
+    "byte_2": 74,
+    "time_2": 0,
+    "byte_3": 100,
+    "time_3": 0,
+    "byte_4": 144,
+    "time_4": 500,
+    "byte_5": 71,
+    "time_5": 500,
+    "byte_6": 100,
+    "time_6": 500,
+    "byte_7": 144,
+    "time_7": 500,
+    "byte_8": 74,
+    "time_8": 500,
+    "byte_9": 0,
+    "time_9": 500,
+    "byte_10": 144,
+    "time_10": 629,
+    "byte_11": 71,
+    "time_11": 629,
+    "byte_12": 0,
+    "time_12": 629,
+    "byte_13": 176,
+    "time_13": 630,
+    "byte_14": 123,
+    "time_14": 630,
+    "byte_15": 0,
+    "time_15": 630,
+    "Comment": "[Comments on file]"
+  },
+  {
+    "Name": {
+      "key": "Name",
+      "value": "na"
+      },
+    "Identifier": {
+      "key": "Id",
+      "value": 7
+      },
+    "Object type": {
+      "key": "Type",
+      "value": 1,
+      "unit": "enum"
+      },
+    "Resolution": {
+      "key": "Resolution",
+      "value": 1,
+      "unit": "ms"
+      },
+    "Default MIDI channel": {
+      "key": "DefaultChannel",
+      "value": 0
+      },
+    "Tref": {
+      "key": "Tref",
+      "value": 1000,
+      "unit": "ms"
+      },
+    "Quantization": {
+      "key": "Quan",
+      "value": 0.0000,
+      "unit": "ms"
+      },
+    "Never rescale": {
+      "key": "FixScale",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Expand": {
+      "key": "OkExpand",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Compress": {
+      "key": "OkCompress",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Relocate": {
+      "key": "OkRelocate",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Break tempo after this object (organum)": {
+      "key": "BreakTempo",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Force continuity at the beginning": {
+      "key": "ContBeg",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Force continuity at the end": {
+      "key": "ContEnd",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Cover beginning": {
+      "key": "CoverBeg",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Cover end": {
+      "key": "CoverEnd",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Truncate beginning": {
+      "key": "TruncBeg",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Truncate end": {
+      "key": "TruncEnd",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Pivot type": {
+      "key": "PivType",
+      "value": 1,
+      "unit": "enum"
+      },
+    "Alpha control": {
+      "key": "AlphaCtrl",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Rescale mode": {
+      "key": "RescaleMode",
+      "value": 0,
+      "unit": "enum"
+      },
+    "Minimum expansion": {
+      "key": "AlphaMin",
+      "value": 0.0000
+      },
+    "Maximum expansion": {
+      "key": "AlphaMax",
+      "value": 0.0000
+      },
+    "Delay mode": {
+      "key": "DelayMode",
+      "value": -1,
+      "unit": "enum"
+      },
+    "Forward mode": {
+      "key": "ForwardMode",
+      "value": -1,
+      "unit": "enum"
+      },
+    "Max delay": {
+      "key": "MaxDelay",
+      "value": 0,
+      "unit": "ms"
+      },
+    "Max forward": {
+      "key": "MaxForward",
+      "value": 0,
+      "unit": "ms"
+      },
+    "Break tempo mode": {
+      "key": "BreakTempoMode",
+      "value": 1,
+      "unit": "enum"
+      },
+    "Continuity at beginning mode": {
+      "key": "ContBegMode",
+      "value": 1,
+      "unit": "enum"
+      },
+    "Max gap at beginning": {
+      "key": "MaxBegGap",
+      "value": 0,
+      "unit": "ms"
+      },
+    "Continuity at end mode": {
+      "key": "ContEndMode",
+      "value": 1,
+      "unit": "enum"
+      },
+    "Max gap at end (ms or percent)": {
+      "key": "MaxEndGap",
+      "value": 0,
+      "unit": "ms"
+      },
+    "Cover beginning mode": {
+      "key": "CoverBegMode",
+      "value": 0,
+      "unit": "enum"
+      },
+    "Max cover at beginning": {
+      "key": "MaxCoverBeg",
+      "value": 100,
+      "unit": "ms or percent"
+      },
+    "Cover end mode": {
+      "key": "CoverEndMode",
+      "value": 0,
+      "unit": "enum"
+      },
+    "Max cover at end": {
+      "key": "MaxCoverEnd",
+      "value": 100,
+      "unit": "ms or percent"
+      },
+    "Truncate beginning mode": {
+      "key": "TruncBegMode",
+      "value": 1,
+      "unit": "enum"
+      },
+    "Max truncate beginning": {
+      "key": "MaxTruncBeg",
+      "value": 0,
+      "unit": "ms or percent"
+      },
+    "Truncate end mode": {
+      "key": "TruncEndMode",
+      "value": 1,
+      "unit": "enum"
+      },
+    "Max truncate end": {
+      "key": "MaxTruncEnd",
+      "value": 0,
+      "unit": "ms or percent"
+      },
+    "Pivot mode": {
+      "key": "PivMode",
+      "value": -1,
+      "unit": "enum"
+      },
+    "Pivot position": {
+      "key": "PivPos",
+      "value": 0.0000,
+      "unit": "ms"
+      },
+    "Alpha controller number": {
+      "key": "AlphaCtr",
+      "value": -1
+      },
+    "Alpha controller channel": {
+      "key": "AlphaCtrlChan",
+      "value": 0
+      },
+    "Accept transposition": {
+      "key": "OkTransp",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Accept articulation": {
+      "key": "OkArticul",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Accept volume changes": {
+      "key": "OkVolume",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Accept panoramic changes": {
+      "key": "OkPan",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Accept key expand changes": {
+      "key": "OkMap",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Accept velocity changes": {
+      "key": "OkVelocity",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Preroll": {
+      "key": "Preroll",
+      "value": 0.0000,
+      "unit": "ms"
+      },
+    "Postroll": {
+      "key": "Postroll",
+      "value": 0.0000,
+      "unit": "ms"
+      },
+    "Preroll mode": {
+      "key": "PreRollMode",
+      "value": 0,
+      "unit": "enum"
+      },
+    "Postroll mode": {
+      "key": "PostRollMode",
+      "value": 0,
+      "unit": "enum"
+      },
+    "Cyclic mode": {
+      "key": "CyclicMode",
+      "value": -2,
+      "unit": "enum"
+      },
+    "Cyclic after": {
+      "key": "CyclicAfter",
+      "value": 0.0000,
+      "unit": "ms or percent"
+      },
+    "Force integer number of cycles": {
+      "key": "ForceIntegerCycles",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Discard NoteOff's (cyclic play) exxcept in last cycle": {
+      "key": "DiscardNoteOffs",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Strike (again) mode": {
+      "key": "StrikeAgain",
+      "value": -1,
+      "unit": "enum"
+      },
+    "Force MIDI to Csound instrument #": {
+      "key": "CsoundAssignedInstr",
+      "value": -1
+      },
+    "MIDI to Csound conversion mode": {
+      "key": "CsoundInstr",
+      "value": 0,
+      "unit": "enum"
+      },
+    "Tempo of MF2T code": {
+      "key": "Tpict",
+      "value": 1000000,
+      "unit": "ms"
+      },
+    "Csound score": "<HTML></HTML>",
+    "Size of MIDI code": {
+      "key": "MIDIcodesize",
+      "value": 33
+      },
+    "byte_1": 144,
+    "time_1": 0,
+    "byte_2": 59,
+    "time_2": 0,
+    "byte_3": 59,
+    "time_3": 0,
+    "byte_4": 144,
+    "time_4": 12,
+    "byte_5": 55,
+    "time_5": 12,
+    "byte_6": 49,
+    "time_6": 12,
+    "byte_7": 144,
+    "time_7": 24,
+    "byte_8": 57,
+    "time_8": 24,
+    "byte_9": 51,
+    "time_9": 24,
+    "byte_10": 144,
+    "time_10": 24,
+    "byte_11": 53,
+    "time_11": 24,
+    "byte_12": 74,
+    "time_12": 24,
+    "byte_13": 144,
+    "time_13": 62,
+    "byte_14": 57,
+    "time_14": 62,
+    "byte_15": 0,
+    "time_15": 62,
+    "byte_16": 144,
+    "time_16": 62,
+    "byte_17": 52,
+    "time_17": 62,
+    "byte_18": 85,
+    "time_18": 62,
+    "byte_19": 144,
+    "time_19": 74,
+    "byte_20": 59,
+    "time_20": 74,
+    "byte_21": 0,
+    "time_21": 74,
+    "byte_22": 144,
+    "time_22": 75,
+    "byte_23": 55,
+    "time_23": 75,
+    "byte_24": 0,
+    "time_24": 75,
+    "byte_25": 144,
+    "time_25": 86,
+    "byte_26": 53,
+    "time_26": 86,
+    "byte_27": 0,
+    "time_27": 86,
+    "byte_28": 144,
+    "time_28": 124,
+    "byte_29": 52,
+    "time_29": 124,
+    "byte_30": 0,
+    "time_30": 124,
+    "byte_31": 176,
+    "time_31": 124,
+    "byte_32": 123,
+    "time_32": 124,
+    "byte_33": 0,
+    "time_33": 124,
+    "Comment": "dhee"
+  },
+  {
+    "Name": {
+      "key": "Name",
+      "value": "ta"
+      },
+    "Identifier": {
+      "key": "Id",
+      "value": 3
+      },
+    "Object type": {
+      "key": "Type",
+      "value": 1,
+      "unit": "enum"
+      },
+    "Resolution": {
+      "key": "Resolution",
+      "value": 1,
+      "unit": "ms"
+      },
+    "Default MIDI channel": {
+      "key": "DefaultChannel",
+      "value": 0
+      },
+    "Tref": {
+      "key": "Tref",
+      "value": 1000,
+      "unit": "ms"
+      },
+    "Quantization": {
+      "key": "Quan",
+      "value": 0.0000,
+      "unit": "ms"
+      },
+    "Never rescale": {
+      "key": "FixScale",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Expand": {
+      "key": "OkExpand",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Compress": {
+      "key": "OkCompress",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Relocate": {
+      "key": "OkRelocate",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Break tempo after this object (organum)": {
+      "key": "BreakTempo",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Force continuity at the beginning": {
+      "key": "ContBeg",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Force continuity at the end": {
+      "key": "ContEnd",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Cover beginning": {
+      "key": "CoverBeg",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Cover end": {
+      "key": "CoverEnd",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Truncate beginning": {
+      "key": "TruncBeg",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Truncate end": {
+      "key": "TruncEnd",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Pivot type": {
+      "key": "PivType",
+      "value": 1,
+      "unit": "enum"
+      },
+    "Alpha control": {
+      "key": "AlphaCtrl",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Rescale mode": {
+      "key": "RescaleMode",
+      "value": 0,
+      "unit": "enum"
+      },
+    "Minimum expansion": {
+      "key": "AlphaMin",
+      "value": 0.0000
+      },
+    "Maximum expansion": {
+      "key": "AlphaMax",
+      "value": 0.0000
+      },
+    "Delay mode": {
+      "key": "DelayMode",
+      "value": -1,
+      "unit": "enum"
+      },
+    "Forward mode": {
+      "key": "ForwardMode",
+      "value": -1,
+      "unit": "enum"
+      },
+    "Max delay": {
+      "key": "MaxDelay",
+      "value": 0,
+      "unit": "ms"
+      },
+    "Max forward": {
+      "key": "MaxForward",
+      "value": 0,
+      "unit": "ms"
+      },
+    "Break tempo mode": {
+      "key": "BreakTempoMode",
+      "value": 1,
+      "unit": "enum"
+      },
+    "Continuity at beginning mode": {
+      "key": "ContBegMode",
+      "value": 1,
+      "unit": "enum"
+      },
+    "Max gap at beginning": {
+      "key": "MaxBegGap",
+      "value": 0,
+      "unit": "ms"
+      },
+    "Continuity at end mode": {
+      "key": "ContEndMode",
+      "value": 1,
+      "unit": "enum"
+      },
+    "Max gap at end (ms or percent)": {
+      "key": "MaxEndGap",
+      "value": 0,
+      "unit": "ms"
+      },
+    "Cover beginning mode": {
+      "key": "CoverBegMode",
+      "value": 0,
+      "unit": "enum"
+      },
+    "Max cover at beginning": {
+      "key": "MaxCoverBeg",
+      "value": 100,
+      "unit": "ms or percent"
+      },
+    "Cover end mode": {
+      "key": "CoverEndMode",
+      "value": 0,
+      "unit": "enum"
+      },
+    "Max cover at end": {
+      "key": "MaxCoverEnd",
+      "value": 100,
+      "unit": "ms or percent"
+      },
+    "Truncate beginning mode": {
+      "key": "TruncBegMode",
+      "value": 1,
+      "unit": "enum"
+      },
+    "Max truncate beginning": {
+      "key": "MaxTruncBeg",
+      "value": 0,
+      "unit": "ms or percent"
+      },
+    "Truncate end mode": {
+      "key": "TruncEndMode",
+      "value": 1,
+      "unit": "enum"
+      },
+    "Max truncate end": {
+      "key": "MaxTruncEnd",
+      "value": 0,
+      "unit": "ms or percent"
+      },
+    "Pivot mode": {
+      "key": "PivMode",
+      "value": -1,
+      "unit": "enum"
+      },
+    "Pivot position": {
+      "key": "PivPos",
+      "value": 0.0000,
+      "unit": "ms"
+      },
+    "Alpha controller number": {
+      "key": "AlphaCtr",
+      "value": -1
+      },
+    "Alpha controller channel": {
+      "key": "AlphaCtrlChan",
+      "value": 0
+      },
+    "Accept transposition": {
+      "key": "OkTransp",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Accept articulation": {
+      "key": "OkArticul",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Accept volume changes": {
+      "key": "OkVolume",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Accept panoramic changes": {
+      "key": "OkPan",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Accept key expand changes": {
+      "key": "OkMap",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Accept velocity changes": {
+      "key": "OkVelocity",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Preroll": {
+      "key": "Preroll",
+      "value": 0.0000,
+      "unit": "ms"
+      },
+    "Postroll": {
+      "key": "Postroll",
+      "value": 0.0000,
+      "unit": "ms"
+      },
+    "Preroll mode": {
+      "key": "PreRollMode",
+      "value": 0,
+      "unit": "enum"
+      },
+    "Postroll mode": {
+      "key": "PostRollMode",
+      "value": 0,
+      "unit": "enum"
+      },
+    "Cyclic mode": {
+      "key": "CyclicMode",
+      "value": -2,
+      "unit": "enum"
+      },
+    "Cyclic after": {
+      "key": "CyclicAfter",
+      "value": 0.0000,
+      "unit": "ms or percent"
+      },
+    "Force integer number of cycles": {
+      "key": "ForceIntegerCycles",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Discard NoteOff's (cyclic play) exxcept in last cycle": {
+      "key": "DiscardNoteOffs",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Strike (again) mode": {
+      "key": "StrikeAgain",
+      "value": -1,
+      "unit": "enum"
+      },
+    "Force MIDI to Csound instrument #": {
+      "key": "CsoundAssignedInstr",
+      "value": 0
+      },
+    "MIDI to Csound conversion mode": {
+      "key": "CsoundInstr",
+      "value": -1,
+      "unit": "enum"
+      },
+    "Tempo of MF2T code": {
+      "key": "Tpict",
+      "value": 1000000,
+      "unit": "ms"
+      },
+    "Csound score": "<HTML>; Csound score<BR>i1 0.000 0.059 8.09 90.000 90.000 0.000 0.000 0.000 0.000 ; A4<BR>i1 0.001 0.059 8.11 90.000 90.000 0.000 0.000 0.000 0.000 ; B4<BR>i1 0.000 0.060 8.07 90.000 90.000 0.000 0.000 0.000 0.000 ; G4<BR>e<BR></HTML>",
+    "Size of MIDI code": {
+      "key": "MIDIcodesize",
+      "value": 21
+      },
+    "byte_1": 144,
+    "time_1": 0,
+    "byte_2": 67,
+    "time_2": 0,
+    "byte_3": 99,
+    "time_3": 0,
+    "byte_4": 144,
+    "time_4": 0,
+    "byte_5": 69,
+    "time_5": 0,
+    "byte_6": 107,
+    "time_6": 0,
+    "byte_7": 144,
+    "time_7": 1,
+    "byte_8": 71,
+    "time_8": 1,
+    "byte_9": 104,
+    "time_9": 1,
+    "byte_10": 144,
+    "time_10": 59,
+    "byte_11": 69,
+    "time_11": 59,
+    "byte_12": 0,
+    "time_12": 59,
+    "byte_13": 144,
+    "time_13": 60,
+    "byte_14": 71,
+    "time_14": 60,
+    "byte_15": 0,
+    "time_15": 60,
+    "byte_16": 144,
+    "time_16": 60,
+    "byte_17": 67,
+    "time_17": 60,
+    "byte_18": 0,
+    "time_18": 60,
+    "byte_19": 176,
+    "time_19": 60,
+    "byte_20": 123,
+    "time_20": 60,
+    "byte_21": 0,
+    "time_21": 60,
+    "Comment": "ti"
+  },
+  {
+    "Name": {
+      "key": "Name",
+      "value": "tee"
+      },
+    "Identifier": {
+      "key": "Id",
+      "value": 9
+      },
+    "Object type": {
+      "key": "Type",
+      "value": 1,
+      "unit": "enum"
+      },
+    "Resolution": {
+      "key": "Resolution",
+      "value": 1,
+      "unit": "ms"
+      },
+    "Default MIDI channel": {
+      "key": "DefaultChannel",
+      "value": 0
+      },
+    "Tref": {
+      "key": "Tref",
+      "value": 1000,
+      "unit": "ms"
+      },
+    "Quantization": {
+      "key": "Quan",
+      "value": 0.0000,
+      "unit": "ms"
+      },
+    "Never rescale": {
+      "key": "FixScale",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Expand": {
+      "key": "OkExpand",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Compress": {
+      "key": "OkCompress",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Relocate": {
+      "key": "OkRelocate",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Break tempo after this object (organum)": {
+      "key": "BreakTempo",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Force continuity at the beginning": {
+      "key": "ContBeg",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Force continuity at the end": {
+      "key": "ContEnd",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Cover beginning": {
+      "key": "CoverBeg",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Cover end": {
+      "key": "CoverEnd",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Truncate beginning": {
+      "key": "TruncBeg",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Truncate end": {
+      "key": "TruncEnd",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Pivot type": {
+      "key": "PivType",
+      "value": 1,
+      "unit": "enum"
+      },
+    "Alpha control": {
+      "key": "AlphaCtrl",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Rescale mode": {
+      "key": "RescaleMode",
+      "value": 0,
+      "unit": "enum"
+      },
+    "Minimum expansion": {
+      "key": "AlphaMin",
+      "value": 0.0000
+      },
+    "Maximum expansion": {
+      "key": "AlphaMax",
+      "value": 10.0000
+      },
+    "Delay mode": {
+      "key": "DelayMode",
+      "value": -1,
+      "unit": "enum"
+      },
+    "Forward mode": {
+      "key": "ForwardMode",
+      "value": -1,
+      "unit": "enum"
+      },
+    "Max delay": {
+      "key": "MaxDelay",
+      "value": 0,
+      "unit": "ms"
+      },
+    "Max forward": {
+      "key": "MaxForward",
+      "value": 0,
+      "unit": "ms"
+      },
+    "Break tempo mode": {
+      "key": "BreakTempoMode",
+      "value": 1,
+      "unit": "enum"
+      },
+    "Continuity at beginning mode": {
+      "key": "ContBegMode",
+      "value": -1,
+      "unit": "enum"
+      },
+    "Max gap at beginning": {
+      "key": "MaxBegGap",
+      "value": 0,
+      "unit": "ms"
+      },
+    "Continuity at end mode": {
+      "key": "ContEndMode",
+      "value": -1,
+      "unit": "enum"
+      },
+    "Max gap at end (ms or percent)": {
+      "key": "MaxEndGap",
+      "value": 0,
+      "unit": "ms"
+      },
+    "Cover beginning mode": {
+      "key": "CoverBegMode",
+      "value": 0,
+      "unit": "enum"
+      },
+    "Max cover at beginning": {
+      "key": "MaxCoverBeg",
+      "value": 100,
+      "unit": "ms or percent"
+      },
+    "Cover end mode": {
+      "key": "CoverEndMode",
+      "value": 0,
+      "unit": "enum"
+      },
+    "Max cover at end": {
+      "key": "MaxCoverEnd",
+      "value": 100,
+      "unit": "ms or percent"
+      },
+    "Truncate beginning mode": {
+      "key": "TruncBegMode",
+      "value": 0,
+      "unit": "enum"
+      },
+    "Max truncate beginning": {
+      "key": "MaxTruncBeg",
+      "value": 100,
+      "unit": "ms or percent"
+      },
+    "Truncate end mode": {
+      "key": "TruncEndMode",
+      "value": 0,
+      "unit": "enum"
+      },
+    "Max truncate end": {
+      "key": "MaxTruncEnd",
+      "value": 100,
+      "unit": "ms or percent"
+      },
+    "Pivot mode": {
+      "key": "PivMode",
+      "value": -1,
+      "unit": "enum"
+      },
+    "Pivot position": {
+      "key": "PivPos",
+      "value": 0.0000,
+      "unit": "ms"
+      },
+    "Alpha controller number": {
+      "key": "AlphaCtr",
+      "value": 0
+      },
+    "Alpha controller channel": {
+      "key": "AlphaCtrlChan",
+      "value": 1
+      },
+    "Accept transposition": {
+      "key": "OkTransp",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Accept articulation": {
+      "key": "OkArticul",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Accept volume changes": {
+      "key": "OkVolume",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Accept panoramic changes": {
+      "key": "OkPan",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Accept key expand changes": {
+      "key": "OkMap",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Accept velocity changes": {
+      "key": "OkVelocity",
+      "value": 1,
+      "unit": "boolean"
+      },
+    "Preroll": {
+      "key": "Preroll",
+      "value": 0.0000,
+      "unit": "ms"
+      },
+    "Postroll": {
+      "key": "Postroll",
+      "value": 0.0000,
+      "unit": "ms"
+      },
+    "Preroll mode": {
+      "key": "PreRollMode",
+      "value": 0,
+      "unit": "enum"
+      },
+    "Postroll mode": {
+      "key": "PostRollMode",
+      "value": 0,
+      "unit": "enum"
+      },
+    "Cyclic mode": {
+      "key": "CyclicMode",
+      "value": -2,
+      "unit": "enum"
+      },
+    "Cyclic after": {
+      "key": "CyclicAfter",
+      "value": 0.0000,
+      "unit": "ms or percent"
+      },
+    "Force integer number of cycles": {
+      "key": "ForceIntegerCycles",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Discard NoteOff's (cyclic play) exxcept in last cycle": {
+      "key": "DiscardNoteOffs",
+      "value": 0,
+      "unit": "boolean"
+      },
+    "Strike (again) mode": {
+      "key": "StrikeAgain",
+      "value": -1,
+      "unit": "enum"
+      },
+    "Force MIDI to Csound instrument #": {
+      "key": "CsoundAssignedInstr",
+      "value": -1
+      },
+    "MIDI to Csound conversion mode": {
+      "key": "CsoundInstr",
+      "value": 0,
+      "unit": "enum"
+      },
+    "Tempo of MF2T code": {
+      "key": "Tpict",
+      "value": 0,
+      "unit": "ms"
+      },
+    "Csound score": "<HTML></HTML>",
+    "Size of MIDI code": {
+      "key": "MIDIcodesize",
+      "value": 27
+      },
+    "byte_1": 144,
+    "time_1": 0,
+    "byte_2": 67,
+    "time_2": 0,
+    "byte_3": 73,
+    "time_3": 0,
+    "byte_4": 144,
+    "time_4": 12,
+    "byte_5": 71,
+    "time_5": 12,
+    "byte_6": 78,
+    "time_6": 12,
+    "byte_7": 144,
+    "time_7": 13,
+    "byte_8": 72,
+    "time_8": 13,
+    "byte_9": 86,
+    "time_9": 13,
+    "byte_10": 144,
+    "time_10": 28,
+    "byte_11": 74,
+    "time_11": 28,
+    "byte_12": 76,
+    "time_12": 28,
+    "byte_13": 144,
+    "time_13": 44,
+    "byte_14": 67,
+    "time_14": 44,
+    "byte_15": 0,
+    "time_15": 44,
+    "byte_16": 144,
+    "time_16": 57,
+    "byte_17": 71,
+    "time_17": 57,
+    "byte_18": 0,
+    "time_18": 57,
+    "byte_19": 144,
+    "time_19": 77,
+    "byte_20": 72,
+    "time_20": 77,
+    "byte_21": 0,
+    "time_21": 77,
+    "byte_22": 144,
+    "time_22": 79,
+    "byte_23": 74,
+    "time_23": 79,
+    "byte_24": 0,
+    "time_24": 79,
+    "byte_25": 176,
+    "time_25": 79,
+    "byte_26": 123,
+    "time_26": 79,
+    "byte_27": 0,
+    "time_27": 79,
+    "Comment": "tr"
+  }
+  ]
+}

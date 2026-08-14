@@ -28,9 +28,14 @@ exclus = {m.group(1): m.group(2).strip()
           for m in re.finditer(r"^#\s*(\S*test[-_]\S*\.\w+)\s+(\S.*)$", texte, re.M)}
 
 trouves, orphelins = [], []
+# Le denominateur qui compte ici n'est PAS le nombre de tests trouves — il peut legitimement
+# valoir zero, ce depot n'en portant aucun. C'est le nombre de fichiers PARCOURUS : sans lui,
+# un garde qui ne balaie plus rien annonce « aucun orphelin » et reste vert.
+fichiers_parcourus = 0
 for base, dirs, fics in os.walk(R):
     dirs[:] = [d for d in dirs if d not in IGNORE and not d.startswith(".")]
     for f in fics:
+        fichiers_parcourus += 1
         rel = os.path.relpath(os.path.join(base, f), R)
         if not MOTIF.search(rel.replace(os.sep, "/")):
             continue
@@ -49,5 +54,11 @@ if orphelins:
     print("   #  <chemin>   <motif de l'exclusion>")
     sys.exit(1)
 
-print(f"anti-bypass : {len(trouves)} fichier(s) de test trouves — "
+if fichiers_parcourus == 0:
+    print("ANTI-BYPASS : 0 fichier parcouru — le balayage ne regarde plus rien, "
+          "son vert ne prouve rien.")
+    sys.exit(1)
+
+print(f"anti-bypass : {fichiers_parcourus} fichier(s) parcouru(s), "
+      f"{len(trouves)} fichier(s) de test trouves — "
       f"{len(trouves) - len(exclus)} branches, {len(exclus)} exclus avec motif. Aucun orphelin.")

@@ -36,6 +36,9 @@ ecarts = []
 
 # ── 1. symboles marqués legacy portant un appelant vivant ────────────────────
 suspects = {}
+# Un garde compte ce qu'il a examine : sans denominateur, « rien trouve » ne se distingue pas
+# de « rien regarde ». Le zero se dit et se justifie.
+fichiers_vus = 0
 for d in POSSEDE:
     for base, _, fics in os.walk(os.path.join(R, d)):
         if any(p.startswith(".") for p in base.split(os.sep) if p):
@@ -46,6 +49,7 @@ for d in POSSEDE:
             p = os.path.join(base, f)
             if os.path.relpath(p, R) in EXCLUS:
                 continue
+            fichiers_vus += 1
             lignes = open(p, encoding="utf-8", errors="replace").read().split("\n")
             for i, l in enumerate(lignes):
                 if not MARQUE.search(l):
@@ -114,10 +118,16 @@ for art, sources in ARTEFACTS:
                       f"(ex. {plus_recents[0]}) — reconstruisez, sinon les gardes mesurent "
                       f"un artefact perime")
 
+if fichiers_vus == 0:
+    print("ANTI-RÉTROCOMPAT : 0 fichier examine dans " + ", ".join(POSSEDE)
+          + " — un garde qui n a rien regarde ne prouve rien.")
+    sys.exit(1)
+
 if ecarts:
-    print(f"ANTI-RÉTROCOMPAT : {len(ecarts)} probleme(s) :")
+    print(f"ANTI-RÉTROCOMPAT : {len(ecarts)} probleme(s) sur {fichiers_vus} fichier(s) examine(s) :")
     for e in ecarts:
         print("   -", e)
     sys.exit(1)
-print("anti-retrocompat : aucun symbole au retrait avec appelant vivant ; "
-      "le binaire natif est plus recent que ses sources.")
+print(f"anti-retrocompat : {fichiers_vus} fichier(s) examine(s) dans {', '.join(POSSEDE)}, "
+      f"{len(suspects)} symbole(s) marque(s) au retrait, aucun avec appelant vivant ; "
+      f"le binaire natif est plus recent que ses sources.")

@@ -11,23 +11,49 @@ bp3 produce -e -gr <grammaire> --seed 1 -se ../test-data/-se.checkAllCsound \
 
 ## La loi
 
-**Le pas vaut l'écart divisé par le nombre de notes situées ENTRE les deux écritures, et la valeur
-écrite est portée par la PREMIÈRE NOTE QUI LA SUIT.**
+**La valeur d'une note vaut la valeur écrite précédente, plus l'écart multiplié par la durée écoulée
+depuis cette écriture, divisée par la durée totale qui sépare les deux écritures. La valeur écrite
+est portée par la PREMIÈRE NOTE QUI LA SUIT.**
 
-Le nombre de notes de la séquence n'entre pas dans le calcul, et le nombre d'intervalles non plus.
-Seules comptent les notes qui séparent les deux écritures.
+Le diviseur **cumule des durées**. Il ne compte pas les notes, ni les intervalles, ni les notes de
+la séquence entière.
 
-## Les quatre dispositions qui séparent les lectures
+## Le témoin qui sépare la durée du rang
 
-Volume, écart de 20 à 120, mode `_volumestep`. Colonne `volume start` de la liste native, et
-contrôleur 7 du fichier MIDI — les deux concordent sur les quatre.
+Deux notes entre les écritures, la prolongation `_` allongeant l'une puis l'autre. Les deux lectures
+prédisent des valeurs différentes, et le binaire tranche.
 
-| grammaire | notes entre les écritures | pas | valeurs |
-| --- | --- | --- | --- |
-| `_volume(20)` 6 notes `_volume(120)` | 6 | 100 ÷ 6 | 20 36 53 70 86 103 |
-| `_volume(20)` 5 notes `_volume(120)` 1 note | 5 | 100 ÷ 5 | 20 40 60 80 100 · **120** |
-| `_volume(20)` 3 notes `_volume(120)` | 3 | 100 ÷ 3 | 20 53 86 |
-| `_volume(20)` 2 notes `_volume(120)` 1 note | 2 | 100 ÷ 2 | 20 70 · **120** |
+| grammaire | durées | valeurs | par le rang | par la durée |
+| --- | --- | --- | --- | --- |
+| `_volume(0)` `C4 _ _` `C4` `_volume(100)` `C4` | 3000 1000 1000 | 0 **75** 100 | 50 | **75** |
+| `_volume(0)` `C4` `C4 _ _` `_volume(100)` `C4` | 1000 3000 1000 | 0 **25** 100 | 50 | **25** |
+| `_volume(0)` `C4 C4 _ _ C4` `_volume(100)` `C4` | 1000 3000 1000 1000 | 0 **20 80** 100 | 33 66 | **20 80** |
+
+Le calcul : durée totale entre les écritures 3+1 = 4, la seconde note commence après 3 → 100 × 3/4
+= 75. Le cas miroir donne 100 × 1/4 = 25. Sur trois notes, total 5, les notes commencent après 1 et
+après 4 → 20 et 80.
+
+**Témoins de contrôle, durées égales** — les mêmes dispositions à notes de durée identique rendent
+`0 50 100` et `0 33 66 100`. Durée cumulée et rang y coïncident : c'est pour cela que quatre
+dispositions à durées égales ne pouvaient pas trancher.
+
+`_vel` rend les mêmes valeurs — 75, 25, 20 et 80.
+
+## Les quatre dispositions à durées égales
+
+Volume, écart de 20 à 120, mode `_volumestep`, toutes les notes de même durée. Colonne
+`volume start` de la liste native, et contrôleur 7 du fichier MIDI — les deux concordent sur les
+quatre.
+
+| grammaire | durée entre les écritures | valeurs |
+| --- | --- | --- |
+| `_volume(20)` 6 notes `_volume(120)` | 6 notes égales | 20 36 53 70 86 103 |
+| `_volume(20)` 5 notes `_volume(120)` 1 note | 5 notes égales | 20 40 60 80 100 · **120** |
+| `_volume(20)` 3 notes `_volume(120)` | 3 notes égales | 20 53 86 |
+| `_volume(20)` 2 notes `_volume(120)` 1 note | 2 notes égales | 20 70 · **120** |
+
+Les notes étant de durée égale, diviser par leur nombre donne ici le même résultat que diviser par
+la durée. Ces quatre cas ne distinguent pas les deux lectures.
 
 Dans les deux dispositions sans note après la seconde écriture, la valeur 120 **n'est jamais
 atteinte**.
@@ -80,6 +106,15 @@ obéissent à la même loi, et **chacun est invisible sur l'axe de l'autre** :
   lit que sur la **vélocité des notes MIDI**.
 
 Une mesure qui lit le mauvais axe voit une valeur immobile et conclut à l'absence d'effet.
+
+**Une note écrite à `_vel(0)` porte une vélocité nulle** : un lecteur qui écarte les vélocités nulles
+— convention du note-off — la compte comme absente alors que le moteur l'a bien émise. Lire les
+`0x90` sans filtrer, ou lire la liste native.
+
+## Écrire des durées inégales
+
+La prolongation `_` allonge la note qui précède, d'une unité par occurrence. Mesuré :
+`C4 C4 _ _ C4` rend des durées de 1000, 3000 et 1000 ms.
 
 ## Deux axes qui ne publient pas ce qu'ils semblent publier
 

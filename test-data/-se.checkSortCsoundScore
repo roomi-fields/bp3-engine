@@ -179,6 +179,12 @@
   "unit": "",
   "boolean": "1"
  },
+ "SplitVariables": {
+  "name": "Split |variables|",
+  "value": "0",
+  "unit": "",
+  "boolean": "1"
+ },
  "DeftBufferSize": {
   "name": "Default buffer size",
   "value": "1002",
@@ -189,6 +195,12 @@
   "name": "Max computation time",
   "value": "3600",
   "unit": "seconds. Time for console's work (0 = no limit) Except in Improvize mode",
+  "boolean": "0"
+ },
+ "Seed": {
+  "name": "Seed for randomization",
+  "value": "0",
+  "unit": "Positive integer, or 0 if cards need to be shuffled",
   "boolean": "0"
  },
  "NoteConvention": {

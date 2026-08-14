@@ -75,14 +75,20 @@ class Flux:
         return v
 
     def ent(self):
-        s = self.brut().strip()
+        # L'ecrivain d'origine suffixe certains entiers d'un « l » de type long : la graine de
+        # -se.check& vaut « 0l ». Sans ce retrait, la valeur ne se parse pas, le champ est ecarte
+        # en silence, et le fichier converti perd un reglage que le moteur d'aujourd'hui lit.
+        # Trouve par la question de Romain sur la conformite, pas par la mesure de production —
+        # les captures forcent --seed en ligne de commande, donc elles etaient stables SANS la
+        # graine : stables pour la mauvaise raison.
+        s = self.brut().strip().rstrip("lL")
         try:
             return int(float(s))
         except ValueError:
             return None
 
     def flottant(self):
-        s = self.brut().strip()
+        s = self.brut().strip().rstrip("lL")
         try:
             return float(s)
         except ValueError:
@@ -154,7 +160,11 @@ def lire(L, iv):
     if jmax is not None and jmax > 26:
         f.ent()                        # p_oms
     v["SplitTimeObjects"] = f.ent()
-    f.ent()                            # SplitVariables, pas de cle JSON
+    # SplitVariables : 121 fichiers du corpus portent cette cle, et le lecteur JSON compare
+    # « Split_|SplitVariables| » (SaveLoads1.c:676) — la cle du corpus n'est donc JAMAIS lue par le
+    # moteur. On l'ecrit pour la conformite de forme au corpus, sans effet sur la production. Le
+    # nom de cle du lecteur appartient a Bernard ; on ne le corrige pas.
+    v["SplitVariables"] = f.ent()
     f.ent()                            # UseTextColor
     k = f.ent()
     v["DeftBufferSize"] = 1000 if (k is None or k < 100) else k     # reference:141
@@ -162,7 +172,12 @@ def lire(L, iv):
     f.ent()                            # UseBufferLimit, force a FALSE
     k = f.ent()
     v["MaxConsoleTime"] = None if k is None else min(k, 3600)       # reference:153
-    f.ent()                            # graine
+    # LA GRAINE EST LUE PAR LE MOTEUR D AUJOURD HUI (SaveLoads1.c:680) et par le lecteur d origine
+    # (reference:156-157, Seed = k % 32768). L'ecarter la perdait — et mes captures ne pouvaient pas
+    # le voir : elles forcent --seed en ligne de commande, donc elles etaient stables pour la
+    # mauvaise raison. Trouve par la question de Romain, pas par ma mesure.
+    k = f.ent()
+    v["Seed"] = None if k is None else (k % 32768)
     f.ent()                            # Token
     v["NoteConvention"] = f.ent()
     f.ent()                            # StartFromOne, pas de cle JSON

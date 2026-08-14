@@ -49,6 +49,28 @@ En fixe : `1200` cinq fois puis `2200`.
 - La colonne **`articul`** de la liste native reste à `0` dans tous les cas, y compris quand la durée
   varie de 500 à 2200 ms. Elle ne publie pas l'articulation appliquée.
 
+## Une valeur posée après la dernière note ne produit rien
+
+```
+gram#1[1] S --> _volume(127) C4 C4 C4 C4 C4 C4 _volume(0)
+```
+
+Le moteur émet **six** événements sonnants, tous à 127. Aucun événement ne porte la valeur finale,
+ni dans la liste native, ni dans le fichier MIDI. Le jeton figure dans la sortie texte.
+
+Les trois fichiers MIDI sont **identiques octet pour octet** :
+
+| grammaire | empreinte du fichier MIDI |
+| --- | --- |
+| `… C4 C4` sans valeur finale | `df85fafd6e3ee227c14d29a6e2f5b1e3` |
+| `… C4 C4 _volume(0)` | `df85fafd6e3ee227c14d29a6e2f5b1e3` |
+| `… C4 C4 _volume(64)` | `df85fafd6e3ee227c14d29a6e2f5b1e3` |
+| `_volume(127) C4 C4 _volume(64) C4 C4 C4 C4` | `4a67116a7c6892c15d9c1865eadd48b6` |
+
+La quatrième ligne est le **témoin de discrimination** : la même forme posée au milieu déplace les
+quatre notes suivantes à 64 et pose un message de contrôleur 7 à l'instant 2000. La mesure pouvait
+donc montrer un effet.
+
 ## Lire le contrôleur 7 sans se tromper
 
 La suite des messages de contrôleur 7 se poursuit après la sixième valeur — `120 118 117 116 115…`

@@ -3,6 +3,24 @@
 **État : proposition à Romain.** L'assiette scellée reste à 91. Le rescellement à 96 a été fait le
 2026-08-14 puis annulé : sceller la référence est le geste de Romain.
 
+## ⛔ La baseline scellée porte une cause qui ne peut plus se produire
+
+`baseline-native/baseline.json` donne, pour chacune des cinq, la raison de sa sortie :
+
+```
+=> Could not parse JSON settings: // Bol Processor version BP2.7.1
+```
+
+Ce message **ne peut plus être obtenu** : les cinq fichiers sont en JSON depuis le 2026-08-14. Un
+lecteur qui chercherait à reproduire cette cause échouerait.
+
+La corriger demande d'écrire dans `baseline.json`, que `GEL.json` empreinte : la correction périme
+le sceau, et refaire le sceau est le geste de Romain. La raison reste donc en place, fausse, et ce
+document est l'endroit où le dire.
+
+**Une exclusion qui survit à sa cause doit dire la nouvelle.** Celle-ci est : l'attente de
+l'arbitrage sur cette proposition.
+
 ## La cause de leur sortie est levée
 
 `check&`, `koto1`, `koto2`, `transposition1`, `tryMIDIfile` sont sorties de l'assiette le 2026-08-12

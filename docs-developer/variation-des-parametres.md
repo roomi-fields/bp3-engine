@@ -4,74 +4,86 @@ Mesure du 2026-08-14 sur `builds/v3.5.1-iso.2/bp3`, empreinte `372dd047bc52fd152
 version affichée `3.5.1 (Aug 11 2026)`, graine 1, réglages `-se.checkAllCsound`, depuis
 `capture-run/`.
 
-Six notes, la valeur écrite sur la première et sur la sixième :
-
-```
-gram#1[1] S --> <mot de mode> _volume(20) C4 C4 C4 C4 C4 _volume(120) C4
-```
-
 ```
 bp3 produce -e -gr <grammaire> --seed 1 -se ../test-data/-se.checkAllCsound \
     -o /dev/null --eventlistout <f> --midiout <f>
 ```
 
-## La règle
+## La loi
 
-La variation se répartit sur les **intervalles entre notes**, et la dernière note **porte la valeur
-écrite**. Six notes de 20 à 120 donnent un pas de 20 — soit 100 ÷ 5.
+**Le pas vaut l'écart divisé par le nombre de notes situées ENTRE les deux écritures, et la valeur
+écrite est portée par la PREMIÈRE NOTE QUI LA SUIT.**
 
-Le mode **fixe** tient la valeur précédente jusqu'à l'écriture suivante, et **applique l'écriture** :
-la sixième note passe à 120. **Sans mot de mode, le comportement est celui du fixe.**
+Le nombre de notes de la séquence n'entre pas dans le calcul, et le nombre d'intervalles non plus.
+Seules comptent les notes qui séparent les deux écritures.
 
-## Les trois paramètres, sur deux axes chacun
+## Les quatre dispositions qui séparent les lectures
 
-| paramètre | mot paliers | valeurs en paliers | valeurs en fixe |
+Volume, écart de 20 à 120, mode `_volumestep`. Colonne `volume start` de la liste native, et
+contrôleur 7 du fichier MIDI — les deux concordent sur les quatre.
+
+| grammaire | notes entre les écritures | pas | valeurs |
 | --- | --- | --- | --- |
-| volume | `_volumestep` | 20 40 60 80 100 120 | 20 20 20 20 20 120 |
-| transposition | `_transposestep` | 0 2 4 6 8 10 | 0 0 0 0 0 10 |
-| articulation | `_articulstep` | 20 40 60 80 100 120 | 20 20 20 20 20 120 |
+| `_volume(20)` 6 notes `_volume(120)` | 6 | 100 ÷ 6 | 20 36 53 70 86 103 |
+| `_volume(20)` 5 notes `_volume(120)` 1 note | 5 | 100 ÷ 5 | 20 40 60 80 100 · **120** |
+| `_volume(20)` 3 notes `_volume(120)` | 3 | 100 ÷ 3 | 20 53 86 |
+| `_volume(20)` 2 notes `_volume(120)` 1 note | 2 | 100 ÷ 2 | 20 70 · **120** |
 
-**Volume** — liste native, colonnes `volume start`/`volume end` : `(20,40) (40,60) (60,80) (80,100)
-(100,120) (120,120)`. Fichier MIDI, contrôleur 7 : `20 40 60 80 100 120`. En fixe : `20` puis `120`.
+Dans les deux dispositions sans note après la seconde écriture, la valeur 120 **n'est jamais
+atteinte**.
 
-**Transposition** — colonne `transpos` : `0 2 4 6 8 10`. Notes MIDI émises : `60 62 64 66 68 70`.
-En fixe : `60 60 60 60 60 70`.
+## Le corollaire : une valeur posée après la dernière note ne produit rien
 
-**Articulation** — elle se lit sur la **durée** de chaque note. Base 1000 ms ; `_legato(50)` donne
-1500 ms, `_staccato(50)` donne 500 ms. En paliers de 20 à 120 : `1200 1400 1600 1800 2000 2200`.
-En fixe : `1200` cinq fois puis `2200`.
-
-## Deux axes qui ne disent rien
-
-- La **vélocité MIDI** reste plate quelle que soit la valeur de volume écrite. Elle porte un champ
-  distinct de l'instance (`MakeSound.c:821`), passé par `ClipVelocity` ; `_volume` n'y entre pas.
-  Le volume s'exprime par le **contrôleur 7**.
-- La colonne **`articul`** de la liste native reste à `0` dans tous les cas, y compris quand la durée
-  varie de 500 à 2200 ms. Elle ne publie pas l'articulation appliquée.
-
-## Une valeur posée après la dernière note ne produit rien
-
-```
-gram#1[1] S --> _volume(127) C4 C4 C4 C4 C4 C4 _volume(0)
-```
-
-Le moteur émet **six** événements sonnants, tous à 127. Aucun événement ne porte la valeur finale,
-ni dans la liste native, ni dans le fichier MIDI. Le jeton figure dans la sortie texte.
+Aucune note ne la suit, donc aucune note ne la porte. Ce n'est pas un fait séparé, c'est la même loi.
 
 Les trois fichiers MIDI sont **identiques octet pour octet** :
 
 | grammaire | empreinte du fichier MIDI |
 | --- | --- |
-| `… C4 C4` sans valeur finale | `df85fafd6e3ee227c14d29a6e2f5b1e3` |
-| `… C4 C4 _volume(0)` | `df85fafd6e3ee227c14d29a6e2f5b1e3` |
-| `… C4 C4 _volume(64)` | `df85fafd6e3ee227c14d29a6e2f5b1e3` |
-| `_volume(127) C4 C4 _volume(64) C4 C4 C4 C4` | `4a67116a7c6892c15d9c1865eadd48b6` |
+| `_volume(127)` 6 notes, sans valeur finale | `df85fafd6e3ee227c14d29a6e2f5b1e3` |
+| `_volume(127)` 6 notes `_volume(0)` | `df85fafd6e3ee227c14d29a6e2f5b1e3` |
+| `_volume(127)` 6 notes `_volume(64)` | `df85fafd6e3ee227c14d29a6e2f5b1e3` |
+| `_volume(127)` 2 notes `_volume(64)` 4 notes | `4a67116a7c6892c15d9c1865eadd48b6` |
 
-La quatrième ligne est le **témoin de discrimination** : la même forme posée au milieu déplace les
-quatre notes suivantes à 64 et pose un message de contrôleur 7 à l'instant 2000. La mesure pouvait
-donc montrer un effet.
+La quatrième ligne est le **témoin de discrimination** : une note suit l'écriture, la valeur est
+portée, et le fichier diffère.
 
-## Lire le contrôleur 7 sans se tromper
+## Le mode fixe, et l'absence de mot de mode
 
-La suite des messages de contrôleur 7 se poursuit après la sixième valeur — `120 118 117 116 115…`
-Ces valeurs appartiennent à l'extinction de la dernière note. Les six premières portent la mesure.
+Le mode **fixe** tient la valeur précédente jusqu'à l'écriture suivante, et **applique l'écriture** :
+la première note qui suit porte la valeur. Sur la disposition à cinq notes puis une :
+`20 20 20 20 20 · 120`.
+
+**Sans mot de mode, le comportement est celui du fixe.**
+
+## Les trois paramètres suivent la même loi
+
+| paramètre | mot paliers | 6 notes avant l'écriture | 5 notes, écriture, 1 note |
+| --- | --- | --- | --- |
+| volume, écart 100 | `_volumestep` | 20 36 53 70 86 103 | 20 40 60 80 100 · 120 |
+| transposition, écart 12 | `_transposestep` | 0 2 4 6 8 10 | 0 2 4 7 9 · 12 |
+| articulation, écart 120 | `_articulstep` | 0 20 40 60 80 100 | 0 24 48 72 96 · 120 |
+
+La transposition se lit à la colonne `transpos` et sur les notes MIDI émises. L'articulation se lit
+sur la **durée** de chaque note : base 1000 ms, `_legato(50)` donne 1500 ms, `_staccato(50)` donne
+500 ms ; les durées de la troisième ligne sont `1000 1200 1400 1600 1800 2000` et
+`1000 1240 1480 1720 1960 2200`.
+
+## Deux mots, deux canaux disjoints
+
+`_vel` écrit la **vélocité** (jeton `T11`), `_volume` écrit le **volume** (jeton `T19`). Les deux
+obéissent à la même loi, et **chacun est invisible sur l'axe de l'autre** :
+
+- `_volume` ne touche pas la vélocité MIDI, qui porte un champ d'instance distinct
+  (`MakeSound.c:821`, passé par `ClipVelocity`). Il sort par le **contrôleur 7**.
+- `_vel` laisse la colonne `volume start` de la liste native à `64` sur toutes les notes. Il ne se
+  lit que sur la **vélocité des notes MIDI**.
+
+Une mesure qui lit le mauvais axe voit une valeur immobile et conclut à l'absence d'effet.
+
+## Deux axes qui ne publient pas ce qu'ils semblent publier
+
+- La colonne **`articul`** de la liste native reste à `0` dans tous les cas, y compris quand la durée
+  varie de 500 à 2200 ms.
+- La suite des messages de contrôleur 7 se poursuit après la dernière valeur — `120 118 117 116 115…`
+  Ces valeurs appartiennent à l'extinction de la dernière note.

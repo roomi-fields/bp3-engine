@@ -459,7 +459,7 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   est inscrite chez lui en KAN-51.
   ⛔ En attente : le chantier ouvert est celui des entrées, et rien ne se pose ici avant.
 
-- **BPE-32** `ouvert` [P2] — UN CLONE FRAIS NE LANCE AUCUN PORTILLON. Priorité posée par
+- **BPE-36** `ouvert` [P2] — UN CLONE FRAIS NE LANCE AUCUN PORTILLON. Priorité posée par
   l'architecte le 2026-08-17 sur la mesure ci-dessous : le défaut est réel et dormant.
   `core.hooksPath` est une configuration locale, jamais versionnée : un clone frais ne porte pas
   ce qui désigne `scripts/githooks`, donc git ne lance rien. Le crochet a été rendu exécutable
@@ -476,7 +476,7 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   sorties identiques au sha256 près sur du contenu non vide, 0 écart, 4 nommées hors preuve. Un
   clone frais rend 0 ligne de `git status`.
 
-- **BPE-33** `ouvert` [P3] — QUARANTE-QUATRE FICHIERS DU CORPUS PORTENT ENCORE DES CR, ET RIEN NE
+- **BPE-37** `fait-a-clore` [P3] — QUARANTE-QUATRE FICHIERS DU CORPUS PORTENT ENCORE DES CR, ET RIEN NE
   LE DIT. `test-data/.gitattributes` ne couvre que `-gr.*` : les autres types passent au vert dans
   un clone frais tout en portant des retours chariot. Mesure du 2026-08-17 sur les blobs : 83
   fichiers de `test-data` en portent, 39 traités, 44 restants — 22 en `-da.`, 8 en `-al.`, 2 en
@@ -486,7 +486,7 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   Le geste est de même forme que celui des grammaires : témoin, normalisation, contre-témoin.
   Élargir la règle sans normaliser rendrait ces 44 sales d'un coup.
 
-- **BPE-34** `ouvert` [P3] — DEUX QUESTIONS NON MESURÉES, LAISSÉES OUVERTES SANS ÊTRE TRAITÉES.
+- **BPE-38** `ouvert` [P3] — DEUX QUESTIONS NON MESURÉES, LAISSÉES OUVERTES SANS ÊTRE TRAITÉES.
   Pourquoi 39 blobs sont restés en CRLF pendant un mois alors que `test-data/.gitattributes` le
   refusait : le garde agit au commit et au checkout des fichiers **touchés**, et ceux-là ne
   l'ont pas été ; le fil n'est pas remonté commit par commit. Et les liens symboliques des cinq
@@ -494,7 +494,9 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   `node_modules`, plus les `node_modules` de kanopi. Le test tient en une ligne — cloner, puis
   `git status` — et se prend chez chacun.
 
-- **BPE-31** `en-attente-arbitrage` [P2] — EN-TÊTE DE GRAMMAIRE CONTRE REGISTRE : la divergence est
+- **BPE-35** `en-attente-arbitrage` [P2] — EN-TÊTE DE GRAMMAIRE CONTRE REGISTRE. ⚠ Même sujet que
+  [[BPE-33]], inscrit par l'architecte : celui-ci porte la directive, celui-là la mesure qui la
+  corrige. Leur fusion est le geste de l'architecte, pas le mien. La divergence est
   de **22** grammaires, pas de 39, et elle va dans le sens inverse de celui qu'on lui prête.
   Le chiffre 39 vient d'un commentaire de `baseline-native/capture.py`. Remesuré le 2026-08-17 :
   13 en-têtes concordent avec le registre, 22 nomment le **même alphabet sous son autre préfixe**

@@ -486,6 +486,21 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   Le geste est de même forme que celui des grammaires : témoin, normalisation, contre-témoin.
   Élargir la règle sans normaliser rendrait ces 44 sales d'un coup.
 
+- **BPE-39** `ouvert` [P2] — RÉCLAMER LA LISTE D'ÉVÉNEMENTS FAIT ÉCRIRE LE MOTEUR DANS
+  `test-data/`. Mesuré le 2026-08-17 par épreuve contrôlée : avec `-so.abc` et `-al.abc`, la même
+  commande ne crée rien sans `--eventlistout` et crée `test-data/abc.json` avec. Le moteur dépose
+  un dump JSON des prototypes **à côté du fichier `-so.` qu'on lui donne**, donc dans le corpus.
+  **Trois résidus sont déjà committés** : `dhati.json`, `tryCsoundObjects.json`, `tryKeyMap.json`
+  — un par `-so.` correspondant, suivis par git, jamais identifiés comme dérivés.
+  **Ce que ça a coûté aujourd'hui** : mes mesures de la journée ont modifié `dhati.json` et créé
+  `abc.json` sans que je m'en aperçoive ; trouvé par un `git status` de contrôle après avoir écrit
+  dans un rapport que le corpus était intact. Restauré, corpus propre.
+  **Qui déclenche** : `scripts/confronter-jetons-liste.py` et `scripts/confronter-amont.py`
+  réclament `--eventlistout`. `baseline-native/capture.py` ne le réclame pas — la référence est
+  indemne, vérifié.
+  Le geste tient en deux parties : faire écrire ces outils dans une copie hors corpus, et décider
+  du sort des trois résidus committés. La seconde touche le corpus et attend Romain.
+
 - **BPE-38** `ouvert` [P3] — DEUX QUESTIONS NON MESURÉES, LAISSÉES OUVERTES SANS ÊTRE TRAITÉES.
   Pourquoi 39 blobs sont restés en CRLF pendant un mois alors que `test-data/.gitattributes` le
   refusait : le garde agit au commit et au checkout des fichiers **touchés**, et ceux-là ne

@@ -4,3 +4,31 @@
 # fichier comme une seule ligne // commentée et ne produit qu'un token 'S' (artefact, pas moteur).
 # Ce garde force la normalisation LF au commit et au checkout.
 -gr.* text eol=lf
+
+# Élargi le 2026-08-17 : la règle ne couvrait que -gr.*, et 44 autres fichiers du corpus
+# portaient des CR sans que rien le signale — ils passaient au vert dans un clone frais tout en
+# étant corrompus. L'un d'eux, annotated.bpse, était en CR SEUL : mesuré, le moteur lisait ses
+# 2183 octets comme UNE SEULE LIGNE, exactement la corruption que la règle de juillet visait.
+-al.* text eol=lf
+-da.* text eol=lf
+-gl.* text eol=lf
+-ho.* text eol=lf
+-in.* text eol=lf
+-kb.* text eol=lf
+-md.* text eol=lf
+-mi.* text eol=lf
+-sc.* text eol=lf
+-se.* text eol=lf
+-so.* text eol=lf
+-to.* text eol=lf
+-wg.* text eol=lf
+*.bpal text eol=lf
+*.bpgr text eol=lf
+*.bpse text eol=lf
+
+# Les binaires du corpus, déclarés APRÈS pour que la dernière règle l'emporte. Leurs octets
+# 0x0D sont des données, pas des fins de ligne : une règle « text » les détruirait.
+# -da.checkPoly.sol n'a pas de CR aujourd'hui et porte un préfixe couvert par -da.* ci-dessus.
+*.mid binary
+*.aiff binary
+-da.checkPoly.sol binary

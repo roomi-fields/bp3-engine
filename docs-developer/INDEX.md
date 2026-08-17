@@ -27,6 +27,11 @@ Les notes de rétro-ingénierie du moteur natif, et les bons de travail qui en d
 - [reglages-declares-contre-retenus.md](reglages-declares-contre-retenus.md) — les couples grammaire
   et réglages dont la déclaration diverge de ce que la mesure retient
 
+## Le corpus
+
+- [jeu-de-grammaires-library.md](jeu-de-grammaires-library.md) — la branche `library`, ses quatre
+  familles, et les trois gestes qui la construisent, la posent et la retirent
+
 ## Propositions en attente de Romain
 
 - [proposition-assiette-96.md](proposition-assiette-96.md) — cinq grammaires peuvent revenir dans

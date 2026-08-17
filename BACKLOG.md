@@ -459,6 +459,22 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   est inscrite chez lui en KAN-51.
   ⛔ En attente : le chantier ouvert est celui des entrées, et rien ne se pose ici avant.
 
+- **BPE-32** `ouvert` [P1] — UN CLONE FRAIS NE LANCE AUCUN PORTILLON, ET SON ARBRE EST SALE.
+  Deux défauts mesurés le 2026-08-17 en éprouvant la pose du jeu `library` depuis un clone frais.
+  **1. `core.hooksPath` n'est pas versionnable.** Le crochet a été rendu exécutable dans l'index
+  hier (`da81eae`), et cette correction est nécessaire sans être suffisante : un clone frais ne
+  porte pas la configuration qui désigne `scripts/githooks`, donc git ne lance rien. La preuve
+  d'hier — « clone frais, crochet exécutable » — montrait un crochet lançable que git n'appelle
+  jamais. Un mécanisme d'installation reste à poser.
+  **2. Quarante fichiers du corpus sont sales dès le `git checkout`.** Un clone frais de `wasm`
+  rend 40 lignes de `git status`, toutes des grammaires de `test-data` que git veut convertir de
+  CRLF en LF ; le dépôt ne porte ni `.gitattributes` ni `core.autocrlf`. Mon disque est propre
+  parce que ces fichiers y ont été écrits avant. **Ce dépôt est consommé par lien symbolique, et
+  Kanopi refuse de démarrer en production quand un dépôt qu'il consomme porte des modifications
+  non enregistrées** : chez un consommateur qui cloner, la condition est fausse d'emblée.
+  Le geste — `.gitattributes` ou normalisation — touche 40 fichiers du corpus et déplacerait des
+  empreintes. Rien ne se pose avant l'arbitrage de Romain.
+
 - **BPE-31** `en-attente-arbitrage` [P2] — EN-TÊTE DE GRAMMAIRE CONTRE REGISTRE : la divergence est
   de **22** grammaires, pas de 39, et elle va dans le sens inverse de celui qu'on lui prête.
   Le chiffre 39 vient d'un commentaire de `baseline-native/capture.py`. Remesuré le 2026-08-17 :

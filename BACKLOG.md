@@ -459,21 +459,40 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   est inscrite chez lui en KAN-51.
   ⛔ En attente : le chantier ouvert est celui des entrées, et rien ne se pose ici avant.
 
-- **BPE-32** `ouvert` [P1] — UN CLONE FRAIS NE LANCE AUCUN PORTILLON, ET SON ARBRE EST SALE.
-  Deux défauts mesurés le 2026-08-17 en éprouvant la pose du jeu `library` depuis un clone frais.
-  **1. `core.hooksPath` n'est pas versionnable.** Le crochet a été rendu exécutable dans l'index
-  hier (`da81eae`), et cette correction est nécessaire sans être suffisante : un clone frais ne
-  porte pas la configuration qui désigne `scripts/githooks`, donc git ne lance rien. La preuve
-  d'hier — « clone frais, crochet exécutable » — montrait un crochet lançable que git n'appelle
-  jamais. Un mécanisme d'installation reste à poser.
-  **2. Quarante fichiers du corpus sont sales dès le `git checkout`.** Un clone frais de `wasm`
-  rend 40 lignes de `git status`, toutes des grammaires de `test-data` que git veut convertir de
-  CRLF en LF ; le dépôt ne porte ni `.gitattributes` ni `core.autocrlf`. Mon disque est propre
-  parce que ces fichiers y ont été écrits avant. **Ce dépôt est consommé par lien symbolique, et
-  Kanopi refuse de démarrer en production quand un dépôt qu'il consomme porte des modifications
-  non enregistrées** : chez un consommateur qui cloner, la condition est fausse d'emblée.
-  Le geste — `.gitattributes` ou normalisation — touche 40 fichiers du corpus et déplacerait des
-  empreintes. Rien ne se pose avant l'arbitrage de Romain.
+- **BPE-32** `ouvert` [P2] — UN CLONE FRAIS NE LANCE AUCUN PORTILLON. Priorité posée par
+  l'architecte le 2026-08-17 sur la mesure ci-dessous : le défaut est réel et dormant.
+  `core.hooksPath` est une configuration locale, jamais versionnée : un clone frais ne porte pas
+  ce qui désigne `scripts/githooks`, donc git ne lance rien. Le crochet a été rendu exécutable
+  dans l'index (`da81eae`) puis les treize scripts avec lui (`1a6349f`) — nécessaire et
+  insuffisant : le crochet est lançable et personne ne l'appelle. Un mécanisme d'installation
+  reste à poser.
+  **Qui est atteint** : personne aujourd'hui. La vérification qui refuse une construction de
+  production est `kanopi/scripts/lib/voisins-lies.mjs`, et elle porte sur les dépôts consommés
+  **par lien symbolique** ; kanopi consomme ce dépôt par copie — 417 fichiers sous
+  `packages/library/test-assets/bp3/commun/`. Le seul clone du dépôt est
+  `~/dev/bp/BPweb/bp3-engine`, sur `06a0de5`, propre. Le défaut mordrait le jour où un
+  consommateur lirait par lien, ce qui est l'objet de [[BPE-30]].
+  **L'arbre sale au checkout est résolu** (`59aebd2`) : 39 grammaires normalisées en LF, 43
+  sorties identiques au sha256 près sur du contenu non vide, 0 écart, 4 nommées hors preuve. Un
+  clone frais rend 0 ligne de `git status`.
+
+- **BPE-33** `ouvert` [P3] — QUARANTE-QUATRE FICHIERS DU CORPUS PORTENT ENCORE DES CR, ET RIEN NE
+  LE DIT. `test-data/.gitattributes` ne couvre que `-gr.*` : les autres types passent au vert dans
+  un clone frais tout en portant des retours chariot. Mesure du 2026-08-17 sur les blobs : 83
+  fichiers de `test-data` en portent, 39 traités, 44 restants — 22 en `-da.`, 8 en `-al.`, 2 en
+  `-sc.`, un chacun en `-so.` `-md.` `-kb.` `-in.` `-gl.`, et sept sans préfixe de type.
+  **L'un est en CR seul** : `test-data/annotated.bpse`, 337 CR, aucun CRLF — exactement la
+  corruption qui a motivé le garde en juillet, sur un autre fichier que celui alors corrigé.
+  Le geste est de même forme que celui des grammaires : témoin, normalisation, contre-témoin.
+  Élargir la règle sans normaliser rendrait ces 44 sales d'un coup.
+
+- **BPE-34** `ouvert` [P3] — DEUX QUESTIONS NON MESURÉES, LAISSÉES OUVERTES SANS ÊTRE TRAITÉES.
+  Pourquoi 39 blobs sont restés en CRLF pendant un mois alors que `test-data/.gitattributes` le
+  refusait : le garde agit au commit et au checkout des fichiers **touchés**, et ceux-là ne
+  l'ont pas été ; le fil n'est pas remonté commit par commit. Et les liens symboliques des cinq
+  autres dépôts de la tour vers celui-ci : le périmètre examiné est `~/dev/bp/*/` hors
+  `node_modules`, plus les `node_modules` de kanopi. Le test tient en une ligne — cloner, puis
+  `git status` — et se prend chez chacun.
 
 - **BPE-31** `en-attente-arbitrage` [P2] — EN-TÊTE DE GRAMMAIRE CONTRE REGISTRE : la divergence est
   de **22** grammaires, pas de 39, et elle va dans le sens inverse de celui qu'on lui prête.

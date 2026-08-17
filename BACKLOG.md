@@ -459,6 +459,25 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   est inscrite chez lui en KAN-51.
   ⛔ En attente : le chantier ouvert est celui des entrées, et rien ne se pose ici avant.
 
+- **BPE-31** `en-attente-arbitrage` [P2] — EN-TÊTE DE GRAMMAIRE CONTRE REGISTRE : la divergence est
+  de **22** grammaires, pas de 39, et elle va dans le sens inverse de celui qu'on lui prête.
+  Le chiffre 39 vient d'un commentaire de `baseline-native/capture.py`. Remesuré le 2026-08-17 :
+  13 en-têtes concordent avec le registre, 22 nomment le **même alphabet sous son autre préfixe**
+  (`-ho.Ruwet` contre `-al.Ruwet` — le corpus passe les deux sous le drapeau `-al` et les deux se
+  chargent), et 22 divergent réellement.
+  **Le sens de la divergence** : sur les 18 écarts d'alphabet parmi ces 22, aucun n'est « le
+  registre retient un autre alphabet ». L'en-tête n'en cite **aucun**, et c'est le registre qui en
+  retient un — couples établis par mesure là où l'en-tête est muette, arbitrés par Romain le
+  2026-08-11. Une seule va dans l'autre sens, `-gr.checkrests`, dont l'en-tête cite `-ho.notes`,
+  fichier **absent du disque** ; trois autres auxiliaires cités en en-tête sont absents de même
+  (`-md.VisserShapes.bpmd`, `-se.checkVolChan`, `-se.tryConsoleMaxTime`).
+  **Ce que le retrait coûterait** : les 22 sont toutes inscrites à la baseline, dont 19
+  productibles ; aucune ne figure dans `test-data/iso100`. De 113 entrées et 98 productibles, on
+  passerait à 91 et 79.
+  ⛔ La baseline est scellée. Romain a tranché le **principe** d'un retrait sur la prémisse
+  « couples douteux » ; la mesure dit que ce sont les couples arbitrés. Rien ne se pose, rien ne
+  se mesure, en attente de son mot sur pièce.
+
 - **BPE-29** `en-attente-arbitrage` [P2] — ANCRE DE HAUTEUR : le natif ENCODE la note décalée, la
   tour la recompense à la main. `C4key` s'applique à l'**encodage** (`Encode.c:674` et `:865`), donc
   avant que la moindre sortie ne voie la note : les quatre axes du moteur — jetons, liste
@@ -494,3 +513,6 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   (ni drapeaux, ni alphabet, ni motif de temps) : c'est la PROFONDEUR d'imbrication seule.
   Lien BPE-15 : tryTranspose ne l'exposait qu'une fois rendue compilable (sa recursion garde-forcee
   atteint ~40 niveaux). `_stepOn`/... sans rapport. Statut : `remonte a Bernard`.
+- **BPE-31** `ouvert` [P3] — COURRIER A BERNARD, en francais — reecrit, attend la relecture de Romain avant envoi. Son point 2b n a plus d objet : la liste d evenements vide est notre defaut, pas le sien.
+- **BPE-32** `ouvert` [P4] — DEUX DEMANDES DE L ARCHITECTE DU 2026-08-14, non faites et hors chantier : la section de contrat sur test-data/ (mesure faite — qui lit quoi et par quelle porte — mais la section n est pas ecrite) et la lecture des trente-et-une directives de mesure avec avis sur celles tirees de ses propres mesures.
+- **BPE-33** `ouvert` — EXCLURE DE LA BASELINE ISO-100 LES 39 GRAMMAIRES DONT L EN-TETE DIVERGE DU REGISTRE. Principe tranche par Romain le 2026-08-16 ; la frappe attend son mot pour le geste precis, la baseline etant scellee. MESURE ETABLIE le 2026-08-16 : l en-tete d une grammaire N EST PAS l autorite sur son alphabet — le moteur saute cette ligne, et elle designe un AUTRE auxiliaire que celui retenu pour 39 des 113 grammaires du registre. Ce n est pas marginal, c est un tiers. Et ce n est pas theorique : -ho.Ruwet est REFUSE au chargement (« Can t compile alphabet ») la ou -al.Ruwet charge — suivre l en-tete de ruwet casserait la scene. L AUTORITE EST test-data/REGISTRE.json, arbitre par Romain le 2026-08-11. AVANT TOUTE FRAPPE, trois chiffres a rendre : lesquelles sont les 39 nommees, combien d entre elles sont AUJOURD HUI dans la baseline, et ce que leur retrait change — le compte avant et apres, et si des mesures publiees s appuient dessus. ⛔ LA BASELINE NE BOUGE QU AVEC L ACCORD DE ROMAIN POUR LE GESTE PRECIS. HORS DU CHANTIER LIBRAIRIES/LANGAGE — sorti du scope le 2026-08-17.

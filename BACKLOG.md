@@ -501,6 +501,22 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   Le geste tient en deux parties : faire écrire ces outils dans une copie hors corpus, et décider
   du sort des trois résidus committés. La seconde touche le corpus et attend Romain.
 
+- **BPE-43** `ouvert` [P2] — L'INDEX SERT DEUX CAPTURES DE RÉFÉRENCE QUI N'EXISTENT PLUS, ET LE
+  RETRAIT EST EN FILE SANS SERVEUR. Mesuré le 2026-08-18, sur demande de recensement de l'architecte.
+  535 documents indexés, **159 n'existent plus sur le disque — 29,7 %**. Deux instruments
+  concordants : l'énumération `rtfm files` confrontée au disque, et `git ls-files`.
+  **Répartition** : 156 sont des résidus dans trois répertoires de capture que git n'a jamais suivis,
+  dont deux ont disparu et un est vide. Les 2 derniers vivent dans `baseline-native/captures`, le
+  répertoire de référence, mêlés à 158 vivants : `check_.text.txt` et `tryMIDIfile.text.txt`, dont
+  les jumeaux `.tokens.json` existent.
+  **Le coût, constaté** : sur la requête « tryMIDIfile capture texte », le fantôme sort premier,
+  score 17,90, devant six vivants. L'axe texte de l'oracle est celui qui ment.
+  **La cause** : `rtfm queue stats` rend `remove done=939 pending=114`. Le retrait existe et a tourné
+  939 fois ; 114 attendent. L'ouvrier mutualisé sert 20 dépôts sur 12 places et ne sert pas celui-ci ;
+  deux relevés espacés ne montrent aucun drainage. La reprise de cet ouvrier sort de ce dépôt.
+  **Une ligne d'énumération porte `(? bytes)`** — l'index ne parvient plus à mesurer ce fichier. Un
+  premier motif de lecture l'a écartée en silence, l'écart n'apparaissant qu'en comparant à l'en-tête.
+
 - **BPE-42** `ouvert` [P2] — UN BINAIRE QUI N'EST PAS L'ORACLE PORTE LE NOM DE L'ORACLE, DANS UN
   ARBRE DE TRAVAIL DÉTACHÉ. Trouvé le 2026-08-18, en répondant à un recensement d'arbres de travail
   demandé par l'architecte.

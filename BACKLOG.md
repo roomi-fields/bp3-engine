@@ -501,6 +501,19 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   Le geste tient en deux parties : faire écrire ces outils dans une copie hors corpus, et décider
   du sort des trois résidus committés. La seconde touche le corpus et attend Romain.
 
+- **BPE-41** `en-attente` [P2] — CE QUE J'ATTENDS, ET DE QUI. État au 2026-08-18, avant compaction.
+  **De Romain** : le sort des 22 grammaires dont l'en-tête diverge du registre ([[BPE-35]] — le
+  principe est tranché, la mesure le contredit, la frappe attend son mot) · l'ancre de hauteur
+  ([[BPE-29]]) · l'envoi à Bernard Bel de trois défauts moteur mesurés — la valeur non initialisée
+  que rend un `#` après une minuscule, le compilateur d'alphabet qui avale ses marqueurs de
+  section, et le brouillon de `courrier-bernard-brouillon.md` qui attend sa relecture.
+  **De l'architecte** : la fermeture de la fenêtre BPScript, qu'il annonce · le routage de ce que
+  je lui ai rendu les 16, 17 et 18 et qu'il n'avait pas encore porté.
+  **De kanopi** : rien — sa resynchronisation est chez lui en KAN-51, et [[BPE-30]] en dépend.
+  **De bpscript** : un signal si `dist/bp3.js` ou `test/FEEDBACK_BERNARD.md` apparaissent, changent
+  de nom ou de chemin ([[BPE-40]]).
+  Rien de ma part n'est en cours : aucun chantier ouvert, aucun geste suspendu à mi-course.
+
 - **BPE-40** `ouvert` [P3] — `build.sh` LIT DEUX CHEMINS QUI N'EXISTENT PLUS, ET L'UN ÉCRIT ZÉRO
   SANS LE DIRE. Mesuré le 2026-08-18, après un signalement de bpscript confronté à ma propre mesure.
   `build.sh:24` définit `BPSCRIPT_DIST="$BPSCRIPT_DIR/dist"` et `:99` vérifie l'existence de

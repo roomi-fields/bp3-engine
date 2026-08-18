@@ -27,8 +27,15 @@ Les notes de rétro-ingénierie du moteur natif, et les bons de travail qui en d
 - [reglages-declares-contre-retenus.md](reglages-declares-contre-retenus.md) — les couples grammaire
   et réglages dont la déclaration diverge de ce que la mesure retient
 
+## Le portillon
+
+- [etat-du-portillon.md](etat-du-portillon.md) — les dix-sept maillons, ce qui atteste qu'un garde
+  mord, et le temps de chacun
+
 ## Le corpus
 
+- [comment-un-nom-se-lit.md](comment-un-nom-se-lit.md) — la casse, la segmentation, les alphabets,
+  les conventions de note, et les caractères qui ne sont pas des lettres
 - [jeu-de-grammaires-library.md](jeu-de-grammaires-library.md) — la branche `library`, ses quatre
   familles, et les trois gestes qui la construisent, la posent et la retirent
 

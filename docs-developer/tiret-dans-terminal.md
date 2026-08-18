@@ -95,3 +95,50 @@ transcription ni d'une règle de lexeur fixe : un run dont aucun préfixe n'est 
 n'intersecte pas la table car le natif ne le compare jamais entier — il le compare **segment par
 segment**. Une écriture bols **séparés** est ce que le natif produit ; une écriture d'un seul
 tenant décrit la même chose *à condition que le lecteur segmente comme le fait le moteur*.
+
+## 6. Dans un nom de VARIABLE, le tiret est une lettre — c'est la casse qui décide
+
+Mesuré le 2026-08-18 sur le binaire natif figé (md5 `372dd047bc52fd152ff51ec6715fae74`),
+alphabet `-al.dhin--`, cas fabriqués, contre-épreuve sans tiret à chaque ligne.
+
+Les sections 1 à 5 portent sur les terminaux, écrits en minuscules. Un nom qui commence par une
+**majuscule** suit la règle inverse : le tiret y est un caractère du nom.
+
+| écrit | rendu | lecture |
+| --- | --- | --- |
+| `A8-2` | `A8-2` | un seul nom |
+| `A-8-2` | `A-8-2` | un seul nom |
+| `X-N` | `X-N` | un seul nom |
+| `A'8-2` | `A'8-2` | un seul nom, apostrophe comprise |
+| `do4-` | `do4 - ` | le nom, puis un silence |
+
+La déclaration n'y change rien : `A-8-2` déclaré par une règle et `A-8-2` employé sans règle sont
+lus pareil, l'un remplacé, l'autre traversant intact. La position non plus.
+
+**Le nom à majuscule est atomique.** Une règle qui vise `A-8` ne mord pas sur `A-8-2` ; une règle
+qui vise `A` non plus. Le moteur ne le voit pas comme un assemblage.
+
+### L'écart se lit sur le temps, pas sur le texte
+
+| écrit | objets sonores placés |
+| --- | --- |
+| `dha dha` | dha à 0, dha à 4000 |
+| `dha - dha` | dha à 0, dha à 8000 |
+| `dha A-2 dha`, `A-2` déclaré | dha à 0, ta à 4000, dha à 8000 |
+| `dha A-2 dha`, non déclaré | dha à 0, `A-2` à 4000, dha à 8000 |
+| `dha A2 dha`, sans tiret | dha à 0, ta à 4000, dha à 8000 |
+| `dha A - 2 dha`, espacé | dha à 0, A à 4000, dha à **20000** |
+
+Le nom collé prend une unité ; le même endroit espacé en prend cinq. Une unité vaut 4000 tics.
+
+Un **chiffre isolé** prolonge d'autant d'unités qu'il vaut : `dha 2 dha` place le second dha à
+12000, `dha 3 dha` à 16000. D'où les cinq unités de `A - 2` : 1 + 1 + 2, après le premier `dha`.
+
+### Les autres caractères suivent le même partage
+
+Après une majuscule, font partie du nom : `'` `-` `#` `"` et les chiffres. Sont détachés : `_`
+`.` `+` `*`. Après une minuscule, aucun ne fait partie du nom, sauf déclaration explicite dans
+l'alphabet — `-al.checkhomo` déclare `a'` et `a"` comme trois termes distincts de `a`.
+
+`dha#` ne refuse pas : il produit une valeur numérique différente à chaque exécution, à graine
+identique — mémoire non initialisée, le `???` venant du moteur.

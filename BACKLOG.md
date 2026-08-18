@@ -476,7 +476,7 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   sorties identiques au sha256 près sur du contenu non vide, 0 écart, 4 nommées hors preuve. Un
   clone frais rend 0 ligne de `git status`.
 
-- **BPE-37** `fait-a-clore` [P3] — QUARANTE-QUATRE FICHIERS DU CORPUS PORTENT ENCORE DES CR, ET RIEN NE
+- **BPE-37** `fait` [P3] — QUARANTE-QUATRE FICHIERS DU CORPUS PORTENT ENCORE DES CR, ET RIEN NE  _(fait: Traite par bp3-engine, rendu le 2026-08-18. Clos par l architecte.)_
   LE DIT. `test-data/.gitattributes` ne couvre que `-gr.*` : les autres types passent au vert dans
   un clone frais tout en portant des retours chariot. Mesure du 2026-08-17 sur les blobs : 83
   fichiers de `test-data` en portent, 39 traités, 44 restants — 22 en `-da.`, 8 en `-al.`, 2 en
@@ -500,6 +500,25 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   indemne, vérifié.
   Le geste tient en deux parties : faire écrire ces outils dans une copie hors corpus, et décider
   du sort des trois résidus committés. La seconde touche le corpus et attend Romain.
+
+- **BPE-42** `ouvert` [P2] — UN BINAIRE QUI N'EST PAS L'ORACLE PORTE LE NOM DE L'ORACLE, DANS UN
+  ARBRE DE TRAVAIL DÉTACHÉ. Trouvé le 2026-08-18, en répondant à un recensement d'arbres de travail
+  demandé par l'architecte.
+  `git worktree list` en rend deux : l'arbre principal, et un arbre détaché sur le tag amont
+  `v3.5.1`, hors de la racine du dépôt. Ce second arbre n'est pas propre — `Makefile` modifié de
+  100 insertions et 73 suppressions, et un binaire `bp3` construit sur place.
+  **L'écart** : ce binaire porte l'empreinte `06244c55d11bd9496c6e7187afea2787`, quand l'oracle figé
+  `builds/v3.5.1-iso.2/bp3` porte `372dd047bc52fd152ff51ec6715fae74`. Toute mesure de référence se
+  prend sur le binaire figé ; celui-ci est le binaire reconstruit que la règle écarte, sous le même
+  nom et dans un dossier appelé « amont ».
+  **Portée mesurée** : aucune mesure publiée n'est touchée — `baseline-native/capture.py` désigne le
+  chemin figé, vérifié. Le piège est armé, jamais mordu.
+  **Ce qui protège l'index** : les deux requêtes de contrôle rendent 30 sources, toutes sous la
+  racine du dépôt, zéro ailleurs — l'arbre détaché vit dans un répertoire temporaire que l'indexeur
+  ne parcourt pas. Cette immunité tient à l'emplacement, pas à une garde : un arbre de travail posé
+  dans le dépôt serait indexé.
+  Le détachement attend la méthode d'identification des commits déjà repris, que l'architecte
+  annonce. Le commit est retenu par `refs/tags/v3.5.1` et `refs/remotes/upstream/graphics-for-BP3`.
 
 - **BPE-41** `en-attente` [P2] — CE QUE J'ATTENDS, ET DE QUI. État au 2026-08-18, avant compaction.
   **De Romain** : le sort des 22 grammaires dont l'en-tête diverge du registre ([[BPE-35]] — le

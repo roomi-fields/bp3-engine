@@ -516,6 +516,15 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   deux relevés espacés ne montrent aucun drainage. La reprise de cet ouvrier sort de ce dépôt.
   **Une ligne d'énumération porte `(? bytes)`** — l'index ne parvient plus à mesurer ce fichier. Un
   premier motif de lecture l'a écartée en silence, l'écart n'apparaissant qu'en comparant à l'en-tête.
+  **L'autre moitié, mesurée le même soir** : 385 fichiers vivants, versionnés et indexables, dont
+  **14 absents de l'index — 3,6 %**. Onze attendent en file, aucun n'a échoué, et trois n'ont jamais
+  été réclamés : `source/BP3/.vscode/{tasks,settings,c_cpp_properties}.json`, suivis par git et
+  qu'aucun filtre d'exclusion ne réclame — le parcours ne descend pas dans les répertoires cachés.
+  ⛔ **Les deux comptes se croisent sur deux noms** : `check_` et `tryMIDIfile` ont leur capture
+  texte indexée et morte, et leur capture jetons vivante et absente. Pour ces deux-là l'index porte
+  exactement la moitié fausse. Ni le compte des morts ni celui des absents ne le montrait seul.
+  Sont également en file les deux documents écrits le 2026-08-18 pour rendre les mesures trouvables,
+  `comment-un-nom-se-lit.md` et `etat-du-portillon.md`.
 
 - **BPE-42** `ouvert` [P2] — UN BINAIRE QUI N'EST PAS L'ORACLE PORTE LE NOM DE L'ORACLE, DANS UN
   ARBRE DE TRAVAIL DÉTACHÉ. Trouvé le 2026-08-18, en répondant à un recensement d'arbres de travail

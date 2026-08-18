@@ -525,6 +525,15 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   exactement la moitié fausse. Ni le compte des morts ni celui des absents ne le montrait seul.
   Sont également en file les deux documents écrits le 2026-08-18 pour rendre les mesures trouvables,
   `comment-un-nom-se-lit.md` et `etat-du-portillon.md`.
+  ⛔ **45 des 159 morts ne sont inscrits nulle part** — ni en file, ni tombés. Un bloc contigu de
+  `baseline-native/captures.en-cours`, de `765432` à `cloches1`. L'inscription des retraits s'arrête
+  en cours de route ; `pending=114` porte 71 % du travail et tait le reste. Une réconciliation
+  terminée en laissera donc 45. Contrôle inverse : aucun retrait en file ne porte sur un vivant.
+  **La réconciliation est sûre ici** : 376 vivants indexés, zéro illisible, zéro résolu hors de la
+  racine, zéro lien symbolique suivi. Mesuré après avoir lancé le `gc`, non avant.
+  **Nature des morts** : 159 captures, artefacts régénérables ; zéro document rédigé. Ce qui rend
+  `check_` et `tryMIDIfile` nuisibles est leur emplacement — le répertoire de référence scellé, au
+  milieu de 163 captures versionnées qui font autorité — et non leur nature ni leur versionnage.
 
 - **BPE-42** `ouvert` [P2] — UN BINAIRE QUI N'EST PAS L'ORACLE PORTE LE NOM DE L'ORACLE, DANS UN
   ARBRE DE TRAVAIL DÉTACHÉ. Trouvé le 2026-08-18, en répondant à un recensement d'arbres de travail

@@ -501,6 +501,20 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   Le geste tient en deux parties : faire écrire ces outils dans une copie hors corpus, et décider
   du sort des trois résidus committés. La seconde touche le corpus et attend Romain.
 
+- **BPE-40** `ouvert` [P3] — `build.sh` LIT DEUX CHEMINS QUI N'EXISTENT PLUS, ET L'UN ÉCRIT ZÉRO
+  SANS LE DIRE. Mesuré le 2026-08-18, après un signalement de bpscript confronté à ma propre mesure.
+  `build.sh:24` définit `BPSCRIPT_DIST="$BPSCRIPT_DIR/dist"` et `:99` vérifie l'existence de
+  `dist/bp3.js`. **Le répertoire `dist/` n'existe pas chez bpscript** : `--status` affiche donc
+  « missing » en permanence, et non quand un paquet n'est pas construit. Aucun `cp` ne déploie vers
+  ce chemin — la vérification survit à un déploiement retiré lors de la migration du 2026-06-14,
+  dont le commentaire de `:22` porte encore la trace.
+  `build.sh:265` lit `test/FEEDBACK_BERNARD.md` pour compter ses points et les inscrire à la fiche
+  d'un binaire archivé (`:291`). **Le fichier n'existe pas non plus** ; le `|| echo 0` fait que
+  `feedback_count` vaut zéro en silence. Une fiche d'archive porterait donc « 0 points » sans
+  qu'aucun message ne dise que la source est absente. Aucune fiche existante ne porte la mention.
+  **Ce que ça vaut** : deux lectures vers un voisin qui ne désignent rien. La première est
+  cosmétique, la seconde écrit une donnée fausse dans une fiche d'archive.
+
 - **BPE-38** `ouvert` [P3] — DEUX QUESTIONS NON MESURÉES, LAISSÉES OUVERTES SANS ÊTRE TRAITÉES.
   Pourquoi 39 blobs sont restés en CRLF pendant un mois alors que `test-data/.gitattributes` le
   refusait : le garde agit au commit et au checkout des fichiers **touchés**, et ceux-là ne

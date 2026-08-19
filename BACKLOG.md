@@ -501,6 +501,20 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   Le geste tient en deux parties : faire écrire ces outils dans une copie hors corpus, et décider
   du sort des trois résidus committés. La seconde touche le corpus et attend Romain.
 
+- **BPE-44** `ouvert` [P3] — LE GARDE ANTI-RÉTROCOMPATIBILITÉ ROUGIT SUR UNE MENTION DESCRIPTIVE.
+  Mesuré par injection le 2026-08-19, après une décision de méthode de l'architecte sur le périmètre
+  des gardes de forme.
+  `scripts/gate-legacy.py:32` cherche les mots `deprecated|legacy|obsolete|voué au retrait` sur une
+  ligne quelconque, et marque tout symbole déclaré dans les deux lignes suivantes. Un commentaire qui
+  dit qu'une fonction **n'est pas** vouée au retrait suffit donc à la marquer.
+  **La morsure, prouvée** : une sonde portant `# Cette fonction n'est pas deprecated` deux lignes
+  au-dessus d'une déclaration et un appelant vivant fait sortir le garde en code 1, sur 32 fichiers
+  examinés. Sonde retirée, garde revenu vert sur 31 fichiers.
+  **Le geste** : discriminer sur la graphie qui porte la décision plutôt que sur le mot en prose —
+  une convention de marquage reste à choisir, et ce choix est un arbitrage.
+  Ce que le garde tient déjà : le périmètre exclut `source/BP3/`, nommément et pour une cause écrite,
+  et il compte ce qu'il a examiné plutôt que d'accepter zéro.
+
 - **BPE-43** `ouvert` [P2] — L'INDEX SERT DEUX CAPTURES DE RÉFÉRENCE QUI N'EXISTENT PLUS, ET LE
   RETRAIT EST EN FILE SANS SERVEUR. Mesuré le 2026-08-18, sur demande de recensement de l'architecte.
   535 documents indexés, **159 n'existent plus sur le disque — 29,7 %**. Deux instruments

@@ -524,6 +524,10 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   pas son travail. Le défaut est dans ce que le dépôt annonce, non dans leur lecture.
   **Bloqué** : basculer la branche par défaut change ce que le dépôt présente comme lui-même, et
   l'articulation entre le miroir amont et la branche vivante appartient à Romain.
+  **La portée est locale à ce dépôt** : atlas mesure le 2026-08-19 que quatre dépôts de la tour ne
+  posent aucune branche par défaut. Une résolution par ce moyen reste donc muette chez un quart de la
+  tour même après cette correction, et la branche de référence se déclare au contrat partagé. Aucun
+  voisin n'attend cet item : atlas déclare `origin/wasm` pour ce dépôt, avec sa cause.
 
 - **BPE-45** `ouvert` [P3] — TROIS FICHIERS DE CORPUS GISENT HORS DU DÉPÔT, SORTIS DE LA RACINE.
   Constaté le 2026-08-19 à 11h15, à l'arrêt général demandé par l'architecte.

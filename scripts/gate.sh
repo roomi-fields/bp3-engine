@@ -26,6 +26,10 @@ lancer() { # lancer <nom> <delai> <commande...>
     [ $c -eq 124 ] && echo "DÉPASSE $d s" || echo "ROUGE (sortie $c)"
     ROUGE=$((ROUGE+1))
   fi
+  # ⛔ LA MENTION DE RÉGIME REMONTE, VERT COMME ROUGE. Le portillon retient la sortie de
+  # chaque maillon dans un journal ; une mention qui y reste ne qualifie rien, puisque
+  # personne ne lit le journal quand tout est vert. Elle s'affiche sous son maillon.
+  grep -h '^\[regime\]' "/tmp/gate.$n.log" 2>/dev/null | sed 's/^/    /' || true
 }
 
 if [ "$VOIE" = rapide ] || [ "$VOIE" = tout ]; then

@@ -541,6 +541,14 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   **La réparation n'est pas un geste de ce dépôt** : l'ordonnanceur mutualisé place le balayage
   au-dessus du retrait, chaque créneau part au balayage, et le balayage réinscrit. La priorité de la
   tour dans cet ordonnanceur appartient à Romain.
+  ⛔ **Le coût des morts dépendait de l'instance interrogée, mesuré le 2026-08-19.** Une déclaration
+  d'index propre au dépôt, jamais enregistrée, doublait le module global. Sur `tryMIDIfile capture
+  texte`, l'instance du dépôt rendait le mort en tête avec le score 17,90 ; le module n'en rend
+  aucun — même base, le module écarte à la lecture les chemins qu'il ne résout pas. Le discriminant :
+  un document absent de la base manque des deux côtés. La déclaration du dépôt est retirée par
+  `claude mcp remove rtfm -s project`, et le module sert l'index, vérifié sur trois requêtes.
+  **Les morts sont donc masqués, les absents intacts** : aucune instance ne rend ce qui n'est pas
+  indexé.
 
 - **BPE-42** `ouvert` [P2] — UN BINAIRE QUI N'EST PAS L'ORACLE PORTE LE NOM DE L'ORACLE, DANS UN
   ARBRE DE TRAVAIL DÉTACHÉ. Trouvé le 2026-08-18, en répondant à un recensement d'arbres de travail

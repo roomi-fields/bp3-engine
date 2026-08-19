@@ -29,6 +29,16 @@ POSSEDE = ["scripts", "baseline-native"]
 # Exclu NOMMEMENT : ce script porte le leurre en clair pour prouver la morsure du garde.
 # Le scanner sans l'exclure, c'est se mordre soi-meme et rendre la preuve impossible.
 EXCLUS = {"scripts/gate-legacy-injection.sh", "scripts/gate-legacy.py"}
+# Une exemption qui ne designe plus un fichier suivi ouvre un TROU AU NOM DE PERSONNE :
+# le chemin est renomme, l'exemption survit, et plus rien ne dit ce qu'elle couvrait.
+# Elle doit faire ECHOUER le garde, jamais l'avertir — un garde qui continue avec une
+# exemption morte garde un trou qu'aucune relecture ne retrouve.
+for _ex in sorted(EXCLUS):
+    if subprocess.run(["git", "-C", R, "ls-files", "--error-unmatch", _ex],
+                      capture_output=True).returncode != 0:
+        print(f"ANTI-RÉTROCOMPAT : l'exemption « {_ex} » ne designe plus un fichier suivi — "
+              f"corrigez la liste, une exemption morte est un trou au nom de personne.")
+        sys.exit(1)
 MARQUE = re.compile(r"\b(deprecated|legacy|obsolete|voué au retrait|voue au retrait)\b", re.I)
 # un symbole déclaré sur la même ligne ou la suivante qu'un marqueur
 DECL = re.compile(r"\b(?:int|void|char|long|double|float|def|function|const)\s+\**(\w+)\s*\(")

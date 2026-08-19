@@ -512,6 +512,11 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   examinés. Sonde retirée, garde revenu vert sur 31 fichiers.
   **Le geste** : discriminer sur la graphie qui porte la décision plutôt que sur le mot en prose —
   une convention de marquage reste à choisir, et ce choix est un arbitrage.
+  **Ce que la borne du motif coûte, mesuré le 2026-08-19 sur les primitives natives** : `_map` sort
+  à 12 fichiers sans borne, 0 avec une borne exigeant la parenthèse, 2 avec une borne de mot ; `_sub`
+  sort à 19 puis 0, ses occurrences étant toutes `_subgram` et `_subtable`. Une borne trop lâche
+  compte des sous-chaînes, une borne trop stricte efface les primitives sans argument. Le compte juste
+  se prend sur une borne de mot, et se vérifie en ouvrant les occurrences.
   Ce que le garde tient déjà : le périmètre exclut `source/BP3/`, nommément et pour une cause écrite,
   et il compte ce qu'il a examiné plutôt que d'accepter zéro.
 

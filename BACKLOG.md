@@ -501,6 +501,17 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   Le geste tient en deux parties : faire écrire ces outils dans une copie hors corpus, et décider
   du sort des trois résidus committés. La seconde touche le corpus et attend Romain.
 
+- **BPE-47** `fait-a-clore` [P1] — UNE POUSSÉE NUE VISAIT LE DÉPÔT DE BERNARD BEL. Mesuré et corrigé
+  le 2026-08-19, en confrontant une clame de l'architecte sur le régime de ce dépôt.
+  `branch.wasm.remote` valait `upstream` et `branch.wasm.merge` valait `refs/heads/graphics-for-BP3` :
+  un `git push` sans argument visait `bolprocessor/bolprocessor`, le dépôt du mainteneur externe.
+  Seul un garde-fou de nommage l'arrêtait, et son message parlait de configuration, jamais de
+  destination.
+  **Ce que ça a déjà coûté** : une poussée nue de ce jour a échoué en silence, et le code de sortie lu
+  était celui du filtre — la synchronisation a été annoncée avant d'être vraie, puis corrigée.
+  `wasm` suit désormais `origin/wasm`. L'écart avec l'amont reste lisible par
+  `git rev-list --left-right --count upstream/graphics-for-BP3...wasm`, qui rend 42 et 221.
+
 - **BPE-46** `bloqué` [P1] — LA BRANCHE PAR DÉFAUT PUBLIÉE EST LE MIROIR DE L'AMONT, PAS LA BRANCHE
   VIVANTE. Mesuré le 2026-08-19, sur un signalement d'atlas confronté à mon état réel.
   `gh repo view --json defaultBranchRef` rend `master`, et `origin/master` vaut `e31c3a7` — le

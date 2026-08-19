@@ -534,6 +534,13 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   **Nature des morts** : 159 captures, artefacts régénérables ; zéro document rédigé. Ce qui rend
   `check_` et `tryMIDIfile` nuisibles est leur emplacement — le répertoire de référence scellé, au
   milieu de 163 captures versionnées qui font autorité — et non leur nature ni leur versionnage.
+  **Nature des absents**, le chiffre à citer plutôt que le brut : 5 captures régénérables se refont
+  par une commande, **9 sont réels** — trois skills dont `bpscript-oracle`, l'autorité sur la forme
+  du langage, absente de l'instrument censé la trouver ; deux documents de `docs-developer/` ; un
+  script ; trois configurations d'éditeur.
+  **La réparation n'est pas un geste de ce dépôt** : l'ordonnanceur mutualisé place le balayage
+  au-dessus du retrait, chaque créneau part au balayage, et le balayage réinscrit. La priorité de la
+  tour dans cet ordonnanceur appartient à Romain.
 
 - **BPE-42** `ouvert` [P2] — UN BINAIRE QUI N'EST PAS L'ORACLE PORTE LE NOM DE L'ORACLE, DANS UN
   ARBRE DE TRAVAIL DÉTACHÉ. Trouvé le 2026-08-18, en répondant à un recensement d'arbres de travail

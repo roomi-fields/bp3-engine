@@ -501,6 +501,19 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   Le geste tient en deux parties : faire écrire ces outils dans une copie hors corpus, et décider
   du sort des trois résidus committés. La seconde touche le corpus et attend Romain.
 
+- **BPE-46** `bloqué` [P1] — LA BRANCHE PAR DÉFAUT PUBLIÉE EST LE MIROIR DE L'AMONT, PAS LA BRANCHE
+  VIVANTE. Mesuré le 2026-08-19, sur un signalement d'atlas confronté à mon état réel.
+  `gh repo view --json defaultBranchRef` rend `master`, et `origin/master` vaut `e31c3a7` — le
+  dernier commit de Bernard Bel, daté du 2025-01-28, identique à `upstream/master`. **Un clone de ce
+  dépôt rend donc un arbre de janvier 2025, sans aucun des 696 commits de `wasm`.**
+  **Ce qui n'est pas en cause** : `wasm` est publiée et à jour, zéro commit local en attente, et les
+  fichiers que la carte d'autorités désigne y sont tous présents. La pureté de `master` est la règle
+  — c'est contre lui que se confronte chaque montée de version amont.
+  **Ce qui l'est** : tout voisin qui résout `origin/HEAD` lit le miroir et conclut que ce dépôt n'a
+  pas son travail. Le défaut est dans ce que le dépôt annonce, non dans leur lecture.
+  **Bloqué** : basculer la branche par défaut change ce que le dépôt présente comme lui-même, et
+  l'articulation entre le miroir amont et la branche vivante appartient à Romain.
+
 - **BPE-45** `ouvert` [P3] — TROIS FICHIERS DE CORPUS GISENT HORS DU DÉPÔT, SORTIS DE LA RACINE.
   Constaté le 2026-08-19 à 11h15, à l'arrêt général demandé par l'architecte.
   `-ho.transposition` (une table d'homomorphisme), `-se.transposition` (des réglages BP2 datés de

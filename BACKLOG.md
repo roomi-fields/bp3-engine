@@ -501,6 +501,17 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   Le geste tient en deux parties : faire écrire ces outils dans une copie hors corpus, et décider
   du sort des trois résidus committés. La seconde touche le corpus et attend Romain.
 
+- **BPE-45** `ouvert` [P3] — TROIS FICHIERS DE CORPUS GISENT HORS DU DÉPÔT, SORTIS DE LA RACINE.
+  Constaté le 2026-08-19 à 11h15, à l'arrêt général demandé par l'architecte.
+  `-ho.transposition` (une table d'homomorphisme), `-se.transposition` (des réglages BP2 datés de
+  1997) et `console_strings.json` (les chaînes de console du moteur) traînaient à la racine, jamais
+  suivis. Ils sont déposés dans
+  `/tmp/claude-1000/-home-romi-dev-bp-bp3-engine/2886bb74-5c18-4f37-8f64-8d3075d1375c/scratchpad/residus-racine/`,
+  intacts.
+  **Ce qui reste à faire** : établir qui les a écrits, et si les deux premiers rejoignent `test-data/`
+  avec leur entrée au `REGISTRE.json` ou se jettent. Même famille que [[BPE-39]] — un outil qui écrit
+  hors du corpus.
+
 - **BPE-44** `ouvert` [P3] — LE GARDE ANTI-RÉTROCOMPATIBILITÉ ROUGIT SUR UNE MENTION DESCRIPTIVE.
   Mesuré par injection le 2026-08-19, après une décision de méthode de l'architecte sur le périmètre
   des gardes de forme.

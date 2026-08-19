@@ -42,3 +42,10 @@ node_modules/
 
 # Jeu de grammaires natif : branche « library », posée ici par scripts/library.sh poser
 /library/
+
+# Configuration MCP locale au poste (voir la charte : la regle du depot prime)
+/.mcp.json
+
+# Cache Python
+__pycache__/
+*.pyc

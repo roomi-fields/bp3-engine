@@ -45,6 +45,21 @@ if [ -n "$manque" ]; then
   exit 1
 fi
 
+# ⛔ LA MENTION DE RÉGIME — décision de l'architecte du 2026-08-19.
+# Ce maillon n'appelle pas une donnée du voisin, il EXÉCUTE SON CODE, pris dans son arbre de
+# travail. Son verdict change quand le hub écrit, sans qu'une ligne bouge ici : il n'est pas
+# reproductible, et inscrit à un registre il se lirait comme un fait.
+# Elle ÉCHOUE plutôt que de s'afficher vide — une mention muette certifierait un verdict sans
+# régime, l'inverse exact de ce qu'elle sert.
+publie=$(git -C "$hub" rev-parse --short '@{u}' 2>/dev/null) || {
+  echo "✗ gardes documentaires — régime de lecture INDÉTERMINABLE dans $hub" >&2
+  echo "  Un verdict sans régime se lit comme reproductible ; il ne sort pas." >&2
+  exit 1
+}
+[ -n "$publie" ] || { echo "✗ gardes documentaires — régime vide, refusé." >&2; exit 1; }
+[ -z "$(git -C "$hub" status --porcelain)" ] || publie="$publie~sale"
+echo "[regime] SOURCE VIVE : hub @ $publie — code exécuté depuis son arbre de travail"
+
 for g in $OUTILS; do
   python3 "$hub/tools/$g" --depot "$moi"
 done

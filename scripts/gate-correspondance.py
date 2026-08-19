@@ -12,14 +12,45 @@ renommage (voir l en-tete de correspondance.json), donc sa corruption est silenc
 
 Sortie 0 = vert. Sortie 1 = rouge.
 """
-import json, os, sys
+import json, os, subprocess, sys
 
 KANOPI = "/home/romi/dev/bp/kanopi/packages/library"
+DEPOT_VOISIN = "/home/romi/dev/bp/kanopi"
 TABLE = os.path.join(KANOPI, "test-assets", "bp3", "correspondance.json")
 DIR_SCENES = os.path.join(KANOPI, "scenes", "BP3-tests")
 
 
+def regime():
+    """La mention de régime, qui dit ce que le verdict vaut.
+
+    Ce garde lit l'ARBRE DE TRAVAIL d'un voisin : son verdict change quand ce voisin
+    écrit, sans qu'une ligne bouge ici. Un rouge pris dans sa fenêtre d'écriture n'est
+    pas reproductible, et inscrit à un registre il se lit comme un fait.
+
+    ⛔ ELLE ÉCHOUE PLUTÔT QUE DE S'AFFICHER VIDE. Une mention muette certifierait un
+    verdict sans régime — l'inverse exact de ce qu'elle sert.
+    """
+    def git(*a):
+        r = subprocess.run(["git", "-C", DEPOT_VOISIN, *a], capture_output=True, text=True)
+        if r.returncode != 0:
+            raise RuntimeError(f"git {' '.join(a)} → {r.stderr.strip() or r.returncode}")
+        return r.stdout.strip()
+
+    publie = git("rev-parse", "--short", "@{u}")
+    sale = "~sale" if git("status", "--porcelain") else ""
+    return f"[regime] SOURCE VIVE : kanopi @ {publie}{sale} — arbre de travail lu directement"
+
+
 def main():
+    # La mention se construit AVANT toute mesure : un verdict ne sort jamais sans elle.
+    try:
+        mention = regime()
+    except (RuntimeError, OSError) as e:
+        print(f"ROUGE : le regime de lecture est indeterminable — {e}\n"
+              f"   un verdict sans regime se lit comme un fait reproductible ; il ne sort pas.")
+        return 1
+    print(mention)
+
     # La bibliotheque vit dans un AUTRE depot. Si ce depot n est pas la, il n y a rien a
     # verifier et le dire est honnete. Mais si la bibliotheque EST la et que la table
     # manque, c est le defaut meme que ce garde surveille : rouge, pas de passe-droit.

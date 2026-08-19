@@ -549,6 +549,15 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   `claude mcp remove rtfm -s project`, et le module sert l'index, vérifié sur trois requêtes.
   **Les morts sont donc masqués, les absents intacts** : aucune instance ne rend ce qui n'est pas
   indexé.
+  ⛔ **Les chiffres ci-dessus décrivent l'état du 2026-08-18 au soir.** Relevé du 2026-08-19 à 10h45,
+  après une reprise de l'outil d'index : l'index passe de 535 à 376 documents, **les 159 morts sont
+  sortis, il n'en reste aucun**. Les 14 absents sont inchangés, les 9 réels compris — le skill
+  `bpscript-oracle` en tête. Le retrait a donc porté, la première ingestion non.
+  **Ce qui distingue les deux** : `BACKLOG.md`, déjà indexé, a été repris quelques minutes après un
+  enregistrement. Une mise à jour de document connu passe ; une première entrée de document jamais
+  indexé n'est pas passée ici.
+  Versions installées sur ce poste au 2026-08-19 : ligne de commande `rtfm-ai 0.25.0`, module intégré
+  `0.24.1`, une seule déclaration. Aucune mesure n'est prise sur une version postérieure.
 
 - **BPE-42** `ouvert` [P2] — UN BINAIRE QUI N'EST PAS L'ORACLE PORTE LE NOM DE L'ORACLE, DANS UN
   ARBRE DE TRAVAIL DÉTACHÉ. Trouvé le 2026-08-18, en répondant à un recensement d'arbres de travail

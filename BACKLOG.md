@@ -544,14 +544,16 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   **La réparation n'est pas un geste de ce dépôt** : l'ordonnanceur mutualisé place le balayage
   au-dessus du retrait, chaque créneau part au balayage, et le balayage réinscrit. La priorité de la
   tour dans cet ordonnanceur appartient à Romain.
-  ⛔ **Le coût des morts dépendait de l'instance interrogée, mesuré le 2026-08-19.** Une déclaration
-  d'index propre au dépôt, jamais enregistrée, doublait le module global. Sur `tryMIDIfile capture
-  texte`, l'instance du dépôt rendait le mort en tête avec le score 17,90 ; le module n'en rend
-  aucun — même base, le module écarte à la lecture les chemins qu'il ne résout pas. Le discriminant :
-  un document absent de la base manque des deux côtés. La déclaration du dépôt est retirée par
-  `claude mcp remove rtfm -s project`, et le module sert l'index, vérifié sur trois requêtes.
-  **Les morts sont donc masqués, les absents intacts** : aucune instance ne rend ce qui n'est pas
-  indexé.
+  **Une déclaration d'index propre au dépôt, jamais enregistrée, doublait le module global.** Elle
+  est retirée le 2026-08-19 par `claude mcp remove rtfm -s project`, et le module sert l'index,
+  vérifié sur trois requêtes.
+  ⛔ **Les deux instances rendent la même chose.** Contrôle du 2026-08-19 à 10h55, requête
+  `tryMIDIfile capture texte` lancée sur l'une puis l'autre à la suite : jeux de résultats
+  identiques, aucun mort de part et d'autre. Une comparaison antérieure les opposait — elle portait
+  deux relevés séparés de onze heures, entre lesquels les 159 morts avaient quitté la base, et
+  attribuait à l'instance un écart qui venait du temps. Les deux relevés différaient aussi de version,
+  `0.25.0` en ligne de commande contre `0.24.1` pour le module : deux confusions possibles pour un
+  seul écart observé.
   ⛔ **Les chiffres ci-dessus décrivent l'état du 2026-08-18 au soir.** Relevé du 2026-08-19 à 10h45 :
   l'index porte 376 documents contre 535, et **aucun mort — les 159 sont sortis**.
   Les 14 absents sont inchangés, les 9 réels compris — le skill

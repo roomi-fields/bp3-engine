@@ -13,6 +13,11 @@
 #
 # Contournement : `git push --no-verify`. Il est volontairement possible — mais il devient
 # alors un acte explicite et traçable, au lieu du silence d'avant.
+# ⛔ EN TÊTE, AVANT LE PORTILLON : un voisin qui mesure sur ce dépôt tient une fenêtre ouverte,
+# et le gel de la tour ferme sa porte, pas celle de git. Le garde vient du hub, il est appelé et
+# jamais recopié. `BP_AGENT` lui dit qui je suis : sans lui, il déduirait mon nom du répertoire.
+BP_AGENT=bp3-engine bash "$HOME/dev/bp/hub/tools/garde-fenetre.sh" || exit 1
+
 racine="$(git rev-parse --show-toplevel)"
 echo "── portillon bp3-engine (voie rapide) ───────"
 if "$racine/scripts/gate.sh" rapide; then

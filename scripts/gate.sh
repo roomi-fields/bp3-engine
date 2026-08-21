@@ -61,6 +61,10 @@ if [ "$VOIE" = rapide ] || [ "$VOIE" = tout ]; then
   lancer "gel-morsure"        90 "$COPIE/scripts/gate-gel-injection.sh"
   lancer "autonomie"          60 python3 scripts/gate-autonomie.py
   lancer "autonomie-morsure"  90 "$COPIE/scripts/gate-autonomie-injection.sh"
+  # Le garde de fenêtre vit en TÊTE de ce même crochet : il refuse avant que le portillon
+  # ne démarre. Sa morsure s'éprouve ici, dans la copie — le volet qui prouve son branchement
+  # lance `build.sh --clean`, qui écrit.
+  lancer "fenetre-morsure"    90 "$COPIE/scripts/gate-fenetre-injection.sh"
   # L'oracle figé est atteint par lien symbolique depuis la copie : une écriture dessus
   # aurait touché l'original. Le vérifier fait partie du portillon, pas d'un journal.
   lancer "oracle-fige-intact" 30 ./scripts/copie-injection.sh verifier

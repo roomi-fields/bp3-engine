@@ -501,6 +501,22 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   Le geste tient en deux parties : faire écrire ces outils dans une copie hors corpus, et décider
   du sort des trois résidus committés. La seconde touche le corpus et attend Romain.
 
+- **BPE-48** `ouvert` [P1] — LE PORTILLON ÉCRIT DANS L'ARBRE DE TRAVAIL, DONT LE CODE AMONT ET
+  L'ORACLE. Mesuré le 2026-08-21, sur demande de l'architecte.
+  Portillon complet, 2,3 s, arbre propre avant et après. **Sept écritures de contenu**, toutes
+  restaurées, chacune visible de 0,00 à 0,05 s : `source/BP3/PlayThings.c`, le binaire `bp3`,
+  `baseline-native/baseline.json`, `baseline-native/capture.py`, deux captures, et la création de
+  `scripts/bp3_leurre_legacy.c` — un nom fabriqué pour ressembler à ce qu'un garde chasse, non ignoré
+  par git. Sept autres fichiers ne reçoivent qu'un horodatage, dont `source/BP3/Misc.c`.
+  **Ce qu'un voisin peut y lire** : une modification non déclarée du moteur d'origine, et une mesure
+  prise sur un oracle muté.
+  **L'obstacle à la bascule vers une copie** : `bp3` fait 2 536 512 octets et **n'est suivi par aucun
+  commit** — `.gitignore:7`. Un clone ne le porte pas, et les deux maillons qui le mesurent
+  rougiraient sur un dépôt sain. Une copie doit donc porter aussi ce que le dépôt ignore
+  délibérément, population distincte des modifications en cours et invisible à `git status`.
+  **Le geste** : huit injections à basculer, chacune reprouvée mordante une par une sur le nouveau
+  support. Le portillon reste en l'état d'ici là — le désarmer serait un repli.
+
 - **BPE-47** `fait-a-clore` [P1] — UNE POUSSÉE NUE VISAIT LE DÉPÔT DE BERNARD BEL. Mesuré et corrigé
   le 2026-08-19, en confrontant une clame de l'architecte sur le régime de ce dépôt.
   `branch.wasm.remote` valait `upstream` et `branch.wasm.merge` valait `refs/heads/graphics-for-BP3` :

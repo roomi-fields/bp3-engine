@@ -34,24 +34,37 @@ lancer() { # lancer <nom> <delai> <commande...>
 
 if [ "$VOIE" = rapide ] || [ "$VOIE" = tout ]; then
   echo "── voie RAPIDE ───────────────────────────────"
+  # ⛔ LES INJECTIONS S'ÉPROUVENT DANS UNE COPIE, JAMAIS DANS L'ARBRE DE TRAVAIL.
+  # Mesuré le 2026-08-21 : elles écrivaient sept fichiers ici, dont `source/BP3/PlayThings.c`
+  # — le code de Bernard Bel — et le binaire oracle. Un voisin qui lisait l'arbre pendant
+  # une poussée voyait l'apparence exacte de la faute la plus grave de la charte.
+  # Sans copie, PAS D'INJECTION : un repli sur l'arbre réel rendrait le défaut invisible.
+  COPIE="$(./scripts/copie-injection.sh poser)" || {
+    echo "  ✗ la copie d'injection n'a pas pu être posée — les morsures ne s'éprouvent pas ici"
+    exit 1
+  }
   # Listés un par un, et non par une boucle : le méta-garde anti-bypass doit pouvoir
   # lire ce fichier sans interpréter du shell. Un garde qui doit deviner ne garde rien.
   lancer "baseline-integrite" 60 python3 scripts/gate-baseline.py
   lancer "anti-bypass"        60 python3 scripts/gate-meta.py
-  lancer "anti-bypass-morsure" 90 ./scripts/gate-meta-injection.sh
+  lancer "anti-bypass-morsure" 90 "$COPIE/scripts/gate-meta-injection.sh"
   lancer "anti-retrocompat"   60 python3 scripts/gate-legacy.py
-  lancer "anti-retro-morsure" 90 ./scripts/gate-legacy-injection.sh
+  lancer "anti-retro-morsure" 90 "$COPIE/scripts/gate-legacy-injection.sh"
   lancer "ancrages-locaux"    60 python3 scripts/gate-ancrages.py
-  lancer "ancrages-morsure"   90 ./scripts/gate-ancrages-injection.sh
-  lancer "effondrement-morsure" 90 ./scripts/gate-effondrement-injection.sh
+  lancer "ancrages-morsure"   90 "$COPIE/scripts/gate-ancrages-injection.sh"
+  lancer "effondrement-morsure" 90 "$COPIE/scripts/gate-effondrement-injection.sh"
   lancer "non-retour-bug55"   60 ./scripts/verif-bug55.sh
-  lancer "sonde-morsure"     120 ./scripts/gate-sonde-injection.sh
+  lancer "sonde-morsure"     120 "$COPIE/scripts/gate-sonde-injection.sh"
   lancer "correspondance"     60 python3 scripts/gate-correspondance.py
-  lancer "correspondance-morsure" 90 ./scripts/gate-correspondance-injection.sh
+  lancer "correspondance-morsure" 90 "$COPIE/scripts/gate-correspondance-injection.sh"
   lancer "gel-baseline"       60 python3 scripts/gel-baseline.py
-  lancer "gel-morsure"        90 ./scripts/gate-gel-injection.sh
+  lancer "gel-morsure"        90 "$COPIE/scripts/gate-gel-injection.sh"
   lancer "autonomie"          60 python3 scripts/gate-autonomie.py
-  lancer "autonomie-morsure"  90 ./scripts/gate-autonomie-injection.sh
+  lancer "autonomie-morsure"  90 "$COPIE/scripts/gate-autonomie-injection.sh"
+  # L'oracle figé est atteint par lien symbolique depuis la copie : une écriture dessus
+  # aurait touché l'original. Le vérifier fait partie du portillon, pas d'un journal.
+  lancer "oracle-fige-intact" 30 ./scripts/copie-injection.sh verifier
+  ./scripts/copie-injection.sh retirer
   # Les deux gardes documentaires du hub, appelés et non recopiés. Ils vivaient dans un bloc greffé
   # après `verify` dans le seul crochet de poussée : « verify vert » ne valait pas « portillon
   # vert ». Ici ils sont au même niveau que les seize autres.

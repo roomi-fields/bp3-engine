@@ -501,8 +501,28 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   Le geste tient en deux parties : faire écrire ces outils dans une copie hors corpus, et décider
   du sort des trois résidus committés. La seconde touche le corpus et attend Romain.
 
-- **BPE-48** `ouvert` [P1] — LE PORTILLON ÉCRIT DANS L'ARBRE DE TRAVAIL, DONT LE CODE AMONT ET
-  L'ORACLE. Mesuré le 2026-08-21, sur demande de l'architecte.
+- **BPE-49** `ouvert` [P3] — LE MAILLON `oracle-fige-intact` N'A PAS D'INJECTION DÉDIÉE.
+  Posé le 2026-08-21 avec la bascule des injections en copie. Sa morsure est prouvée à la main : une
+  empreinte attendue faussée le fait sortir en code 1 en nommant le fichier, l'empreinte attendue et
+  l'obtenue ; intacte, il rend code 0.
+  **Ce que cette preuve ne couvre pas** : elle éprouve la comparaison, non la détection d'une
+  écriture réelle sur le binaire figé — écrire dans l'oracle pour le prouver est écarté.
+  Le geste : un `scripts/gate-oracle-injection.sh` qui monte un oracle de substitution et prouve la
+  détection sans toucher au binaire de référence.
+
+- **BPE-48** `fait-a-clore` [P1] — LE PORTILLON ÉCRIT DANS L'ARBRE DE TRAVAIL, DONT LE CODE AMONT ET
+  L'ORACLE. Mesuré le 2026-08-21, sur demande de l'architecte. **Corrigé le même jour.**
+  **Après bascule** : zéro écriture de contenu, zéro horodatage touché, portillon de 2,3 s à 2,6 s.
+  Les huit injections s'éprouvent dans une copie posée par `scripts/copie-injection.sh`, hors de
+  l'arbre — clone partagé de 17 Mo en 600 ms, portant les références distantes, la configuration
+  locale, le travail non enregistré et ce que le dépôt ignore. Les 730 Mo d'oracles figés sont
+  atteints par lien symbolique, et le maillon `oracle-fige-intact` vérifie que rien ne les a écrits.
+  Sans copie, pas d'injection : le portillon échoue plutôt que de se replier sur l'arbre réel.
+  ⛔ **Ce que la bascule a révélé, et qui la bloquait** : `baseline-native/capture.py` portait sa
+  racine en dur. Lancée depuis la copie, elle lisait et écrivait l'arbre **original** en se croyant
+  isolée — l'injection de la sonde y mesurait donc l'original, preuve nulle et pollution sous
+  couvert d'isolement. La racine se déduit désormais du fichier, et la zone de travail aussi : elle
+  suivait le chemin de bac à sable d'une seule session. Mesure inchangée depuis l'original.
   Portillon complet, 2,3 s, arbre propre avant et après. **Sept écritures de contenu**, toutes
   restaurées, chacune visible de 0,00 à 0,05 s : `source/BP3/PlayThings.c`, le binaire `bp3`,
   `baseline-native/baseline.json`, `baseline-native/capture.py`, deux captures, et la création de

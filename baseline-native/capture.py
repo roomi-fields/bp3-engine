@@ -17,7 +17,11 @@ N'ECRIT QUE dans baseline-native/.
 import sys
 import hashlib, json, os, re, subprocess, datetime, collections, shutil
 
-ROOT = "/home/romi/dev/bp/bp3-engine"
+# ⛔ LA RACINE SE DEDUIT DU FICHIER, ELLE NE S'ECRIT PAS EN DUR. Mesure du 2026-08-21 :
+# lancee depuis une COPIE du depot, cette capture lisait et ecrivait l'arbre ORIGINAL, en
+# se croyant isolee. Une preuve d'injection posee dans la copie mesurait donc l'original —
+# proof nulle, et pollution du vrai arbre sous couvert d'isolement.
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TD = os.path.join(ROOT, "test-data")
 BP3 = os.path.join(ROOT, "bp3")
 OUT = os.path.join(ROOT, "baseline-native")
@@ -33,7 +37,11 @@ CAP_PUBLIE = os.path.join(OUT, "captures")
 CAP = os.path.join(OUT, "captures.en-cours")
 RUN = os.path.join(ROOT, "capture-run")  # cwd du binaire : ../csound_resources/ y resout
 REG = os.path.join(TD, "REGISTRE.json")   # le corpus et son couplage vivent DANS ce depot
-TMP = "/tmp/claude-1000/-home-romi-dev-bp-bp3-engine/2886bb74-5c18-4f37-8f64-8d3075d1375c/scratchpad/v4"
+# La zone de travail suivait le chemin de bac a sable d'UNE session : hors de cette
+# session, l'outil ecrivait dans un dossier que personne d'autre n'a. Elle se derive du
+# depot mesure, donc une copie a la sienne.
+TMP = os.path.join(os.environ.get("TMPDIR", "/tmp"),
+                   "bp3-capture", hashlib.blake2b(ROOT.encode(), digest_size=6).hexdigest())
 os.makedirs(TMP, exist_ok=True)
 if os.path.isdir(CAP):
     shutil.rmtree(CAP)

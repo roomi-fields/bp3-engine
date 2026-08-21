@@ -501,14 +501,15 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   Le geste tient en deux parties : faire écrire ces outils dans une copie hors corpus, et décider
   du sort des trois résidus committés. La seconde touche le corpus et attend Romain.
 
-- **BPE-49** `ouvert` [P3] — LE MAILLON `oracle-fige-intact` N'A PAS D'INJECTION DÉDIÉE.
-  Posé le 2026-08-21 avec la bascule des injections en copie. Sa morsure est prouvée à la main : une
-  empreinte attendue faussée le fait sortir en code 1 en nommant le fichier, l'empreinte attendue et
-  l'obtenue ; intacte, il rend code 0.
-  **Ce que cette preuve ne couvre pas** : elle éprouve la comparaison, non la détection d'une
-  écriture réelle sur le binaire figé — écrire dans l'oracle pour le prouver est écarté.
-  Le geste : un `scripts/gate-oracle-injection.sh` qui monte un oracle de substitution et prouve la
-  détection sans toucher au binaire de référence.
+- **BPE-49** `fait-a-clore` [P3] — LE MAILLON `oracle-fige-intact` N'AVAIT PAS D'INJECTION DÉDIÉE.
+  Posé le 2026-08-21 avec la bascule des injections en copie, complété le même jour.
+  `scripts/gate-oracle-injection.sh` monte un dépôt jetable dont le rôle d'oracle est tenu par un
+  fichier quelconque, y copie `copie-injection.sh` — qui déduit sa racine de son emplacement — et
+  **écrit réellement** dans ce fichier. Le code éprouvé est le même, l'écriture est réelle, et le
+  binaire de référence n'est pas touché : l'injection vérifie son empreinte en dernière étape.
+  Quatre volets : vert au départ, rouge nommant le fichier et les deux empreintes après écriture,
+  vert après restauration, oracle réel intact. Branché au portillon sous `oracle-fige-morsure`,
+  19 maillons.
 
 - **BPE-48** `fait-a-clore` [P1] — LE PORTILLON ÉCRIT DANS L'ARBRE DE TRAVAIL, DONT LE CODE AMONT ET
   L'ORACLE. Mesuré le 2026-08-21, sur demande de l'architecte. **Corrigé le même jour.**

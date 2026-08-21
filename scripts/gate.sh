@@ -64,6 +64,7 @@ if [ "$VOIE" = rapide ] || [ "$VOIE" = tout ]; then
   # L'oracle figé est atteint par lien symbolique depuis la copie : une écriture dessus
   # aurait touché l'original. Le vérifier fait partie du portillon, pas d'un journal.
   lancer "oracle-fige-intact" 30 ./scripts/copie-injection.sh verifier
+  lancer "oracle-fige-morsure" 60 "$COPIE/scripts/gate-oracle-injection.sh"
   ./scripts/copie-injection.sh retirer
   # Les deux gardes documentaires du hub, appelés et non recopiés. Ils vivaient dans un bloc greffé
   # après `verify` dans le seul crochet de poussée : « verify vert » ne valait pas « portillon

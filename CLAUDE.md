@@ -274,7 +274,8 @@ Mon identité : `BP_AGENT=bp3-engine`. Elle ne persiste pas entre appels shell, 
 préfixe : `BP_AGENT=bp3-engine ~/dev/bp/hub/tour <commande>`.
 
 1. **Au réveil, le courrier d'abord** : `tour inbox`, puis `TABLEAU.md` et mes contrats.
-   `tour inbox --ack` une fois traité.
+   `tour ack` une fois traité — **lire et acquitter sont deux appels distincts** : un filtre sur
+   la sortie d'un appel unique jette l'affichage et garde l'acquittement, en silence.
 2. **Un livrable poussé se route aussitôt**, dans le même geste que le push : `tour send architecte`.
    Sans cela, personne ne sait qu'il faut le confronter, et le chantier se cale en silence.
 3. **La dernière action avant de rendre la main est un courrier à l'architecte** : fini avec sa

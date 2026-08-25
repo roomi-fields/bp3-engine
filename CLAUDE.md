@@ -96,6 +96,11 @@ parfois la condition même que l'on teste. Nommer ce que la mesure aurait pu mon
 La bible du langage est `docs/spec/LANGUAGE.md`, **dans le dépôt BPscript** — elle **est ce que le code doit dire**, et
 un écart entre les deux est un défaut du code. `AST.md` et `EBNF.md` en sont des dérivés.
 
+**Elle se lit à la référence publiée, jamais sur le disque du voisin** — `git -C <tour>/BPscript show
+origin/main:docs/spec/LANGUAGE.md`. BPscript publie sur `main` ; **le moteur natif publie sur `wasm`**,
+et une branche se mesure au lieu de se supposer. Une réponse nomme le commit qu'elle a lu, et cite le
+**nom de la section**, jamais un numéro de ligne.
+
 - **Interdiction formelle d'y écrire** sans autorisation explicite de Romain pour le geste précis.
   L'interdiction couvre l'**ajout**, le **retrait**, la **réécriture**, la **correction d'une forme**,
   et l'**ajout d'un socle à un exemple qui ne compile pas**.

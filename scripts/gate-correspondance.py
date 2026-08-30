@@ -37,7 +37,11 @@ def regime():
         return r.stdout.strip()
 
     publie = git("rev-parse", "--short", "@{u}")
-    sale = "~sale" if git("status", "--porcelain") else ""
+    # ⛔ `--no-optional-locks` sur CE SEUL appel : `status` rafraîchit l'index de kanopi et y
+    # prend `.git/index.lock`, ce que le `rev-parse` de la ligne au-dessus ne fait pas. Le poser
+    # dans le helper le rendrait décoratif sur l'autre appel. Mesuré : 1 verrou → 0, sortie
+    # identique sur un arbre SALE à index périmé.
+    sale = "~sale" if git("--no-optional-locks", "status", "--porcelain") else ""
     return f"[regime] SOURCE VIVE : kanopi @ {publie}{sale} — arbre de travail lu directement"
 
 

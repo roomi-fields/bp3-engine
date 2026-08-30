@@ -77,9 +77,16 @@ def config(gd):
     capture — par l'en-tete de la grammaire, ou par un registre voisin — c'est accepter
     qu'un oracle change de reponse sans que personne ait rien decide.
 
-    L'en-tete de la grammaire ne peut pas servir de source : le moteur la SAUTE
-    (CompileGrammar.c:251) et elle designe un autre auxiliaire que celui retenu pour 39 des
-    113 grammaires. Elle est plausible et fausse, ce qui est le pire des deux.
+    L'en-tete de la grammaire ne peut pas servir de source, et la raison est dans le moteur :
+    IL LA SAUTE. `CompileGrammar.c:251` porte « Skip headers » et fait `goto NEXTLINE` sur
+    chaque declaration — alphabet ancien (`-ho.`) comme nouveau (`-al.`), reglages, base de
+    temps, Csound. `adjust_prefix` (CompileGrammar.c:1787) ne fait que reecrire `-ho.` en
+    `-al.` dans une chaine : il n'ouvre rien. Les auxiliaires n'arrivent QUE par la ligne de
+    commande.
+    Mesure du 2026-08-30 sur les 113 entrees, tous genres, temoin de 165 accords : ZERO
+    en-tete designe un auxiliaire different du couple retenu. Ce qui la disqualifie est
+    qu'elle est INCOMPLETE — 22 asymetries, un genre declare sans couple ou l'inverse — et
+    surtout qu'elle n'atteint jamais le moteur.
     """
     return dict(gd.get("auxiliaires") or {}), gd.get("convention"), gd.get("origine_du_couple")
 

@@ -29,7 +29,9 @@ if [ -z "$publie" ]; then
   exit 1
 fi
 sale=""
-[ -n "$(git -C "$HUB" status --porcelain 2>/dev/null)" ] && sale="~sale"
+# ⛔ `--no-optional-locks` : voir garde-documentaires.sh. Sans lui, ce `status` prend
+# `.git/index.lock` chez le hub à chaque passage du portillon.
+[ -n "$(git --no-optional-locks -C "$HUB" status --porcelain 2>/dev/null)" ] && sale="~sale"
 echo "[regime] SOURCE VIVE : hub @ ${publie}${sale} — garde-fenetre.sh lu dans son arbre de travail"
 
 T=$(mktemp -d)

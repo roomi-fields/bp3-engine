@@ -57,7 +57,12 @@ publie=$(git -C "$hub" rev-parse --short '@{u}' 2>/dev/null) || {
   exit 1
 }
 [ -n "$publie" ] || { echo "✗ gardes documentaires — régime vide, refusé." >&2; exit 1; }
-[ -z "$(git -C "$hub" status --porcelain)" ] || publie="$publie~sale"
+# ⛔ `--no-optional-locks` : sans lui, `git status` RAFRAÎCHIT l'index du voisin et y prend
+# `.git/index.lock`. Celui qui subit voit sa commande git échouer sur « Unable to create
+# index.lock », rare et inexplicable de son côté. Mesuré sur un cobaye à index périmé et arbre
+# SALE : 1 verrou sans le drapeau, 0 avec, sortie identique à l'empreinte près. Le drapeau ne
+# va QUE sur `status` — `rev-parse` et `log -1` prennent zéro verrou, il y serait décoratif.
+[ -z "$(git --no-optional-locks -C "$hub" status --porcelain)" ] || publie="$publie~sale"
 echo "[regime] SOURCE VIVE : hub @ $publie — code exécuté depuis son arbre de travail"
 
 for g in $OUTILS; do

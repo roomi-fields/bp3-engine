@@ -50,6 +50,11 @@ Les notes de rétro-ingénierie du moteur natif, et les bons de travail qui en d
   ligne de commande, mesurés sur 3.4.7, 3.5.0 et 3.5.1
 - [courrier-bernard-brouillon.md](courrier-bernard-brouillon.md) — l'image de zéro octet sur
   l'option de trace. **Brouillon en attente de la relecture de Romain.**
+- [COURRIER-BERNARD-2026-08-30.md](../COURRIER-BERNARD-2026-08-30.md) — trois défauts rejoués sur
+  l'oracle figé : les deux procédures de pas inécrivables, le débordement du sérialiseur fichier
+  à dix-sept groupes imbriqués, et `SUB` qui produit moins que `SUB1` quand l'aide dit l'inverse.
+  **Écrit et non envoyé : Romain l'envoie lui-même.** Le fichier porte aussi ce qui en a été
+  écarté — le plantage de l'option de trace, qui est une régression de notre arbre.
 
 ## Témoins conservés
 

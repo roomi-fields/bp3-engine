@@ -10,10 +10,16 @@
 # ⛔ IL ÉCHOUE PLUTÔT QU'IL N'AVERTIT quand le dossier partagé est introuvable : un garde désarmé
 # par une absence est invisible, et la poussée passait au vert sans qu'il ait tourné.
 #
-# LA LISTE DES OUTILS EST UNE SEULE VARIABLE, et la sonde comme l'appel bouclent dessus. Forme de
-# runtime-MIDI, meilleure que la sonde par nom : celle-ci corrige le défaut du jour, celle-là
-# l'empêche de renaître à la prochaine addition. Un troisième garde s'ajoute à `OUTILS` et se
-# retrouve sondé sans qu'on y pense.
+# LA LISTE DES OUTILS SE DÉRIVE DE `hub/tools/PORTILLON.txt`, qui fait autorité. Une liste écrite
+# ici protégerait de la DISPARITION d'un outil et serait AVEUGLE à son APPARITION : un outil neuf
+# du hub n'entrerait jamais dans ce portillon sans que quelqu'un édite la ligne. Mesuré le
+# 2026-08-31 : la liste en dur portait deux noms quand le hub en nommait trois, et
+# `garde-source-voisine.py` n'était atteint ni par lancement ni par lecture — zéro sur les deux
+# axes, trace du crochet entier, témoins non nuls.
+#
+# ⛔ ET UNE LISTE DÉRIVÉE PERD LE REFUS DE ZÉRO QUE LA LISTE EN DUR DONNAIT GRATUITEMENT : liste
+# absente, ou ne nommant aucun outil, et la boucle tourne à vide puis sort au VERT en se déclarant
+# complète. Les deux cas refusent ici, et le compte des outils lancés s'AFFIRME au lieu de se taire.
 set -e
 
 # BP3_HUB surcharge la racine du dossier partagé. Elle existe pour ÉPROUVER la branche « dossier
@@ -24,11 +30,25 @@ racine="$(git rev-parse --show-toplevel)"
 hub="${BP3_HUB:-$(cd "$racine/.." && pwd)/hub}"
 moi="$(basename "$racine")"
 
-OUTILS="garde-navigation.py garde-copies.py"
-
 if [ ! -d "$hub/tools" ]; then
   echo "✗ gardes documentaires INEXÉCUTABLES — dossier introuvable : $hub/tools" >&2
   echo "  Ces gardes ne se sautent pas : sans eux, le portillon n'est pas complet." >&2
+  exit 1
+fi
+
+LISTE="$hub/tools/PORTILLON.txt"
+if [ ! -f "$LISTE" ]; then
+  echo "✗ gardes documentaires INEXÉCUTABLES — liste d'autorité introuvable : $LISTE" >&2
+  echo "  Sans elle, ce maillon ne sait pas ce qu'il doit lancer, et un vert ne vaudrait rien." >&2
+  exit 1
+fi
+# Une ligne = un outil. Les commentaires et les lignes vides se sautent.
+OUTILS="$(sed -e 's/#.*//' -e 's/[[:space:]]//g' -e '/^$/d' "$LISTE")"
+attendus=0
+for g in $OUTILS; do attendus=$((attendus + 1)); done
+if [ "$attendus" -eq 0 ]; then
+  echo "✗ gardes documentaires INEXÉCUTABLES — $LISTE ne nomme AUCUN outil." >&2
+  echo "  Une boucle sur rien sort au vert en se déclarant complète : elle est refusée ici." >&2
   exit 1
 fi
 
@@ -65,6 +85,16 @@ publie=$(git -C "$hub" rev-parse --short '@{u}' 2>/dev/null) || {
 [ -z "$(git --no-optional-locks -C "$hub" status --porcelain)" ] || publie="$publie~sale"
 echo "[regime] SOURCE VIVE : hub @ $publie — code exécuté depuis son arbre de travail"
 
+lances=0
 for g in $OUTILS; do
   python3 "$hub/tools/$g" --depot "$moi"
+  lances=$((lances + 1))
 done
+# ⛔ LE COMPTE S'AFFIRME. Un garde qui se contente de ne pas rougir ne dit pas s'il a examiné
+# quelque chose ; celui-ci nomme combien d'outils il a lancés, et refuse d'en avoir lancé moins
+# que la liste n'en nommait.
+if [ "$lances" -ne "$attendus" ]; then
+  echo "✗ gardes documentaires — $lances outil(s) lancé(s) pour $attendus nommé(s) dans $LISTE." >&2
+  exit 1
+fi
+echo "✓ gardes documentaires — $lances outil(s) du hub lancé(s), dérivés de $LISTE"

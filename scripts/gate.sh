@@ -74,6 +74,12 @@ if [ "$VOIE" = rapide ] || [ "$VOIE" = tout ]; then
   # après `verify` dans le seul crochet de poussée : « verify vert » ne valait pas « portillon
   # vert ». Ici ils sont au même niveau que les seize autres.
   lancer "documentaires-hub"  90 ./scripts/garde-documentaires.sh
+  # ⛔ CETTE INJECTION-CI TOURNE DANS L'ARBRE, ET C'EST DÉLIBÉRÉ. Son décor entier — un hub
+  # fabriqué, ses leurres — vit dans un dossier jetable : elle n'écrit pas une ligne ici, ce qui
+  # est la raison d'être de la copie. Et son volet nominal doit mesurer CE dépôt : depuis la
+  # copie, les outils du hub seraient appelés avec le nom du dossier de copie, qu'aucune table
+  # ne connaît, et le vert ne dirait rien de moi.
+  lancer "documentaires-morsure" 90 ./scripts/gate-documentaires-injection.sh
 fi
 
 # La voie ROUGE porte les défauts MOTEUR connus et non corrigés. On ne les maquille jamais :

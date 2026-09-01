@@ -116,8 +116,25 @@ se relit à la main à chaque décision de langage. **Quand cette section et les
 divergent, ce sont elles qui font foi.**
 
 **Trois mots restent** : `object`, `def`, `init`. Tout le reste est un **type déclaré** — `actor`,
-`terminal`, et les catalogues qui fonctionnent déjà ainsi : `alphabet`, `tuning`, `octaves`,
-`homomorphism`.
+`terminal`.
+
+⛔ **DEUX CATALOGUES DÉCLARENT LEURS ENTRÉES PAR LEUR TYPE, ET EUX SEULS** — `scales` et `types`.
+Mesuré le 2026-08-31 au paquet publié `01da677`, sur la trace de dérivation que porte chaque entrée
+dérivée : `scales` **185**, `types` **4**, **189 au total**. `alphabets`, `tunings`, `octaves` et
+`homomorphism` en portent **zéro**.
+
+⚠️ **LA LISTE DES MOTS RÉSERVÉS DU SOCLE TRANCHE POUR DIX-HUIT MOTS SUR VINGT, ET DEUX Y ÉCHAPPENT.**
+Mesuré le 2026-08-31 au paquet publié : `<mot> essai (x:1)` en partie déclarative est **refusé pour
+les dix-huit**, et **accepté pour `def` et `actor`**, qui portent leur propre forme de déclaration.
+Témoin `zorglub` refusé — la sonde discrimine.
+
+⛔ **Ce sont deux questions distinctes, et la liste ne répond qu'à la première** : ce que le code
+REFUSE, et ce que les catalogues FONT. **Pour la seconde, ce qui tranche est la trace de dérivation.**
+
+⚠️ **Et cette sonde se monte avec sa production** : `actor essai (x:1)` sur une production par défaut
+est refusé parce qu'un **second acteur rend `C4` ambigu** — un refus qui ne dit rien de la liste. La
+même forme avec `S -> lead.C4` compile. *Mesuré ici même, après un premier relevé qui rendait `def`
+seul.*
 
 **Le type vient en tête**, et la **position** qualifie la ligne, de part et d'autre du délimiteur
 `-----`. L'arobase de tête est sortie le 2026-08-16.

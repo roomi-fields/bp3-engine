@@ -12,10 +12,22 @@ renommage (voir l en-tete de correspondance.json), donc sa corruption est silenc
 
 Sortie 0 = vert. Sortie 1 = rouge.
 """
-import json, os, subprocess, sys
+import json, os, sys
 
-KANOPI = "/home/romi/dev/bp/kanopi/packages/library"
-DEPOT_VOISIN = "/home/romi/dev/bp/kanopi"
+# ⛔ Ce garde lit l ESPACE PUBLIE de kanopi, jamais son arbre de travail : sous enveloppe
+# le dossier du voisin N EXISTE PAS, et un arbre de travail n a de toute facon pas de
+# reference citable — il bouge sous la mesure.
+RACINE_PUBLIEE = "/home/romi/dev/bp/.publie/kanopi"
+
+# ⛔ SEULE PORTE D EPREUVE, et elle NE REND JAMAIS ZERO (code 3 quand tout est vert).
+# Un garde qu on peut mettre au vert par sa porte d epreuve n est pas un garde : l espace
+# publie etant en lecture seule, l injection travaille sur une copie, et cette copie ne
+# doit pas pouvoir certifier un portillon.
+EPREUVE = os.environ.get("BP3E_KANOPI_EPREUVE") or ""
+RACINE = EPREUVE or RACINE_PUBLIEE
+VERT = 3 if EPREUVE else 0
+
+KANOPI = os.path.join(RACINE, "packages", "library")
 TABLE = os.path.join(KANOPI, "test-assets", "bp3", "correspondance.json")
 DIR_SCENES = os.path.join(KANOPI, "scenes", "BP3-tests")
 
@@ -23,33 +35,31 @@ DIR_SCENES = os.path.join(KANOPI, "scenes", "BP3-tests")
 def regime():
     """La mention de régime, qui dit ce que le verdict vaut.
 
-    Ce garde lit l'ARBRE DE TRAVAIL d'un voisin : son verdict change quand ce voisin
-    écrit, sans qu'une ligne bouge ici. Un rouge pris dans sa fenêtre d'écriture n'est
-    pas reproductible, et inscrit à un registre il se lit comme un fait.
+    L'état publié porte son EMPREINTE : un commit, et la branche dont il vient. C'est ce
+    qui rend le verdict citable — il vaut pour cette empreinte-là, et pour elle seule.
 
     ⛔ ELLE ÉCHOUE PLUTÔT QUE DE S'AFFICHER VIDE. Une mention muette certifierait un
     verdict sans régime — l'inverse exact de ce qu'elle sert.
     """
-    def git(*a):
-        r = subprocess.run(["git", "-C", DEPOT_VOISIN, *a], capture_output=True, text=True)
-        if r.returncode != 0:
-            raise RuntimeError(f"git {' '.join(a)} → {r.stderr.strip() or r.returncode}")
-        return r.stdout.strip()
-
-    publie = git("rev-parse", "--short", "@{u}")
-    # ⛔ `--no-optional-locks` sur CE SEUL appel : `status` rafraîchit l'index de kanopi et y
-    # prend `.git/index.lock`, ce que le `rev-parse` de la ligne au-dessus ne fait pas. Le poser
-    # dans le helper le rendrait décoratif sur l'autre appel. Mesuré : 1 verrou → 0, sortie
-    # identique sur un arbre SALE à index périmé.
-    sale = "~sale" if git("--no-optional-locks", "status", "--porcelain") else ""
-    return f"[regime] SOURCE VIVE : kanopi @ {publie}{sale} — arbre de travail lu directement"
+    chemin = os.path.join(RACINE, "EMPREINTE")
+    with open(chemin, encoding="utf-8") as f:
+        lignes = [l.strip() for l in f if l.strip()]
+    if not lignes:
+        raise RuntimeError(f"EMPREINTE vide — {chemin}")
+    commit = lignes[0]
+    detail = f" ({lignes[1]})" if len(lignes) > 1 else ""
+    if EPREUVE:
+        return (f"[regime] EPREUVE : copie de kanopi @ {commit}{detail} — "
+                f"porte d epreuve, ce chemin ne rend jamais zero")
+    return (f"[regime] ETAT PUBLIE : kanopi @ {commit}{detail} — "
+            f"lu a l espace publie, jamais a l arbre de travail")
 
 
 def main():
     # La mention se construit AVANT toute mesure : un verdict ne sort jamais sans elle.
     try:
         mention = regime()
-    except (RuntimeError, OSError) as e:
+    except (RuntimeError, OSError, IndexError) as e:
         print(f"ROUGE : le regime de lecture est indeterminable — {e}\n"
               f"   un verdict sans regime se lit comme un fait reproductible ; il ne sort pas.")
         return 1
@@ -59,8 +69,8 @@ def main():
     # verifier et le dire est honnete. Mais si la bibliotheque EST la et que la table
     # manque, c est le defaut meme que ce garde surveille : rouge, pas de passe-droit.
     if not os.path.isdir(DIR_SCENES):
-        print(f"sans objet : bibliotheque Kanopi absente de cette machine ({DIR_SCENES})")
-        return 0
+        print(f"sans objet : bibliotheque Kanopi absente de l espace publie ({DIR_SCENES})")
+        return VERT
     if not os.path.isfile(TABLE):
         print(f"ROUGE : la bibliotheque est la mais la table manque — {TABLE}")
         return 1
@@ -98,7 +108,7 @@ def main():
         n_aux = sum(len(e["auxiliaires"]) for e in entrees)
         print(f"vert : {len(entrees)} grammaires, {n_aux} references auxiliaires, "
               f"0 chemin mort, 0 orpheline, 0 fantome")
-    return 1 if rouge else 0
+    return 1 if rouge else VERT
 
 
 if __name__ == "__main__":

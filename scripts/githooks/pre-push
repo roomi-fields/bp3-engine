@@ -18,6 +18,13 @@
 # jamais recopié. `BP_AGENT` lui dit qui je suis : sans lui, il déduirait mon nom du répertoire.
 BP_AGENT=bp3-engine bash "$HOME/dev/bp/hub/tools/garde-fenetre.sh" || exit 1
 
+# ⛔ ET LE RETARD DE PUBLICATION : depuis le cloisonnement, un voisin ne lit plus cet arbre de
+# travail, il lit l'état publié — qui ne bouge que par `hub/tools/publier.sh`. L'intervalle
+# entre une poussée et la republication qui la suit est le seul trou du dispositif : pendant
+# lui, un voisin lit un état vieux et rien ne le lui dit. Le garde vient du hub, appelé et
+# jamais recopié ; il mord au crochet SUIVANT celui qui n'a pas été publié.
+bash "$HOME/dev/bp/hub/tools/garde-publie-a-jour.sh" || exit $?
+
 racine="$(git rev-parse --show-toplevel)"
 echo "── portillon bp3-engine (voie rapide) ───────"
 if "$racine/scripts/gate.sh" rapide; then

@@ -19,8 +19,10 @@ set -e
 # === Paths ===
 ENGINE_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-# Deploy destinations (migration PC2 natif 2026-06-14 : ex-WSL /mnt/c, /mnt/d morts)
-BPSCRIPT_DIR="/home/romi/dev/bp/BPscript"
+# ⛔ BPscript se lit à son ÉTAT PUBLIÉ, jamais à son arbre de travail : depuis le
+# cloisonnement, le dossier d'un voisin n'existe pas dans cette enveloppe, et un arbre de
+# travail n'a de toute façon pas de référence citable. L'espace publié porte son EMPREINTE.
+BPSCRIPT_DIR="/home/romi/dev/bp/.publie/BPscript"
 BPSCRIPT_DIST="$BPSCRIPT_DIR/dist"
 # BPweb et MAMP Windows n'existent plus sur PC2 natif. Laissés vides → déploiements
 # gardés par `[ -d ]` donc simplement sautés. Oracle S0 = bp3 natif (plus de bp.exe).
@@ -96,6 +98,13 @@ if [ $DO_STATUS -eq 1 ]; then
 
     echo ""
     echo -e "${CYAN}=== Deploy Status ===${NC}"
+    # ⛔ La SOURCE avant la cible : sans elle, « missing » ne distingue pas un binaire non
+    # déployé d'un voisin injoignable — un zéro muet est la forme la plus coûteuse d'une casse.
+    if [ -f "$BPSCRIPT_DIR/EMPREINTE" ]; then
+        echo "  source BPscript : état publié @ $(head -1 "$BPSCRIPT_DIR/EMPREINTE")"
+    else
+        echo -e "  ${RED}source BPscript INJOIGNABLE${NC} ($BPSCRIPT_DIR) — les lignes qui suivent ne disent rien"
+    fi
     deploy_checks=("$BPSCRIPT_DIST/bp3.js")
     [ -n "$BPWEB_DIST" ] && deploy_checks+=("$BPWEB_DIST/bp3.js")
     [ -n "$MAMP_DIR" ]   && deploy_checks+=("$MAMP_DIR/bp.exe")
@@ -268,10 +277,13 @@ if [ $DO_ARCHIVE -eq 1 ]; then
     fi
 
     # FEEDBACK_BERNARD points count
+    # ⛔ Un compte de zéro et une source absente se ressemblent, et l'archive garde la trace.
+    # BPscript ne publie pas son dossier `test/` : le compte est alors « injoignable », jamais 0.
     feedback_file="$BPSCRIPT_DIR/test/FEEDBACK_BERNARD.md"
-    feedback_count=0
     if [ -f "$feedback_file" ]; then
         feedback_count=$(grep -c "^## [0-9]" "$feedback_file" 2>/dev/null || echo 0)
+    else
+        feedback_count="injoignable ($feedback_file)"
     fi
 
     # Diff since previous version

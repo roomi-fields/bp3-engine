@@ -65,6 +65,12 @@ if [ "$VOIE" = rapide ] || [ "$VOIE" = tout ]; then
   # ne démarre. Sa morsure s'éprouve ici, dans la copie — le volet qui prouve son branchement
   # lance `build.sh --clean`, qui écrit.
   lancer "fenetre-morsure"    90 "$COPIE/scripts/gate-fenetre-injection.sh"
+  # ⛔ Le garde du RETARD DE PUBLICATION vit lui aussi en tête du crochet, et sa ligne se
+  # retirait sans que rien ne rougisse — mesuré : 21 verts sur un crochet amputé. Ce maillon
+  # tourne DANS L'ARBRE parce que son sujet est le crochet que GIT EXÉCUTE ici, lu par
+  # core.hooksPath ; depuis la copie il prouverait le crochet de la copie. Il n'écrit rien :
+  # ses leurres vivent dans un dossier jetable, atteints en substituant HOME.
+  lancer "retard-morsure"     60 ./scripts/gate-retard-injection.sh
   # L'oracle figé est atteint par lien symbolique depuis la copie : une écriture dessus
   # aurait touché l'original. Le vérifier fait partie du portillon, pas d'un journal.
   lancer "oracle-fige-intact" 30 ./scripts/copie-injection.sh verifier

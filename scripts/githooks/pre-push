@@ -18,12 +18,17 @@
 # jamais recopié. `BP_AGENT` lui dit qui je suis : sans lui, il déduirait mon nom du répertoire.
 BP_AGENT=bp3-engine bash "$HOME/dev/bp/hub/tools/garde-fenetre.sh" || exit 1
 
-# ⛔ ET LE RETARD DE PUBLICATION : depuis le cloisonnement, un voisin ne lit plus cet arbre de
-# travail, il lit l'état publié — qui ne bouge que par `hub/tools/publier.sh`. L'intervalle
-# entre une poussée et la republication qui la suit est le seul trou du dispositif : pendant
-# lui, un voisin lit un état vieux et rien ne le lui dit. Le garde vient du hub, appelé et
-# jamais recopié ; il mord au crochet SUIVANT celui qui n'a pas été publié.
-bash "$HOME/dev/bp/hub/tools/garde-publie-a-jour.sh" || exit $?
+# ⛔ LES GARDES PARTAGÉS PASSENT PAR LE POINT D'ENTRÉE DU HUB, ET LEUR LISTE N'EST PAS ÉCRITE ICI.
+# Ce crochet portait la liste en dur — deux noms — et c'est le défaut mesuré par l'architecte le
+# 2026-09-04 : quinze copies de la liste, un garde neuf n'atteignant personne, et rien qui le dise.
+# `gardes-du-portillon.sh` est appelé avec mon nom ; il porte aujourd'hui le retard de publication
+# et la traversée, et ce qu'il portera demain arrive sans geste ici.
+#
+# ⇒ EN TÊTE, ET NON DANS `gate.sh` : ils décident si la poussée a le droit d'avoir lieu, et ils
+#   refusent avant que le portillon ne dépense ses quarante secondes. Le retard de publication ne
+#   PEUT PAS vivre dans le portillon : le maillon qui prouve son branchement relance ce crochet,
+#   donc le portillon — s'y placer le rendrait récursif.
+BP_AGENT=bp3-engine bash "$HOME/dev/bp/hub/tools/gardes-du-portillon.sh" bp3-engine || exit $?
 
 racine="$(git rev-parse --show-toplevel)"
 echo "── portillon bp3-engine (voie rapide) ───────"

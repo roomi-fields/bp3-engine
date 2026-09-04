@@ -34,6 +34,13 @@ mkdir -p "$T/leurre/dev/bp/hub/tools"
 FENETRE="$T/leurre/dev/bp/hub/tools/garde-fenetre.sh"
 RETARD="$T/leurre/dev/bp/hub/tools/garde-publie-a-jour.sh"
 printf '#!/usr/bin/env bash\nexit 0\n' > "$FENETRE"; chmod +x "$FENETRE"
+# ⛔ LE CROCHET N'APPELLE PLUS LE GARDE DIRECTEMENT : il passe par le POINT D'ENTRÉE du hub,
+# depuis le 2026-09-04. Le leurre doit donc porter ce point d'entrée, sinon le crochet
+# échouerait sur un fichier absent et le volet 3 rendrait son verdict sur cette cause-là.
+# ⇒ Ce leurre-ci ne fait qu'UNE chose : appeler le garde du retard. Le volet mesure alors la
+#   chaîne entière — crochet → point d'entrée → garde — et c'est elle, le branchement.
+ENTREE="$T/leurre/dev/bp/hub/tools/gardes-du-portillon.sh"
+printf '#!/usr/bin/env bash\nexec bash "%s"\n' "$RETARD" > "$ENTREE"; chmod +x "$ENTREE"
 
 poser_retard() { # poser_retard <code de sortie>
   rm -f "$T/marqueur"
@@ -49,7 +56,7 @@ else
   echo "   $CROCHET ✔"
 fi
 
-echo "2. le CROCHET QUE GIT EXÉCUTE appelle le garde du retard"
+echo "2. le CROCHET QUE GIT EXÉCUTE atteint le garde du retard, par le point d'entrée du hub"
 # ⚠️ `timeout` est ici pour que l'ÉCHEC SE NOMME : si la ligne du garde manque, le crochet
 # poursuit jusqu'au portillon — donc jusqu'à ce maillon-ci — et sans borne il rendrait
 # « dépassement » au lieu de dire ce qu'il a trouvé. Un garde nomme sa cause.

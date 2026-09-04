@@ -1,0 +1,38 @@
+# LA LISTE ATTENDUE DES MAILLONS DU PORTILLON — un nom par ligne, dans l'ordre de gate.sh.
+#
+# ⛔ POURQUOI ELLE VIT HORS DE `gate.sh`. Un portillon qui perd un maillon rend un vert de moins
+# et rien d'autre : ni rouge, ni vide, mais PARTIEL. Mesuré ici le 2026-09-03, sur le crochet :
+# une ligne de garde retirée, et le portillon rendait ses 21 verts sans une ligne pour le dire.
+# ⇒ Comparer ce que `gate.sh` déclare à ce que `gate.sh` lance ne voit rien : un maillon effacé
+#   sort des DEUX côtés de la comparaison, et le garde reste vert en ayant cessé de mesurer.
+#   La trace doit se tenir HORS des deux ensembles comparés. C'est ce fichier.
+#
+# ⛔ ET LE REFUS EST PAR NOM, JAMAIS SUR LE TOTAL : calé sur un compte, il ne mordrait qu'au
+# SECOND retrait, le premier redéfinissant le seuil, et un ajout ailleurs le compenserait.
+#
+# Un maillon qui entre au portillon s'inscrit ici dans le même geste ; un maillon qui en sort
+# s'y retire dans le même geste. Les deux sens refusent : le retrait silencieux comme l'ajout
+# non inscrit.
+
+baseline-integrite
+anti-bypass
+anti-bypass-morsure
+anti-retrocompat
+anti-retro-morsure
+ancrages-locaux
+ancrages-morsure
+effondrement-morsure
+non-retour-bug55
+sonde-morsure
+correspondance
+correspondance-morsure
+gel-baseline
+gel-morsure
+autonomie
+autonomie-morsure
+fenetre-morsure
+retard-morsure
+oracle-fige-intact
+oracle-fige-morsure
+documentaires-hub
+documentaires-morsure

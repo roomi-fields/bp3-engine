@@ -22,7 +22,12 @@ IGNORE = {".git", "node_modules", "test-data", "captures", "build", "source",
 MOTIF = re.compile(r"(^|/)(test-|test_)[^/]*\.(js|py|sh|mjs|cjs)$")
 
 texte = open(GATE, encoding="utf-8").read()
-lances = set(re.findall(r'lancer\s+"([^"]+)"', texte))
+# `lancer` et `lancer_seul` sont deux facons de brancher un maillon, pas deux choses. Le motif
+# doit les couvrir toutes deux : ecrit `lancer\s+"`, il a cesse de voir onze maillons sur
+# vingt-deux le jour ou `lancer_seul` est apparu, SANS ROUGIR — le compte etant vide chez nous,
+# la comparaison d ensembles etait vraie sur rien. Un garde se prouve sur la graphie que le code
+# ecrit, jamais sur celle qu on croit qu il ecrit.
+lances = set(re.findall(r'lancer(?:_seul)?\s+"([^"]+)"', texte))
 # une exclusion ne compte QUE si elle est commentée avec un motif à sa suite
 exclus = {m.group(1): m.group(2).strip()
           for m in re.finditer(r"^#\s*(\S*test[-_]\S*\.\w+)\s+(\S.*)$", texte, re.M)}

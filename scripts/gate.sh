@@ -66,6 +66,35 @@ lancer_seul() { # écrit dans la copie d'injection partagée : sa place est en s
   _courir "$@"
 }
 
+population() {
+  # ⛔ LA LISTE ATTENDUE, CONFRONTÉE PAR NOM. Un maillon retiré de ce fichier-ci sort des deux
+  # côtés d'une comparaison interne et ne rougit nulle part : la trace se tient donc DEHORS,
+  # dans scripts/MAILLONS.txt. Les deux sens refusent — le retrait silencieux comme l'ajout non
+  # inscrit — et le refus NOMME, parce qu'un compte qui bouge ne dit pas lequel a bougé.
+  local liste="$PWD/scripts/MAILLONS.txt" attendus lances manquants surnumeraires
+  if [ ! -f "$liste" ]; then
+    echo "  ✗ population des maillons — liste attendue introuvable : $liste"
+    echo "    Sans elle, un maillon disparu rend un vert de moins et rien de plus."
+    ROUGE=$((ROUGE+1)); return
+  fi
+  attendus=$(sed -e 's/#.*//' -e 's/[[:space:]]//g' -e '/^$/d' "$liste" | sort)
+  lances=$(printf '%s\n' "${NOMS[@]}" | sort)
+  # Un lot vide REFUSE : zéro maillon exécuté n'est pas un portillon vert.
+  if [ -z "$attendus" ] || [ ${#NOMS[@]} -eq 0 ]; then
+    echo "  ✗ population des maillons — liste vide ou aucun maillon lancé ; un lot vide refuse."
+    ROUGE=$((ROUGE+1)); return
+  fi
+  manquants=$(comm -23 <(printf '%s\n' "$attendus") <(printf '%s\n' "$lances"))
+  surnumeraires=$(comm -13 <(printf '%s\n' "$attendus") <(printf '%s\n' "$lances"))
+  if [ -n "$manquants" ] || [ -n "$surnumeraires" ]; then
+    [ -n "$manquants" ] && echo "  ✗ maillon(s) ATTENDU(S) et non lancé(s) : $(echo $manquants)"
+    [ -n "$surnumeraires" ] && echo "  ✗ maillon(s) lancé(s) et non inscrit(s) : $(echo $surnumeraires)"
+    echo "    → inscrire ou retirer dans scripts/MAILLONS.txt, dans le même geste."
+    ROUGE=$((ROUGE+1)); return
+  fi
+  echo "  ✓ population — ${#NOMS[@]} maillon(s) lancé(s), nom pour nom, conformes à scripts/MAILLONS.txt"
+}
+
 verdicts() {
   wait
   local i n d c dt
@@ -162,6 +191,7 @@ if [ "$VOIE" = rapide ] || [ "$VOIE" = tout ]; then
   # Les verdicts se rendent ICI, dans l'ordre déclaré et jamais dans l'ordre d'arrivée : un
   # portillon dont la sortie change de forme d'une course à l'autre ne se compare plus.
   verdicts
+  population
 fi
 
 # La voie ROUGE porte les défauts MOTEUR connus et non corrigés. On ne les maquille jamais :

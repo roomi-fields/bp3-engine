@@ -54,9 +54,10 @@ _courir() { # _courir <nom> <delai> <commande...> — écrit son verdict, jamais
 #     pas », pas un chiffre. Ce qui domine est la charge de la machine, extérieure à ce portillon.
 #   ⚠️ Et la première mesure, prise sur DEUX COURSES SUCCESSIVES au lieu d'une paire, concluait
 #     l'inverse — « le parallèle est plus lent » — en comparant deux instants, pas deux formes.
-#   ⇒ Le vrai coût est ailleurs, et lui se mesure : `documentaires-hub` et sa morsure valent à
-#     eux deux les deux tiers du portillon, parce qu'ils lancent chacun les trois outils du hub,
-#     dont un qui balaie 2879 fichiers sur les quinze états publiés.
+#   ⇒ Ce qui pesait le plus n'est plus ici : les deux maillons qui relançaient les outils du hub
+#     valaient à eux seuls les deux tiers du portillon, l'un d'eux balayant 2879 fichiers sur les
+#     quinze états publiés. Ils sont partis avec la voie parallèle qu'ils formaient, et ces
+#     gardes-là tournent une seule fois, en tête du crochet.
 lancer() {      # parallélisable : n'écrit pas dans la copie partagée
   NOMS+=("$1"); DELAIS+=("$2")
   if [ "${GATE_SERIE:-0}" = 1 ]; then _courir "$@"; else _courir "$@" & fi
@@ -178,16 +179,14 @@ if [ "$VOIE" = rapide ] || [ "$VOIE" = tout ]; then
   lancer_seul "oracle-fige-intact" 30 ./scripts/copie-injection.sh verifier
   lancer_seul "oracle-fige-morsure" 60 "$COPIE/scripts/gate-oracle-injection.sh"
   ./scripts/copie-injection.sh retirer
-  # Les deux gardes documentaires du hub, appelés et non recopiés. Ils vivaient dans un bloc greffé
-  # après `verify` dans le seul crochet de poussée : « verify vert » ne valait pas « portillon
-  # vert ». Ici ils sont au même niveau que les seize autres.
-  lancer "documentaires-hub"  90 ./scripts/garde-documentaires.sh
-  # ⛔ CETTE INJECTION-CI TOURNE DANS L'ARBRE, ET C'EST DÉLIBÉRÉ. Son décor entier — un hub
-  # fabriqué, ses leurres — vit dans un dossier jetable : elle n'écrit pas une ligne ici, ce qui
-  # est la raison d'être de la copie. Et son volet nominal doit mesurer CE dépôt : depuis la
-  # copie, les outils du hub seraient appelés avec le nom du dossier de copie, qu'aucune table
-  # ne connaît, et le vert ne dirait rien de moi.
-  lancer "documentaires-morsure" 90 ./scripts/gate-documentaires-injection.sh
+  # ⛔ LES GARDES DU HUB NE SONT PLUS RELANCÉS ICI. Ils vivaient dans ce portillon, dérivés de
+  # `hub/tools/PORTILLON.txt` — trois noms. Depuis le 2026-09-04 le hub porte un POINT D'ENTRÉE
+  # unique, appelé en tête de mon crochet, qui lance ces trois-là et trois de plus, et qui nomme
+  # à chaque passage ceux qu'il n'appelle pas. Les relancer ici ferait de PORTILLON.txt une
+  # seconde autorité sur la même liste, et deux listes divergent toujours : celle du hub en
+  # nommait trois quand son point d'entrée en lançait quatre, le même jour.
+  # ⇒ Leur branchement est prouvé par `retard-morsure`, qui suit la chaîne crochet → point
+  #   d'entrée → garde et rougit quand la ligne du crochet est amputée.
   # Les verdicts se rendent ICI, dans l'ordre déclaré et jamais dans l'ordre d'arrivée : un
   # portillon dont la sortie change de forme d'une course à l'autre ne se compare plus.
   verdicts

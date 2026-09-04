@@ -13,21 +13,20 @@
 #
 # Contournement : `git push --no-verify`. Il est volontairement possible — mais il devient
 # alors un acte explicite et traçable, au lieu du silence d'avant.
-# ⛔ EN TÊTE, AVANT LE PORTILLON : un voisin qui mesure sur ce dépôt tient une fenêtre ouverte,
-# et le gel de la tour ferme sa porte, pas celle de git. Le garde vient du hub, il est appelé et
-# jamais recopié. `BP_AGENT` lui dit qui je suis : sans lui, il déduirait mon nom du répertoire.
-BP_AGENT=bp3-engine bash "$HOME/dev/bp/hub/tools/garde-fenetre.sh" || exit 1
-
 # ⛔ LES GARDES PARTAGÉS PASSENT PAR LE POINT D'ENTRÉE DU HUB, ET LEUR LISTE N'EST PAS ÉCRITE ICI.
 # Ce crochet portait la liste en dur — deux noms — et c'est le défaut mesuré par l'architecte le
 # 2026-09-04 : quinze copies de la liste, un garde neuf n'atteignant personne, et rien qui le dise.
-# `gardes-du-portillon.sh` est appelé avec mon nom ; il porte aujourd'hui le retard de publication
-# et la traversée, et ce qu'il portera demain arrive sans geste ici.
+# `gardes-du-portillon.sh` est appelé avec mon nom ; il porte aujourd'hui la fenêtre, la navigation,
+# les copies diffusées, le retard de publication, les sources voisines et la traversée, et ce qu'il
+# portera demain arrive sans geste ici. `BP_AGENT` lui dit qui je suis : sans lui, il déduirait mon
+# nom du répertoire.
 #
 # ⇒ EN TÊTE, ET NON DANS `gate.sh` : ils décident si la poussée a le droit d'avoir lieu, et ils
-#   refusent avant que le portillon ne dépense ses quarante secondes. Le retard de publication ne
-#   PEUT PAS vivre dans le portillon : le maillon qui prouve son branchement relance ce crochet,
-#   donc le portillon — s'y placer le rendrait récursif.
+#   refusent avant que le portillon ne dépense ses quarante secondes. Le garde de FENÊTRE d'abord,
+#   dans leur ordre à eux : un voisin qui mesure sur ce dépôt tient une fenêtre ouverte, et le gel
+#   de la tour ferme sa porte, pas celle de git. Le retard de publication, lui, ne PEUT PAS vivre
+#   dans le portillon : le maillon qui prouve son branchement relance ce crochet, donc le portillon
+#   — s'y placer le rendrait récursif.
 BP_AGENT=bp3-engine bash "$HOME/dev/bp/hub/tools/gardes-du-portillon.sh" bp3-engine || exit $?
 
 racine="$(git rev-parse --show-toplevel)"

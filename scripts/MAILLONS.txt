@@ -34,5 +34,3 @@ fenetre-morsure
 retard-morsure
 oracle-fige-intact
 oracle-fige-morsure
-documentaires-hub
-documentaires-morsure

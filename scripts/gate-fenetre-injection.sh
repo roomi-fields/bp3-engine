@@ -80,6 +80,12 @@ fi
 
 mkdir -p "$T/leurre/dev/bp/hub/tools"
 LEURRE="$T/leurre/dev/bp/hub/tools/garde-fenetre.sh"
+# ⛔ LE CROCHET N'APPELLE PLUS LE GARDE DIRECTEMENT : il passe par le POINT D'ENTRÉE du hub,
+# depuis le 2026-09-04, et ce point d'entrée lance le garde de fenêtre EN PREMIER. Le leurre
+# porte donc les deux, sans quoi le crochet échouerait sur un fichier absent et le volet 5
+# rendrait son verdict sur cette cause-là. `build.sh`, lui, appelle toujours le garde en direct.
+ENTREE="$T/leurre/dev/bp/hub/tools/gardes-du-portillon.sh"
+printf '#!/usr/bin/env bash\nexec bash "%s"\n' "$LEURRE" > "$ENTREE"; chmod +x "$ENTREE"
 poser_leurre() { # poser_leurre <code de sortie>
   rm -f "$T/marqueur"
   printf '#!/usr/bin/env bash\ntouch "%s"\necho "leurre : refus simule" >&2\nexit %s\n' \

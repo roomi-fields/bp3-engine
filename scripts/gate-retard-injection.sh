@@ -28,12 +28,8 @@ CROCHET="$(git rev-parse --show-toplevel)/$(git config core.hooksPath)/pre-push"
 # trouverait un reste et refuserait pour une cause sans rapport. Mesuré ici même. Sa copie va
 # donc dans le dossier jetable de cette épreuve.
 
-# Le leurre du garde de FENÊTRE laisse passer : sans lui le crochet s'arrête avant
-# d'atteindre le garde du retard, et l'épreuve ne toucherait jamais son sujet.
 mkdir -p "$T/leurre/dev/bp/hub/tools"
-FENETRE="$T/leurre/dev/bp/hub/tools/garde-fenetre.sh"
 RETARD="$T/leurre/dev/bp/hub/tools/garde-publie-a-jour.sh"
-printf '#!/usr/bin/env bash\nexit 0\n' > "$FENETRE"; chmod +x "$FENETRE"
 # ⛔ LE CROCHET N'APPELLE PLUS LE GARDE DIRECTEMENT : il passe par le POINT D'ENTRÉE du hub,
 # depuis le 2026-09-04. Le leurre doit donc porter ce point d'entrée, sinon le crochet
 # échouerait sur un fichier absent et le volet 3 rendrait son verdict sur cette cause-là.

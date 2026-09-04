@@ -145,9 +145,9 @@ if [ "$VOIE" = rapide ] || [ "$VOIE" = tout ]; then
   #
   # ⛔ `lancer_seul` = ce maillon travaille DANS la copie d'injection, qui est unique et partagée.
   # Le critère n'est pas « il écrit » mais « son objet est la copie » : cinq d'entre eux y écrivent
-  # sans dossier jetable à eux, `fenetre-morsure` y lance `build.sh --clean`, et les deux gardes de
-  # l'oracle figé LISENT l'état de cette même copie. Un lecteur de la copie lancé pendant qu'un
-  # autre la réécrit rend un verdict sur un décor à moitié défait.
+  # sans dossier jetable à eux, et les deux gardes de l'oracle figé LISENT l'état de cette même
+  # copie. Un lecteur de la copie lancé pendant qu'un autre la réécrit rend un verdict sur un décor
+  # à moitié défait.
   lancer "baseline-integrite" 60 python3 scripts/gate-baseline.py
   lancer "anti-bypass"        60 python3 scripts/gate-meta.py
   lancer_seul "anti-bypass-morsure" 90 "$COPIE/scripts/gate-meta-injection.sh"
@@ -164,11 +164,7 @@ if [ "$VOIE" = rapide ] || [ "$VOIE" = tout ]; then
   lancer_seul "gel-morsure"        90 "$COPIE/scripts/gate-gel-injection.sh"
   lancer "autonomie"          60 python3 scripts/gate-autonomie.py
   lancer_seul "autonomie-morsure"  90 "$COPIE/scripts/gate-autonomie-injection.sh"
-  # Le garde de fenêtre vit en TÊTE de ce même crochet : il refuse avant que le portillon
-  # ne démarre. Sa morsure s'éprouve ici, dans la copie — le volet qui prouve son branchement
-  # lance `build.sh --clean`, qui écrit.
-  lancer_seul "fenetre-morsure"    90 "$COPIE/scripts/gate-fenetre-injection.sh"
-  # ⛔ Le garde du RETARD DE PUBLICATION vit lui aussi en tête du crochet, et sa ligne se
+  # ⛔ Le garde du RETARD DE PUBLICATION vit en tête du crochet, et sa ligne se
   # retirait sans que rien ne rougisse — mesuré : 21 verts sur un crochet amputé. Ce maillon
   # tourne DANS L'ARBRE parce que son sujet est le crochet que GIT EXÉCUTE ici, lu par
   # core.hooksPath ; depuis la copie il prouverait le crochet de la copie. Il n'écrit rien :

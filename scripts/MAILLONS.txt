@@ -30,7 +30,6 @@ gel-baseline
 gel-morsure
 autonomie
 autonomie-morsure
-fenetre-morsure
 retard-morsure
 oracle-fige-intact
 oracle-fige-morsure

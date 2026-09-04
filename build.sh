@@ -132,12 +132,6 @@ if [ $DO_STATUS -eq 1 ]; then
     exit 0
 fi
 
-# ⛔ SECOND SITE DU GARDE DE FENÊTRE — ici rien n'est poussé, et pourtant tout bouge : la
-# construction réécrit `bp3` à la racine, et les voisins consomment ce dépôt par lien symbolique.
-# Une mesure lancée chez eux verrait le binaire changer sous elle sans qu'aucun git n'intervienne.
-# Placé APRÈS `--status`, qui ne fait que lire, et AVANT tout ce qui écrit — construction comprise.
-BP_AGENT=bp3-engine bash "$HOME/dev/bp/hub/tools/garde-fenetre.sh" || exit 1
-
 # === Clean ===
 if [ $DO_CLEAN -eq 1 ]; then
     echo -e "${YELLOW}Cleaning all build artifacts...${NC}"

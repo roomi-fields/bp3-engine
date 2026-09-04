@@ -4,20 +4,30 @@
 Source : baseline-native/baseline.json, champ 'config' de chaque grammaire — la seule
 trace ecrite du couple, etablie grammaire par grammaire lors des captures.
 
-Cible : <kanopi>/packages/library/test-assets/bp3/correspondance.json
+Cible : baseline-native/correspondance.json, DANS CE DEPOT — decision de l architecte du
+2026-09-04 : un depot ecrit chez lui ou dans un dossier temporaire, jamais chez un voisin.
+Ce qui se produit chez soi se REND ; le destinataire l integre par son propre geste. La table
+part donc a l espace publie avec le reste de cet arbre, et kanopi la reprend quand il veut.
 
-Ce script VERIFIE chaque chemin sur le disque avant d ecrire. Un chemin mort dans la
-table est pire que pas de table : il se lit comme une verite. Si une seule reference
-manque, on n ecrit RIEN et on sort en erreur.
+Les chemins de la table restent RELATIFS a packages/library : c est kanopi qui la consomme.
+Leur verification se prend sur l ETAT PUBLIE de kanopi, jamais sur son arbre de travail — un
+arbre de voisin n est plus atteignable sous enveloppe, et un chemin verifie ailleurs que la ou
+il sera lu ne prouve rien.
+
+Ce script VERIFIE chaque chemin avant d ecrire. Un chemin mort dans la table est pire que pas
+de table : il se lit comme une verite. Si une seule reference manque, on n ecrit RIEN et on
+sort en erreur.
 
 Usage : scripts/table-correspondance.py [--verifier-seulement]
 """
 import json, os, re, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-KANOPI = "/home/romi/dev/bp/kanopi/packages/library"
+KANOPI = "/home/romi/dev/bp/.publie/kanopi/packages/library"
 BASELINE = os.path.join(ROOT, "baseline-native", "baseline.json")
-CIBLE = os.path.join(KANOPI, "test-assets", "bp3", "correspondance.json")
+CIBLE = os.path.join(ROOT, "baseline-native", "correspondance.json")
+# La ou kanopi porte SON exemplaire. Lue pour DIRE si son integration a pris ; jamais ecrite.
+CHEZ_KANOPI = os.path.join(KANOPI, "test-assets", "bp3", "correspondance.json")
 
 DIR_SCENES = "scenes/BP3-tests"
 DIR_AUX = "test-assets/bp3/commun"
@@ -261,11 +271,23 @@ def main():
         "n_references_auxiliaires": n_aux,
         "grammaires": entrees,
     }
-    os.makedirs(os.path.dirname(CIBLE), exist_ok=True)
+    rendu = json.dumps(table, ensure_ascii=False, indent=1) + "\n"
     with open(CIBLE, "w", encoding="utf-8") as f:
-        json.dump(table, f, ensure_ascii=False, indent=1)
-        f.write("\n")
+        f.write(rendu)
     print(f"ecrit : {CIBLE}")
+
+    # ⛔ RENDRE N EST PAS DEPOSER. Ce qui est produit ici ne devient la table de kanopi que par
+    # SON geste. Sans cette ligne, une divergence entre ce qui est produit et ce qu il porte ne
+    # se voit nulle part : les deux fichiers sont propres chacun de leur cote, et rien ne les
+    # compare. Elle informe, elle ne refuse pas — le calendrier d integration est a lui.
+    try:
+        with open(CHEZ_KANOPI, encoding="utf-8") as f:
+            porte = f.read()
+    except OSError as e:
+        print(f"a rendre a kanopi : son exemplaire est illisible a son etat publie ({e.strerror}).")
+    else:
+        etat = "identique" if porte == rendu else "DIFFERENT — a integrer par kanopi"
+        print(f"exemplaire de kanopi, a son etat publie : {etat}")
     return 0
 
 

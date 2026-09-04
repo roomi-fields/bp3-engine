@@ -16,20 +16,83 @@ cd "$(dirname "$0")/.."
 VOIE="${1:-rapide}"
 ROUGE=0; VERT=0
 
-lancer() { # lancer <nom> <delai> <commande...>
+# ⛔ CE PORTILLON DIT OÙ PART SON TEMPS — levier 4 de la demande de Romain du 2026-09-04.
+# Sans cette mesure, personne ne cherche : un portillon lent est lent « en gros », et le maillon
+# qui en mange la moitié se cache derrière vingt et un autres. Elle s'affiche à chaque course, y
+# compris verte, parce qu'une régression de temps ne se voit que contre la course d'avant.
+CHRONO_TOTAL=0
+# ⛔ ON PAIE LE MAXIMUM, PAS LA SOMME — levier 1 de la demande de Romain du 2026-09-04.
+# ⛔⛔ ET CE QUI BORNE CE PORTILLON N'EST PAS LE PROCESSEUR : c'est le DÉCOR. Cinq injections
+# n'ont pas de dossier jetable à elles et écrivent DANS la copie d'injection, qui est unique.
+# Les lancer ensemble les ferait se marcher dessus, et deux gardes qui se marchent dessus
+# rendent VERT — parce que leur objet a disparu, pas parce qu'il tient. Elles restent en série,
+# par `lancer_seul`, et c'est le fichier de garde qui le déclare, jamais une liste ailleurs.
+# (Le levier prescrit — un processus partagé contre l'amorçage répété — ne mord pas ici :
+# ce portillon ne lance pas un seul processus `node`. Sa dépense est du travail, pas du
+# démarrage : `user`+`sys` valent 16 s sur 31 s de maillons, le reste étant de la lecture
+# de disque sur les quinze états publiés.)
+RES=$(mktemp -d "${TMPDIR:-/tmp}/gate-verdicts.XXXXXX")
+trap 'rm -rf "$RES"' EXIT
+NOMS=(); DELAIS=()
+
+_courir() { # _courir <nom> <delai> <commande...> — écrit son verdict, jamais l'écran
   local n=$1 d=$2; shift 2
-  printf '  %-26s ' "$n"
-  if timeout "$d" "$@" >"/tmp/gate.$n.log" 2>&1; then
-    echo "vert"; VERT=$((VERT+1))
-  else
-    local c=$?
-    [ $c -eq 124 ] && echo "DÉPASSE $d s" || echo "ROUGE (sortie $c)"
-    ROUGE=$((ROUGE+1))
-  fi
-  # ⛔ LA MENTION DE RÉGIME REMONTE, VERT COMME ROUGE. Le portillon retient la sortie de
-  # chaque maillon dans un journal ; une mention qui y reste ne qualifie rien, puisque
-  # personne ne lit le journal quand tout est vert. Elle s'affiche sous son maillon.
-  grep -h '^\[regime\]' "/tmp/gate.$n.log" 2>/dev/null | sed 's/^/    /' || true
+  local t0=${EPOCHREALTIME/,/.}
+  timeout "$d" "$@" >"/tmp/gate.$n.log" 2>&1
+  local c=$?
+  printf '%s %s\n' "$c" "$(awk -v a="$t0" -v b="${EPOCHREALTIME/,/.}" 'BEGIN{printf "%.2f", b-a}')" \
+    > "$RES/$n"
+}
+
+# ⛔ LE TÉMOIN QUI COMPARE LES DEUX FORMES. `GATE_SERIE=1` reproduit la forme entièrement en
+# série. Sans lui, « le parallèle est plus rapide » est une croyance : les deux formes doivent
+# rendre le MÊME verdict et deux durées comparables sur la même machine, au même moment.
+# ⇒ MESURÉ LE 2026-09-04, CINQ PAIRES ENTRELACÉES : parallèle 35,9 · 53,5 · 46,4 · 63,6 · 57,3 s,
+#   série 39,6 · 55,8 · 49,5 · 68,5 · 37,3 s. Le parallèle gagne 3 à 5 s quatre fois et perd 20 s
+#   une fois, quand l'écart entre deux courses de la MÊME forme atteint 28 s.
+#   ⛔ L'écart cherché est donc plus petit que le bruit, et la bonne réponse est « on ne sait
+#     pas », pas un chiffre. Ce qui domine est la charge de la machine, extérieure à ce portillon.
+#   ⚠️ Et la première mesure, prise sur DEUX COURSES SUCCESSIVES au lieu d'une paire, concluait
+#     l'inverse — « le parallèle est plus lent » — en comparant deux instants, pas deux formes.
+#   ⇒ Le vrai coût est ailleurs, et lui se mesure : `documentaires-hub` et sa morsure valent à
+#     eux deux les deux tiers du portillon, parce qu'ils lancent chacun les trois outils du hub,
+#     dont un qui balaie 2879 fichiers sur les quinze états publiés.
+lancer() {      # parallélisable : n'écrit pas dans la copie partagée
+  NOMS+=("$1"); DELAIS+=("$2")
+  if [ "${GATE_SERIE:-0}" = 1 ]; then _courir "$@"; else _courir "$@" & fi
+}
+lancer_seul() { # écrit dans la copie d'injection partagée : sa place est en série
+  NOMS+=("$1"); DELAIS+=("$2")
+  _courir "$@"
+}
+
+verdicts() {
+  wait
+  local i n d c dt
+  for i in "${!NOMS[@]}"; do
+    n=${NOMS[$i]}; d=${DELAIS[$i]}
+    printf '  %-26s ' "$n"
+    # ⛔ L'ABSENCE DE VERDICT REFUSE. Un maillon qui n'a pas déposé son code n'a pas fini, ou il
+    # est mort avant d'écrire — les deux sont des refus, jamais un vert par défaut.
+    if [ ! -f "$RES/$n" ]; then
+      printf '%-14s\n' "ROUGE (sans verdict)"; ROUGE=$((ROUGE+1)); continue
+    fi
+    read -r c dt < "$RES/$n"
+    CHRONO_TOTAL=$(awk -v a="$CHRONO_TOTAL" -v b="$dt" 'BEGIN{printf "%.2f", a+b}')
+    # ⛔ LE REFUS NOMME QUI REFUSE : un lot parallèle qui rend « 1 » sans nom est
+    # indistinguable d'un refus survenu ailleurs.
+    if [ "$c" -eq 0 ]; then
+      printf '%-14s %6s s\n' "vert" "$dt"; VERT=$((VERT+1))
+    elif [ "$c" -eq 124 ]; then
+      printf '%-14s %6s s\n' "DÉPASSE $d s" "$dt"; ROUGE=$((ROUGE+1))
+    else
+      printf '%-14s %6s s\n' "ROUGE (sortie $c)" "$dt"; ROUGE=$((ROUGE+1))
+    fi
+    # ⛔ LA MENTION DE RÉGIME REMONTE, VERT COMME ROUGE. Le portillon retient la sortie de
+    # chaque maillon dans un journal ; une mention qui y reste ne qualifie rien, puisque
+    # personne ne lit le journal quand tout est vert. Elle s'affiche sous son maillon.
+    grep -h '^\[regime\]' "/tmp/gate.$n.log" 2>/dev/null | sed 's/^/    /' || true
+  done
 }
 
 if [ "$VOIE" = rapide ] || [ "$VOIE" = tout ]; then
@@ -39,32 +102,42 @@ if [ "$VOIE" = rapide ] || [ "$VOIE" = tout ]; then
   # — le code de Bernard Bel — et le binaire oracle. Un voisin qui lisait l'arbre pendant
   # une poussée voyait l'apparence exacte de la faute la plus grave de la charte.
   # Sans copie, PAS D'INJECTION : un repli sur l'arbre réel rendrait le défaut invisible.
+  # La pose de la copie est hors maillon et se chronomètre à part : c'est un décor, pas un garde,
+  # et il pèse. Le confondre avec un maillon ferait chercher la lenteur dans le mauvais objet.
+  T_COPIE0=${EPOCHREALTIME/,/.}
   COPIE="$(./scripts/copie-injection.sh poser)" || {
     echo "  ✗ la copie d'injection n'a pas pu être posée — les morsures ne s'éprouvent pas ici"
     exit 1
   }
+  T_COPIE=$(awk -v a="$T_COPIE0" -v b="${EPOCHREALTIME/,/.}" 'BEGIN{printf "%.2f", b-a}')
   # Listés un par un, et non par une boucle : le méta-garde anti-bypass doit pouvoir
   # lire ce fichier sans interpréter du shell. Un garde qui doit deviner ne garde rien.
+  #
+  # ⛔ `lancer_seul` = ce maillon travaille DANS la copie d'injection, qui est unique et partagée.
+  # Le critère n'est pas « il écrit » mais « son objet est la copie » : cinq d'entre eux y écrivent
+  # sans dossier jetable à eux, `fenetre-morsure` y lance `build.sh --clean`, et les deux gardes de
+  # l'oracle figé LISENT l'état de cette même copie. Un lecteur de la copie lancé pendant qu'un
+  # autre la réécrit rend un verdict sur un décor à moitié défait.
   lancer "baseline-integrite" 60 python3 scripts/gate-baseline.py
   lancer "anti-bypass"        60 python3 scripts/gate-meta.py
-  lancer "anti-bypass-morsure" 90 "$COPIE/scripts/gate-meta-injection.sh"
+  lancer_seul "anti-bypass-morsure" 90 "$COPIE/scripts/gate-meta-injection.sh"
   lancer "anti-retrocompat"   60 python3 scripts/gate-legacy.py
-  lancer "anti-retro-morsure" 90 "$COPIE/scripts/gate-legacy-injection.sh"
+  lancer_seul "anti-retro-morsure" 90 "$COPIE/scripts/gate-legacy-injection.sh"
   lancer "ancrages-locaux"    60 python3 scripts/gate-ancrages.py
-  lancer "ancrages-morsure"   90 "$COPIE/scripts/gate-ancrages-injection.sh"
-  lancer "effondrement-morsure" 90 "$COPIE/scripts/gate-effondrement-injection.sh"
+  lancer_seul "ancrages-morsure"   90 "$COPIE/scripts/gate-ancrages-injection.sh"
+  lancer_seul "effondrement-morsure" 90 "$COPIE/scripts/gate-effondrement-injection.sh"
   lancer "non-retour-bug55"   60 ./scripts/verif-bug55.sh
-  lancer "sonde-morsure"     120 "$COPIE/scripts/gate-sonde-injection.sh"
+  lancer_seul "sonde-morsure"     120 "$COPIE/scripts/gate-sonde-injection.sh"
   lancer "correspondance"     60 python3 scripts/gate-correspondance.py
-  lancer "correspondance-morsure" 90 "$COPIE/scripts/gate-correspondance-injection.sh"
+  lancer_seul "correspondance-morsure" 90 "$COPIE/scripts/gate-correspondance-injection.sh"
   lancer "gel-baseline"       60 python3 scripts/gel-baseline.py
-  lancer "gel-morsure"        90 "$COPIE/scripts/gate-gel-injection.sh"
+  lancer_seul "gel-morsure"        90 "$COPIE/scripts/gate-gel-injection.sh"
   lancer "autonomie"          60 python3 scripts/gate-autonomie.py
-  lancer "autonomie-morsure"  90 "$COPIE/scripts/gate-autonomie-injection.sh"
+  lancer_seul "autonomie-morsure"  90 "$COPIE/scripts/gate-autonomie-injection.sh"
   # Le garde de fenêtre vit en TÊTE de ce même crochet : il refuse avant que le portillon
   # ne démarre. Sa morsure s'éprouve ici, dans la copie — le volet qui prouve son branchement
   # lance `build.sh --clean`, qui écrit.
-  lancer "fenetre-morsure"    90 "$COPIE/scripts/gate-fenetre-injection.sh"
+  lancer_seul "fenetre-morsure"    90 "$COPIE/scripts/gate-fenetre-injection.sh"
   # ⛔ Le garde du RETARD DE PUBLICATION vit lui aussi en tête du crochet, et sa ligne se
   # retirait sans que rien ne rougisse — mesuré : 21 verts sur un crochet amputé. Ce maillon
   # tourne DANS L'ARBRE parce que son sujet est le crochet que GIT EXÉCUTE ici, lu par
@@ -73,8 +146,8 @@ if [ "$VOIE" = rapide ] || [ "$VOIE" = tout ]; then
   lancer "retard-morsure"     60 ./scripts/gate-retard-injection.sh
   # L'oracle figé est atteint par lien symbolique depuis la copie : une écriture dessus
   # aurait touché l'original. Le vérifier fait partie du portillon, pas d'un journal.
-  lancer "oracle-fige-intact" 30 ./scripts/copie-injection.sh verifier
-  lancer "oracle-fige-morsure" 60 "$COPIE/scripts/gate-oracle-injection.sh"
+  lancer_seul "oracle-fige-intact" 30 ./scripts/copie-injection.sh verifier
+  lancer_seul "oracle-fige-morsure" 60 "$COPIE/scripts/gate-oracle-injection.sh"
   ./scripts/copie-injection.sh retirer
   # Les deux gardes documentaires du hub, appelés et non recopiés. Ils vivaient dans un bloc greffé
   # après `verify` dans le seul crochet de poussée : « verify vert » ne valait pas « portillon
@@ -86,6 +159,9 @@ if [ "$VOIE" = rapide ] || [ "$VOIE" = tout ]; then
   # copie, les outils du hub seraient appelés avec le nom du dossier de copie, qu'aucune table
   # ne connaît, et le vert ne dirait rien de moi.
   lancer "documentaires-morsure" 90 ./scripts/gate-documentaires-injection.sh
+  # Les verdicts se rendent ICI, dans l'ordre déclaré et jamais dans l'ordre d'arrivée : un
+  # portillon dont la sortie change de forme d'une course à l'autre ne se compare plus.
+  verdicts
 fi
 
 # La voie ROUGE porte les défauts MOTEUR connus et non corrigés. On ne les maquille jamais :
@@ -103,5 +179,8 @@ fi
 
 echo "─────────────────────────────────────────────"
 echo "  $VERT vert(s), $ROUGE rouge(s)"
+if [ "${T_COPIE:-}" != "" ]; then
+  echo "  temps : ${CHRONO_TOTAL} s de maillons + ${T_COPIE} s de pose du décor d'injection"
+fi
 [ "$VOIE" = rouge ] && exit 0   # cette voie est informative : son rouge est attendu
 exit $(( ROUGE > 0 ? 1 : 0 ))

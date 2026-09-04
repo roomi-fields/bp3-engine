@@ -170,6 +170,10 @@ if [ "$VOIE" = rapide ] || [ "$VOIE" = tout ]; then
   # core.hooksPath ; depuis la copie il prouverait le crochet de la copie. Il n'écrit rien :
   # ses leurres vivent dans un dossier jetable, atteints en substituant HOME.
   lancer "retard-morsure"     60 ./scripts/gate-retard-injection.sh
+  # Le garde du COURRIER NON LU vit en tête du crochet, avant tout le reste. Sa ligne se retire
+  # sans que rien ne rougisse — c'est le même défaut, et il se couvre de la même façon. Ce maillon
+  # tourne DANS L'ARBRE pour la même raison que le précédent : son sujet est le crochet d'ici.
+  lancer "courrier-morsure"   60 ./scripts/gate-courrier-injection.sh
   # L'oracle figé est atteint par lien symbolique depuis la copie : une écriture dessus
   # aurait touché l'original. Le vérifier fait partie du portillon, pas d'un journal.
   lancer_seul "oracle-fige-intact" 30 ./scripts/copie-injection.sh verifier

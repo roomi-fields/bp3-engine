@@ -31,5 +31,6 @@ gel-morsure
 autonomie
 autonomie-morsure
 retard-morsure
+courrier-morsure
 oracle-fige-intact
 oracle-fige-morsure

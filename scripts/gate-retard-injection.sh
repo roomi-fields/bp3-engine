@@ -30,6 +30,12 @@ CROCHET="$(git rev-parse --show-toplevel)/$(git config core.hooksPath)/pre-push"
 
 mkdir -p "$T/leurre/dev/bp/hub/tools"
 RETARD="$T/leurre/dev/bp/hub/tools/garde-publie-a-jour.sh"
+# Le leurre du garde de COURRIER NON LU laisse passer : il vit en tête du crochet, et sans lui
+# celui-ci s'arrête sur un fichier absent avant d'atteindre le sujet de cette épreuve. Mesuré ici
+# le 2026-09-05, à la minute où ce garde a été branché : les trois volets ont rougi d'un coup en
+# nommant « abonné, pas branché », sur une cause qui n'était pas la leur.
+COURRIER="$T/leurre/dev/bp/hub/tools/garde-courrier-non-lu.sh"
+printf '#!/usr/bin/env bash\nexit 0\n' > "$COURRIER"; chmod +x "$COURRIER"
 # ⛔ LE CROCHET N'APPELLE PLUS LE GARDE DIRECTEMENT : il passe par le POINT D'ENTRÉE du hub,
 # depuis le 2026-09-04. Le leurre doit donc porter ce point d'entrée, sinon le crochet
 # échouerait sur un fichier absent et le volet 3 rendrait son verdict sur cette cause-là.

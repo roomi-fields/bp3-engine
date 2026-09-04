@@ -14,6 +14,17 @@
 # Contournement : `git push --no-verify`. Il est volontairement possible — mais il devient
 # alors un acte explicite et traçable, au lieu du silence d'avant.
 
+# ⛔ LE COURRIER NON LU REFUSE LA POUSSÉE, ET SEULEMENT ICI. Un dépôt a poussé dans la fenêtre d'un
+# voisin après avoir lu QUATRE messages sur SIX : le lot d'affichage est borné à quatre, et la
+# ligne « N à suivre » ne suffit pas. ⇒ « 0 non-lu » est le seul verdict, jamais l'écran.
+# ⚠️ SA PLACE EST LE GESTE DE POUSSÉE, jamais un site de bascule : le portillon dure des minutes et
+# le courrier arrive toutes les une à deux minutes — branché ailleurs, il mesure un autre instant
+# que le geste et refuse deux poussées de suite.
+# ⇒ Ce refus vivait dans le garde de fenêtre, qui en portait DEUX. Retirer le mécanisme de gel a
+#   emporté celui-ci avec lui : mesuré ici le 2026-09-05, crochet à 21 verts et code 0 avec deux
+#   lettres non lues en boîte. Deux refus dans un même fichier sont DEUX gardes.
+bash "$HOME/dev/bp/hub/tools/garde-courrier-non-lu.sh" || exit 1
+
 # ⛔ LES GARDES PARTAGÉS PASSENT PAR LE POINT D'ENTRÉE DU HUB, ET LEUR LISTE N'EST PAS ÉCRITE ICI.
 # Ce crochet portait la liste en dur — deux noms — et c'est le défaut mesuré par l'architecte le
 # 2026-09-04 : quinze copies de la liste, un garde neuf n'atteignant personne, et rien qui le dise.

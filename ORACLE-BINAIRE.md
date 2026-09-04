@@ -5,12 +5,31 @@ la **pièce partagée dont dépendent TOUS les oracles de la flotte**. Une page,
 
 ## Où vit le binaire de référence
 
-- **Natif** : `/home/romi/dev/bp/bp3-engine/bp3` — dépôt `bp3-engine`, branche `wasm`. C'est
-  l'oracle de la campagne ISO, et le seul. Il est **construit sur place** par `./build.sh` et
-  n'est **pas** suivi par git (chaque version figée est archivée dans `builds/`).
-- **Versions figées archivées** : `builds/…/bp3` (ex. l'oracle 3.4.7 `md5 0fa0f3d…`). Les
-  archives antérieures au 2026-08-11 portent un suffixe `-wasm.N` : c'est un compteur de
-  construction, pas une cible.
+- **Les campagnes figées** : `builds/…/bp3`, chacune nommée par son empreinte md5. **Ce sont
+  elles, l'oracle, et elles seules.** Les archives antérieures au 2026-08-11 portent un suffixe
+  `-wasm.N` : c'est un compteur de construction, pas une cible.
+- **Pour un voisin** : `.publie/bp3-engine/builds/…/bp3`. Les campagnes citées comme oracle sont
+  déclarées par `AVANT-PUBLICATION.sh` ; les binaires n'étant pas suivis en version, une campagne
+  absente de cette déclaration est atteignable ici et introuvable là-bas.
+- **`/home/romi/dev/bp/bp3-engine/bp3`** est l'artefact de travail, construit sur place par
+  `./build.sh` et non suivi par git. Il n'est pas une référence : voir « État courant ».
+
+## ⛔ D'où le binaire se lance — `capture-run/`, et pas ailleurs
+
+Le moteur cherche `console_strings.json` **au répertoire courant**, puis dans `php/`, sur un nom
+nu et sans chemin de recherche (`Inits.c:753` et `756`). Il préfixe par ailleurs **en dur** `../`
+au chemin Csound stocké dans un fichier `-so.*` (`SaveLoads1.c:855`), que le drapeau `-cs`
+n'écrase pas.
+
+⇒ **Le répertoire de travail est `capture-run/`** — celui du dépôt en local, celui de l'espace
+publié pour un voisin. `../csound_resources/` y résout, et les chaînes de console sont à côté.
+C'est ce que fait `baseline-native/capture.py`, et c'est la décision de l'architecte du
+2026-07-19, option (b).
+
+⛔ **Lancé d'ailleurs, le binaire AFFICHE SA VERSION ET NE PRODUIT RIEN** : `=> Could not find
+file "console_strings.json"`, aucune sortie, code 0. *Afficher sa version et produire sont deux
+chemins de code ; seul le second ouvre ses fichiers auxiliaires.* Un témoin qui se contente de
+lancer le binaire ne peut pas montrer cet écart — il faut une **production**.
 
 ## Qui le monte — UNE SEULE main
 

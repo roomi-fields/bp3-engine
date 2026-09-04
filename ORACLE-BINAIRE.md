@@ -66,6 +66,18 @@ servir dans le dépôt d'un autre, d'où ce lot).
 
 | version | md5 | rôle |
 |---|---|---|
-| 3.5.1 | b100125b660287ea3cb0ce3eb9fb23f9 | **courant** (`./bp3`, byte-identique à `builds/…auto.51`, premier build 2026-08-08 19:18:26) |
+| 3.5.1 | fb6df5ad5ee18a0398ae3cdb1817287d | oracle figé, campagne `builds/v3.5.1-iso.1` |
+| 3.5.1 | 372dd047bc52fd152ff51ec6715fae74 | oracle figé COURANT, campagne `builds/v3.5.1-iso.2` |
 | 3.5.0 | 53eae9c6c987b3cd5aec7a90e2b7c925 | précédent (`builds/…auto.50`) |
 | 3.4.7 | 0fa0f3d466613974b4ea2f1c78548955 | oracle ISO figé (`builds/…auto.31`) |
+
+Les deux campagnes 3.5.1 sont publiées dans `.publie/bp3-engine/builds/`, déclarées par
+`AVANT-PUBLICATION.sh` : c'est par là qu'un voisin sous enveloppe atteint le natif.
+
+⛔ **`./bp3` À LA RACINE N'EST PAS UNE RÉFÉRENCE, ET SON EMPREINTE NE SE COMPARE À RIEN.** Le
+binaire grave sa date et son heure de construction : la campagne figée annonce
+`Version 3.5.1 (Aug 11 2026 - 13:16:56)`, l'artefact de travail `Version 3.5.1 (Sep  4 2026 -
+16:50:13)`. Deux constructions complètes des mêmes sources rendent donc deux empreintes, alors
+qu'une reconstruction partielle — celle qui ne recompile pas le fichier portant la date — peut
+rendre la même. C'est un artefact de travail, reconstructible à volonté par `./build.sh`. Toute
+mesure de référence se prend sur une campagne figée de `builds/`, nommée avec son empreinte.

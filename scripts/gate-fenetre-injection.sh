@@ -80,12 +80,16 @@ fi
 
 mkdir -p "$T/leurre/dev/bp/hub/tools"
 LEURRE="$T/leurre/dev/bp/hub/tools/garde-fenetre.sh"
-# ⛔ LE CROCHET N'APPELLE PLUS LE GARDE DIRECTEMENT : il passe par le POINT D'ENTRÉE du hub,
-# depuis le 2026-09-04, et ce point d'entrée lance le garde de fenêtre EN PREMIER. Le leurre
-# porte donc les deux, sans quoi le crochet échouerait sur un fichier absent et le volet 5
-# rendrait son verdict sur cette cause-là. `build.sh`, lui, appelle toujours le garde en direct.
+# ⛔ LE CROCHET APPELLE AUSSI LE POINT D'ENTRÉE DU HUB, juste après ce garde-ci. Le leurre doit le
+# porter, sans quoi le crochet échouerait sur un fichier absent et le volet 5 rendrait son verdict
+# sur cette cause-là.
+# ⛔⛔ ET CE LEURRE-LÀ LAISSE PASSER SANS RIEN APPELER. Écrit d'abord pour relayer vers le garde de
+# fenêtre — parce que le point d'entrée l'a porté pendant quinze minutes le 2026-09-04 — il RENDAIT
+# LE VOLET 5 AVEUGLE : l'appel local amputé du crochet, le marqueur était posé quand même, par le
+# relais, et le volet rendait ✔ sur un crochet qui n'appelait plus rien. Mesuré ici même.
+# ⇒ *Un témoin qui peut être satisfait par un AUTRE chemin que celui qu'il mesure ne mesure rien.*
 ENTREE="$T/leurre/dev/bp/hub/tools/gardes-du-portillon.sh"
-printf '#!/usr/bin/env bash\nexec bash "%s"\n' "$LEURRE" > "$ENTREE"; chmod +x "$ENTREE"
+printf '#!/usr/bin/env bash\nexit 0\n' > "$ENTREE"; chmod +x "$ENTREE"
 poser_leurre() { # poser_leurre <code de sortie>
   rm -f "$T/marqueur"
   printf '#!/usr/bin/env bash\ntouch "%s"\necho "leurre : refus simule" >&2\nexit %s\n' \

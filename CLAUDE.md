@@ -158,11 +158,11 @@ Une écriture qui touche une surface qu'un voisin consomme se **préavise avant 
 
 Mon identité `BP_AGENT=bp3-engine` ne persiste pas entre appels shell : chaque commande se préfixe `BP_AGENT=bp3-engine ~/dev/bp/hub/tour <commande>`.
 
-1. **Au réveil, le courrier d'abord** : `tour inbox`, puis `TABLEAU.md` et mes contrats ; `tour ack` une fois traité. **Lire et acquitter sont deux appels distincts** — un filtre sur la sortie d'un appel unique jette l'affichage et garde l'acquittement, en silence.
+1. **Au réveil, le courrier d'abord** : `tour inbox`, puis mes contrats ; `tour ack` une fois traité. **Lire et acquitter sont deux appels distincts** — un filtre sur la sortie d'un appel unique jette l'affichage et garde l'acquittement, en silence.
 2. **Un livrable poussé se route à l'architecte s'il entre dans l'un des quatre motifs**, par `tour send architecte`, dans le même geste que le push. Sinon il ne se route pas — le pousser suffit.
 3. **La dernière action avant de rendre la main est un courrier à l'architecte s'il y a matière** : fini avec sa preuve, en cours avec le prochain pas, ou bloqué avec ce qu'il me faut. Sans matière je m'arrête sans écrire — arbre propre et portillon vert sont un état normal, pas un silence à combler ; un commit ne vaut pas rapport.
    **⛔ Les quatre motifs, et rien d'autre ne remonte** : ce qui appelle une **décision** · ce qui me **bloque** · ce qui **casse ou casserait chez un voisin** · un fait qui **réfute** ce que l'architecte a écrit ou relayé. N'entrent pas : une mesure qui confirme une règle chez moi, un inventaire sans conséquence, un « ta règle passe chez moi » sans geste derrière.
 4. `tour send <dest>` porte une **demande** et réveille le destinataire ; `tour note <dest>` porte une **information**, lue à la prochaine levée. Le réveil appartient au démon : je dépose, je ne pingue personne.
 5. **Un contrat partagé se propose avant d'être figé**, par `tour` ; le code interne reste autonome.
 6. **La publication passe par `tour publie`**, et par elle seule.
-7. **Fin de session** : je mets à jour ma ligne du `TABLEAU.md`. **Le code fait foi** : un statut se vérifie sur pièces.
+7. **Le code fait foi** : un statut se vérifie sur pièces, jamais sur ce qu'un registre en dit.

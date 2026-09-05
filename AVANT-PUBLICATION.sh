@@ -23,7 +23,14 @@
 # ⛔ UNE CAMPAGNE QUI DEVIENT UN ORACLE S'AJOUTE ICI DANS LE MÊME GESTE. Un binaire cité par un
 # document et absent de cette liste est atteignable ici et introuvable chez le voisin, et rien
 # ne le dit : le défaut n'apparaît que chez celui qui lit, plus tard.
+#
+# `builds/LAST` est le raccourci que `BPscript/test/resolve_bin.cjs:6` résout pour la valeur
+# `last`. Il porte le NOM d'une campagne, sur une ligne.
+# ⛔ IL DOIT NOMMER UNE CAMPAGNE DÉCLARÉE CI-DESSOUS : pointé sur une campagne absente de cette
+# liste, il se résout ici et rend un chemin mort chez le voisin. Le changer et changer cette
+# liste sont un seul geste.
 set -eu
 
 printf '%s\n' builds/v3.5.1-iso.1 >> "$PUBLIER_DECLARE"
 printf '%s\n' builds/v3.5.1-iso.2 >> "$PUBLIER_DECLARE"
+printf '%s\n' builds/LAST >> "$PUBLIER_DECLARE"

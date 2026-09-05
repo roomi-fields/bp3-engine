@@ -176,6 +176,11 @@ if [ "$VOIE" = rapide ] || [ "$VOIE" = tout ]; then
   lancer "courrier-morsure"   60 ./scripts/gate-courrier-injection.sh
   # L'oracle figé est atteint par lien symbolique depuis la copie : une écriture dessus
   # aurait touché l'original. Le vérifier fait partie du portillon, pas d'un journal.
+  # L'oracle-figé vérifie que le binaire n'a pas BOUGÉ pendant les injections ; celui-ci vérifie
+  # que l'empreinte ANNONCÉE dans mes documents est la sienne. Deux questions distinctes : une
+  # description juste que rien ne confronte est juste par soin, pas par construction.
+  lancer "empreinte-oracle"   60 python3 scripts/gate-empreinte-oracle.py
+  lancer_seul "empreinte-morsure"  90 "$COPIE/scripts/gate-empreinte-injection.sh"
   lancer_seul "oracle-fige-intact" 30 ./scripts/copie-injection.sh verifier
   lancer_seul "oracle-fige-morsure" 60 "$COPIE/scripts/gate-oracle-injection.sh"
   ./scripts/copie-injection.sh retirer

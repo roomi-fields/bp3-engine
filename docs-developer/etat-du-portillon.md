@@ -1,4 +1,4 @@
-# L'état du portillon — vingt maillons, sept secondes
+# L'état du portillon — vingt-deux maillons, neuf secondes
 
 Mesuré le 2026-09-05. La source de vérité est `scripts/gate.sh` : ce que le portillon **lance**,
 et non ce qui réside dans `scripts/`. Un garde hors du portillon ne prévient jamais.
@@ -35,24 +35,24 @@ quand la ligne du crochet est amputée.
 
 | espèce | nombre | ce qu'elle fait |
 | --- | --- | --- |
-| garde | 9 | il examine le dépôt et refuse |
-| injection | 11 | il fabrique une faute et vérifie qu'un garde la refuse |
+| garde | 10 | il examine le dépôt et refuse |
+| injection | 12 | il fabrique une faute et vérifie qu'un garde la refuse |
 
-52 assertions au total, 19 fichiers distincts. Ce compte suit les motifs `assert`, `exit 1`,
+58 assertions au total, 21 fichiers distincts. Ce compte suit les motifs `assert`, `exit 1`,
 `sys.exit(1)` et `⛔` : il vaut ce que vaut un comptage par motif.
 
-**Les neuf gardes** : `gate-baseline.py` · `gate-meta.py` · `gate-legacy.py` · `gate-ancrages.py` ·
+**Les dix gardes** : `gate-baseline.py` · `gate-meta.py` · `gate-legacy.py` · `gate-ancrages.py` ·
 `verif-bug55.sh` · `gate-correspondance.py` · `gel-baseline.py` · `gate-autonomie.py` ·
-`copie-injection.sh verifier`.
+`gate-empreinte-oracle.py` · `copie-injection.sh verifier`.
 
-**Les onze injections** portent le suffixe `-injection.sh` et nomment dans leur texte le garde
+**Les douze injections** portent le suffixe `-injection.sh` et nomment dans leur texte le garde
 qu'elles éprouvent. Deux d'entre elles éprouvent des gardes qui vivent hors de `scripts/` :
 `gate-effondrement-injection.sh` et `gate-sonde-injection.sh` visent `baseline-native/capture.py`,
 aux lignes 163, 334, 348 pour l'effondrement et 161 à 190 pour la sonde.
 
 ## La liste attendue vit hors de `gate.sh`
 
-`scripts/MAILLONS.txt` porte les vingt noms, un par ligne. `gate.sh` confronte à cette liste ce
+`scripts/MAILLONS.txt` porte les vingt-deux noms, un par ligne. `gate.sh` confronte à cette liste ce
 qu'il a réellement lancé, nom pour nom, et refuse dans les deux sens : le retrait silencieux comme
 l'ajout non inscrit.
 
@@ -70,8 +70,8 @@ Deux pièces se mesurent à la place.
 
 | pièce | compte |
 | --- | --- |
-| une injection dédiée, rejouable à chaque poussée | 7 gardes sur 9 |
-| une date dans les trente premières lignes du fichier | 6 sur 9 |
+| une injection dédiée, rejouable à chaque poussée | 8 gardes sur 10 |
+| une date dans les trente premières lignes du fichier | 7 sur 10 |
 
 Les deux gardes sans injection : `baseline-integrite`, `non-retour-bug55`.
 
@@ -93,18 +93,18 @@ Course du 2026-09-05, machine à douze cœurs :
 
 | maillon | secondes | maillon | secondes |
 | --- | --- | --- | --- |
-| baseline-integrite | 0,06 | gel-baseline | 0,12 |
-| anti-bypass | 0,09 | gel-morsure | 0,89 |
-| anti-bypass-morsure | 0,20 | autonomie | 0,08 |
-| anti-retrocompat | 0,10 | autonomie-morsure | 0,29 |
-| anti-retro-morsure | 0,40 | retard-morsure | 0,22 |
-| ancrages-locaux | 0,09 | courrier-morsure | 0,22 |
-| ancrages-morsure | 0,37 | oracle-fige-intact | 0,10 |
-| effondrement-morsure | 0,23 | oracle-fige-morsure | 0,39 |
-| non-retour-bug55 | 0,18 | *pose du décor* | *0,64* |
-| sonde-morsure | 0,76 | | |
-| correspondance | 0,08 | **total** | **6,60** |
-| correspondance-morsure | 1,09 | | |
+| baseline-integrite | 0,10 | gel-baseline | 0,09 |
+| anti-bypass | 0,09 | gel-morsure | 0,61 |
+| anti-bypass-morsure | 0,28 | autonomie | 0,06 |
+| anti-retrocompat | 0,13 | autonomie-morsure | 0,31 |
+| anti-retro-morsure | 0,58 | retard-morsure | 0,15 |
+| ancrages-locaux | 0,08 | courrier-morsure | 0,18 |
+| ancrages-morsure | 0,30 | empreinte-oracle | 0,11 |
+| effondrement-morsure | 0,18 | empreinte-morsure | 0,81 |
+| non-retour-bug55 | 0,10 | oracle-fige-intact | 0,08 |
+| sonde-morsure | 0,53 | oracle-fige-morsure | 0,44 |
+| correspondance | 0,08 | *pose du décor* | *2,48* |
+| correspondance-morsure | 0,95 | **total** | **8,72** |
 
 Le temps au mur d'une course mesure la charge de la machine autant que le travail : deux courses
 successives de la même forme s'écartent de plus que ne les sépare le passage du parallèle au série.

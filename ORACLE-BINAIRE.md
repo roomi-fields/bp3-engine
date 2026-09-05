@@ -87,8 +87,8 @@ servir dans le dépôt d'un autre, d'où ce lot).
 |---|---|---|
 | 3.5.1 | fb6df5ad5ee18a0398ae3cdb1817287d | oracle figé, campagne `builds/v3.5.1-iso.1` |
 | 3.5.1 | 372dd047bc52fd152ff51ec6715fae74 | oracle figé COURANT, campagne `builds/v3.5.1-iso.2` |
-| 3.5.0 | 53eae9c6c987b3cd5aec7a90e2b7c925 | précédent (`builds/…auto.50`) |
-| 3.4.7 | 0fa0f3d466613974b4ea2f1c78548955 | oracle ISO figé (`builds/…auto.31`) |
+| 3.5.0 | 53eae9c6c987b3cd5aec7a90e2b7c925 | précédent, campagne `builds/v3.4.2-wasm.2_auto.50` |
+| 3.4.7 | 0fa0f3d466613974b4ea2f1c78548955 | oracle ISO figé, campagne `builds/v3.4.2-wasm.2_auto.31` |
 
 Les deux campagnes 3.5.1 sont publiées dans `.publie/bp3-engine/builds/`, déclarées par
 `AVANT-PUBLICATION.sh` : c'est par là qu'un voisin sous enveloppe atteint le natif.

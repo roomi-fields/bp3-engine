@@ -32,5 +32,7 @@ autonomie
 autonomie-morsure
 retard-morsure
 courrier-morsure
+empreinte-oracle
+empreinte-morsure
 oracle-fige-intact
 oracle-fige-morsure

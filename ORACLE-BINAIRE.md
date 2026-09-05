@@ -31,6 +31,25 @@ file "console_strings.json"`, aucune sortie, code 0. *Afficher sa version et pro
 chemins de code ; seul le second ouvre ses fichiers auxiliaires.* Un témoin qui se contente de
 lancer le binaire ne peut pas montrer cet écart — il faut une **production**.
 
+## ⛔ LE CODE DE SORTIE NE DISCRIMINE PAS — LE VERDICT SE PREND SUR LES OCTETS PRODUITS
+
+Même commande, même binaire, seul le répertoire de lancement change :
+
+| lancé depuis | code | fichier de sortie | console |
+|---|---|---|---|
+| `capture-run/` | **0** | 1 791 octets | `Loading: ../csound_resources/… 6 instruments` |
+| la racine | **0** | **aucun** | `Failed to open: ../csound_resources/…` |
+
+**Le moteur n'échoue pas : il ne produit rien.** Un banc qui juge sur le code de sortie est vert
+en permanence, y compris le jour où il a cessé de mesurer — c'est ce qui a rendu 0 OK / 27 ÉCART
+chez un consommateur sans qu'aucun code non nul ne le signale.
+
+⇒ **Le verdict d'une mesure sur ce binaire se prend sur les octets produits.** Le maillon
+`production-oracle` du portillon d'ici applique cette règle et refuse sur zéro octet.
+
+⇒ Une production sans fichier de son n'exerce que la moitié « répertoire courant » : le `../`
+gravé en dur n'est touché que par le chargement d'un `-so.*`. Un cas de contrôle en charge un.
+
 ## Qui le monte — UNE SEULE main
 
 **Seul l'agent `bp3-engine` monte le binaire.** Personne d'autre ne l'édite, ne le construit, ni

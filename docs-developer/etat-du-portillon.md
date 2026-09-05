@@ -1,4 +1,4 @@
-# L'état du portillon — vingt-deux maillons, neuf secondes
+# L'état du portillon — vingt-quatre maillons, onze secondes
 
 Mesuré le 2026-09-05. La source de vérité est `scripts/gate.sh` : ce que le portillon **lance**,
 et non ce qui réside dans `scripts/`. Un garde hors du portillon ne prévient jamais.
@@ -35,24 +35,24 @@ quand la ligne du crochet est amputée.
 
 | espèce | nombre | ce qu'elle fait |
 | --- | --- | --- |
-| garde | 10 | il examine le dépôt et refuse |
-| injection | 12 | il fabrique une faute et vérifie qu'un garde la refuse |
+| garde | 11 | il examine le dépôt et refuse |
+| injection | 13 | il fabrique une faute et vérifie qu'un garde la refuse |
 
-58 assertions au total, 21 fichiers distincts. Ce compte suit les motifs `assert`, `exit 1`,
+67 assertions au total, 23 fichiers distincts. Ce compte suit les motifs `assert`, `exit 1`,
 `sys.exit(1)` et `⛔` : il vaut ce que vaut un comptage par motif.
 
-**Les dix gardes** : `gate-baseline.py` · `gate-meta.py` · `gate-legacy.py` · `gate-ancrages.py` ·
+**Les onze gardes** : `gate-baseline.py` · `gate-meta.py` · `gate-legacy.py` · `gate-ancrages.py` ·
 `verif-bug55.sh` · `gate-correspondance.py` · `gel-baseline.py` · `gate-autonomie.py` ·
-`gate-empreinte-oracle.py` · `copie-injection.sh verifier`.
+`gate-empreinte-oracle.py` · `gate-production.py` · `copie-injection.sh verifier`.
 
-**Les douze injections** portent le suffixe `-injection.sh` et nomment dans leur texte le garde
+**Les treize injections** portent le suffixe `-injection.sh` et nomment dans leur texte le garde
 qu'elles éprouvent. Deux d'entre elles éprouvent des gardes qui vivent hors de `scripts/` :
 `gate-effondrement-injection.sh` et `gate-sonde-injection.sh` visent `baseline-native/capture.py`,
 aux lignes 163, 334, 348 pour l'effondrement et 161 à 190 pour la sonde.
 
 ## La liste attendue vit hors de `gate.sh`
 
-`scripts/MAILLONS.txt` porte les vingt-deux noms, un par ligne. `gate.sh` confronte à cette liste ce
+`scripts/MAILLONS.txt` porte les vingt-quatre noms, un par ligne. `gate.sh` confronte à cette liste ce
 qu'il a réellement lancé, nom pour nom, et refuse dans les deux sens : le retrait silencieux comme
 l'ajout non inscrit.
 
@@ -70,8 +70,8 @@ Deux pièces se mesurent à la place.
 
 | pièce | compte |
 | --- | --- |
-| une injection dédiée, rejouable à chaque poussée | 8 gardes sur 10 |
-| une date dans les trente premières lignes du fichier | 7 sur 10 |
+| une injection dédiée, rejouable à chaque poussée | 9 gardes sur 11 |
+| une date dans les trente premières lignes du fichier | 8 sur 11 |
 
 Les deux gardes sans injection : `baseline-integrite`, `non-retour-bug55`.
 
@@ -93,18 +93,20 @@ Course du 2026-09-05, machine à douze cœurs :
 
 | maillon | secondes | maillon | secondes |
 | --- | --- | --- | --- |
-| baseline-integrite | 0,10 | gel-baseline | 0,09 |
-| anti-bypass | 0,09 | gel-morsure | 0,61 |
-| anti-bypass-morsure | 0,28 | autonomie | 0,06 |
-| anti-retrocompat | 0,13 | autonomie-morsure | 0,31 |
-| anti-retro-morsure | 0,58 | retard-morsure | 0,15 |
-| ancrages-locaux | 0,08 | courrier-morsure | 0,18 |
-| ancrages-morsure | 0,30 | empreinte-oracle | 0,11 |
-| effondrement-morsure | 0,18 | empreinte-morsure | 0,81 |
-| non-retour-bug55 | 0,10 | oracle-fige-intact | 0,08 |
-| sonde-morsure | 0,53 | oracle-fige-morsure | 0,44 |
-| correspondance | 0,08 | *pose du décor* | *2,48* |
-| correspondance-morsure | 0,95 | **total** | **8,72** |
+| baseline-integrite | 0,09 | gel-baseline | 0,09 |
+| anti-bypass | 0,17 | gel-morsure | 0,57 |
+| anti-bypass-morsure | 0,28 | autonomie | 0,13 |
+| anti-retrocompat | 0,22 | autonomie-morsure | 0,36 |
+| anti-retro-morsure | 0,69 | retard-morsure | 0,21 |
+| ancrages-locaux | 0,09 | courrier-morsure | 0,22 |
+| ancrages-morsure | 0,29 | empreinte-oracle | 0,26 |
+| effondrement-morsure | 0,23 | empreinte-morsure | 1,03 |
+| non-retour-bug55 | 0,10 | production-oracle | 0,20 |
+| sonde-morsure | 0,54 | production-morsure | 1,15 |
+| correspondance | 0,08 | oracle-fige-intact | 0,05 |
+| correspondance-morsure | 1,16 | oracle-fige-morsure | 0,39 |
+| | | *pose du décor* | *2,15* |
+| | | **total** | **10,75** |
 
 Le temps au mur d'une course mesure la charge de la machine autant que le travail : deux courses
 successives de la même forme s'écartent de plus que ne les sépare le passage du parallèle au série.
@@ -118,6 +120,11 @@ plus à son contenu.
 `gate-correspondance.py` lit l'espace publié de kanopi à chaque poussée — la table de
 correspondance et l'existence de 113 fichiers de scène. Un renommage chez kanopi refuse la poussée
 d'ici, pour une cause qui n'est pas ici.
+
+`production-oracle` **produit** au lieu de vérifier une présence : le moteur rend code 0 quand il
+ne produit rien, et un contrôle de présence passerait là où un consommateur échoue. Son verdict se
+prend sur les octets, et un de ses deux cas charge un fichier de son — le `../` gravé en dur devant
+le chemin Csound n'est touché que par là.
 
 `retard-morsure` et `courrier-morsure` tournent **dans l'arbre**, quand les autres injections
 tournent dans la copie : leur sujet est le crochet que git exécute ici, lu par `core.hooksPath`.

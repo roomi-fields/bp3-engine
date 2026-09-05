@@ -181,6 +181,11 @@ if [ "$VOIE" = rapide ] || [ "$VOIE" = tout ]; then
   # description juste que rien ne confronte est juste par soin, pas par construction.
   lancer "empreinte-oracle"   60 python3 scripts/gate-empreinte-oracle.py
   lancer_seul "empreinte-morsure"  90 "$COPIE/scripts/gate-empreinte-injection.sh"
+  # ⛔ Celui-ci PRODUIT, il ne se contente pas de vérifier une présence : le moteur rend CODE 0
+  # quand il ne produit rien, et un contrôle de présence passerait là où un consommateur échoue.
+  # Son verdict se prend sur les OCTETS. 0,05 à 0,15 s, nul au mur puisqu'il court en parallèle.
+  lancer "production-oracle"  90 python3 scripts/gate-production.py
+  lancer_seul "production-morsure" 120 "$COPIE/scripts/gate-production-injection.sh"
   lancer_seul "oracle-fige-intact" 30 ./scripts/copie-injection.sh verifier
   lancer_seul "oracle-fige-morsure" 60 "$COPIE/scripts/gate-oracle-injection.sh"
   ./scripts/copie-injection.sh retirer

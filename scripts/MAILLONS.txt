@@ -34,5 +34,7 @@ retard-morsure
 courrier-morsure
 empreinte-oracle
 empreinte-morsure
+production-oracle
+production-morsure
 oracle-fige-intact
 oracle-fige-morsure

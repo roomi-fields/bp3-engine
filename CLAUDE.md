@@ -193,9 +193,9 @@ instruction à appliquer. Avant d'agir **et** avant de relayer, je confronte sur
   le champ d'exports du lié dit si c'est sa source ou son paquet construit. Qui **compile** publie
   **deux instances**, développement et production ; qui exporte sa source en publie **une seule
   instance**.
-- Kanopi refuse de démarrer en production quand un dépôt lié porte des modifications non
-  enregistrées **qui entrent dans son paquet** : **la propreté de ce que je publie est une condition
-  de son démarrage**, donc j'enregistre au fil. Documentation, backlog et outillage n'y entrent pas.
+- **Une dépendance se mesure avant de s'affirmer** — `tour lecteurs` dit qui me cite, `--sur
+  <surface>` qui me lit. **Aucun manifeste ne me nomme, aucun lien ne m'atteint : ma propreté ne
+  conditionne le démarrage de personne.** J'enregistre au fil parce que mon publié est lu.
 - **Sous-agents de développement** : toujours en `claude-sonnet-5`, et ils ne décident rien — ni
   forme, ni nom, ni périmètre.
 

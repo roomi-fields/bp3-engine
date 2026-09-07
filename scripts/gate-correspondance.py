@@ -12,7 +12,7 @@ renommage (voir l en-tete de correspondance.json), donc sa corruption est silenc
 
 Sortie 0 = vert. Sortie 1 = rouge.
 """
-import json, os, sys
+import json, os, subprocess, sys
 
 # ⛔ Ce garde lit l ESPACE PUBLIE de kanopi, jamais son arbre de travail : sous enveloppe
 # le dossier du voisin N EXISTE PAS, et un arbre de travail n a de toute facon pas de
@@ -35,24 +35,29 @@ DIR_SCENES = os.path.join(KANOPI, "scenes", "BP3-tests")
 def regime():
     """La mention de régime, qui dit ce que le verdict vaut.
 
-    L'état publié porte son EMPREINTE : un commit, et la branche dont il vient. C'est ce
-    qui rend le verdict citable — il vaut pour cette empreinte-là, et pour elle seule.
+    La version d'un voisin est le COMMIT DE SON ESPACE PUBLIÉ, et l'espace publié le
+    porte lui-même : c'est ce qui rend le verdict citable — il vaut pour ce commit-là,
+    et pour lui seul.
 
     ⛔ ELLE ÉCHOUE PLUTÔT QUE DE S'AFFICHER VIDE. Une mention muette certifierait un
     verdict sans régime — l'inverse exact de ce qu'elle sert.
     """
-    chemin = os.path.join(RACINE, "EMPREINTE")
-    with open(chemin, encoding="utf-8") as f:
-        lignes = [l.strip() for l in f if l.strip()]
-    if not lignes:
-        raise RuntimeError(f"EMPREINTE vide — {chemin}")
-    commit = lignes[0]
+    try:
+        r = subprocess.run(["git", "-C", RACINE, "log", "-1", "--format=%H%n%s"],
+                           capture_output=True, text=True, timeout=30)
+    except OSError as e:
+        raise RuntimeError(f"git injoignable pour lire la version de {RACINE} — {e}")
+    lignes = [l.strip() for l in r.stdout.split("\n") if l.strip()]
+    if r.returncode != 0 or not lignes:
+        raise RuntimeError(f"aucun commit lisible a {RACINE} — "
+                           f"l espace publie doit etre un depot, code {r.returncode}")
+    commit = lignes[0][:7]
     detail = f" ({lignes[1]})" if len(lignes) > 1 else ""
     if EPREUVE:
         return (f"[regime] EPREUVE : copie de kanopi @ {commit}{detail} — "
                 f"porte d epreuve, ce chemin ne rend jamais zero")
     return (f"[regime] ETAT PUBLIE : kanopi @ {commit}{detail} — "
-            f"lu a l espace publie, jamais a l arbre de travail")
+            f"commit de l espace publie, jamais l arbre de travail ni le sha amont")
 
 
 def main():

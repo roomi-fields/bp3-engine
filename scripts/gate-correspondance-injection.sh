@@ -25,10 +25,14 @@ trap restaurer EXIT INT TERM
 
 [ -d "$PUBLIE/packages/library" ] || { echo "bibliotheque absente de l espace publie, rien a prouver"; exit 1; }
 
-# La copie : la bibliotheque et l EMPREINTE, qui porte le regime.
+# La copie : la bibliotheque, plus un depot qui PORTE SA VERSION. Le regime se lit
+# desormais au commit de l espace publie, jamais dans un fichier depose a cote.
 mkdir -p "$TMP/racine/packages"
 cp -a "$PUBLIE/packages/library" "$TMP/racine/packages/library"
-cp -a "$PUBLIE/EMPREINTE" "$TMP/racine/EMPREINTE"
+git -C "$PUBLIE" log -1 --format='copie d epreuve de %H (%s)' > "$TMP/sujet.txt"
+git -C "$TMP/racine" init -q
+git -C "$TMP/racine" -c user.name=epreuve -c user.email=epreuve@local \
+    commit -q --allow-empty -F "$TMP/sujet.txt"
 
 K=$TMP/racine/packages/library
 TABLE=$K/test-assets/bp3/correspondance.json
@@ -101,16 +105,16 @@ json.dump(t, open(p, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 PY
 attendre_rouge "entree decrivant une grammaire absente"
 
-# --- volet 5 : l EMPREINTE disparait — un verdict sans regime ne sort pas --------------
-mv "$TMP/racine/EMPREINTE" "$TMP/empreinte-deplacee"
+# --- volet 5 : la racine n a plus de version — un verdict sans regime ne sort pas -------
+mv "$TMP/racine/.git" "$TMP/depot-deplace"
 c=$(garde)
 if [ "$c" = "$VERT_EPREUVE" ]; then
-    echo "  FIGURANT : EMPREINTE absente — le garde est reste VERT"
+    echo "  FIGURANT : racine sans depot — le garde est reste VERT"
     ECHECS=$((ECHECS + 1))
 else
-    echo "  mord : EMPREINTE absente, le regime est indeterminable (code $c)"
+    echo "  mord : racine sans version lisible, le regime est indeterminable (code $c)"
 fi
-mv "$TMP/empreinte-deplacee" "$TMP/racine/EMPREINTE"
+mv "$TMP/depot-deplace" "$TMP/racine/.git"
 
 # --- retour a la ligne de base --------------------------------------------------------
 c=$(garde)

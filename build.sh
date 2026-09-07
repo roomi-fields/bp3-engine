@@ -21,7 +21,8 @@ ENGINE_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 # ⛔ BPscript se lit à son ÉTAT PUBLIÉ, jamais à son arbre de travail : depuis le
 # cloisonnement, le dossier d'un voisin n'existe pas dans cette enveloppe, et un arbre de
-# travail n'a de toute façon pas de référence citable. L'espace publié porte son EMPREINTE.
+# travail n'a de toute façon pas de référence citable. L'espace publié est un dépôt : sa
+# version est son propre commit, et lui seul.
 BPSCRIPT_DIR="/home/romi/dev/bp/.publie/BPscript"
 BPSCRIPT_DIST="$BPSCRIPT_DIR/dist"
 # BPweb et MAMP Windows n'existent plus sur PC2 natif. Laissés vides → déploiements
@@ -100,8 +101,10 @@ if [ $DO_STATUS -eq 1 ]; then
     echo -e "${CYAN}=== Deploy Status ===${NC}"
     # ⛔ La SOURCE avant la cible : sans elle, « missing » ne distingue pas un binaire non
     # déployé d'un voisin injoignable — un zéro muet est la forme la plus coûteuse d'une casse.
-    if [ -f "$BPSCRIPT_DIR/EMPREINTE" ]; then
-        echo "  source BPscript : état publié @ $(head -1 "$BPSCRIPT_DIR/EMPREINTE")"
+    # La version d'un voisin est le commit de son espace publié, et il le porte lui-même.
+    if bpscript_version=$(git -C "$BPSCRIPT_DIR" log -1 --format='%h (%s)' 2>/dev/null) \
+       && [ -n "$bpscript_version" ]; then
+        echo "  source BPscript : état publié @ $bpscript_version"
     else
         echo -e "  ${RED}source BPscript INJOIGNABLE${NC} ($BPSCRIPT_DIR) — les lignes qui suivent ne disent rien"
     fi

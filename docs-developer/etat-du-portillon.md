@@ -1,20 +1,13 @@
-# L'état du portillon — vingt-quatre maillons, onze secondes
+# L'état du portillon — vingt-trois maillons, onze secondes
 
 Mesuré le 2026-09-05. La source de vérité est `scripts/gate.sh` : ce que le portillon **lance**,
 et non ce qui réside dans `scripts/`. Un garde hors du portillon ne prévient jamais.
 
 Le crochet que git exécute se lit par `core.hooksPath` — `scripts/githooks/pre-push`. Il appelle
-dans l'ordre `hub/tools/garde-courrier-non-lu.sh`, puis `hub/tools/gardes-du-portillon.sh`, puis
-`scripts/gate.sh rapide`.
+dans l'ordre `hub/tools/gardes-du-portillon.sh`, puis `scripts/gate.sh rapide`.
 
-## Le courrier non lu refuse la poussée
-
-Un geste qui sort d'ici part sur un état que je n'ai pas fini de lire. Le lot d'affichage de la
-boîte est borné à quatre : « 0 non-lu » est le seul verdict, jamais l'écran.
-
-Ce refus vit au geste de **poussée**, jamais à un site de bascule — le portillon dure des minutes
-et le courrier arrive toutes les une à deux minutes ; branché ailleurs, il mesure un autre instant
-que le geste. Le maillon `courrier-morsure` prouve son branchement, et sa place en tête.
+Le courrier se lit à son **arrivée** : une demande réveille, et la charte impose la levée à chaque
+tour. Aucun garde ne le vérifie au départ d'une poussée.
 
 ## Le point d'entrée du hub porte les gardes partagés
 
@@ -98,7 +91,7 @@ Course du 2026-09-05, machine à douze cœurs :
 | anti-bypass-morsure | 0,28 | autonomie | 0,13 |
 | anti-retrocompat | 0,22 | autonomie-morsure | 0,36 |
 | anti-retro-morsure | 0,69 | retard-morsure | 0,21 |
-| ancrages-locaux | 0,09 | courrier-morsure | 0,22 |
+| ancrages-locaux | 0,09 | — | — |
 | ancrages-morsure | 0,29 | empreinte-oracle | 0,26 |
 | effondrement-morsure | 0,23 | empreinte-morsure | 1,03 |
 | non-retour-bug55 | 0,10 | production-oracle | 0,20 |
@@ -126,7 +119,7 @@ ne produit rien, et un contrôle de présence passerait là où un consommateur 
 prend sur les octets, et un de ses deux cas charge un fichier de son — le `../` gravé en dur devant
 le chemin Csound n'est touché que par là.
 
-`retard-morsure` et `courrier-morsure` tournent **dans l'arbre**, quand les autres injections
+`retard-morsure` tourne **dans l'arbre**, quand les autres injections
 tournent dans la copie : leur sujet est le crochet que git exécute ici, lu par `core.hooksPath`.
 Depuis la copie ils prouveraient le crochet de la copie. Ils n'écrivent rien — leurs leurres vivent
 dans un dossier jetable, atteints en substituant `HOME`.

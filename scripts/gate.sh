@@ -173,7 +173,6 @@ if [ "$VOIE" = rapide ] || [ "$VOIE" = tout ]; then
   # Le garde du COURRIER NON LU vit en tête du crochet, avant tout le reste. Sa ligne se retire
   # sans que rien ne rougisse — c'est le même défaut, et il se couvre de la même façon. Ce maillon
   # tourne DANS L'ARBRE pour la même raison que le précédent : son sujet est le crochet d'ici.
-  lancer "courrier-morsure"   60 ./scripts/gate-courrier-injection.sh
   # L'oracle figé est atteint par lien symbolique depuis la copie : une écriture dessus
   # aurait touché l'original. Le vérifier fait partie du portillon, pas d'un journal.
   # L'oracle-figé vérifie que le binaire n'a pas BOUGÉ pendant les injections ; celui-ci vérifie

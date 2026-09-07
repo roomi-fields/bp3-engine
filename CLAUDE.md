@@ -16,17 +16,17 @@ Je tiens le moteur BP3 de Bernard Bel : construction, changelogs, et l'**oracle*
 > entre deux consignes contraires suit celle qui est la plus proche de son geste, et le shell est
 > toujours le plus proche : c'est pour ça que cette clause est écrite, et non déduite.
 
-## L'index d'abord — règle, pas préférence
-- Toute investigation **commence** par l'index : `rtfm_search` pour *le quoi*. ⛔ **Mon arbre de
+## RTFM d'abord — règle, pas préférence
+- Toute investigation **commence** par RTFM : `rtfm_search` pour *le quoi*. ⛔ **Mon arbre de
   travail ne porte AUCUN index d'appel** — `codegraph` n'y répond rien ; seule ma copie publiée en
   porte un, et il décrit l'état publié. L'appel se lit donc dans le **code C**, sur un symbole nommé.
 - On ne fouille **jamais** le dépôt à la main pour **trouver** où une chose vit : `grep -r`, `grep
-  --include`, `find`, `ls -R` → l'index ; `cat`, `head`, `tail`, `sed -n 'x,yp'` pour **regarder**
+  --include`, `find`, `ls -R` → RTFM ; `cat`, `head`, `tail`, `sed -n 'x,yp'` pour **regarder**
   → `rtfm_search` puis `rtfm_expand`.
 - **Seuls usages shell légitimes** : `grep <motif> <fichier déjà nommé>` · `sed`/`cat` dans un
   pipeline d'**édition** · le filtrage d'une **sortie de commande**, qui n'est pas un fichier.
 - Une recherche qui ne trouve rien renseigne sur la recherche : reformuler, jamais `grep`.
-- **L'index d'un VOISIN se lit par `~/dev/bp/hub/tools/rtfm-tour.sh <dépôt> "<requête>"`** —
+- **RTFM d'un VOISIN se lit par `~/dev/bp/hub/tools/rtfm-tour.sh <dépôt> "<requête>"`** —
   `rtfm_search` ne voit que le courant, `--tous` voit la tour.
 
 ## ⛔ Le moteur d'origine ne se modifie pas sans l'accord de Romain
@@ -129,7 +129,7 @@ instruction à appliquer. Avant d'agir **et** avant de relayer, je confronte sur
 - **Un garde se prouve sur la graphie que le code écrit**, jamais sur celle qu'on croit.
 - **Un garde hors du portillon est invisible**, et **un garde qui peut se sauter doit ÉCHOUER,
   jamais avertir** : présent dans le portillon n'est pas exécuté.
-- **Un banc qui appelle ma propre porte prouve la porte, jamais le branchement** : abonné des deux
+- **Un banc qui appelle ma propre interface prouve l'interface, jamais le branchement** : abonné des deux
   côtés et branché nulle part reste vert de bout en bout.
 - **Une absence n'est une preuve que si le périmètre de recherche est établi** : dire où l'on a
   cherché avant de conclure que la chose n'existe pas.
@@ -190,7 +190,7 @@ instruction à appliquer. Avant d'agir **et** avant de relayer, je confronte sur
 - **⛔ Un dépôt lié est consommé VIVANT** : ce que j'enregistre atteint mes consommateurs **sans
   construction ni publication**, et un fichier non commité est déjà en usage — « hors du dépôt »
   n'est pas « hors d'usage ».
-- **Je mesure qui me lie et par quelle porte** : le lien symbolique dit que le dépôt est atteint,
+- **Je mesure qui me lie et par quelle interface** : le lien symbolique dit que le dépôt est atteint,
   le champ d'exports du lié dit si c'est sa source ou son paquet construit. Qui **compile** publie
   **deux instances**, développement et production ; qui exporte sa source en publie **une seule
   instance**.

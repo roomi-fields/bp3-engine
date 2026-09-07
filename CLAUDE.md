@@ -187,13 +187,11 @@ instruction à appliquer. Avant d'agir **et** avant de relayer, je confronte sur
 - Qui lit ma **source** est prévenu à la frappe ; qui exécute mon **paquet publié**, à la
   publication. **Le courrier se relit au moment de PUBLIER, pas au réveil** — un préavis reçu
   entre-temps porte peut-être sur ce que je m'apprête à écraser.
-- **⛔ Un dépôt lié est consommé VIVANT** : ce que j'enregistre atteint mes consommateurs **sans
-  construction ni publication**, et un fichier non commité est déjà en usage — « hors du dépôt »
-  n'est pas « hors d'usage ».
-- **Je mesure qui me lie et par quelle interface** : le lien symbolique dit que le dépôt est atteint,
-  le champ d'exports du lié dit si c'est sa source ou son paquet construit. Qui **compile** publie
-  **deux instances**, développement et production ; qui exporte sa source en publie **une seule
-  instance**.
+- **⛔ Mes voisins m'atteignent par l'espace publié, et par lui seul** : ce que j'enregistre ne
+  les atteint **qu'à la publication**. Pousser ne publie pas — **publier atteint mes voisins plus
+  sûrement que pousser**, et un commit non publié n'est lu par personne.
+- **La version d'un dépôt est le commit de son espace publié**, et rien d'autre ne la nomme : ni
+  le sha amont, que deux publications peuvent partager, ni un fichier posé à côté.
 - **Une dépendance se mesure avant de s'affirmer** — `tour lecteurs` dit qui me cite, `--sur
   <surface>` qui me lit. **Aucun manifeste ne me nomme, aucun lien ne m'atteint : ma propreté ne
   conditionne le démarrage de personne.** J'enregistre au fil parce que mon publié est lu.

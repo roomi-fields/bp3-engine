@@ -128,7 +128,9 @@ graines 1 et 2, plus de 80 s. Retour transmis à Bernard Bel.
 
 ## 2026-06-14 — Sérialiseur timed-tokens NATIF `--tokensout` (oracle unique)
 
-Cap : `hub/decisions/2026-06-14-oracle-natif-trois-voies.md` (oracle = bp3 natif).
+Cap d'alors : slug `2026-06-14-oracle-natif-trois-voies` (oracle = bp3 natif), **PÉRIMÉ** — son
+successeur est la règle de slug `2026-08-11-la-baseline-est-les-110-natives-et-les-corpus-vivent-chez-kanopi`,
+section `conformite` de `hub/decisions/TABLE-DE-LA-LOI.md`.
 Le dump JSON des timed-tokens n'existait qu'en API WASM (`bp3_get_timed_tokens`,
 `csrc/wasm/bp3_api.c:760`). Port fidèle en sortie native :
 
@@ -145,6 +147,7 @@ Le dump JSON des timed-tokens n'existait qu'en API WASM (`bp3_get_timed_tokens`,
 Build natif linux OK (TokensOut.o linké). Dépendance de build : `libasound2-dev`
 (installée sur PC2 ; `-BP3.h` inclut `<alsa/asoundlib.h>` sans condition côté Linux).
 
+GARDE-CHEMINS-SORTANTS: absence — banc RETIRÉ chez bpscript avec le pipeline S0-S5, aucun successeur.
 **Parité de timing natif↔WASM confirmée** (`BPscript/test/s3_native.cjs`, lecture seule,
 sur les snapshots `s3_timed` existants — AUCUNE re-capture, #48-#52 ouverts) :
 - **12 MATCH exacts** dont not-reich (580), visser3 (401), mozart-dice (269), acceleration

@@ -62,7 +62,7 @@ servir dans le dépôt d'un autre, d'où ce lot).
 1. `./bp3 --version` → `Version X.Y.Z (Mon JJ AAAA - HH:MM:SS)`.
 2. ⚠️ **Le numéro de version seul n'est PAS une empreinte md5** (constat #65) : c'est un `#define`
    incrémenté à la main, et l'horodatage vient d'une seule unité de compilation (deux binaires
-   distincts peuvent l'afficher identique). **La seule empreinte de contenu fiable du binaire est son md5** :
+   distincts peuvent l'afficher identique). **La seule empreinte md5 fiable est celle du contenu du binaire** :
    `md5sum bp3`. Un même binaire peut même afficher **deux horodatages selon le chemin** : sur
    `b100125b`, la bannière de `produce` rend `19:18:22`, `--version` rend `19:18:21` — deux unités
    compilées à une seconde d'écart. Le md5 est identique ; c'est lui qui tranche.

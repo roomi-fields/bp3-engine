@@ -12,7 +12,7 @@
 # leurre — et c'est le CODE DE SORTIE du crochet qui tranche, pas son texte.
 #
 # ⚠️ L'espace publié n'est JAMAIS écrit ici : le leurre remplace le garde, pas la donnée
-# qu'il mesure. Une épreuve qui falsifie une EMPREINTE la donne à lire à un voisin.
+# qu'il mesure. Une épreuve qui falsifie l'état publié le donne à lire à un voisin.
 set -u
 cd "$(dirname "$0")/.."
 

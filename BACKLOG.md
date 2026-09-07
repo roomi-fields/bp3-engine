@@ -55,7 +55,7 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   est délégué, l'owner est **bpscript**. Prochaine action : leur demander l'état de l'utilitaire
   partagé avant toute écriture ici. Ce qu'elle attend : leur réponse. Aucune dépendance avec le
   chantier des entrées.
-  GARDE-CHEMINS-SORTANTS: absence — cahier des charges RETIRÉ du hub par `3a5f11ec`, aucun successeur ; son nom reste écrit parce qu'il désigne la source du besoin.
+  GARDE-CHEMINS-SORTANTS: absence — hub/contrats/2026-06-16-sortie-production-texte-kanopi.md retiré par 3a5f11ec, aucun successeur ; son nom reste écrit parce qu'il désigne la source du besoin.
   Libellé d'origine : Tokeniseur « ordre texte » qui REFLÈTE BP3 (markers `=`/`:`, virgule `{N,…}`) — owner **bpscript** (utilitaire partagé). Si l'alignement exact demande du dev → leur backlog. Réf. CDC `hub/contrats/2026-06-16-sortie-production-texte-kanopi.md` §9.
 - **BP3E-ISO-EKDOTIN** `fait` [P4] — ISO-EKDOTIN-TEMPLATES [P4] : ek-do-tin + templates ont un oracle natif présent MAIS leur source -gr est absente de test-data (branche wasm, library/ non checkout) → non mesurables par le frontal .gr, donc non publiables tant que la source n'est pas dispo. Fournir les sources -gr si on veut les exposer. Signalé par bp3-frontend [105]  _(fait: Confirme par bp3-engine sur sa propre mesure (contre-mesure du 2026-08-14))_
 - **BP3E-ISO-REGRESSION** `bloqué` [P3] — ISO-100 RÉGRESSION-NATIF [P3] : dhadhatite1 + dhin1 — le moteur natif ne sort RIEN alors qu'un oracle WASM existait (16/24 jetons). Régression moteur OU dépendance manquante (aux). À discriminer — potentiellement au-delà de ces 2. Signalé campagne bpscript A.2b [71bda33]  _(bloqué: élargi : 4 grammaires — dhadhatite1, dhin1, tryhomomorphism (PHP 6/natif 0), tryRagas (PHP 42/natif 0). Le natif produit RIEN où la référence produisait = régression moteur OU aux manquant. Débloque potentiellement plusieurs si corrigé. bp3-engine dormant → à relancer quand on attaque Phase D moteur)_
@@ -126,14 +126,14 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   (`csrc/bp3/SaveLoads1.c:607`) puis s'arrete SILENCIEUSEMENT (exit 0, aucune phase « Compiling
   grammar », 0 octet) — d'ou des faux « natif ne produit rien ». AUCUN convertisseur cote C
   (grep : rien dans csrc/bp3). Seul le harnais JS convertit (`convertOldSettings`, dans le fichier
-  GARDE-CHEMINS-SORTANTS: absence — outil RETIRÉ chez bpscript avec le pipeline S0-S5, aucun successeur ; cf. BPE-1 `sans-objet`.
+  GARDE-CHEMINS-SORTANTS: absence — BPscript/test/s0_snapshot.cjs retiré avec le pipeline S0-S5, aucun successeur ; cf. BPE-1 `sans-objet`.
   BPscript/test/s0_snapshot.cjs:44-110). AMPLEUR : **84 fichiers -se.* en ancien format contre
   59 en JSON** (143 au total). C'est le blocage DOMINANT du bucket, devant -ho et -or.
   DECISION ROMAIN 2026-07-18 = option (b), convertir le corpus une fois pour toutes
   (`hub/decisions/TABLE-DE-LA-LOI.md`, section `conformite`, slug
   `2026-07-18-convertir-corpus-reglages-vieux-format-json`).
   APPLIQUE : les **84** fichiers reecrits en JSON avec le convertOldSettings d'alors
-  GARDE-CHEMINS-SORTANTS: absence — même outil retiré, voir la déclaration ci-dessus.
+  GARDE-CHEMINS-SORTANTS: absence — BPscript/test/s0_snapshot.cjs retiré, même cause que la déclaration ci-dessus.
   (BPscript/test/s0_snapshot.cjs:44-110, extrait et execute tel quel via scratchpad/conv.cjs —
   aucune reecriture ad-hoc). 84 convertis, 0 echec. Corpus : 143 JSON, 0 ancien.
   Les 59 deja-JSON sont INTACTS (perimetre respecte). Originaux conserves dans l'historique git.

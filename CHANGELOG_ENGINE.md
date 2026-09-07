@@ -147,7 +147,7 @@ Le dump JSON des timed-tokens n'existait qu'en API WASM (`bp3_get_timed_tokens`,
 Build natif linux OK (TokensOut.o linké). Dépendance de build : `libasound2-dev`
 (installée sur PC2 ; `-BP3.h` inclut `<alsa/asoundlib.h>` sans condition côté Linux).
 
-GARDE-CHEMINS-SORTANTS: absence — banc RETIRÉ chez bpscript avec le pipeline S0-S5, aucun successeur.
+GARDE-CHEMINS-SORTANTS: absence — BPscript/test/s3_native.cjs retiré avec le pipeline S0-S5, aucun successeur.
 **Parité de timing natif↔WASM confirmée** (`BPscript/test/s3_native.cjs`, lecture seule,
 sur les snapshots `s3_timed` existants — AUCUNE re-capture, #48-#52 ouverts) :
 - **12 MATCH exacts** dont not-reich (580), visser3 (401), mozart-dice (269), acceleration

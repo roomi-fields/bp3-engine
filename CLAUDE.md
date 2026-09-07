@@ -109,9 +109,9 @@ instruction à appliquer. Avant d'agir **et** avant de relayer, je confronte sur
   Linux, `libasound2-dev` ; Python 3 pour l'oracle, les gardes et les outils de mesure.
 - **La façon de tester est `scripts/gate-*.py`** sous le portillon de poussée.
 - **Changelog après toute modification** : `source/BP3/` alimente `CHANGELOG_ENGINE.md`.
-- **Un défaut du moteur** s'inscrit en détail au registre de `hub/courrier/bp3-engine.md`, section
-  « ▼ Registre Bernard Bel » ; **le résumé transverse attend son domicile**. Bernard Bel est
-  mainteneur externe : les
+- **Un défaut du moteur** s'inscrit en résumé dans `DEFAUTS-MOTEUR.md` — **il vit ici, je le
+  maintiens, les autres le consultent chez moi** — et en détail au registre de
+  `hub/courrier/bp3-engine.md`. Bernard Bel est mainteneur externe : les
   défauts lui parviennent hors de la tour, et **un constat ne part à Bernard qu'avec un cas minimal
   et solide.**
 - **Le garde de la voie unique est `scripts/gate-legacy.py`**, sa morsure prouvée par injection.

@@ -126,12 +126,14 @@ Items qui touchent le **langage** (syntaxe/sémantique) → backlog central
   (`csrc/bp3/SaveLoads1.c:607`) puis s'arrete SILENCIEUSEMENT (exit 0, aucune phase « Compiling
   grammar », 0 octet) — d'ou des faux « natif ne produit rien ». AUCUN convertisseur cote C
   (grep : rien dans csrc/bp3). Seul le harnais JS convertit (`convertOldSettings`,
+  GARDE-CHEMINS-SORTANTS: absence — outil retiré avec le pipeline S0-S5 ; cf. BPE-1 `sans-objet`.
   BPscript/test/s0_snapshot.cjs:44-110). AMPLEUR : **84 fichiers -se.* en ancien format contre
   59 en JSON** (143 au total). C'est le blocage DOMINANT du bucket, devant -ho et -or.
   DECISION ROMAIN 2026-07-18 = option (b), convertir le corpus une fois pour toutes
   (`hub/decisions/TABLE-DE-LA-LOI.md`, section `conformite`, slug
   `2026-07-18-convertir-corpus-reglages-vieux-format-json`).
   APPLIQUE : les **84** fichiers reecrits en JSON avec le convertOldSettings EXISTANT
+  GARDE-CHEMINS-SORTANTS: absence — même outil retiré, voir la déclaration ci-dessus.
   (BPscript/test/s0_snapshot.cjs:44-110, extrait et execute tel quel via scratchpad/conv.cjs —
   aucune reecriture ad-hoc). 84 convertis, 0 echec. Corpus : 143 JSON, 0 ancien.
   Les 59 deja-JSON sont INTACTS (perimetre respecte). Originaux conserves dans l'historique git.

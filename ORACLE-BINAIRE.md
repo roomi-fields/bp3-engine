@@ -60,9 +60,9 @@ servir dans le dépôt d'un autre, d'où ce lot).
 ## Comment un voisin sait quelle version il exécute
 
 1. `./bp3 --version` → `Version X.Y.Z (Mon JJ AAAA - HH:MM:SS)`.
-2. ⚠️ **Le numéro de version seul n'est PAS une empreinte** (constat #65) : c'est un `#define`
+2. ⚠️ **Le numéro de version seul n'est PAS une empreinte md5** (constat #65) : c'est un `#define`
    incrémenté à la main, et l'horodatage vient d'une seule unité de compilation (deux binaires
-   distincts peuvent l'afficher identique). **La seule empreinte de contenu fiable est le md5** :
+   distincts peuvent l'afficher identique). **La seule empreinte de contenu fiable du binaire est son md5** :
    `md5sum bp3`. Un même binaire peut même afficher **deux horodatages selon le chemin** : sur
    `b100125b`, la bannière de `produce` rend `19:18:22`, `--version` rend `19:18:21` — deux unités
    compilées à une seconde d'écart. Le md5 est identique ; c'est lui qui tranche.
@@ -112,10 +112,10 @@ servir dans le dépôt d'un autre, d'où ce lot).
 Les deux campagnes 3.5.1 sont publiées dans `.publie/bp3-engine/builds/`, déclarées par
 `AVANT-PUBLICATION.sh` : c'est par là qu'un voisin sous enveloppe atteint le natif.
 
-⛔ **`./bp3` À LA RACINE N'EST PAS UNE RÉFÉRENCE, ET SON EMPREINTE NE SE COMPARE À RIEN.** Le
+⛔ **`./bp3` À LA RACINE N'EST PAS UNE RÉFÉRENCE, ET SON EMPREINTE MD5 NE SE COMPARE À RIEN.** Le
 binaire grave sa date et son heure de construction : la campagne figée annonce
 `Version 3.5.1 (Aug 11 2026 - 13:16:56)`, l'artefact de travail `Version 3.5.1 (Sep  4 2026 -
-16:50:13)`. Deux constructions complètes des mêmes sources rendent donc deux empreintes, alors
+16:50:13)`. Deux constructions complètes des mêmes sources rendent donc deux empreintes md5, alors
 qu'une reconstruction partielle — celle qui ne recompile pas le fichier portant la date — peut
 rendre la même. C'est un artefact de travail, reconstructible à volonté par `./build.sh`. Toute
-mesure de référence se prend sur une campagne figée de `builds/`, nommée avec son empreinte.
+mesure de référence se prend sur une campagne figée de `builds/`, nommée avec son empreinte md5.

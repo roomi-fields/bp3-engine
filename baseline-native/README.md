@@ -11,6 +11,7 @@ vides au repos, ignorées par git (`.gitignore`), et ne doivent jamais être lue
 | `captures/`             | **la référence publiée** — 163 fichiers, cités par `baseline.json`                | ✅ oui    |
 | `captures.en-cours/`    | zone d'écriture d'une recapture complète, renommée sur `captures/` à la fin       | ❌ non    |
 | `captures-a-la-demande/`| sortie du mode mono-grammaire `capture.py <grammaire>` — vérification ponctuelle  | ❌ non    |
+| `oracles-midi/`         | la **sortie MIDI** du binaire pour 30 grammaires (`<g>/s1_native.json`), lue par la parité de runtime-midi ; provenance dans son `PROVENANCE.md` | ✅ oui    |
 
 Les deux zones de travail existent pour une raison précise : **une recapture ne doit jamais écrire
 dans le dossier publié pendant qu'elle tourne.** Le 2026-07-19, une recapture en cours a été lue

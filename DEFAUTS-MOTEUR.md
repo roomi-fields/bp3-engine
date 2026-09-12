@@ -154,10 +154,32 @@ et ici sur la présence de l'opérateur dans la sortie.
 **+10 ms exactement** — l'ensemble des deltas de `start` observés sur les 401 couples est `{10}`.
 Ce n'est pas un jeton qui bouge, c'est l'origine.
 
-⚠️ **Le delta n'est pas une constante gravée** : `bp-mono` mesure `+10`, `+10` et `+1` sur trois
-fixtures de son corpus. Il suit quelque chose de la scène. ⛔ **Non imputé** — ni eux ni moi n'avons
-isolé de quoi il dépend, et une cause plausible non mesurée coûterait plus qu'aucune. Candidats
-**lus** dans le diff, non mesurés : `TimeSet.c`, `TimeSetFunctions.c`, `FillPhaseDiagram.c` (+68).
+⚠️ **DEUX fixtures portent #74, pas trois** — corrigé le 2026-09-12 même, par `bp-mono` qui avait
+annoncé la troisième :
+
+| fixture | jetons | ce que c'est |
+| --- | ---: | --- |
+| `acceleration` | 78 | décalage UNIFORME de `+10`, zéro étiquette en désaccord |
+| `Visser3` | 401 | décalage UNIFORME de `+10`, zéro étiquette en désaccord |
+| ~~`Visser5`~~ | 1152 | ⛔ **PRODUCTION DIFFÉRENTE, pas #74** — 712 étiquettes sur 1152 en désaccord, 651 deltas distincts |
+
+⇒ **Deux invocations différentes concluent pareil sur `Visser5`** : avec les fixtures de `bp-mono`
+(en-tête et `INIT:` retirés, `MaxItemsProduce` forcé à 1) comme avec `-gr.Visser5` + `-se.Visser5` du
+corpus de ce dépôt, on obtient 1152 jetons **non identiques**. Ce n'est pas une origine qui bouge.
+
+⛔ **L'affirmation « le delta n'est pas une constante gravée » est RETIRÉE** : elle reposait sur le
+triplet `10, 10, 1`, et le `1` était l'artefact d'un rapport qui n'imprimait que le premier écart.
+**Les deux fixtures confirmées valent toutes deux `+10`.** On ne sait donc plus si le delta est
+constant — et il n'y a pas assez de fixtures pour le dire.
+
+⛔ **Non imputé** — ni eux ni moi n'avons isolé de quoi il dépend, et une cause plausible non mesurée
+coûterait plus qu'aucune. Candidats **lus** dans le diff, non mesurés : `TimeSet.c`,
+`TimeSetFunctions.c`, `FillPhaseDiagram.c` (+68).
+
+⚠️ **La leçon d'instrument vaut d'être gardée** : un rapport d'écart qui n'imprime que le PREMIER
+couple divergent ne distingue pas un décalage d'origine d'une production entièrement différente. Le
+témoin qui tranche est le **compte d'étiquettes en désaccord** et le **nombre de deltas distincts**,
+jamais le premier écart lu seul.
 
 ⛔ **#74 et #73 sont DEUX causes distinctes, et elles se mélangeaient dans mon compte d'écarts.**
 `acceleration` ne porte aucun outil sériel et bouge quand même ; `tryRotate` en porte un et ne

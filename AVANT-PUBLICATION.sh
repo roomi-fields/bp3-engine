@@ -13,12 +13,16 @@
 # La décision autorise nommément ce resserrement : « publier le seul répertoire de campagne que
 # l'oracle nomme répond à la décision. »
 #
-# Les deux campagnes déclarées, et qui les nomme :
+# Les trois campagnes déclarées, et qui les nomme :
 #   v3.5.1-iso.1  — l'oracle que BPscript lit, et celui de docs-developer/volumestep-step-et-
 #                   plantage-trace.md
-#   v3.5.1-iso.2  — l'oracle courant de ce dépôt : scripts/copie-injection.sh, le maillon
-#                   « oracle-fige-intact » du portillon, et toute mesure de référence prise
-#                   depuis le 2026-08-14
+#   v3.5.1-iso.2  — l'oracle du PORTILLON : scripts/copie-injection.sh et le maillon
+#                   « oracle-fige-intact », et toute mesure de référence prise entre le
+#                   2026-08-14 et le 2026-09-12. Il reste déclaré parce qu'il est le TÉMOIN
+#                   d'avant la montée en v3.5.4 : les mesures avant/après de
+#                   docs-developer/inventaire-des-deltas.md et du lexique le citent par son md5.
+#   v3.5.4-iso.1  — le binaire de la montée du 2026-09-12, md5 9bab33d1…, et ce que
+#                   builds/LAST nomme
 #
 # ⛔ UNE CAMPAGNE QUI DEVIENT UN ORACLE S'AJOUTE ICI DANS LE MÊME GESTE. Un binaire cité par un
 # document et absent de cette liste est atteignable ici et introuvable chez le voisin, et rien
@@ -33,4 +37,5 @@ set -eu
 
 printf '%s\n' builds/v3.5.1-iso.1 >> "$PUBLIER_DECLARE"
 printf '%s\n' builds/v3.5.1-iso.2 >> "$PUBLIER_DECLARE"
+printf '%s\n' builds/v3.5.4-iso.1 >> "$PUBLIER_DECLARE"
 printf '%s\n' builds/LAST >> "$PUBLIER_DECLARE"

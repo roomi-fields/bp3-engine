@@ -72,6 +72,20 @@ numéro.
 
 ## Ce que ce registre impose à toute mesure
 
+- ⛔⛔ **UNE DONNÉE CORRIGÉE NE CORRIGE PAS CE QU'ON EN AVAIT TIRÉ.** Trouvé à deux le 2026-09-12,
+  et payé deux fois le même jour : une fixture est sortie de #74, et la phrase *« le delta n'est pas
+  une constante gravée »* — déduite du triplet que cette fixture complétait — est restée debout des
+  deux côtés jusqu'à ce qu'on la cherche. **Les conclusions se remontent à la main, et rien ne le
+  rappelle** : la donnée fausse rougit, ce qu'on en a déduit jamais.
+- ⛔ **Les quatre fautes de mesure de la journée ont la même signature : elles rendent un résultat
+  PLAUSIBLE.** Une recette recopiée et périmée marche · un repli sur le binaire de travail répond ·
+  un rapport qui n'imprime que le premier écart imprime quelque chose d'exact · une déduction sur
+  trois points en aligne deux. **Aucune ne ressemble à une faute au moment où on la commet**, donc
+  aucune règle écrite ne les arrête. ⇒ **Ce qui les arrête est un témoin posé DANS l'instrument**,
+  et un contrôle exécuté dans des conditions **différentes** du test.
+- **Un écart entre deux productions se qualifie avant de s'interpréter** : le témoin qui tranche est
+  le **compte d'étiquettes en désaccord** et le **nombre de deltas distincts**, jamais le premier
+  écart lu seul. Un décalage d'origine et une production entièrement différente commencent pareil.
 - **Une capture de référence n'est comparable qu'à une autre prise avec les mêmes drapeaux de
   sortie** (#67, #71) : un oracle porte la **commande complète**, pas seulement la graine.
 - **Le verdict se prend sur les octets produits**, jamais sur le code de sortie : le moteur rend

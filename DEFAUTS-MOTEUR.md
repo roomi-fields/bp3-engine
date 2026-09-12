@@ -7,7 +7,8 @@ De quel moteur il s'agit : le **moteur natif de Bernard Bel** — `bp3` / `bp.ex
 consulter ici.** Arbitrage de Romain du 2026-09-07.
 
 > ## ⛔ IMPACT TOUS PROJETS
-> **Toute validation contre les builds courants doit connaître #48, #49, #50 et #52.**
+> **Toute validation contre les builds courants doit connaître #49, #50 et #52.** #48 est clos
+> depuis le 2026-09-12, mesuré.
 > Un banc qui les ignore attribue au moteur un échec qui vient d'eux.
 
 Le **détail** de chaque entrée — reproduction, citations de code, réponses de Bernard Bel — vit
@@ -25,11 +26,10 @@ ne part à Bernard qu'avec un cas minimal et solide**.
 | --- | --- | --- |
 | 32 | dérive des contrôles continus | 2026-06-10 |
 | 36 · 40 · 44 · 47 | gardes enfant contre drapeaux parent | 2026-06-10 |
-| **48** | un terminal à tiret final fait tomber la compilation d'alphabet (erreur de segmentation) | 2026-06-10 |
-| **49** | un terminal court masque les variables préfixées — `765432` injouable sur les builds courants | 2026-06-10 |
+| 49 | un terminal court masque les variables préfixées — `765432` injouable sur les builds courants. ⚠️ **NON REPRODUIT sur l'axe `produce` en v3.5.4** : voir la note ci-dessous | 2026-06-10 |
 | **50** | `watch` environ deux fois plus lent : les suites tombent en dépassement de délai | 2026-06-10 |
 | 51 | garde mono-item, `rc=-4`, y compris entre sous-grammaires | 2026-06-10 |
-| **52** | régression look-and-say v3.4.2→v3.4.5 : « all weights are nil », zéro jeton | 2026-06-10 |
+| **52** | régression look-and-say v3.4.2→v3.4.5 : « all weights are nil », zéro jeton. ⛔ **CONFIRMÉ TOUJOURS PRÉSENT en v3.5.4**, mesuré le 2026-09-12 | 2026-06-10 |
 | 53 | le WASM applique l'homomorphisme autrement que le natif — mêmes 75 jetons, valeurs divergentes | 2026-07-17 |
 | 54 | drapeaux et `_goto` co-localisés : appliqués en dérivation simple, sautés en énumération exhaustive. **Question ouverte à Bernard** : intentionnel, ou oubli d'ordre | 2026-07-18 |
 | 56 | la limite de temps de calcul n'interrompt pas `cloches1`. Cause établie : la grammaire ne peut pas terminer, c'est un défaut de données — mais la limite existe pour reprendre la main, et elle ne le fait pas | 2026-07-19 |
@@ -59,6 +59,7 @@ sa source. Ce qui en reste appartient à #65 : un oracle non rattachable à sa s
 | 57 | **retiré des défauts**, tranché par Bernard Bel : le glyphe `¬` est une erreur de documentation, pas une régression. La notation réelle est `3+4+2/4 … /3 … /1` |
 | 59 | **diagnostic corrigé** : `_rotate` est bien appliqué — les jetons MIDI le prouvent. Ce qui change en v3.4.7 est la sérialisation **texte** |
 | 62 | **corrigé en amont** le jour même : `--traceout` ne fait plus tomber le moteur. Republié **sous le même numéro de version** |
+| **48** | **CORRIGÉ entre v3.4.2 et v3.5.1**, mesuré le 2026-09-12 sur trois binaires. Un terminal à tiret final dans une **chaîne** d'alphabet — `OCT` / `ta --> ki --> zo-` — faisait tomber v3.4.2 (code 139, signal 11). v3.5.1-iso.1 et v3.5.4-iso.1 refusent proprement : *« Found '-' in terminal symbol »*, *« Error code 27: terminal symbol contains unwanted character »*, code 0. ⚠️ Un tiret sur un terminal **isolé** (`ta- --> ta-`) est refusé proprement sur les trois : ce n'est pas le cas déclenchant |
 
 ⚠️ **Deux binaires au comportement différent portent l'étiquette `3.4.7`** : seule la date de
 compilation les distingue. Une mesure cite **numéro + date de compilation**, jamais le seul
@@ -70,5 +71,51 @@ numéro.
   sortie** (#67, #71) : un oracle porte la **commande complète**, pas seulement la graine.
 - **Le verdict se prend sur les octets produits**, jamais sur le code de sortie : le moteur rend
   zéro même quand il ne produit rien.
-- **Re-capture interdite tant que #48 à #52 sont ouverts** : la baseline documente le réel des
-  données livrées, défauts compris.
+- **Re-capture interdite tant que #49 à #52 sont ouverts** : la baseline documente le réel des
+  données livrées, défauts compris. ⚠️ **#48 sort de cette liste le 2026-09-12** — il est corrigé et
+  mesuré ; les trois autres restent.
+
+## Ce que la montée en v3.5.4 a mesuré sur ces défauts — 2026-09-12
+
+Trois binaires : `v3.4.2` reconstruit du tag amont avec notre chaîne (md5 `bc948176…`),
+`builds/v3.5.1-iso.1` (`fb6df5ad…`), `builds/v3.5.4-iso.1` (`9bab33d1…`).
+
+| # | verdict en v3.5.4 | cas minimal | témoin positif |
+| --- | --- | --- | --- |
+| **48** | ✅ **corrigé** | alphabet `OCT` / `ta --> ki --> zo-` | oui — v3.4.2 rend 139, signal 11 |
+| **49** | ⚠️ **non reproduit**, pas « corrigé » | `-gr.765432` nettoyée, `--seed 1`, `-se.765432` | **non** |
+| **52** | ⛔ **toujours présent** | `-gr.look-and-say` nettoyée, `--seed 1`, `-se.look-and-say`, `-o` | oui — v3.4.2 produit 25 octets |
+
+⚠️ **#49 : l'absence de symptôme n'est pas une correction.** Les trois binaires produisent **8788
+octets de texte et 7971 octets de MIDI, identiques octet pour octet**. Le registre dit « injouable »,
+ce qui peut viser l'axe temps réel — non éprouvé. **Sans témoin positif, le défaut reste ouvert.**
+
+⛔ **#52 : la mesure atteint le point.** v3.4.2 produit 25 octets et `Errors: 0` ; v3.5.1-iso.1 et
+v3.5.4-iso.1 rendent **zéro octet**, *« Cannot produce items because all weights are nil in
+gram#1 »*, *« => result was: -4 »*. ⇒ **Regraver `look-and-say` contre v3.5.4 inscrirait la
+régression du moteur comme référence de parité.**
+
+## Ce que la montée en v3.5.4 déplace dans les sorties — 2026-09-12
+
+Mesuré par `scripts/confronter-amont.py` sur l'assiette scellée de 96 grammaires. L'axe console
+diverge sur les 93 dans tous les cas : il porte le numéro de version, il ne dit rien.
+
+| saut | grammaires dont le TEXTE change | dont le MIDI change |
+| --- | ---: | ---: |
+| 3.4.2 → 3.5.4 | 7 | 23 |
+| 3.5.1 → 3.5.4 | 6 | 17 |
+
+⇒ **L'essentiel du déplacement est entre 3.5.1 et 3.5.4**, pas avant.
+⚠️ Trois des grammaires MIDI — `dhin`, `tryAllItems0`, `tryhomomorphism` — sont **non
+déterministes** et tirent du même vivier des deux côtés : leur écart n'est pas imputable à la
+version. Écart MIDI attribuable : **~14**.
+
+Qui bouge entre 3.5.1 et 3.5.4 — texte : `tryKeyMap`, `tryKeyXpand`, `tryRotate`, `visser-shapes`,
+`visser-waves`, `visser5`. MIDI : `Alarm`, `Mozartexpression`, `checkHomo`, `dhin`, `dhin1`,
+`livecode2`, `polyphony1`, `tryAllItems0`, `tryKeyMap`, `tryKeyXpand`, `tryRagas`,
+`tryhomomorphism`, `vina3`, `visser-shapes`, `visser-waves`, `visser5`, `watch`.
+
+⚠️ **Cause LUE dans le diff, non mesurée par mécanisme** : `Zouleb()` — le moteur des outils
+sériels — est réécrit en entier (+908 lignes), l'ancien conservé sous `ZoulebOld()` et atteint par
+le réglage neuf `IgnoreFields`. `tryRotate` et les `visser*` sont de cette famille. Pclock, Qclock,
+`Nature_of_time` et le tirage à graine fixe **n'ont pas été isolés sur des cas dédiés**.

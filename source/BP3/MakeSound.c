@@ -38,6 +38,7 @@
 #include "-BP3decl.h" 
 
 int trace_csound_pianoroll = 0;
+int trace_maps = 0;
 
 int MakeSound(long *p_kmax,unsigned long imaxstreak,int maxnsequences,
 	tokenbyte ***pp_b,long tmin,long tmax,int interruptok,
@@ -247,7 +248,7 @@ int MakeSound(long *p_kmax,unsigned long imaxstreak,int maxnsequences,
 					im = (*p_CsoundSize)[j];
 				firstcycleduration = beta * (*p_Dur)[j];
 				(*p_iendperiod)[k] = im - 1;
-				if((*p_PreRollMode)[j] == ABSOLU) preroll = (*p_PreRoll)[j];
+				if((*p_PreRollMode)[j] == FIXVALUE) preroll = (*p_PreRoll)[j];
 				else preroll = beta * (*p_PreRoll)[j];
 				if(alpha > 1.) {
 					if(GetPeriod(j,beta,&objectperiod,&cyclicafter) == OK) {
@@ -337,7 +338,7 @@ int MakeSound(long *p_kmax,unsigned long imaxstreak,int maxnsequences,
 		if(j < 0) j = -j;
 		if(j < 16384) {
 			beta = (*p_Instance)[k].dilationratio;
-			if((*p_PreRollMode)[j] == ABSOLU) preroll = (*p_PreRoll)[j];
+			if((*p_PreRollMode)[j] == FIXVALUE) preroll = (*p_PreRoll)[j];
 			else preroll = beta * (*p_PreRoll)[j];
 			}
 		else preroll = 0.;
@@ -358,7 +359,7 @@ int MakeSound(long *p_kmax,unsigned long imaxstreak,int maxnsequences,
 			if(j < 2) continue;
 			if(j < 16384) {
 				beta = (*p_Instance)[k].dilationratio;
-				if((*p_PostRollMode)[j] == ABSOLU) postroll = (*p_PostRoll)[j];
+				if((*p_PostRollMode)[j] == FIXVALUE) postroll = (*p_PostRoll)[j];
 				else postroll = beta * (*p_PostRoll)[j];
 				}
 			else postroll = 0.;
@@ -774,7 +775,6 @@ int MakeSound(long *p_kmax,unsigned long imaxstreak,int maxnsequences,
 			blockkey = (*p_Instance)[kcurrentinstance].blockkey;
 			j = (*p_Instance)[kcurrentinstance].object;
 			if(j == 0) {
-			//	BPPrintMessage(0,odError,"=> Err. MakeSound(). j = 0");
 				BPPrintMessage(0,odError,"=> Err. MakeSound(). j = 0\n");
 				result = ABORT; goto OVER;
 				}
@@ -1342,6 +1342,7 @@ int MakeSound(long *p_kmax,unsigned long imaxstreak,int maxnsequences,
 				result = OK;
 				if(objectduration > ZERO) howmuch = ((float)(t1 - objectstarttime)) / objectduration;
 				else howmuch = 0.;
+		//		BPPrintMessage(0,odInfo,"@@@ objectduration = %ld, howmuch = %.3f\n",objectduration,howmuch);
 				if(trace_csound_pianoroll) BPPrintMessage(0,odInfo,"k = %d j = %d ievent = %d beta = %.2f t0 = %ld t1 = %ld\n",kcurrentinstance,j,ievent,beta,(long)t0,(long)t1);
 					
 				/* Writing a Csound event taken from the Csound score of a sound-object */
@@ -2003,6 +2004,7 @@ int ClipVelocity(int v,int localvelocity,int control,int rndvel) {
 	//	BPPrintMessage(0,odError,"%s",Message);
 		control = -1;
 		}
+	// BPPrintMessage(0,odInfo,"@@@ v = %d, localvelocity = %d, control = %d, rndvel = %d\n",v,localvelocity,control,rndvel);
 	if(control > -1) v = ParamValue[control];
 	if(rndvel > 0) {
 		if(rndvel > 127) r = ParamValue[rndvel-128];
@@ -2388,74 +2390,86 @@ int GoodKey(int j) {
 
 
 int StoreMappedKey(int orgkey,int imagekey,int k,int channel,
-	MappedKey ***pp_currmapped,long *p_maxmapped)
-{
-long imap;							
+	MappedKey ***pp_currmapped,long *p_maxmapped) {
+	long imap;							
+		
+	for(imap=0; imap < (*p_maxmapped); imap++) {
+		if((**pp_currmapped)[imap].orgkey == -1) break;
+		}
+	if(imap >= *p_maxmapped) {
+		(*p_maxmapped) = ((*p_maxmapped) * 3L) / 2L;
+		if((*pp_currmapped=(MappedKey**) IncreaseSpace((Handle)*pp_currmapped))
+				== NULL) return(ABORT);
+		}
+	(**pp_currmapped)[imap].orgkey = orgkey;
+	(**pp_currmapped)[imap].imagekey = imagekey;
+	(**pp_currmapped)[imap].k = k;
+	(**pp_currmapped)[imap].channel = channel;
+	return(OK);
+	}
+
+
+int RetrieveMappedKey(int orgkey,int k,int channel,MappedKey **p_currmapped,long maxmapped) {
+	long imap;
+	int key;
+
+	for(imap=0; imap < maxmapped; imap++) {
+		if((*p_currmapped)[imap].orgkey != orgkey) continue;
+		if((*p_currmapped)[imap].k != k) continue;
+		if((*p_currmapped)[imap].channel != channel) continue;
+		key = (*p_currmapped)[imap].imagekey;
+		(*p_currmapped)[imap].orgkey = -1;
+		return(key);
+		}
+	return(orgkey);
+	}
+
+
+int MapThisKey(int key,float howmuch,char mapmode,KeyNumberMap *p_map0,KeyNumberMap *p_map1) {
+	KeyNumberMap map;	/* Fixed 24/2/99 - was 'p_map' */
 	
-for(imap=0; imap < (*p_maxmapped); imap++) {
-	if((**pp_currmapped)[imap].orgkey == -1) break;
+	if(trace_maps) {
+		if(howmuch < 0.000001) BPPrintMessage(0,odInfo,"\n=====\n");
+		else BPPrintMessage(0,odInfo,"\n•\n");
+		}
+	if(mapmode == OFF) return(key);
+	if(mapmode == FIX || mapmode == STEPWISE) {
+		if(trace_maps) {
+			BPPrintMessage(0,odInfo,"map0 p1 = %d, q1 = %d, p2 = %d, q2 = %d \n",p_map0->p1,p_map0->q1,p_map0->p2,p_map0->q2);
+			BPPrintMessage(0,odInfo,"map1 p1 = %d, q1 = %d, p2 = %d, q2 = %d \n",p_map1->p1,p_map1->q1,p_map1->p2,p_map1->q2);
+			BPPrintMessage(0,odInfo,"STEPWISE p1 = %d, q1 = %d, p2 = %d, q2 = %d\n",p_map0->p1,p_map0->q1,p_map0->p2,p_map0->q2);
+			}
+		return(KeyImage(key,p_map0));
+		}
+	map.p1 = p_map0->p1 + howmuch * (p_map1->p1 - p_map0->p1);
+	map.q1 = p_map0->q1 + howmuch * (p_map1->q1 - p_map0->q1);
+	map.p2 = p_map0->p2 + howmuch * (p_map1->p2 - p_map0->p2);
+	map.q2 = p_map0->q2 + howmuch * (p_map1->q2 - p_map0->q2);
+	if(trace_maps) {
+		BPPrintMessage(0,odInfo,"map0 p1 = %d, q1 = %d, p2 = %d, q2 = %d \n",p_map0->p1,p_map0->q1,p_map0->p2,p_map0->q2);
+		BPPrintMessage(0,odInfo,"map1 p1 = %d, q1 = %d, p2 = %d, q2 = %d \n",p_map1->p1,p_map1->q1,p_map1->p2,p_map1->q2);
+		BPPrintMessage(0,odInfo,"CONTINUOUS howmuch = %.3f p1 = %d, q1 = %d, p2 = %d, q2 = %d\n",howmuch,map.p1,map.q1,map.p2,map.q2);
+		}
+	return(KeyImage(key,&map));
 	}
-if(imap >= *p_maxmapped) {
-	(*p_maxmapped) = ((*p_maxmapped) * 3L) / 2L;
-	if((*pp_currmapped=(MappedKey**) IncreaseSpace((Handle)*pp_currmapped))
-			== NULL) return(ABORT);
+
+
+int KeyImage(int key,KeyNumberMap *p_map) {
+	int c;
+
+	if(key < p_map->p1 || key > p_map->p2) return(key);
+	if(p_map->p1 == p_map->p2) return(key);
+
+	c = p_map->q1
+			+ Round(((double)(key - p_map->p1) * (p_map->q2 - p_map->q1))
+										/ ((double)p_map->p2 - p_map->p1));
+	if(c < 0) {
+		BPPrintMessage(0,odError,"Err. KeyImage(). c < 0\n");
+		c = 0;
+		}
+	if(c > 127) {
+		BPPrintMessage(0,odError,"Err. KeyImage(). c > 127\n");
+		c = 127;
+		}
+	return(c);
 	}
-(**pp_currmapped)[imap].orgkey = orgkey;
-(**pp_currmapped)[imap].imagekey = imagekey;
-(**pp_currmapped)[imap].k = k;
-(**pp_currmapped)[imap].channel = channel;
-return(OK);
-}
-
-
-int RetrieveMappedKey(int orgkey,int k,int channel,MappedKey **p_currmapped,long maxmapped)
-{
-long imap;
-int key;
-
-for(imap=0; imap < maxmapped; imap++) {
-	if((*p_currmapped)[imap].orgkey != orgkey) continue;
-	if((*p_currmapped)[imap].k != k) continue;
-	if((*p_currmapped)[imap].channel != channel) continue;
-	key = (*p_currmapped)[imap].imagekey;
-	(*p_currmapped)[imap].orgkey = -1;
-	return(key);
-	}
-return(orgkey);
-}
-
-
-int MapThisKey(int key,float howmuch,char mapmode,KeyNumberMap *p_map0,KeyNumberMap *p_map1)
-{
-KeyNumberMap map;	/* Fixed 24/2/99 - was 'p_map' */
-	
-if(mapmode == OFF) return(key);
-if(mapmode == FIXED || mapmode == STEPWISE) return(KeyImage(key,p_map0));
-map.p1 = p_map0->p1 + howmuch * (p_map1->p1 - p_map0->p1);
-map.q1 = p_map0->q1 + howmuch * (p_map1->q1 - p_map0->q1);
-map.p2 = p_map0->p2 + howmuch * (p_map1->p2 - p_map0->p2);
-map.q2 = p_map0->q2 + howmuch * (p_map1->q2 - p_map0->q2);
-return(KeyImage(key,&map));
-}
-
-
-int KeyImage(int key,KeyNumberMap *p_map)
-{
-int c;
-
-if(key < p_map->p1 || key > p_map->p2) return(key);
-if(p_map->p1 == p_map->p2) return(key);
-
-c = p_map->q1
-		+ Round(((double)(key - p_map->p1) * (p_map->q2 - p_map->q1))
-									/ ((double)p_map->p2 - p_map->p1));
-if(c < 0) {
-	BPPrintMessage(0,odError,"Err. KeyImage(). c < 0\n");
-	c = 0;
-	}
-if(c > 127) {
-	BPPrintMessage(0,odError,"Err. KeyImage(). c > 127\n");
-	c = 127;
-	}
-return(c);
-}

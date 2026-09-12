@@ -834,8 +834,8 @@ PRINTPROLONGATIONS:
 			else {
 		//		Reformat(wind,-1,-1,-1,&Blue,NO,NO);
 				switch(p) {
-					case 0:	/* _velcont */
-					case 1:	/* _velstep */
+					case 0:	/* _velstep */
+					case 1:	/* _velcont */
 						p += 2; break;
 					case 2:	/* _modstep */
 					case 3:	/* _modcont */
@@ -920,9 +920,9 @@ PRINTPROLONGATIONS:
 				m = (**pp_a)[i];
 				p = (**pp_a)[i+1];
 				if(m != T43) {
-					BPPrintMessage(0,odError,"=> Err. PrintArgSub().  Second T43 is missing");
-					i -= 2L;
-					continue;
+					BPPrintMessage(0,odError,"=> Err. PrintArgSub(). Second T43 is missing, i = %ld, m = %d, p = %d\n",i,m,p);
+				/*	i -= 2L;
+					continue; */
 					}
 			//	Reformat(wind,-1,-1,-1,&Black,NO,NO);
 				my_sprintf(line,"%ld",(long)p);
@@ -1188,7 +1188,7 @@ PRINTPROLONGATIONS:
 			else {
 				if(!datamode || ((p > 11 || p == 7) && (print_periods < 3 || p == 18 || p == 19))) {
 					if((p != 1 || sp != 4) && p != 9 && p != 8 && p != 18 /* && p != 7 */
-							&& (p < 12 || p > 14)) // FIXED by BB 2020-10-22
+							&& (p < 12 || p > 14))
 						if(Space(f,th,&sp) != OK) {
 							r = ABORT; goto SORTIR;
 							}
@@ -1211,7 +1211,7 @@ PRINTPROLONGATIONS:
 						case 2:
 							sp = 4; break;
 						case 3:
-				//		case 7: FIXED by BB 2020-10-22
+				//		case 7:
 						case 8:
 						case 12:
 						case 14:

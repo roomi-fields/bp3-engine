@@ -36,7 +36,7 @@
 #ifndef _H_BP3
 #define _H_BP3
 
-#define SHORT_VERSION "3.5.1"
+#define SHORT_VERSION "3.5.4"
 #define IDSTRING ( "Version " SHORT_VERSION " (" __DATE__ " - " __TIME__ ")")
 #define MAXVERSION 31
 
@@ -305,10 +305,9 @@ enum {
 #define ON 1
 #define LINE 2
 
-#define RELATIF 0
-#define ABSOLU -1
-#define IRRELEVANT -2
-#define LINEAR 0
+#define PERCENT 0
+#define FIXVALUE -1
+#define IRRELEVANT 1
 
 // Values for wait event types
 #define KEYBOARDEVENT 0
@@ -332,7 +331,7 @@ enum {
 
 // Values and indexes for pitch, modulation and pressure
 // #define OFF 0 already defined
-#define FIXED 1
+#define FIX 1
 #define CONTINUOUS 2
 #define STEPWISE 3
 
@@ -535,7 +534,7 @@ enum {
 #define MAXWIND 15	/* number of windows */
 #define MAXDIAL 25	/* number of dialogs */
 #define WMAX 40		/* number of windows = MAXDIAL + MAXWIND */
-#define MAXMESSAGES 5000 // Maximum number of messsages (0 if unlimited)
+#define MAXMESSAGES 50000 // Maximum number of messsages (0 if unlimited)
 
 // Strings ID's
 #define DialogStringsBaseID 300
@@ -1308,8 +1307,8 @@ typedef struct {
 
 struct s_CurrentParameters {
 	int currvel,rndvel,velcontrol,currarticul,currchan,scale,blockkey,currinstr,currpart,capture;
-	int currtranspose;
-	short xpandkey,xpandval,randomtime,seed;
+	int currtranspose,randomtime,seed;
+	short xpandkey,xpandval;
 	char velmode,articulmode,mapmode,transposemode,transposefirst;
 	KeyNumberMap map0,map1;
 	};
@@ -1378,12 +1377,12 @@ typedef struct s_ContinuousControl ContinuousControl;
 
 struct s_SoundObjectInstanceParameters {
 	Milliseconds starttime,endtime;
-	short object,nseq,ncycles,seed;
+	short object,nseq,ncycles;
 	Milliseconds truncbeg,truncend;
 	char velocity,channel;
-	int transposition,scale,blockkey;
+	int transposition,scale,blockkey,randomtime,seed;
 	int capture;
-	short rndvel,velcontrol,randomtime;
+	short rndvel,velcontrol;
 	short xpandkey,xpandval;
 	short instrument,part;
 	double alpha,dilationratio;

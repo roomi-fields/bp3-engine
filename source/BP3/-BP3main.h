@@ -175,6 +175,7 @@ char ****p_Bol,****p_Patt,****p_Flagname,****p_Script,****p_Var,****p_Homo,****p
 tokenbyte ***pp_Scrap,**p_Scrap,**p_Initbuff;
 char **p_InitScriptLine;
 unsigned Seed,UsedRandom;
+int IgnoreFields,TraceZouleb;
 short CurrentVref,LastVref;
 int ScriptW,CurrentChannel;
 int imageHits;
@@ -240,7 +241,7 @@ unsigned long LapWait,WhenItStarted;
 int ****p_Image,****p_NoteImage,MaxGram,MaxRul,SplitTimeObjects,SplitVariables,SplitLines,Token,Step,SpaceOn,
 	VariableOn,N_err,nstore,NumberTables,OkShowExpand,Improvize,Analyzing,ComputeWhilePlay,TransposeInput,
 	TransposeValue,Varweight,MIDIcapture,Flagthere,ResetDone,BolsInGrammar,NoAlphabet,PointCsound,PointMIDI,
-	**p_Ifrom,**p_Resolution,**p_CsoundInstr,**p_CsoundAssignedInstr;
+	**p_Ifrom,**p_Resolution,**p_CsoundInstr,**p_CsoundInstrumentMode;
 int LiveGrammar,LiveSettings,TraceLive,LearnFromWeights,SyncChange,ChangedGrammar,NewGrammarWaiting,ChangedSettings;
 MIDIcode ****pp_MIDIcode;
 float **p_CsoundTempo;
@@ -252,7 +253,7 @@ char **p_DefaultChannel,**p_AlphaCtrlChan,**p_AlphaCtrl,**p_Type,**p_PasteDone,
 	**p_ContBeg,**p_ContEnd,
 	**p_CoverBeg,**p_CoverEnd,**p_TruncBeg,**p_TruncEnd,**p_PivType,**p_PivMode,
 	**p_RescaleMode,**p_DelayMode,**p_ForwardMode,
-	**p_BreakTempoMode,**p_ContBegMode,**p_ContEndMode,**p_CoverBegMode,**p_CoverEndMode,
+	**p_ContBegMode,**p_ContEndMode,**p_CoverBegMode,**p_CoverEndMode,
 	**p_TruncBegMode,**p_TruncEndMode,**p_PreRollMode,**p_PostRollMode,**p_CyclicMode,
 	**p_ForceIntegerCycles,**p_StrikeAgain,
 	****pp_Comment,****pp_CsoundScoreText,****p_CsoundTables;

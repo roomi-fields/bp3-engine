@@ -907,7 +907,7 @@ int GetPerformanceControl(char **pp,int arg_nr,int *p_n,int quick,long *p_u,long
 			}
 		ptr++;
 		}
-	if(p_map->p1 > p_map->p2) {
+	if(p_map->p1 >= p_map->p2) {
 		my_sprintf(Message,"\nIn _keymap(p1,q1,p2,q2), p2 must be greater than p1. Can't accept _keymap(%ld,%ld,%ld,%ld)",
 			(long)p_map->p1,(long)p_map->q1,(long)p_map->p2,(long)p_map->q2);
 		Print(wTrace,Message);
@@ -1324,25 +1324,25 @@ int GetPerformanceControl(char **pp,int arg_nr,int *p_n,int quick,long *p_u,long
 			break;
 		case 65:	/* _scale() */
 			if(trace_scale) BPPrintMessage(0,odInfo,"_scale() found in compilation\n");
-			if(!OutCsound && (rtMIDI || WriteMIDIfile)) { 
-				if(!MIDImicrotonality) BPPrintMessage(0,odInfo,"👉 Microtonality mimics MIDI Polyphonic Expression\n");
+			if(!OutCsound && (rtMIDI || WriteMIDIfile || EventListOn)) { 
+				if(!MIDImicrotonality) BPPrintMessage(0,odInfo,"👉 Microtonality mimics MIDI Polyphonic Expression\nNumber of scales = %d\n",NumberScales);
 				MIDImicrotonality = TRUE;
 				}
-			if(strcmp(line,"0") == 0 || (!OutCsound && !rtMIDI && !WriteMIDIfile)) k = 0; 
+			if(strcmp(line,"0") == 0 || (!OutCsound && !rtMIDI && !WriteMIDIfile && !EventListOn)) {
+				k = 0;
+				if(trace_scale) BPPrintMessage(0,odInfo,"_scale(0,…) found in compilation\n");
+				}
 			else {
 				k = FixStringConstant(line);
 				if(k < 0) return(k);
 				i_scale = FindScale(k);
-		/*		for(i_scale = 1; i_scale <= NumberScales; i_scale++) {
-					result = MyHandlecmp((*p_StringConstant)[k],(*Scale)[i_scale].label);
-					if(result == 0) break;
-					} */
 				if(i_scale > NumberScales) {
 					my_sprintf(Message,"Instruction \"_scale(%s,...)\" is illicit as this name is unknown\n",*((*p_StringConstant)[k]));
 					Print(wTrace,Message);
 					return(ABORT);
 					}
 				else {
+					Exported_scale[i_scale] = FALSE;
 					numgrades = (*Scale)[i_scale].numgrades;
 					numnotes = (*Scale)[i_scale].numnotes;
 					basekey = (*Scale)[i_scale].basekey;

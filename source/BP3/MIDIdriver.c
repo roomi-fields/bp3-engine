@@ -1421,7 +1421,7 @@ void sendMIDIEvent(int kcurrentinstance,int i_scale,int direction,int blockkey,u
 			channel = AssignUniqueChannel(status,key,value,i_scale,(int) DEFTPITCHBEND,time);
 			if(channel < 1) { // Added 2025-01-07
 				if(SaidChannel < 5) {
-					BPPrintMessage(1,odInfo,"=> No channel available for note #%d vel = %d in sendMIDIEvent()",key,value);
+					BPPrintMessage(1,odInfo,"=> No channel available for key #%d vel = %d in sendMIDIEvent()",key,value);
 					if(SaidChannel == 4) BPPrintMessage(0,odInfo,"\n➡ Maybe more...\n");
 					BPPrintMessage(1,odInfo,"\n");
 					SaidChannel++;
@@ -1432,7 +1432,7 @@ void sendMIDIEvent(int kcurrentinstance,int i_scale,int direction,int blockkey,u
 				if(MPEold_note[channel] == key) key = midiData[1] = MPEnew_note[channel];
 				MPEold_note[channel] = MPEnew_note[channel] = -1;
 				}
-        //    BPPrintMessage(0,odInfo,"§§ Note %d velocity %d channel %d i_scale = %d\n",key,value,channel,i_scale);
+            // BPPrintMessage(0,odInfo,"§§ Note %d velocity %d channel %d i_scale = %d\n",key,value,channel,i_scale);
             midiData[0] = status + channel;
             if(status == NoteOn && value > 0) {
                 if(blockkey == 0) blockkey = DefaultBlockKey;

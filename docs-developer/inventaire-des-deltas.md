@@ -1,13 +1,27 @@
 # Inventaire des écarts avec le moteur de Bernard
 
-Établi le 2026-08-12 par comparaison de `HEAD` avec le tag amont `v3.5.1`, sur `source/BP3/`.
+Établi le 2026-08-12 contre `v3.5.1`, **relevé le 2026-09-12 contre `v3.5.4`**, sur `source/BP3/`.
 
 ```
-git diff v3.5.1 HEAD -- source/BP3/
+git diff v3.5.4 HEAD -- source/BP3/
 ```
 
-15 fichiers, 244 insertions, 67 suppressions. Le tag n'est pas un ancêtre de notre branche : notre
+14 fichiers, 237 insertions, 44 suppressions. Le tag n'est pas un ancêtre de notre branche : notre
 arbre a été construit par reprise de fichiers, et la comparaison porte sur le contenu.
+
+## La montée en v3.5.4 — 2026-09-12
+
+L'apport amont a été porté par `git diff v3.5.1 v3.5.4 -- source/BP3 source/not_used | git apply -3`
+sur une branche `fusion-v3.5.4`, notre arbre étant au niveau v3.5.1 par son contenu. **Deux
+conflits**, tous deux sur nos retraits de conditionnelles WASM — `CompileProcs.c` et `Encode.c`,
+`case 65 /* _scale */` — résolus en gardant la branche `#else` d'amont enrichie de `EventListOn`,
+sans réintroduire de `#ifdef`. ⛔ **Zéro `__BP3_WASM__` dans `source/BP3` après la montée**, mesuré.
+
+**Les trois écarts non déclarés ci-dessous sont RÉPARÉS dans le même mouvement** : ils étaient des
+pertes de reprise, pas des choix. Mesures d'avant/après en tête de chaque section.
+⚠️ **Nouvelle dépendance de construction amont** : `-BP3.h:97` inclut `<curl/curl.h>`. Présent sur
+le poste (`/usr/include/x86_64-linux-gnu/curl/`) ; **la cible Windows n'a pas cet en-tête**, et
+`./build.sh` sans argument échoue sur elle. La cible Linux se construit par `./build.sh linux`.
 
 ## Ce que ces écarts changent à la production — mesuré
 
@@ -57,9 +71,11 @@ Romain du 2026-08-12, arbitrage relayé par l'architecte. **Le fichier est à no
 | `PlayThings.c` | appel de `EmitTimedTokensItem` après `TimeSet` | 2026-06-14, chantier oracle |
 | `CompileProcs.c` · `ConsoleMessages.c` · `Encode.c` · `Misc.c` · `ProduceItems.c` · `ConsoleMain.c` | retrait des conditionnelles `__BP3_WASM__` | 2026-08-11, sortie du portage WASM, `CHANGELOG_ENGINE.md` |
 
-## Écarts non déclarés jusqu'ici, trouvés par cet inventaire
+## ✅ Écarts non déclarés, trouvés par cet inventaire — RÉPARÉS LE 2026-09-12
 
-Ils portent tous la même signature : l'amont a **ajouté** du code que notre reprise n'a pas gardé.
+Ils portaient tous la même signature : l'amont avait **ajouté** du code que notre reprise n'avait pas
+gardé. Les trois sont alignés sur l'amont, et les deux qui avaient un cas minimal sont mesurés des
+deux côtés.
 
 ### `Graphic.c` et `ConsoleMain.c` — cinq gardes de pointeur nul manquants
 
@@ -86,7 +102,12 @@ bp3 produce -e -gr <-gr.765432 nettoyée> --seed 1 -se ../test-data/-se.765432 \
 | binaire | code de sortie |
 | --- | --- |
 | amont `06244c55` | 0 |
-| nôtre `372dd047` | 139 — signal 11 |
+| nôtre `372dd047` (v3.5.1-iso.2) | 139 — signal 11 |
+| ✅ nôtre `9bab33d1` (v3.5.4-iso.1) | **0** |
+
+**Réparation** : `Graphic.c` repris tel quel de `v3.5.4` (`git checkout v3.5.4 -- source/BP3/Graphic.c`) ;
+les trois gardes de `CreateImageFile` rétablis à la main dans `ConsoleMain.c` — `imagePtr = NULL;
+ShowGraphic = FALSE; return;` aux trois échecs, et le message repassé en `odError`.
 
 Le gabarit `CANVAS_header.txt` n'existe dans **aucune** branche amont — ni `master`, ni
 `graphics-for-BP3`, ni `BP3-develop — ni nulle part dans la tour. Le fichier manquant n'est donc
@@ -111,16 +132,26 @@ bp3 produce -e -gr <-gr.Alarm nettoyée> --seed 1 -al ../test-data/-ho.Frenchnot
 | binaire | lignes écrites |
 | --- | --- |
 | amont `06244c55` | 32 |
-| nôtre `372dd047` | 1 — l'en-tête seul |
+| nôtre `372dd047` (v3.5.1-iso.2) | 1 — l'en-tête seul |
+| ✅ nôtre `9bab33d1` (v3.5.4-iso.1) | **32** |
+
+**Réparation** : les deux mentions de `EventListOn` rétablies dans `PlayThings.c` — `if(!ShowPianoRoll
+&& !onlypianoroll && !EventListOn)` et `else if(OutCsound || WriteMIDIfile || EventListOn || rtMIDI
+|| OutBPdata)`.
+⛔ **Cet écart bloquait aussi la nouveauté de v3.5.4** : l'export SCL/KBM des gammes tonales a
+`EventListOn` pour seule condition (`MIDIstuff.c:1601`) et passe par `MakeSound()`. Sans la
+réparation, la fonctionnalité annoncée par Bernard serait restée inerte chez nous.
 
 Réclamer **une seconde sortie** rétablit la liste : `-o`, ou `--midiout`, ou `--csoundout` arme
 une des autres mentions de la condition et masque celle qui manque. La mesure qui réclame
 plusieurs axes à la fois ne peut donc pas voir cet écart.
 
-### `MIDIdriver.c` — un bloc de reprise du serveur CoreMIDI
+### `MIDIdriver.c` — un bloc de reprise du serveur CoreMIDI — **CONSERVÉ**
 
-Notre arbre relance `MIDIServer` par `system("killall MIDIServer")` là où l'amont v3.5.1 rend un
-message d'erreur et abandonne. Code macOS, sans effet sur la construction Linux.
+Notre arbre relance `MIDIServer` par `system("killall MIDIServer")` là où l'amont rend un message
+d'erreur et abandonne. Code macOS, sans effet sur la construction Linux. ⇒ **Non aligné le
+2026-09-12** : c'est le seul des écarts non déclarés qui apporte quelque chose, et il ne touche pas
+la cible construite. Il passe donc de « non déclaré » à **déclaré**.
 
 ### `PlayThings.c` et `ConsoleMain.c` — deux écarts mineurs
 

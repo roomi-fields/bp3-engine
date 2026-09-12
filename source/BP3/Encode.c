@@ -321,7 +321,7 @@ tokenbyte **Encode(t_gram* p_gram,int sequence,int notargument, int igram, int i
 						(*p_buff)[i++] = T12; (*p_buff)[i++] = (tokenbyte)(j - 34);
 						break;
 					case 65: /* _scale */
-						if(OutCsound || rtMIDI || WriteMIDIfile) {
+						if(OutCsound || rtMIDI || WriteMIDIfile || EventListOn) {
 							(*p_buff)[i++] = T44; (*p_buff)[i++] = (tokenbyte) n;
 							if(trace_scale) BPPrintMessage(0,odInfo,"Encode() T44 i = %d n = %d\n",i,n);
 							}

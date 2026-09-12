@@ -81,9 +81,10 @@ FILE * weightPtr;
 char imageFileName[500];
 int N_image;
 long MaxConsoleTime; // seconds: time allowed for console work
-int NumberScales, MaxScales, DefaultScaleParam, ToldAboutScale; // Microtonal scales loaded from Csound instruments file
+int NumberScales, MaxScales, DefaultScaleParam, ToldAboutScale; // Microtonal scales loaded from tonality file
 t_scale** Scale;
 char LastSeen_scale[100]; // Last scale found during compilation of grammar
+char Exported_scale[500];
 Handle mem_ptr[5000];
 int i_ptr, hist_mem_ptr[5000], size_mem_ptr[5000];
 
@@ -133,28 +134,6 @@ int main (int argc, char* args[]) {
 		BPPrintMessage(0,odInfo,"Splitting message output from algorithmic output\n");
 		}
 
-/*	struct stat buffer;
-	if(stat("/Applications/XAMPP/xamppfiles/bin/httpd",&buffer) == 0) {
-		// We restart Apache because XAMPP is the server and it needs to be cleanly restarted
-		BPPrintMessage(0,odInfo,"We restart Apache because XAMPP is the server\n");
-		fflush(stdout);
-		fflush(stderr);
-	//	int debug_status = system("sudo -l -U root > /tmp/sudo_debug.log 2>&1");
-	// 	int restart_status = system("env sudo -u root /Applications/XAMPP/xamppfiles/xampp restartapache");
-	//	int restart_status = system("bash -c 'sudo -u root /Applications/XAMPP/xamppfiles/xampp restartapache < /dev/null'");
-	//	int restart_status = system("sudo -u root /Applications/XAMPP/xamppfiles/xampp restartapache > /tmp/sudo_output.log 2>&1");
-
-		int restart_status = system("/usr/bin/sudo -u root /Applications/XAMPP/xamppfiles/xampp restartapache");
-	//	int restart_status = system("sudo -u root /Applications/XAMPP/xamppfiles/bin/httpd -k restart");
-	    if(restart_status != 0) {
-			int actual_exit_code = WEXITSTATUS(restart_status);
-			BPPrintMessage(0,odError, 
-				"=> Failed to restart Apache in XAMPP. MIDI cannot be initialised. (Exit code: %d)\n",actual_exit_code);
-			}
-		sleep(5); // seconds
-		} */
-
-
 	if(Inits() != OK) goto CLEANUP;
 	
 	result = ParsePostInitArgs(argc, args,&gOptions);
@@ -202,9 +181,8 @@ int main (int argc, char* args[]) {
 	if(result == OK)
 		result = PrepareTraceDestination(&gOptions);
 
-	if(NoTracePath) {
+	if(NoTracePath)
     	ShowObjectGraph = ShowPianoRoll = ShowGraphic = FALSE;
-		}
 	if(result == OK) {
 		if(EventListOn) MakeEventListFile(&(gOptions.outputFiles[ofiEventListfile]));
 		switch (gOptions.action) {
@@ -263,8 +241,9 @@ int main (int argc, char* args[]) {
 				PlaySelectionOn = PlayChunks = TRUE;
 				result = PlaySelection(wData,1);
 				PlayAllChunks = FALSE;
-				if(result == OK) BPPrintMessage(0,odInfo,"\nErrors: 0\n");
-				else if(Beta && result != OK && result != ABORT) BPPrintMessage(0,odError,"=> PlaySelection() returned errors\n");
+				result = OK;
+			/*	if(result == OK) BPPrintMessage(0,odInfo,"\nErrors: 0\n");
+				else if(result != OK && result != ABORT) BPPrintMessage(0,odError,"=> PlaySelection() returned errors, result = %d\n",result); */
 				break;
 			case analyze:
 				BPPrintMessage(0,odInfo,"Analysing…\n");
@@ -374,6 +353,7 @@ CLEANUP:
         if(TimeSettingTime > 0) BPPrintMessage(0,odInfo, "Time-setting time: %ld seconds\n",(long)TimeSettingTime);
         if(!Analyzing && current_time > SessionStartTime && !Panic) BPPrintMessage(0,odInfo, "Total computation time: %ld seconds\n",(long)(current_time-SessionStartTime));
         }
+	else BPPrintMessage(0,odError, "=> result was: %d\n",result);
 	CreateDoneFile();
 	free(eventStack);
 	return EXIT_SUCCESS;
@@ -412,7 +392,7 @@ void CreateDoneFile(void) {
 	//	BPPrintMessage(0,odInfo,"\n_____________________\n");
 		ptr = my_fopen(1,new_thefile,"w");
 		if(ptr != NULL) {
-	    	BPPrintMessage(0,odInfo,"Created 'done' file: %s\n",new_thefile);
+	    	BPPrintMessage(0,odInfo,"Creating 'done' file: %s\n",new_thefile);
 			fputs("bp completed work!\n",ptr);
 			my_fclose(ptr);
 			}
@@ -583,8 +563,9 @@ void CreateImageFile(double time) {
 	N_image++;
 //	BPPrintMessage(0,odInfo,"N_image = %d\n",N_image);
 	if(gOptions.outputFiles[ofiTraceFile].name == NULL) {
-		BPPrintMessage(0,odInfo,"=> Cannot create image file because no path is specified and trace mode is not active\n");
+		BPPrintMessage(0,odError,"=> Cannot create image file because no path is specified and trace mode is not active\n");
 		N_image = 0;
+		imagePtr = NULL; ShowGraphic = FALSE;
 		return;
 		}
     my_sprintf(line1,"%s",gOptions.outputFiles[ofiTraceFile].name);
@@ -604,11 +585,20 @@ void CreateImageFile(double time) {
     BPPrintMessage(0,odInfo,"Creating image #%d: %s\n",N_image,new_thefile);
 	imagePtr = my_fopen(1,new_thefile,"w");
 	strcpy(imageFileName,new_thefile);
-    getcwd(cwd,sizeof(cwd));
+	if(getcwd(cwd, sizeof cwd) == NULL) {
+    	BPPrintMessage(0,odError,"=> Could not read directory of image data: %s\n",strerror(errno));
+		N_image = 0;
+		imagePtr = NULL; ShowGraphic = FALSE;
+		return;
+		}
     convert_path(cwd);
 	size_t len = strlen(cwd);
 	if(len < 4 || strcmp(cwd + len - 4, "/php") != 0) strcat(cwd,"/php");
-    if(strlen(cwd) > 259) BPPrintMessage(0,odError,"=> Warning: this path might be too long: %s\n",cwd);
+    if(strlen(cwd) > 259) {
+		BPPrintMessage(0,odError,"=> Warning: this path might be too long: %s\n",cwd);
+		imagePtr = NULL; ShowGraphic = FALSE;
+		return;
+		}
 //  	BPPrintMessage(1,odInfo,"cwd = %s\n",cwd);
     my_sprintf(line1,"%s/CANVAS_header.txt",cwd);
 //	BPPrintMessage(0,odInfo,"Reading %s\n",line1);
@@ -616,7 +606,8 @@ void CreateImageFile(double time) {
 	if(thisfile == NULL) {
 //		BPPrintMessage(0,odError,"%s is missing!\n",line1);
 		my_fclose(imagePtr);
-        imagePtr = NULL;
+        imagePtr = NULL; ShowGraphic = FALSE;
+		return;
 		}
 	else {
 		someline = (char*) malloc(MAXLIN);
@@ -657,7 +648,13 @@ int EndImageFile(void) {
         return ABORT;
         }
 	imageHits = 0;
-    getcwd(cwd,sizeof(cwd));
+	if(getcwd(cwd,sizeof cwd) == NULL) {
+    	BPPrintMessage(0,odError,"=> Could not read directory of image data: %s\n",strerror(errno));
+		N_image = 0;
+		imagePtr = NULL; ShowGraphic = FALSE;
+		return ABORT;
+		}
+
     convert_path(cwd);
 	size_t len = strlen(cwd);
 	if(len < 4 || strcmp(cwd + len - 4, "/php") != 0) strcat(cwd,"/php");

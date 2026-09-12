@@ -11,6 +11,40 @@ Chaque section référence le point correspondant dans `FEEDBACK_BERNARD.md` (te
 ---
 
 
+## 2026-09-12 — montée en `v3.5.4`, et trois pertes de reprise réparées
+
+Bernard a publié `v3.5.4` (export SCL/KBM des gammes tonales, noms de notes dans la liste
+d'événements). L'apport amont `v3.5.1 → v3.5.4` est porté sur `source/BP3/` : 30 fichiers,
++1491/−507.
+
+**Deux conflits**, tous deux sur nos retraits de conditionnelles `__BP3_WASM__`, au `case 65
+/* _scale */` de `CompileProcs.c` et d'`Encode.c`. Résolus en gardant la branche `#else` d'amont,
+enrichie par v3.5.4 de `EventListOn`, sans réintroduire de `#ifdef`. Zéro `__BP3_WASM__` dans
+`source/BP3` après la montée, mesuré.
+
+**Trois écarts non déclarés — des pertes de reprise, pas des choix — sont alignés sur l'amont** :
+
+- `PlayThings.c` : les deux mentions de `EventListOn` rétablies dans les conditions qui décident
+  d'appeler `MakeSound()`. Mesuré sur `-gr.Alarm` nettoyée, `--seed 1`, `--eventlistout` seule :
+  **1 ligne avant, 32 après** — l'amont en écrit 32. Solde le constat #68 de `ORACLE-BINAIRE.md`.
+  ⛔ Cet écart bloquait aussi la nouveauté de v3.5.4 : l'export SCL/KBM a `EventListOn` pour seule
+  condition (`MIDIstuff.c:1601`) et passe par `MakeSound()`.
+- `Graphic.c` repris tel quel de `v3.5.4`, et les trois gardes de `CreateImageFile` rétablis dans
+  `ConsoleMain.c`. Mesuré sur `-gr.765432` nettoyée avec `--traceout` : **code 139 (signal 11)
+  avant, 0 après**.
+- `MIDIdriver.c` : le bloc de reprise CoreMIDI est **conservé** — macOS, sans effet sur la cible
+  construite — et passe de « non déclaré » à déclaré dans l'inventaire.
+
+**Nos trois deltas voulus sont intacts** : `TokensOut.c`, `bp3_timed_events.{c,h}`, l'option
+`--tokensout` et son appel après `TimeSet` dans `PlayThings.c`.
+
+⚠️ **Nouvelle dépendance de construction** : `-BP3.h:97` inclut `<curl/curl.h>`. La cible Linux se
+construit ; **la cible Windows échoue**, l'en-tête manquant côté croisé — `./build.sh` sans argument
+échoue donc, `./build.sh linux` passe.
+
+Binaire gelé : `builds/v3.5.4-iso.1/bp3`, md5 `9bab33d162996c6373626966905ec16c`, version annoncée
+`3.5.4 (Sep 12 2026)`.
+
 ## 2026-08-12 — la mesure se prend avant la compensation de gigue (`TokensOut.c`)
 
 Décision de Romain : la capture doit porter les instants que le moteur **produit**, pas ceux

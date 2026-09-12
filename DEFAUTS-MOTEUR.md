@@ -7,7 +7,8 @@ De quel moteur il s'agit : le **moteur natif de Bernard Bel** — `bp3` / `bp.ex
 consulter ici.** Arbitrage de Romain du 2026-09-07.
 
 > ## ⛔ IMPACT TOUS PROJETS
-> **Toute validation contre les builds courants doit connaître #49, #50, #52 et #73.** #48 est clos
+> **Toute validation contre les builds courants doit connaître #49, #50, #52, #73 et #74.**
+> ⚠️ Et #75 dit le PLANCHER DE BRUIT de notre propre banc : 14 sur 96 à l'axe des événements. #48 est clos
 > depuis le 2026-09-12, mesuré. ⛔ **#73 est MUET** — il ne se voit ni au code de sortie ni au
 > compte d'erreurs, et il touche tout ce qui porte un outil sériel.
 > Un banc qui les ignore attribue au moteur un échec qui vient d'eux.
@@ -47,6 +48,8 @@ ne part à Bernard qu'avec un cas minimal et solide**.
 | 71 | demander une seconde sortie **tronque** la trace texte, et sur trois grammaires change aussi la production. Quatre grammaires ne sont pas reproductibles à graine fixe sur l'axe MIDI | 2026-08-11 |
 | 72 | un **rang de gabarit non numérique** n'est pas refusé : il dégénère en un nombre. `[1z]` devient le rang 10, `[zzz]` le rang 0 ; un message par caractère fautif, non compté aux erreurs. Même famille que #64 | 2026-09-06 |
 | **73** | ⛔ **les OUTILS SÉRIELS ne sont plus appliqués** — `_retro`, `_rotate(n)`, `_rndseq`, `_ordseq` restent écrits dans la sortie, et le moteur annonce le travail et rend `Errors: 0`. Régression **v3.5.1 → v3.5.4** | 2026-09-12 |
+| **74** | ⛔ **l'ORIGINE DU TEMPS se décale** — mêmes jetons, même ordre, tous les instants décalés du même delta. Régression **v3.5.1 → v3.5.4** | 2026-09-12 |
+| **75** | ⚠️ **notre axe « liste d'événements » n'est pas REPRODUCTIBLE** — 14 grammaires sur 96 divergent entre deux constructions de la MÊME source. Défaut de notre mesure, pas du moteur | 2026-09-12 |
 
 ⚠️ **#68 n'est pas dans cette liste, et l'entrée reste instructive.** Il avait été inscrit comme
 une régression v3.5.0→v3.5.1 sur `--eventlistout` ; l'attribution était fausse — les deux
@@ -133,6 +136,58 @@ regravure de 20 oracles de sa famille `reorder` (36 `_rndseq`, 20 `_seq`, 18 `_r
 ⚠️ **Et un code de retour ne l'attrape pas** : une chaîne de validation qui juge sur `Errors:` ou sur
 le code de sortie déclare ces grammaires conformes. Le verdict se prend sur **les octets produits**,
 et ici sur la présence de l'opérateur dans la sortie.
+
+
+## #74 — l'origine du temps se décale entre v3.5.1 et v3.5.4
+
+**Trouvé par la session `bp-mono` le 2026-09-12, reproduit ici le même jour.** Mesuré sur les deux
+**campagnes gelées**, donc hors du bruit de construction décrit en #75.
+
+`-gr.Visser3` nettoyée, `--seed 1`, `-se.Visser3`, flux de jetons par `--tokensout` :
+
+| binaire | jetons | premier `start` | dernier `end` |
+| --- | ---: | ---: | ---: |
+| `builds/v3.5.1-iso.1` | 401 | `0` | `103510` |
+| `builds/v3.5.4-iso.1` | 401 | `10` | `103520` |
+
+⇒ **Les 401 jetons sont les mêmes, dans le même ordre**, et **tous** les instants sont décalés de
+**+10 ms exactement** — l'ensemble des deltas de `start` observés sur les 401 couples est `{10}`.
+Ce n'est pas un jeton qui bouge, c'est l'origine.
+
+⚠️ **Le delta n'est pas une constante gravée** : `bp-mono` mesure `+10`, `+10` et `+1` sur trois
+fixtures de son corpus. Il suit quelque chose de la scène. ⛔ **Non imputé** — ni eux ni moi n'avons
+isolé de quoi il dépend, et une cause plausible non mesurée coûterait plus qu'aucune. Candidats
+**lus** dans le diff, non mesurés : `TimeSet.c`, `TimeSetFunctions.c`, `FillPhaseDiagram.c` (+68).
+
+⛔ **#74 et #73 sont DEUX causes distinctes, et elles se mélangeaient dans mon compte d'écarts.**
+`acceleration` ne porte aucun outil sériel et bouge quand même ; `tryRotate` en porte un et ne
+décale rien. Un écart MIDI entre 3.5.1 et 3.5.4 peut venir de l'une, de l'autre, ou des deux.
+
+## #75 — notre axe « liste d'événements » n'est pas reproductible
+
+⚠️ **Ce défaut est le NÔTRE, pas celui du moteur**, et il périme la précision de toute mesure prise
+sur cet axe.
+
+Contrôle : `scripts/confronter-amont.py` entre `builds/v3.5.4-iso.1` (md5 `9bab33d1…`) et un binaire
+reconstruit **de la même source, inchangée**, `git status` vide (md5 `12269546…`).
+
+| axe | grammaires qui divergent, sur 96 |
+| --- | ---: |
+| texte | **0** |
+| MIDI | **1** — `tryAllItems0`, non déterministe connue |
+| **liste d'événements** | **14** |
+| console | 96 — elle porte le numéro de version, elle ne dit rien |
+
+Les 14 : `destru`, `dhin`, `dhin1`, `flags`, `gramgene1`, `nadaka`, `polyphony1`, `repeat`,
+`tryAllItems0`, `tryLIN`, `tryPatternGrammar`, `tryflags2`, `tryflags3`, `trytemplates`,
+`trytemplates2`.
+
+⇒ **Le plancher de bruit de notre banc est de 14 sur l'axe des événements, et de 0 sur le texte.**
+Un écart d'événements inférieur à ce plancher ne prouve rien. ⛔ **Les comptes d'écarts que j'ai
+publiés le 2026-09-12 pour la montée v3.5.4 ne portaient que sur le texte et le MIDI** — ils tiennent
+donc ; mais toute mesure future sur l'axe des événements doit citer ce plancher.
+⛔ **Non imputé** : la cause n'est pas cherchée. Ce qui est établi, c'est que deux binaires issus de
+la même source ne rendent pas la même liste d'événements.
 
 ## Ce que la montée en v3.5.4 a mesuré sur ces défauts — 2026-09-12
 

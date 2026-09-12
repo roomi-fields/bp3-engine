@@ -14,15 +14,16 @@
 # l'oracle nomme répond à la décision. »
 #
 # Les trois campagnes déclarées, et qui les nomme :
-#   v3.5.1-iso.1  — l'oracle que BPscript lit, et celui de docs-developer/volumestep-step-et-
-#                   plantage-trace.md
-#   v3.5.1-iso.2  — l'oracle du PORTILLON : scripts/copie-injection.sh et le maillon
-#                   « oracle-fige-intact », et toute mesure de référence prise entre le
-#                   2026-08-14 et le 2026-09-12. Il reste déclaré parce qu'il est le TÉMOIN
-#                   d'avant la montée en v3.5.4 : les mesures avant/après de
-#                   docs-developer/inventaire-des-deltas.md et du lexique le citent par son md5.
-#   v3.5.4-iso.1  — le binaire de la montée du 2026-09-12, md5 9bab33d1…, et ce que
-#                   builds/LAST nomme
+#   v3.5.4-iso.1  — ⛔ L'ORACLE COURANT, décision de Romain du 2026-09-12. md5 9bab33d1… ;
+#                   ce que builds/LAST nomme, ce que scripts/copie-injection.sh,
+#                   gate-production.py, valider-reglages-convertis.py et les deux témoins
+#                   d'injection lancent.
+#   v3.5.1-iso.1  — l'oracle de la BASELINE v14, scellé par baseline-native/GEL.json ; le
+#                   dégel appartient à Romain. Lu aussi par BPscript et par
+#                   docs-developer/volumestep-step-et-plantage-trace.md.
+#   v3.5.1-iso.2  — le TÉMOIN d'avant la montée en v3.5.4. Plus un oracle ; reste déclaré
+#                   parce que les mesures avant/après de docs-developer/inventaire-des-
+#                   deltas.md et du lexique le citent par son md5 372dd047….
 #
 # ⛔ UNE CAMPAGNE QUI DEVIENT UN ORACLE S'AJOUTE ICI DANS LE MÊME GESTE. Un binaire cité par un
 # document et absent de cette liste est atteignable ici et introuvable chez le voisin, et rien

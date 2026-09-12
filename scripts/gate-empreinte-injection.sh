@@ -61,7 +61,7 @@ python3 - "$DOC" <<'EOF'
 import sys
 p = sys.argv[1]
 t = open(p, encoding="utf-8").read()
-t = t.replace("`builds/v3.5.1-iso.2`", "`builds/campagne-qui-n-existe-pas`", 1)
+t = t.replace("`builds/v3.5.4-iso.1`", "`builds/campagne-qui-n-existe-pas`", 1)
 open(p, "w", encoding="utf-8").write(t)
 EOF
 essai "C un chemin annoncé absent du disque"

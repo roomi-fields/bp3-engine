@@ -104,13 +104,25 @@ servir dans le dépôt d'un autre, d'où ce lot).
 
 | version | md5 | rôle |
 |---|---|---|
-| 3.5.1 | fb6df5ad5ee18a0398ae3cdb1817287d | oracle figé, campagne `builds/v3.5.1-iso.1` |
-| 3.5.1 | 372dd047bc52fd152ff51ec6715fae74 | oracle figé COURANT, campagne `builds/v3.5.1-iso.2` |
+| 3.5.4 | 9bab33d162996c6373626966905ec16c | oracle figé COURANT, campagne `builds/v3.5.4-iso.1` |
+| 3.5.1 | fb6df5ad5ee18a0398ae3cdb1817287d | oracle de la BASELINE v14 gelée, campagne `builds/v3.5.1-iso.1` |
+| 3.5.1 | 372dd047bc52fd152ff51ec6715fae74 | témoin d'AVANT la montée en 3.5.4, campagne `builds/v3.5.1-iso.2` |
 | 3.5.0 | 53eae9c6c987b3cd5aec7a90e2b7c925 | précédent, campagne `builds/v3.4.2-wasm.2_auto.50` |
 | 3.4.7 | 0fa0f3d466613974b4ea2f1c78548955 | oracle ISO figé, campagne `builds/v3.4.2-wasm.2_auto.31` |
 
-Les deux campagnes 3.5.1 sont publiées dans `.publie/bp3-engine/builds/`, déclarées par
-`AVANT-PUBLICATION.sh` : c'est par là qu'un voisin sous enveloppe atteint le natif.
+Les trois campagnes sont publiées dans `.publie/bp3-engine/builds/`, déclarées par
+`AVANT-PUBLICATION.sh` : c'est par là qu'un voisin sous enveloppe atteint le natif. `builds/LAST`
+nomme la campagne COURANTE, `v3.5.4-iso.1`.
+
+⛔ **TROIS RÔLES, TROIS BINAIRES — ils ne se remplacent pas l'un l'autre.**
+- **L'oracle COURANT** est ce que les scripts lancent pour mesurer aujourd'hui : `v3.5.4-iso.1`,
+  décision de Romain du 2026-09-12. `scripts/copie-injection.sh`, `scripts/gate-production.py`,
+  `scripts/valider-reglages-convertis.py` et les deux témoins d'injection le nomment.
+- **L'oracle de la baseline v14** reste `v3.5.1-iso.1` : `baseline-native/GEL.json` le scelle, et
+  **le dégel appartient à Romain**. Changer l'oracle courant ne dégèle rien.
+- **Le témoin d'avant la montée** est `v3.5.1-iso.2` : les mesures avant/après de
+  `docs-developer/inventaire-des-deltas.md` et du lexique le citent par son md5. Il n'est plus un
+  oracle ; il reste publié parce qu'il est cité.
 
 ⛔ **`./bp3` À LA RACINE N'EST PAS UNE RÉFÉRENCE, ET SON EMPREINTE MD5 NE SE COMPARE À RIEN.** Le
 binaire grave sa date et son heure de construction : la campagne figée annonce

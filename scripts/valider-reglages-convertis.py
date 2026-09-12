@@ -16,7 +16,7 @@ import argparse, json, os, re, subprocess, sys
 R = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 TD = os.path.join(R, "test-data")
 RUN = os.path.join(R, "capture-run")
-BIN = os.path.join(R, "builds", "v3.5.1-iso.2", "bp3")
+BIN = os.path.join(R, "builds", "v3.5.4-iso.1", "bp3")
 TMP = os.environ.get("BP3_VALID_TMP") or "/tmp/valider-reglages"
 os.makedirs(TMP, exist_ok=True)
 MODE = ("RND", "ORD", "LIN", "SUB", "TEMPLATES", "gram#", "GRAM#")

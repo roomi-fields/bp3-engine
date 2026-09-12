@@ -30,7 +30,7 @@ import tempfile
 
 RACINE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LANCEMENT = os.path.join(RACINE, "capture-run")
-BINAIRE = os.path.join(RACINE, "builds", "v3.5.1-iso.2", "bp3")
+BINAIRE = os.path.join(RACINE, "builds", "v3.5.4-iso.1", "bp3")
 
 # Un cas par chemin auxiliaire exercé. Les chemins sont relatifs au répertoire de LANCEMENT,
 # comme chez un consommateur : c'est la résolution qui est mesurée, pas seulement la production.

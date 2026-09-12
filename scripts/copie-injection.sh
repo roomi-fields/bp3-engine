@@ -29,7 +29,7 @@ NOM="$(basename "$SOURCE")"
 RACINE="${BP3_COPIE_RACINE:-${TMPDIR:-/tmp}/bp3-copie-injection}"
 COPIE="$RACINE/$NOM"          # le dossier porte le NOM du dépôt, pas un nom de circonstance
 
-ORACLE="builds/v3.5.1-iso.2/bp3"
+ORACLE="builds/v3.5.4-iso.1/bp3"
 
 case "${1:-poser}" in
 poser)

@@ -11,7 +11,7 @@
 # éprouvé est le même, l'écriture est réelle, le binaire de référence n'est pas touché.
 set -u
 cd "$(dirname "$0")/.."
-VRAI_ORACLE="builds/v3.5.1-iso.2/bp3"
+VRAI_ORACLE="builds/v3.5.4-iso.1/bp3"
 EMPREINTE_AVANT=$(git hash-object "$VRAI_ORACLE")
 echec=0
 
@@ -20,9 +20,9 @@ nettoie() { rm -rf "$T"; }
 trap nettoie EXIT
 
 echo "1. montage d'un dépôt jetable dont l'oracle est un leurre"
-mkdir -p "$T/depot/scripts" "$T/depot/builds/v3.5.1-iso.2"
+mkdir -p "$T/depot/scripts" "$T/depot/builds/v3.5.4-iso.1"
 cp scripts/copie-injection.sh "$T/depot/scripts/"
-printf 'binaire de substitution, pas un oracle\n' > "$T/depot/builds/v3.5.1-iso.2/bp3"
+printf 'binaire de substitution, pas un oracle\n' > "$T/depot/builds/v3.5.4-iso.1/bp3"
 echo "rien" > "$T/depot/marqueur.txt"
 ( cd "$T/depot" && git init -q . && git add -A \
   && git -c user.email=x@y -c user.name=x commit -qm "socle" ) || {
@@ -40,7 +40,7 @@ else
 fi
 
 echo "3. injection — on écrit dans l'oracle de substitution, comme le ferait une injection égarée"
-printf 'un octet de plus\n' >> "$T/depot/builds/v3.5.1-iso.2/bp3"
+printf 'un octet de plus\n' >> "$T/depot/builds/v3.5.4-iso.1/bp3"
 sortie=$(bash "$T/depot/scripts/copie-injection.sh" verifier 2>&1); code=$?
 if [ $code -eq 0 ]; then
   echo "   ÉCHEC : le maillon reste vert alors que l'oracle a été écrit — figurant"; echec=1
@@ -53,7 +53,7 @@ else
 fi
 
 echo "4. retrait — l'oracle de substitution restauré, le maillon doit redevenir VERT"
-printf 'binaire de substitution, pas un oracle\n' > "$T/depot/builds/v3.5.1-iso.2/bp3"
+printf 'binaire de substitution, pas un oracle\n' > "$T/depot/builds/v3.5.4-iso.1/bp3"
 if bash "$T/depot/scripts/copie-injection.sh" verifier >/dev/null 2>&1; then
   echo "   vert ✔"
 else

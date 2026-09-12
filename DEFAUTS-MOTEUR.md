@@ -7,8 +7,9 @@ De quel moteur il s'agit : le **moteur natif de Bernard Bel** — `bp3` / `bp.ex
 consulter ici.** Arbitrage de Romain du 2026-09-07.
 
 > ## ⛔ IMPACT TOUS PROJETS
-> **Toute validation contre les builds courants doit connaître #49, #50 et #52.** #48 est clos
-> depuis le 2026-09-12, mesuré.
+> **Toute validation contre les builds courants doit connaître #49, #50, #52 et #73.** #48 est clos
+> depuis le 2026-09-12, mesuré. ⛔ **#73 est MUET** — il ne se voit ni au code de sortie ni au
+> compte d'erreurs, et il touche tout ce qui porte un outil sériel.
 > Un banc qui les ignore attribue au moteur un échec qui vient d'eux.
 
 Le **détail** de chaque entrée — reproduction, citations de code, réponses de Bernard Bel — vit
@@ -45,6 +46,7 @@ ne part à Bernard qu'avec un cas minimal et solide**.
 | 70 | erreur de segmentation à l'écriture `-o` d'un item à **17 groupes polymétriques imbriqués** ou plus. Seuil exact : 16 passe, 17 tombe. L'affichage terminal, lui, survit | 2026-08-09 |
 | 71 | demander une seconde sortie **tronque** la trace texte, et sur trois grammaires change aussi la production. Quatre grammaires ne sont pas reproductibles à graine fixe sur l'axe MIDI | 2026-08-11 |
 | 72 | un **rang de gabarit non numérique** n'est pas refusé : il dégénère en un nombre. `[1z]` devient le rang 10, `[zzz]` le rang 0 ; un message par caractère fautif, non compté aux erreurs. Même famille que #64 | 2026-09-06 |
+| **73** | ⛔ **les OUTILS SÉRIELS ne sont plus appliqués** — `_retro`, `_rotate(n)`, `_rndseq`, `_ordseq` restent écrits dans la sortie, et le moteur annonce le travail et rend `Errors: 0`. Régression **v3.5.1 → v3.5.4** | 2026-09-12 |
 
 ⚠️ **#68 n'est pas dans cette liste, et l'entrée reste instructive.** Il avait été inscrit comme
 une régression v3.5.0→v3.5.1 sur `--eventlistout` ; l'attribution était fausse — les deux
@@ -75,6 +77,63 @@ numéro.
   données livrées, défauts compris. ⚠️ **#48 sort de cette liste le 2026-09-12** — il est corrigé et
   mesuré ; les trois autres restent.
 
+
+## #73 — les outils sériels ne sont plus appliqués, et le moteur dit qu'ils l'ont été
+
+**Trouvé par la session `bp-mono` le 2026-09-12, reproduit ici le même jour.** Trois binaires :
+`v3.4.2` reconstruit du tag amont (md5 `bc948176…`), `builds/v3.5.1-iso.1` (`fb6df5ad…`),
+`builds/v3.5.4-iso.1` (`9bab33d1…`).
+
+Grammaire minimale `GRAM#1[1] S --> <opérateur> {a b c d}`, alphabet `OCT` / `a --> b --> c --> d`,
+`--seed 1`, sortie `-o` :
+
+| opérateur | v3.4.2 | v3.5.1 | v3.5.4 |
+| --- | --- | --- | --- |
+| `_retro` | `{d c b a}` | `{d c b a}` | ⛔ `_retro {a b c d}` |
+| `_rotate(1)` | `{b c d a}` | — | ⛔ `_rotate(1){a b c d}` |
+| `_rndseq` | `{b d a c}` | `{b d a c}` | ⛔ `_rndseq {a b c d}` |
+| `_ordseq` | `{a b c d}` | `{a b c d}` | ⛔ `_ordseq {a b c d}` |
+
+⇒ **La régression est strictement entre v3.5.1 et v3.5.4** — v3.4.2 et v3.5.1 appliquent, v3.5.4
+n'applique plus. ⚠️ `_rndseq` rend la **même** permutation en v3.4.2 et v3.5.1 à graine 1 : le tirage
+est déterministe, ce n'est pas une variance.
+
+⛔ **L'ÉCHEC EST MUET, ET C'EST CE QUI LE REND PIRE QUE #52.** Les trois binaires annoncent
+*« 👉 Applying serial tools to modify order of sequence(s) »* (`Polymetric.c:122`) et rendent
+`Errors: 0`, code de sortie 0. Le moteur déclare le travail, déclare le succès, ne transforme rien —
+et **l'opérateur reste écrit dans la sortie**, ce qui montre que `DeleteSerialTools()` n'a pas fait
+son office non plus.
+
+### ⛔ `IgnoreFields` N'EST PAS UN CONTOURNEMENT — mesuré, contre l'hypothèse
+
+`Polymetric.c:126` aiguille vers l'ancien moteur quand `IgnoreFields` est vrai. Posé par un fichier
+`-se.` ne portant que cette clé, le réglage **est bien pris** — le moteur écrit *« The “Ignore field
+separators” is set. We will use the old algorithm! »* (`Polymetric.c:132`) — et `ZoulebOld()` rend
+**le même `_retro {a b c d}` non transformé**.
+
+⇒ **La cause n'est donc pas le seul choix de moteur sériel** : l'ancien code, qui fonctionnait en
+v3.5.1 sous le nom `Zouleb()`, échoue en v3.5.4 sous le nom `ZoulebOld()`. Quelque chose en amont ou
+en aval des deux a changé. ⚠️ **Non imputé** : `Zouleb.c` a été réécrit (+908 lignes) et
+`Polymetric.c` modifié (60 lignes) dans le même saut, et je n'ai pas isolé lequel.
+
+### Le fichier de réglages qui pose le réglage, pour rejouer la mesure
+
+```json
+{
+    "header": "// Bol Processor BP3",
+    "IgnoreFields": { "name": "Ignore field separators", "value": "1", "unit": "", "boolean": "1" }
+}
+```
+
+### Ce que ce défaut impose
+
+⛔ **Aucune référence portant un outil sériel ne se grave contre v3.5.4.** `bp-mono` a arrêté la
+regravure de 20 oracles de sa famille `reorder` (36 `_rndseq`, 20 `_seq`, 18 `_rotate`, 6 `_retro`,
+2 `_ordseq`) pour cette raison.
+⚠️ **Et un code de retour ne l'attrape pas** : une chaîne de validation qui juge sur `Errors:` ou sur
+le code de sortie déclare ces grammaires conformes. Le verdict se prend sur **les octets produits**,
+et ici sur la présence de l'opérateur dans la sortie.
+
 ## Ce que la montée en v3.5.4 a mesuré sur ces défauts — 2026-09-12
 
 Trois binaires : `v3.4.2` reconstruit du tag amont avec notre chaîne (md5 `bc948176…`),
@@ -93,7 +152,8 @@ ce qui peut viser l'axe temps réel — non éprouvé. **Sans témoin positif, l
 ⛔ **#52 : la mesure atteint le point.** v3.4.2 produit 25 octets et `Errors: 0` ; v3.5.1-iso.1 et
 v3.5.4-iso.1 rendent **zéro octet**, *« Cannot produce items because all weights are nil in
 gram#1 »*, *« => result was: -4 »*. ⇒ **Regraver `look-and-say` contre v3.5.4 inscrirait la
-régression du moteur comme référence de parité.**
+régression du moteur comme référence de parité.** Même conclusion pour toute grammaire portant un
+outil sériel, par **#73**.
 
 ## Ce que la montée en v3.5.4 déplace dans les sorties — 2026-09-12
 

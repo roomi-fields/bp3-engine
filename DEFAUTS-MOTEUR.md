@@ -9,8 +9,8 @@ consulter ici.** Arbitrage de Romain du 2026-09-07.
 > ## ⛔ IMPACT TOUS PROJETS
 > **Toute validation contre les builds courants doit connaître #49, #50 et #52 — et comparer les instants
 > à UN QUANTUM près entre v3.5.1 et v3.5.4 (#74).**
-> ⚠️ Et #75 dit le PLANCHER DE BRUIT de notre propre banc : 11 à 14 sur 96 à l'axe des événements, toujours
-> dans les colonnes de keymap. #48 est clos
+> ⚠️ Et #75 dit le PLANCHER DE BRUIT de notre propre banc : 11 à 14 sur 96 à l'axe des événements, et
+> deux grammaires qui clignotent en MIDI. #48 est clos
 > depuis le 2026-09-12, mesuré. ⛔ **#73 est RETIRÉ le 2026-09-15 : c'était une erreur de mesure** —
 > les outils sériels sont appliqués, seule l'écriture texte a changé, comme en #59.
 > Un banc qui les ignore attribue au moteur un échec qui vient d'eux.
@@ -49,7 +49,7 @@ ne part à Bernard qu'avec un cas minimal et solide**.
 | 70 | erreur de segmentation à l'écriture `-o` d'un item à **17 groupes polymétriques imbriqués** ou plus. Seuil exact : 16 passe, 17 tombe. L'affichage terminal, lui, survit | 2026-08-09 |
 | 71 | demander une seconde sortie **tronque** la trace texte, et sur trois grammaires change aussi la production. Quatre grammaires ne sont pas reproductibles à graine fixe sur l'axe MIDI | 2026-08-11 |
 | 72 | un **rang de gabarit non numérique** n'est pas refusé : il dégénère en un nombre. `[1z]` devient le rang 10, `[zzz]` le rang 0 ; un message par caractère fautif, non compté aux erreurs. Même famille que #64 | 2026-09-06 |
-| **75** | ⚠️ **notre axe « liste d'événements » n'est pas REPRODUCTIBLE** — 11 à 14 grammaires sur 96 divergent entre deux constructions de la MÊME source, et **seulement dans les colonnes de keymap**. Défaut de notre mesure, pas du moteur | 2026-09-12 |
+| **75** | ⚠️ **notre axe « liste d'événements » n'est pas REPRODUCTIBLE** — 11 à 14 grammaires sur 96 divergent entre deux constructions de la MÊME source, et **jamais dans les étiquettes ni la colonne `id proto`**. Défaut de notre mesure, pas du moteur | 2026-09-12 |
 
 ⚠️ **#68 n'est pas dans cette liste, et l'entrée reste instructive.** Il avait été inscrit comme
 une régression v3.5.0→v3.5.1 sur `--eventlistout` ; l'attribution était fausse — les deux
@@ -173,14 +173,17 @@ Les 11 du 2026-09-15 : `destru`, `dhin`, `dhin1`, `flags`, `polyphony1`, `tryLIN
 dans la liste du 2026-09-12. ⚠️ Celle-ci nomme quinze grammaires pour un compte de 14 ; l'écart
 n'est pas retrouvé.
 
-⇒ **Le bruit est LOCALISÉ, mesuré colonne par colonne le 2026-09-15** sur les 11 : il ne touche que
-`keymap mode`, `keymap0 q1`, `keymap0 p2`, `keymap0 q2`, `keymap1 q1`, `keymap1 p2`, `keymap1 q2`.
-**Jamais** les étiquettes, les instants, ni la colonne `id proto`.
+⇒ **Le bruit est LOCALISÉ, mesuré colonne par colonne le 2026-09-15** : sur les 11 du témoin, il ne
+touche que les colonnes de keymap ; sur les passes répétées, s'y ajoutent `volume channel`,
+`volume mode`, `panoramic channel`, `panoramic mode` — et les instants de `tryflags3` seule.
+**Jamais** les étiquettes ni la colonne `id proto`.
+⚠️ **Deux grammaires clignotent en MIDI d'une exécution à l'autre du MÊME binaire** : `tryflags3`
+(témoin compris) et `simpletemplates` (identique puis en écart, deux passes consécutives).
 ⇒ ⛔ **L'hypothèse « `Identifier` dépend de l'ordre de compilation » est RÉFUTÉE pour ce bruit** —
 le fait que Bernard Bel signale est vrai du JSON des prototypes, mais ce n'est pas lui qui bruite
 notre banc.
-⇒ **Pour qui mesure** : une liste d'événements se compare **colonnes de keymap masquées** ; le texte
-et le MIDI sont propres à zéro sur l'amont pur. ⛔ **Non imputé** : la valeur non déterministe de ces
+⇒ **Pour qui mesure** : une liste d'événements se compare **colonnes de keymap, de canal et de mode
+masquées** ; le texte est propre à zéro, le MIDI aussi hors `tryflags3` et `simpletemplates`. ⛔ **Non imputé** : la valeur non déterministe de ces
 colonnes n'est pas expliquée.
 
 ## Ce que la montée en v3.5.4 a mesuré sur ces défauts — 2026-09-12

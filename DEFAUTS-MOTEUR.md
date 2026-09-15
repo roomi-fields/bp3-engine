@@ -7,10 +7,12 @@ De quel moteur il s'agit : le **moteur natif de Bernard Bel** — `bp3` / `bp.ex
 consulter ici.** Arbitrage de Romain du 2026-09-07.
 
 > ## ⛔ IMPACT TOUS PROJETS
-> **Toute validation contre les builds courants doit connaître #49, #50, #52, #73 et #74.**
-> ⚠️ Et #75 dit le PLANCHER DE BRUIT de notre propre banc : 14 sur 96 à l'axe des événements. #48 est clos
-> depuis le 2026-09-12, mesuré. ⛔ **#73 est MUET** — il ne se voit ni au code de sortie ni au
-> compte d'erreurs, et il touche tout ce qui porte un outil sériel.
+> **Toute validation contre les builds courants doit connaître #49, #50 et #52 — et comparer les instants
+> à UN QUANTUM près entre v3.5.1 et v3.5.4 (#74).**
+> ⚠️ Et #75 dit le PLANCHER DE BRUIT de notre propre banc : 11 à 14 sur 96 à l'axe des événements, toujours
+> dans les colonnes de keymap. #48 est clos
+> depuis le 2026-09-12, mesuré. ⛔ **#73 est RETIRÉ le 2026-09-15 : c'était une erreur de mesure** —
+> les outils sériels sont appliqués, seule l'écriture texte a changé, comme en #59.
 > Un banc qui les ignore attribue au moteur un échec qui vient d'eux.
 
 Le **détail** de chaque entrée — reproduction, citations de code, réponses de Bernard Bel — vit
@@ -47,9 +49,7 @@ ne part à Bernard qu'avec un cas minimal et solide**.
 | 70 | erreur de segmentation à l'écriture `-o` d'un item à **17 groupes polymétriques imbriqués** ou plus. Seuil exact : 16 passe, 17 tombe. L'affichage terminal, lui, survit | 2026-08-09 |
 | 71 | demander une seconde sortie **tronque** la trace texte, et sur trois grammaires change aussi la production. Quatre grammaires ne sont pas reproductibles à graine fixe sur l'axe MIDI | 2026-08-11 |
 | 72 | un **rang de gabarit non numérique** n'est pas refusé : il dégénère en un nombre. `[1z]` devient le rang 10, `[zzz]` le rang 0 ; un message par caractère fautif, non compté aux erreurs. Même famille que #64 | 2026-09-06 |
-| **73** | ⛔ **les OUTILS SÉRIELS ne sont plus appliqués** — `_retro`, `_rotate(n)`, `_rndseq`, `_ordseq` restent écrits dans la sortie, et le moteur annonce le travail et rend `Errors: 0`. Régression **v3.5.1 → v3.5.4** | 2026-09-12 |
-| **74** | ⛔ **l'ORIGINE DU TEMPS se décale** — mêmes jetons, même ordre, tous les instants décalés du même delta. Régression **v3.5.1 → v3.5.4** | 2026-09-12 |
-| **75** | ⚠️ **notre axe « liste d'événements » n'est pas REPRODUCTIBLE** — 14 grammaires sur 96 divergent entre deux constructions de la MÊME source. Défaut de notre mesure, pas du moteur | 2026-09-12 |
+| **75** | ⚠️ **notre axe « liste d'événements » n'est pas REPRODUCTIBLE** — 11 à 14 grammaires sur 96 divergent entre deux constructions de la MÊME source, et **seulement dans les colonnes de keymap**. Défaut de notre mesure, pas du moteur | 2026-09-12 |
 
 ⚠️ **#68 n'est pas dans cette liste, et l'entrée reste instructive.** Il avait été inscrit comme
 une régression v3.5.0→v3.5.1 sur `--eventlistout` ; l'attribution était fausse — les deux
@@ -63,6 +63,8 @@ sa source. Ce qui en reste appartient à #65 : un oracle non rattachable à sa s
 | 55 | **résolu en v3.4.7**, vérifié empiriquement : un fichier `-cs` dont la section de tables n'est pas fermée ne fait plus tourner le moteur sans fin |
 | 57 | **retiré des défauts**, tranché par Bernard Bel : le glyphe `¬` est une erreur de documentation, pas une régression. La notation réelle est `3+4+2/4 … /3 … /1` |
 | 59 | **diagnostic corrigé** : `_rotate` est bien appliqué — les jetons MIDI le prouvent. Ce qui change en v3.4.7 est la sérialisation **texte** |
+| **73** | **ERREUR DE MESURE, retirée le 2026-09-15** — même méprise que #59. Les outils sériels sont **appliqués** en v3.5.4 : `_retro {C4 D4 E4 F4}` rend `F4 E4 D4 C4` dans la liste d'événements, comme en v3.5.1. Ce qui a changé est l'écriture **texte** `-o`, qui garde l'opérateur non développé. Détail ci-dessous |
+| **74** | **REQUALIFIÉ le 2026-09-15 : un ARRONDI, pas un défaut** — le décalage uniforme entre v3.5.1 et v3.5.4 vaut exactement **un quantum de quantification** (+10 à 10 ms, +1 à 1 ms). Expliqué par Bernard Bel, mesuré ici. Une comparaison d'instants entre ces versions tolère un quantum. Détail ci-dessous |
 | 62 | **corrigé en amont** le jour même : `--traceout` ne fait plus tomber le moteur. Republié **sous le même numéro de version** |
 | **48** | **CORRIGÉ entre v3.4.2 et v3.5.1**, mesuré le 2026-09-12 sur trois binaires. Un terminal à tiret final dans une **chaîne** d'alphabet — `OCT` / `ta --> ki --> zo-` — faisait tomber v3.4.2 (code 139, signal 11). v3.5.1-iso.1 et v3.5.4-iso.1 refusent proprement : *« Found '-' in terminal symbol »*, *« Error code 27: terminal symbol contains unwanted character »*, code 0. ⚠️ Un tiret sur un terminal **isolé** (`ta- --> ta-`) est refusé proprement sur les trois : ce n'est pas le cas déclenchant |
 
@@ -95,135 +97,91 @@ numéro.
   mesuré ; les trois autres restent.
 
 
-## #73 — les outils sériels ne sont plus appliqués, et le moteur dit qu'ils l'ont été
+## #73 — retiré : les outils sériels SONT appliqués, seule l'écriture texte a changé
 
-**Trouvé par la session `bp-mono` le 2026-09-12, reproduit ici le même jour.** Trois binaires :
-`v3.4.2` reconstruit du tag amont (md5 `bc948176…`), `builds/v3.5.1-iso.1` (`fb6df5ad…`),
-`builds/v3.5.4-iso.1` (`9bab33d1…`).
+**Ouvert le 2026-09-12 sur une mesure fausse, retiré le 2026-09-15.** Bernard Bel l'a contesté le
+jour même, trace et liste d'événements à l'appui : *« Si, _retro {a b c d} fait le boulot ! »*
 
-Grammaire minimale `GRAM#1[1] S --> <opérateur> {a b c d}`, alphabet `OCT` / `a --> b --> c --> d`,
-`--seed 1`, sortie `-o` :
+Mesure qui tranche — `ORD` / `GRAM#1[1] S --> <opérateur> {C4 D4 E4 F4}`, `--seed 1`, `-o` et
+`--eventlistout` dans la même invocation, trois binaires : `builds/v3.5.1-iso.1`,
+`builds/v3.5.4-iso.1`, et l'amont **pur** au commit `556050c` (2026-09-13) construit par son `Makefile` :
 
-| opérateur | v3.4.2 | v3.5.1 | v3.5.4 |
+| opérateur | texte 3.5.1 | texte 3.5.4, les deux binaires | événements, les trois |
 | --- | --- | --- | --- |
-| `_retro` | `{d c b a}` | `{d c b a}` | ⛔ `_retro {a b c d}` |
-| `_rotate(1)` | `{b c d a}` | — | ⛔ `_rotate(1){a b c d}` |
-| `_rndseq` | `{b d a c}` | `{b d a c}` | ⛔ `_rndseq {a b c d}` |
-| `_ordseq` | `{a b c d}` | `{a b c d}` | ⛔ `_ordseq {a b c d}` |
+| `_retro` | `{F4 E4 D4 C4}` | `_retro {C4 D4 E4 F4}` | `F4 E4 D4 C4` |
+| `_rotate(1)` | `{D4 E4 F4 C4}` | `_rotate(1){C4 D4 E4 F4}` | `D4 E4 F4 C4` |
+| `_rndseq` | `{D4 F4 C4 E4}` | `_rndseq {C4 D4 E4 F4}` | `D4 F4 C4 E4` |
 
-⇒ **La régression est strictement entre v3.5.1 et v3.5.4** — v3.4.2 et v3.5.1 appliquent, v3.5.4
-n'applique plus. ⚠️ `_rndseq` rend la **même** permutation en v3.4.2 et v3.5.1 à graine 1 : le tirage
-est déterministe, ce n'est pas une variance.
+⇒ **L'interprétation est identique sur les trois binaires.** Ce qui change entre 3.5.1 et 3.5.4 est
+la **sérialisation texte** : 3.5.4 écrit l'item avant l'application de l'outil.
+⇒ **Notre fusion n'y est pour rien** : l'amont pur se comporte comme notre binaire.
 
-⛔ **L'ÉCHEC EST MUET, ET C'EST CE QUI LE REND PIRE QUE #52.** Les trois binaires annoncent
-*« 👉 Applying serial tools to modify order of sequence(s) »* (`Polymetric.c:122`) et rendent
-`Errors: 0`, code de sortie 0. Le moteur déclare le travail, déclare le succès, ne transforme rien —
-et **l'opérateur reste écrit dans la sortie**, ce qui montre que `DeleteSerialTools()` n'a pas fait
-son office non plus.
+⛔ **Pourquoi la mesure était fausse** : elle ne lisait que le texte, sur des terminaux sans note
+(`a b c d`), donc sans liste d'événements pour la contredire. **Le registre portait déjà la leçon** :
+#59, clos en v3.4.7 — *« `_rotate` est bien appliqué — les jetons MIDI le prouvent. Ce qui change
+est la sérialisation texte »*. ⇒ **Avant d'ouvrir un défaut, chercher dans les clos celui qu'il
+répète.**
 
-### ⛔ `IgnoreFields` N'EST PAS UN CONTOURNEMENT — mesuré, contre l'hypothèse
+⇒ **Pour qui mesure** : une référence portant un outil sériel se compare sur la liste d'événements
+ou le MIDI, jamais sur le texte seul. Les 20 références de la famille `reorder` dont `bp-mono` a
+arrêté la regravure ne sont **pas** bloquées par le moteur. ⚠️ Écriture texte voulue ou non : la
+question est posée à Bernard.
 
-`Polymetric.c:126` aiguille vers l'ancien moteur quand `IgnoreFields` est vrai. Posé par un fichier
-`-se.` ne portant que cette clé, le réglage **est bien pris** — le moteur écrit *« The “Ignore field
-separators” is set. We will use the old algorithm! »* (`Polymetric.c:132`) — et `ZoulebOld()` rend
-**le même `_retro {a b c d}` non transformé**.
+## #74 — requalifié : le décalage d'origine vaut UN QUANTUM, c'est un arrondi
 
-⇒ **La cause n'est donc pas le seul choix de moteur sériel** : l'ancien code, qui fonctionnait en
-v3.5.1 sous le nom `Zouleb()`, échoue en v3.5.4 sous le nom `ZoulebOld()`. Quelque chose en amont ou
-en aval des deux a changé. ⚠️ **Non imputé** : `Zouleb.c` a été réécrit (+908 lignes) et
-`Polymetric.c` modifié (60 lignes) dans le même saut, et je n'ai pas isolé lequel.
+**Ouvert le 2026-09-12, requalifié le 2026-09-15.** Bernard Bel : *« Un décalage de 10ms n'a aucune
+signification puisque Time resolution = 10 ms »* — et à 1 ms, le décalage tombe à 1 ms.
 
-### Le fichier de réglages qui pose le réglage, pour rejouer la mesure
+`-gr.Visser3` nettoyée, `-se.Visser3` réduit à un item, `--seed 1`, `-o` et `--tokensout`,
+`builds/v3.5.1-iso.1` contre `builds/v3.5.4-iso.1`, quatre réglages :
 
-```json
-{
-    "header": "// Bol Processor BP3",
-    "IgnoreFields": { "name": "Ignore field separators", "value": "1", "unit": "", "boolean": "1" }
-}
-```
+| résolution | quantification | quantifier | jetons | étiquettes en désaccord | deltas de `start` |
+| ---: | ---: | --- | ---: | ---: | --- |
+| 10 | 10 | oui | 401 | 0 | `{10}` |
+| 1 | 10 | oui | 401 | 0 | `{10}` |
+| 1 | 1 | oui | 401 | 0 | `{1}` |
+| 1 | 10 | non | 401 | 0 | `{10}` |
 
-### Ce que ce défaut impose
+⇒ **Le delta vaut la QUANTIFICATION, pas la résolution** : résolution à 1 et quantification à 10
+rendent encore +10. ⚠️ Et **désactiver la quantification ne l'annule pas** — la valeur réglée compte
+même drapeau baissé. ⇒ Ce qui a changé entre les deux versions est le **sens d'un arrondi** au
+quantum ; la production est la même, jeton pour jeton.
 
-⛔ **Aucune référence portant un outil sériel ne se grave contre v3.5.4.** `bp-mono` a arrêté la
-regravure de 20 oracles de sa famille `reorder` (36 `_rndseq`, 20 `_seq`, 18 `_rotate`, 6 `_retro`,
-2 `_ordseq`) pour cette raison.
-⚠️ **Et un code de retour ne l'attrape pas** : une chaîne de validation qui juge sur `Errors:` ou sur
-le code de sortie déclare ces grammaires conformes. Le verdict se prend sur **les octets produits**,
-et ici sur la présence de l'opérateur dans la sortie.
+⇒ **Pour qui mesure** : entre v3.5.1 et v3.5.4, les instants se comparent **à un quantum près**. Un
+écart d'un quantum uniforme n'est pas une régression ; un écart supérieur, ou non uniforme, en est une.
 
-
-## #74 — l'origine du temps se décale entre v3.5.1 et v3.5.4
-
-**Trouvé par la session `bp-mono` le 2026-09-12, reproduit ici le même jour.** Mesuré sur les deux
-**campagnes gelées**, donc hors du bruit de construction décrit en #75.
-
-`-gr.Visser3` nettoyée, `--seed 1`, `-se.Visser3`, flux de jetons par `--tokensout` :
-
-| binaire | jetons | premier `start` | dernier `end` |
-| --- | ---: | ---: | ---: |
-| `builds/v3.5.1-iso.1` | 401 | `0` | `103510` |
-| `builds/v3.5.4-iso.1` | 401 | `10` | `103520` |
-
-⇒ **Les 401 jetons sont les mêmes, dans le même ordre**, et **tous** les instants sont décalés de
-**+10 ms exactement** — l'ensemble des deltas de `start` observés sur les 401 couples est `{10}`.
-Ce n'est pas un jeton qui bouge, c'est l'origine.
-
-⚠️ **DEUX fixtures portent #74, pas trois** — corrigé le 2026-09-12 même, par `bp-mono` qui avait
-annoncé la troisième :
-
-| fixture | jetons | ce que c'est |
-| --- | ---: | --- |
-| `acceleration` | 78 | décalage UNIFORME de `+10`, zéro étiquette en désaccord |
-| `Visser3` | 401 | décalage UNIFORME de `+10`, zéro étiquette en désaccord |
-| ~~`Visser5`~~ | 1152 | ⛔ **PRODUCTION DIFFÉRENTE, pas #74** — 712 étiquettes sur 1152 en désaccord, 651 deltas distincts |
-
-⇒ **Deux invocations différentes concluent pareil sur `Visser5`** : avec les fixtures de `bp-mono`
-(en-tête et `INIT:` retirés, `MaxItemsProduce` forcé à 1) comme avec `-gr.Visser5` + `-se.Visser5` du
-corpus de ce dépôt, on obtient 1152 jetons **non identiques**. Ce n'est pas une origine qui bouge.
-
-⛔ **L'affirmation « le delta n'est pas une constante gravée » est RETIRÉE** : elle reposait sur le
-triplet `10, 10, 1`, et le `1` était l'artefact d'un rapport qui n'imprimait que le premier écart.
-**Les deux fixtures confirmées valent toutes deux `+10`.** On ne sait donc plus si le delta est
-constant — et il n'y a pas assez de fixtures pour le dire.
-
-⛔ **Non imputé** — ni eux ni moi n'avons isolé de quoi il dépend, et une cause plausible non mesurée
-coûterait plus qu'aucune. Candidats **lus** dans le diff, non mesurés : `TimeSet.c`,
-`TimeSetFunctions.c`, `FillPhaseDiagram.c` (+68).
-
-⚠️ **La leçon d'instrument vaut d'être gardée** : un rapport d'écart qui n'imprime que le PREMIER
-couple divergent ne distingue pas un décalage d'origine d'une production entièrement différente. Le
-témoin qui tranche est le **compte d'étiquettes en désaccord** et le **nombre de deltas distincts**,
-jamais le premier écart lu seul.
-
-⛔ **#74 et #73 sont DEUX causes distinctes, et elles se mélangeaient dans mon compte d'écarts.**
-`acceleration` ne porte aucun outil sériel et bouge quand même ; `tryRotate` en porte un et ne
-décale rien. Un écart MIDI entre 3.5.1 et 3.5.4 peut venir de l'une, de l'autre, ou des deux.
+⚠️ **`Visser5` n'a jamais relevé de #74** : 712 étiquettes sur 1152 en désaccord, 651 deltas
+distincts — une production différente, pas un arrondi. ⇒ **Un écart se qualifie avant de
+s'interpréter** : compte d'étiquettes en désaccord et nombre de deltas distincts, jamais le premier
+écart lu seul.
 
 ## #75 — notre axe « liste d'événements » n'est pas reproductible
 
 ⚠️ **Ce défaut est le NÔTRE, pas celui du moteur**, et il périme la précision de toute mesure prise
 sur cet axe.
 
-Contrôle : `scripts/confronter-amont.py` entre `builds/v3.5.4-iso.1` (md5 `9bab33d1…`) et un binaire
-reconstruit **de la même source, inchangée**, `git status` vide (md5 `12269546…`).
+Deux contrôles par `scripts/confronter-amont.py`, chacun entre deux constructions de la **même
+source, inchangée** :
 
-| axe | grammaires qui divergent, sur 96 |
-| --- | ---: |
-| texte | **0** |
-| MIDI | **1** — `tryAllItems0`, non déterministe connue |
-| **liste d'événements** | **14** |
-| console | 96 — elle porte le numéro de version, elle ne dit rien |
+| contrôle | texte | MIDI | liste d'événements |
+| --- | ---: | ---: | ---: |
+| 2026-09-12 — notre arbre : `builds/v3.5.4-iso.1` (`9bab33d1…`) contre reconstruction (`12269546…`) | 0 | 1 | 14 |
+| 2026-09-15 — amont pur `556050c` : deux `make` (`e7ccd3ad…`, `769c5ed0…`) | **0** | **0** | **11** |
 
-Les 14 : `destru`, `dhin`, `dhin1`, `flags`, `gramgene1`, `nadaka`, `polyphony1`, `repeat`,
-`tryAllItems0`, `tryLIN`, `tryPatternGrammar`, `tryflags2`, `tryflags3`, `trytemplates`,
-`trytemplates2`.
+Les 11 du 2026-09-15 : `destru`, `dhin`, `dhin1`, `flags`, `polyphony1`, `tryLIN`,
+`tryPatternGrammar`, `tryflags2`, `tryflags3`, `trytemplates`, `trytemplates2` — **tous inclus**
+dans la liste du 2026-09-12. ⚠️ Celle-ci nomme quinze grammaires pour un compte de 14 ; l'écart
+n'est pas retrouvé.
 
-⇒ **Le plancher de bruit de notre banc est de 14 sur l'axe des événements, et de 0 sur le texte.**
-Un écart d'événements inférieur à ce plancher ne prouve rien. ⛔ **Les comptes d'écarts que j'ai
-publiés le 2026-09-12 pour la montée v3.5.4 ne portaient que sur le texte et le MIDI** — ils tiennent
-donc ; mais toute mesure future sur l'axe des événements doit citer ce plancher.
-⛔ **Non imputé** : la cause n'est pas cherchée. Ce qui est établi, c'est que deux binaires issus de
-la même source ne rendent pas la même liste d'événements.
+⇒ **Le bruit est LOCALISÉ, mesuré colonne par colonne le 2026-09-15** sur les 11 : il ne touche que
+`keymap mode`, `keymap0 q1`, `keymap0 p2`, `keymap0 q2`, `keymap1 q1`, `keymap1 p2`, `keymap1 q2`.
+**Jamais** les étiquettes, les instants, ni la colonne `id proto`.
+⇒ ⛔ **L'hypothèse « `Identifier` dépend de l'ordre de compilation » est RÉFUTÉE pour ce bruit** —
+le fait que Bernard Bel signale est vrai du JSON des prototypes, mais ce n'est pas lui qui bruite
+notre banc.
+⇒ **Pour qui mesure** : une liste d'événements se compare **colonnes de keymap masquées** ; le texte
+et le MIDI sont propres à zéro sur l'amont pur. ⛔ **Non imputé** : la valeur non déterministe de ces
+colonnes n'est pas expliquée.
 
 ## Ce que la montée en v3.5.4 a mesuré sur ces défauts — 2026-09-12
 
@@ -243,8 +201,7 @@ ce qui peut viser l'axe temps réel — non éprouvé. **Sans témoin positif, l
 ⛔ **#52 : la mesure atteint le point.** v3.4.2 produit 25 octets et `Errors: 0` ; v3.5.1-iso.1 et
 v3.5.4-iso.1 rendent **zéro octet**, *« Cannot produce items because all weights are nil in
 gram#1 »*, *« => result was: -4 »*. ⇒ **Regraver `look-and-say` contre v3.5.4 inscrirait la
-régression du moteur comme référence de parité.** Même conclusion pour toute grammaire portant un
-outil sériel, par **#73**.
+régression du moteur comme référence de parité.**
 
 ## Ce que la montée en v3.5.4 déplace dans les sorties — 2026-09-12
 

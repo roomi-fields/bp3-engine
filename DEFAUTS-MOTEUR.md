@@ -90,6 +90,14 @@ numéro.
   écart lu seul. Un décalage d'origine et une production entièrement différente commencent pareil.
 - **Une capture de référence n'est comparable qu'à une autre prise avec les mêmes drapeaux de
   sortie** (#67, #71) : un oracle porte la **commande complète**, pas seulement la graine.
+- ⛔ **`--tokensout` n'écrit RIEN si `-o` n'est pas demandé, et ne le dit pas** : fichier absent,
+  `Errors: 0`, code 0 — famille de #67. L'outil du dépôt réclame toujours les deux ; une mesure de
+  jetons montée à la main sans `-o` rend un vide qui ressemble à une grammaire muette.
+- ⛔ **Un banc qui compare le NOM d'un jeton sans passer les réglages des deux côtés rend un FAUX
+  ROUGE.** Mesuré sur `-gr.Ames`, campagne v3.5.4-iso.1 : 11 jetons des deux côtés, **instants
+  identiques**, un seul nom en désaccord — `Bb4` avec les réglages, `A#4` sans, la convention de
+  notes. La règle de la flotte dit iso quand seule la graphie change et que l'effet nul est
+  vérifié ; la comparaison naïve, elle, la contredit.
 - **Le verdict se prend sur les octets produits**, jamais sur le code de sortie : le moteur rend
   zéro même quand il ne produit rien.
 - **Re-capture interdite tant que #49 à #52 sont ouverts** : la baseline documente le réel des

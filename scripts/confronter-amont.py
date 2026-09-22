@@ -5,10 +5,13 @@ Notre arbre porte 15 fichiers d'ecart avec le tag amont (docs-developer/inventai
 La question que cet outil tranche est la seule qui compte pour l'oracle : ces ecarts changent-ils
 ce que le moteur PRODUIT ?
 
-L'axe des jetons est hors de portee — il est a nous, l'amont ne le connait pas. La confrontation
-porte donc sur les axes NATIFS, presents des deux cotes : sortie texte, liste d'evenements,
-fichier MIDI, console. Si les quatre sont identiques octet pour octet sur toute l'assiette, nos
-ecarts n'atteignent pas la production, et le flux de jetons est une vue d'un moteur intact.
+Les axes NATIFS — sortie texte, liste d'evenements, fichier MIDI, console — sont presents des
+deux cotes, y compris chez un amont pur. Si les quatre sont identiques octet pour octet sur toute
+l'assiette, nos ecarts n'atteignent pas la production.
+
+L'axe des JETONS est a nous : un amont pur ne connait pas `--tokensout`, et le reclamer contre lui
+rend une absence, pas une mesure. Il se reclame donc UNIQUEMENT quand les deux binaires confrontes
+sont des campagnes figees de ce depot — confronter deux de nos versions entre elles, par exemple.
 
 L'invocation est celle de baseline-native/capture.py — meme nettoyage d'en-tete, meme couplage
 lu au REGISTRE, meme surcharge d'un item, meme graine, meme repertoire courant. Seul le binaire
@@ -32,6 +35,9 @@ CONV = {"english": None, "french": "--french", "indian": "--indian"}
 SEED = "1"
 
 AXES = ("texte", "evenements", "midi")
+# `jetons` n'est PAS dans AXES : il ne se reclame qu'explicitement, et contre un amont
+# pur il rendrait une absence des deux cotes — un faux « identique ».
+AXES_DEMANDABLES = AXES + ("jetons",)
 
 
 def clean(src, dst):
@@ -108,6 +114,8 @@ def tirer(binaire, action, gpath, cfg, conv, se_over, slug, marque, demandes=AXE
         args += ["--eventlistout", f["evenements"]]
     if "midi" in f:
         args += ["--midiout", f["midi"]]
+    if "jetons" in f:
+        args += ["--tokensout", f["jetons"]]
     try:
         r = subprocess.run(args, capture_output=True, timeout=120, cwd=RUN)
         console = (r.stdout + r.stderr).decode("utf-8", "replace")
@@ -129,7 +137,7 @@ def main():
     ap.add_argument("--tout", action="store_true", help="les 113 entrees, pas la seule assiette")
     ap.add_argument("--limite", type=int, default=0)
     ap.add_argument("--seulement", nargs="+", help="ne confronter que ces grammaires")
-    ap.add_argument("--axes", nargs="+", default=list(AXES), choices=list(AXES),
+    ap.add_argument("--axes", nargs="+", default=list(AXES), choices=list(AXES_DEMANDABLES),
                     help="sorties natives reclamees ; « evenements » seul isole la condition perdue")
     a = ap.parse_args()
 

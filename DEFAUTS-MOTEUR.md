@@ -40,6 +40,7 @@ ne part à Bernard qu'avec un cas minimal et solide**.
 | 58 | le mode « grammaire d'interprétation » est désactivé par une ligne commentée : `Jfunc` reste nul, tout ce qui en dépend est du code mort | 2026-07-19 |
 | 60 | lacune de documentation : `#`, `(=` et `(:` ne sont définis nulle part. La règle disjonctive du contexte négatif n'existe que dans une ligne de code | 2026-07-20 |
 | 61 | une règle portant une opération de drapeau est sélectionnée sans que son argument gauche s'apparie ; le compteur descend pour rien | 2026-07-20 |
+| **62** | ⛔ **ROUVERT le 2026-09-22 — le correctif n'est PAS dans v3.5.1.** Avec `TraceTimeSet` à 1 et `--traceout`, `v3.5.1-iso.2` tombe en erreur de segmentation, code 139, trois essais sur trois, sur `-gr.Ames` en régime lisse ; `v3.5.4-iso.1` écrit ses 266 octets et rend 0. Le crash ne survient que sur le chemin qui écrit vraiment — en régime strié, trace vide, v3.5.1 rend 0. ⚠️ **Une mesure de trace exige v3.5.4 au minimum** | 2026-07-24 |
 | 63 | lacune de documentation : les opérateurs de vitesse, la normalisation en sortie, et le double sens de « scale » | 2026-07-25 |
 | 64 | une valeur hors domaine de constante énumérée dégénère **en silence** — `Nature_of_time = 100` met toutes les durées à zéro, sans un mot. **Sept fichiers de réglages livrés en portent** | 2026-07-25 |
 | 65 | le compilateur console rejette le vieux format BP2 (`V.2.5`) : 14 captures figées ne sont plus reproductibles. Et **aucune empreinte ne relie une capture à un binaire** | 2026-07-28 |
@@ -65,7 +66,6 @@ sa source. Ce qui en reste appartient à #65 : un oracle non rattachable à sa s
 | 59 | **diagnostic corrigé** : `_rotate` est bien appliqué — les jetons MIDI le prouvent. Ce qui change en v3.4.7 est la sérialisation **texte** |
 | **73** | **ERREUR DE MESURE, retirée le 2026-09-15** — même méprise que #59. Les outils sériels sont **appliqués** en v3.5.4 : `_retro {C4 D4 E4 F4}` rend `F4 E4 D4 C4` dans la liste d'événements, comme en v3.5.1. Ce qui a changé est l'écriture **texte** `-o`, qui garde l'opérateur non développé. Détail ci-dessous |
 | **74** | **REQUALIFIÉ le 2026-09-15 : un ARRONDI, pas un défaut** — le décalage uniforme entre v3.5.1 et v3.5.4 vaut exactement **un quantum de quantification** (+10 à 10 ms, +1 à 1 ms). Expliqué par Bernard Bel, mesuré ici. Une comparaison d'instants entre ces versions tolère un quantum. Détail ci-dessous |
-| 62 | **corrigé en amont** le jour même : `--traceout` ne fait plus tomber le moteur. Republié **sous le même numéro de version** |
 | **48** | **CORRIGÉ entre v3.4.2 et v3.5.1**, mesuré le 2026-09-12 sur trois binaires. Un terminal à tiret final dans une **chaîne** d'alphabet — `OCT` / `ta --> ki --> zo-` — faisait tomber v3.4.2 (code 139, signal 11). v3.5.1-iso.1 et v3.5.4-iso.1 refusent proprement : *« Found '-' in terminal symbol »*, *« Error code 27: terminal symbol contains unwanted character »*, code 0. ⚠️ Un tiret sur un terminal **isolé** (`ta- --> ta-`) est refusé proprement sur les trois : ce n'est pas le cas déclenchant |
 
 ⚠️ **Deux binaires au comportement différent portent l'étiquette `3.4.7`** : seule la date de
